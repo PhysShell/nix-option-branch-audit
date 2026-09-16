@@ -17,15 +17,19 @@
 //!     silently skipped, so a target with an aliased predicate (davis in
 //!     this corpus) doesn't masquerade as a clean PASS.
 //!
-//! Every watched option's verdict comes from a hard 4-gate chain — see
-//! `run_target` — where any gate failing short-circuits to an inconclusive
-//! verdict rather than falling through to a guess: declaration found →
-//! predicate found → default's ValueClass resolves to a predicate outcome
-//! → a structurally-matching test assignment provably flips that outcome.
-//! Exit code is 4-state: 0 clean / 1 FINDING / 2 INCONCLUSIVE (takes
-//! precedence over FINDING) / 3 TOOL_ERROR (the analysis never ran at all
-//! — bad manifest, missing files — distinct from INCONCLUSIVE, where it
-//! ran but couldn't prove something).
+//! Every watched option's verdict comes from a hard 6-step gate chain —
+//! see `run_target` — where any gate failing short-circuits to an
+//! inconclusive verdict rather than falling through to a guess:
+//! declaration found → predicate found → default's ValueClass resolves to
+//! a predicate outcome → known opposite-outcome test evidence (wins
+//! outright) → no unseen test-config region could hide the option
+//! (`imports`/alias/function call — see the TestSpecRoot/ModuleRoot/
+//! ConfigTree walker below) → no matching assignment's own value is
+//! itself unresolvable. Exit code is 4-state: 0 clean / 1 FINDING / 2
+//! INCONCLUSIVE (takes precedence over FINDING) / 3 TOOL_ERROR (the
+//! analysis never ran at all — bad manifest, missing files, a bad CLI
+//! flag — distinct from INCONCLUSIVE, where it ran but couldn't prove
+//! something).
 
 use rnix::SyntaxKind::*;
 use rnix::{SyntaxNode, SyntaxToken};
@@ -38,12 +42,26 @@ use clap::Parser;
 
 #[derive(Parser)]
 struct Cli {
-    /// Path to a TOML target manifest (see targets/*.toml).
+    /// Path to a TOML target manifest (see targets/*.toml). Required
+    /// unless --census is given.
     #[arg(long)]
-    targets: PathBuf,
+    targets: Option<PathBuf>,
     /// Emit machine-readable JSON instead of the human report.
     #[arg(long)]
     json: bool,
+    /// Syntax-visibility census, not option-branch analysis: recursively
+    /// walks every `.nix` file under this directory as a *test-file* scan
+    /// (the same TestSpecRoot/ModuleRoot/ConfigTree walker `run_target`
+    /// uses, run standalone) and reports which root/nodes/module-root
+    /// forms it recognized vs. gave up on opaquely. A cheap rnix-only
+    /// pass -- no Nix evaluation, no VM, no option/predicate matching.
+    /// Exists to answer one narrow question before Layer 1 is considered
+    /// settled: does "no assignment found" mean "genuinely not there" or
+    /// "the walker couldn't see this file's shape at all" more often than
+    /// expected, across a real corpus rather than a handful of fixtures.
+    /// Mutually exclusive with --targets.
+    #[arg(long)]
+    census: Option<PathBuf>,
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
@@ -662,6 +680,41 @@ fn could_contain_nested_options(node: &SyntaxNode) -> bool {
     }
 }
 
+// H1.3 review: the walker is a small explicit state machine, not a single
+// function accreting `if`s. Three distinct contexts, each with genuinely
+// different rules about what a key like `config` or a bare shorthand
+// assignment *means*:
+//
+//   TestSpecRoot        -- top of the test file. Only `nodes`/`containers`
+//                           (flat `nodes.foo = ...` or nested `nodes = {
+//                           foo = ...; };`, both real nixosTest idioms) are
+//                           option-relevant; everything else (`name`,
+//                           `meta`, `testScript`) is harness metadata, not
+//                           option data, and is intentionally not recorded.
+//   ModuleRoot(instance) -- inside one resolved node/container's own
+//                           NixOS-module value. `imports` and `config` are
+//                           special here specifically because this is a
+//                           module root (a real `containers.peer.config`
+//                           *option* one level down, inside ConfigTree, is
+//                           NOT the same key and must NOT be special-cased
+//                           the same way -- that's the whole reason this
+//                           needs to be a context, not a global string
+//                           check). `config = { ... }` normalizes into the
+//                           same option-path namespace as top-level
+//                           shorthand definitions (`config.services.foo`
+//                           and bare `services.foo` at module root are the
+//                           same option), not a `config.*`-prefixed one.
+//   ConfigTree(instance) -- ordinary recursive descent into option paths,
+//                           entered either from ModuleRoot's shorthand
+//                           entries or from an explicit `config = {...}`.
+//
+// The one invariant that must hold everywhere: every syntactic form either
+// resolves to a known `TestAssignment`, or leaves an explicit `Opacity`.
+// There is no third "silently continue" state for anything that could be
+// option-relevant data -- `inherit`, a dynamic `${...}` key, an
+// unrecognized test-file root expression, an un-analyzable node config,
+// all become `Opacity`, not silence.
+
 fn scan_test_assignments(
     file: &str,
     src: &str,
@@ -669,18 +722,20 @@ fn scan_test_assignments(
 ) -> (Vec<TestAssignment>, Vec<Opacity>) {
     let mut assignments = Vec::new();
     let mut opacity = Vec::new();
-    // root is a Lambda `{ lib, ... }: { ... }` for every fixture in this corpus
-    let body = unwrap_lambda_chain(root.clone());
+    let body = resolve_test_root(unwrap_lambda_chain(root.clone()));
     if body.kind() == NODE_ATTR_SET {
-        walk_test_block(
-            file,
-            src,
-            &body,
-            &mut Vec::new(),
-            None,
-            &mut assignments,
-            &mut opacity,
-        );
+        walk_test_spec_root(file, src, &body, &mut assignments, &mut opacity);
+    } else {
+        // Neither a literal attrset nor a recognized wrapper (see
+        // resolve_test_root) -- e.g. some other helper function entirely.
+        // Root-scope opacity: since we don't know the shape at all, any
+        // watched option anywhere is potentially hidden in it.
+        opacity.push(Opacity {
+            path: Vec::new(),
+            instance: None,
+            reason: "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+            span: span_of(file, src, &body),
+        });
     }
     (assignments, opacity)
 }
@@ -711,15 +766,59 @@ fn unwrap_lambda_chain(node: SyntaxNode) -> SyntaxNode {
     node
 }
 
-fn walk_test_block(
+/// Recognizes the single most common nixosTest wrapper across nixpkgs
+/// (559 files under `nixos/tests` use `nodes = {`, 95 use this wrapper
+/// directly): `import ./make-test-python.nix (<arg>)`, where `<arg>` is
+/// either the test attrset directly or a lambda producing it. Anything
+/// past the first two arguments (e.g. a trailing `{ inherit pkgs; }`
+/// application) is ignored -- the test spec itself is always the second
+/// argument to `import`, regardless of what's chained after. Falls
+/// through unchanged (to be caught as root opacity by the caller) for
+/// anything else, rather than guessing.
+fn resolve_test_root(node: SyntaxNode) -> SyntaxNode {
+    if node.kind() == NODE_ATTR_SET {
+        return node;
+    }
+    if node.kind() == NODE_APPLY {
+        let (head, args) = flatten_apply(&node);
+        if call_head_name(&head).as_deref() == Some("import") {
+            if let Some(spec) = args.get(1) {
+                return resolve_test_root(unwrap_lambda_chain(spec.clone()));
+            }
+        }
+    }
+    node
+}
+
+/// TestSpecRoot: finds `nodes`/`containers` bindings, both forms --
+/// `nodes.foo = ...;` (flat) and `nodes = { foo = ...; bar = ...; };`
+/// (nested, equally common in real nixosTests). Everything else at this
+/// level is test-harness metadata (`name`, `meta`, `testScript`), not
+/// option data, and is deliberately not recorded as an assignment or an
+/// opacity site -- there's nothing option-relevant here to miss.
+fn walk_test_spec_root(
     file: &str,
     src: &str,
     attrset: &SyntaxNode,
-    path: &mut Vec<String>,
-    instance: Option<String>,
     out: &mut Vec<TestAssignment>,
     opacity: &mut Vec<Opacity>,
 ) {
+    // Discovered by the H1.3 syntax-visibility census, not anticipated in
+    // advance: a real, non-rare nixosTest convention has NO top-level
+    // `nodes`/`containers` at all -- e.g. `{ justThePackage = runTest {
+    // nodes.machine = ...; ...}; defaults = runTest { ... }; }` (multiple
+    // independent scenarios, each a `runTest`/`makeTest` call keyed by
+    // name) or a single `<name> = makeTest { nodes = ...; };` wrapper.
+    // Before this flag, a file shaped like that produced neither an
+    // assignment nor an opacity site -- a silent "nothing here" that's
+    // actually "an entire convention this walker doesn't parse into" --
+    // which is exactly the failure mode this whole review round exists to
+    // eliminate. Rather than chase every test-builder-function-name
+    // variant (out of scope for this pass, and an open-ended list), any
+    // spec root with zero recognized nodes/containers bindings gets one
+    // whole-file opacity record instead of silence.
+    let mut found_any_instance = false;
+
     for entry in attrset.children() {
         if entry.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -735,16 +834,145 @@ fn walk_test_block(
             continue;
         };
 
-        // `imports = [ ./common.nix ];` (at any nesting level, not just the
-        // instance top level) means there is more config for this scope
-        // living in a file this tool never reads. Its own value (a list of
-        // paths) is syntactically harmless under `could_contain_nested_
-        // options`, but the *presence* of the key itself is the signal --
-        // handled as its own case rather than folded into the general
-        // opacity check below.
-        if segs.last().map(String::as_str) == Some("imports") {
+        if segs.len() == 2 && (segs[0] == "nodes" || segs[0] == "containers") {
+            found_any_instance = true;
+            enter_instance(file, src, &segs[1], &value, &entry, out, opacity);
+            continue;
+        }
+
+        if segs.len() == 1 && (segs[0] == "nodes" || segs[0] == "containers") {
+            found_any_instance = true;
+            let body = unwrap_lambda_chain(value.clone());
+            if body.kind() != NODE_ATTR_SET {
+                opacity.push(Opacity {
+                    path: Vec::new(),
+                    instance: None,
+                    reason: "nodes/containers value is not a literal attrset",
+                    span: span_of(file, src, &entry),
+                });
+                continue;
+            }
+            for inst_entry in body.children() {
+                if inst_entry.kind() != NODE_ATTRPATH_VALUE {
+                    continue;
+                }
+                let mut ic = inst_entry.children();
+                let Some(inst_attrpath) = ic.next() else {
+                    continue;
+                };
+                let Some(inst_segs) = attrpath_segments(&inst_attrpath) else {
+                    opacity.push(Opacity {
+                        path: Vec::new(),
+                        instance: None,
+                        reason: "dynamic (\"${...}\") instance name under nodes/containers",
+                        span: span_of(file, src, &inst_entry),
+                    });
+                    continue;
+                };
+                let Some(inst_value) = ic.next() else {
+                    continue;
+                };
+                if inst_segs.len() == 1 {
+                    enter_instance(
+                        file,
+                        src,
+                        &inst_segs[0],
+                        &inst_value,
+                        &inst_entry,
+                        out,
+                        opacity,
+                    );
+                }
+            }
+        }
+    }
+
+    if !found_any_instance {
+        opacity.push(Opacity {
+            path: Vec::new(),
+            instance: None,
+            reason: "test spec root has no recognized nodes/containers binding -- possibly a multi-scenario file (each entry independently building its own test, e.g. `name = runTest { nodes = ...; };`) or another unrecognized convention",
+            span: span_of(file, src, attrset),
+        });
+    }
+}
+
+/// Resolves one `nodes.<name>` / `containers.<name>` (or nested-form
+/// equivalent) instance's value: if it's a literal attrset, that's a real
+/// module root to walk; otherwise the whole instance is opaque (an alias,
+/// a function call, ...) and nothing under it can be safely called
+/// un-activated.
+fn enter_instance(
+    file: &str,
+    src: &str,
+    name: &str,
+    value: &SyntaxNode,
+    entry: &SyntaxNode,
+    out: &mut Vec<TestAssignment>,
+    opacity: &mut Vec<Opacity>,
+) {
+    let body = unwrap_lambda_chain(value.clone());
+    if body.kind() == NODE_ATTR_SET {
+        walk_module_root(file, src, &body, Some(name.to_string()), out, opacity);
+    } else {
+        opacity.push(Opacity {
+            path: Vec::new(),
+            instance: Some(name.to_string()),
+            reason: "instance config is not a literal attrset (alias, function call, or similar)",
+            span: span_of(file, src, entry),
+        });
+    }
+}
+
+/// ModuleRoot(instance): `imports` and `config` are special *here*,
+/// specifically because this is the top of one node's own NixOS module --
+/// the same two keys one level deeper (inside ConfigTree, i.e. already
+/// inside a real option's value, such as `containers.peer.config` being a
+/// genuine systemd-container option) are NOT module syntax and must NOT
+/// be intercepted the same way. That asymmetry is exactly why this needs
+/// to be a distinct context rather than a blanket "key is named config"
+/// check anywhere in the tree.
+fn walk_module_root(
+    file: &str,
+    src: &str,
+    attrset: &SyntaxNode,
+    instance: Option<String>,
+    out: &mut Vec<TestAssignment>,
+    opacity: &mut Vec<Opacity>,
+) {
+    for entry in attrset.children() {
+        if entry.kind() == NODE_INHERIT {
             opacity.push(Opacity {
-                path: path.clone(),
+                path: Vec::new(),
+                instance: instance.clone(),
+                reason: "inherit binding at module root -- may pull in option-relevant values this walker can't trace",
+                span: span_of(file, src, &entry),
+            });
+            continue;
+        }
+        if entry.kind() != NODE_ATTRPATH_VALUE {
+            continue;
+        }
+        let mut children = entry.children();
+        let Some(attrpath) = children.next() else {
+            continue;
+        };
+        let Some(segs) = attrpath_segments(&attrpath) else {
+            opacity.push(Opacity {
+                path: Vec::new(),
+                instance: instance.clone(),
+                reason: "dynamic (\"${...}\") attribute name at module root -- can't be statically resolved to an option path",
+                span: span_of(file, src, &entry),
+            });
+            continue;
+        };
+        let Some(value) = children.next() else {
+            continue;
+        };
+
+        if segs == ["imports"] {
+            opacity.push(Opacity {
+                path: Vec::new(),
                 instance: instance.clone(),
                 reason: "imports present -- config for this scope may live in an unread file",
                 span: span_of(file, src, &entry),
@@ -752,72 +980,145 @@ fn walk_test_block(
             continue;
         }
 
-        let is_instance_binding =
-            path.is_empty() && segs.len() == 2 && (segs[0] == "containers" || segs[0] == "nodes");
-
-        if is_instance_binding {
-            // `containers.<name>` / `nodes.<name>` are nixosTest scaffolding,
-            // not part of the NixOS option namespace: everything nested
-            // inside is a fresh per-node config, so the accumulated dotted
-            // path resets to empty here rather than carrying "containers.X"
-            // as a prefix (that prefix would never match any real option
-            // path and silently drop every assignment -- caught by the
-            // kimai-after golden case coming back OBA001 when it should
-            // PASS, exactly the "detector died" failure mode to guard
-            // against).
+        if segs == ["config"] {
             let body = unwrap_lambda_chain(value.clone());
             if body.kind() == NODE_ATTR_SET {
-                let mut fresh_path = Vec::new();
-                walk_test_block(
+                walk_config_tree(
                     file,
                     src,
                     &body,
-                    &mut fresh_path,
-                    Some(segs[1].clone()),
+                    &mut Vec::new(),
+                    instance.clone(),
                     out,
                     opacity,
                 );
-            } else {
-                // The instance's config isn't a literal attrset at all --
-                // an alias (`nodes.machine = machineConfig;`), a function
-                // call, etc. The whole instance is opaque: we have no idea
-                // what options it does or doesn't set.
+            } else if could_contain_nested_options(&body) {
                 opacity.push(Opacity {
                     path: Vec::new(),
-                    instance: Some(segs[1].clone()),
-                    reason: "instance config is not a literal attrset (alias, function call, or similar)",
+                    instance: instance.clone(),
+                    reason:
+                        "config = <non-literal expression> at module root -- may hide any option",
                     span: span_of(file, src, &entry),
                 });
             }
             continue;
         }
 
-        path.extend(segs.clone());
-        let body = unwrap_lambda_chain(value.clone());
+        // Anything else at module root is shorthand equivalent to
+        // `config.<path> = value;` -- the same option-path namespace as
+        // an explicit `config = {...}` block, not a `config.*`-prefixed
+        // one and not this instance's own top-level namespace either.
+        walk_config_entry(
+            file,
+            src,
+            &segs,
+            &value,
+            &entry,
+            &mut Vec::new(),
+            instance.clone(),
+            out,
+            opacity,
+        );
+    }
+}
 
-        if body.kind() == NODE_ATTR_SET {
-            walk_test_block(file, src, &body, path, instance.clone(), out, opacity);
-        } else {
-            if could_contain_nested_options(&body) {
-                opacity.push(Opacity {
-                    path: path.clone(),
-                    instance: instance.clone(),
-                    reason: "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
-                    span: span_of(file, src, &entry),
-                });
-            }
-            out.push(TestAssignment {
+/// ConfigTree(instance): ordinary recursive descent into a real option
+/// tree, reached either from ModuleRoot's shorthand definitions or from
+/// an explicit `config = {...}`. Both routes end up here so option paths
+/// are normalized identically either way.
+fn walk_config_tree(
+    file: &str,
+    src: &str,
+    attrset: &SyntaxNode,
+    path: &mut Vec<String>,
+    instance: Option<String>,
+    out: &mut Vec<TestAssignment>,
+    opacity: &mut Vec<Opacity>,
+) {
+    for entry in attrset.children() {
+        if entry.kind() == NODE_INHERIT {
+            opacity.push(Opacity {
                 path: path.clone(),
-                value_source: body.text().to_string(),
-                value_class: classify_value(&body),
                 instance: instance.clone(),
+                reason:
+                    "inherit binding -- may pull in option-relevant values this walker can't trace",
                 span: span_of(file, src, &entry),
             });
+            continue;
         }
+        if entry.kind() != NODE_ATTRPATH_VALUE {
+            continue;
+        }
+        let mut children = entry.children();
+        let Some(attrpath) = children.next() else {
+            continue;
+        };
+        let Some(segs) = attrpath_segments(&attrpath) else {
+            opacity.push(Opacity {
+                path: path.clone(),
+                instance: instance.clone(),
+                reason: "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+                span: span_of(file, src, &entry),
+            });
+            continue;
+        };
+        let Some(value) = children.next() else {
+            continue;
+        };
+        walk_config_entry(
+            file,
+            src,
+            &segs,
+            &value,
+            &entry,
+            path,
+            instance.clone(),
+            out,
+            opacity,
+        );
+    }
+}
 
-        for _ in 0..segs.len() {
-            path.pop();
+/// Shared by ModuleRoot's shorthand branch and ConfigTree's recursive
+/// descent: extends `path` by `segs`, recurses into a nested attrset, or
+/// records a leaf `TestAssignment` (plus opacity if the leaf's value
+/// could itself be hiding further structure).
+fn walk_config_entry(
+    file: &str,
+    src: &str,
+    segs: &[String],
+    value: &SyntaxNode,
+    entry: &SyntaxNode,
+    path: &mut Vec<String>,
+    instance: Option<String>,
+    out: &mut Vec<TestAssignment>,
+    opacity: &mut Vec<Opacity>,
+) {
+    path.extend(segs.iter().cloned());
+    let body = unwrap_lambda_chain(value.clone());
+
+    if body.kind() == NODE_ATTR_SET {
+        walk_config_tree(file, src, &body, path, instance.clone(), out, opacity);
+    } else {
+        if could_contain_nested_options(&body) {
+            opacity.push(Opacity {
+                path: path.clone(),
+                instance: instance.clone(),
+                reason: "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+                span: span_of(file, src, entry),
+            });
         }
+        out.push(TestAssignment {
+            path: path.clone(),
+            value_source: body.text().to_string(),
+            value_class: classify_value(&body),
+            instance,
+            span: span_of(file, src, entry),
+        });
+    }
+
+    for _ in 0..segs.len() {
+        path.pop();
     }
 }
 
@@ -1210,6 +1511,137 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
     })
 }
 
+// ---------------------------------------------------------------------
+// Syntax-visibility census (--census): runs only the test-file walker
+// (scan_test_assignments) over every .nix file under a directory, with no
+// module/option/predicate matching at all -- a standalone sanity pass
+// answering one question before Layer 1 is called settled: across a real
+// corpus, how often does "the walker found nothing" actually mean
+// "genuinely nothing there" vs. "gave up and recorded opacity" vs. (the
+// one outcome that would mean this tool still isn't safe to trust)
+// "silently saw nothing at all, no assignment and no opacity, on a file
+// that clearly has real option-setting content".
+// ---------------------------------------------------------------------
+
+#[derive(Serialize, Debug, Default)]
+struct CensusReport {
+    files_scanned: usize,
+    parse_errors: usize,
+    /// Root resolved directly to a literal attrset (no unwrapping needed
+    /// beyond the ordinary lambda/let-in chain).
+    root_direct_attrset: usize,
+    /// Root needed the `import ./make-test-python.nix (...)` unwrap.
+    root_import_wrapper: usize,
+    /// Root was neither -- an unrecognized wrapper, recorded as root
+    /// opacity rather than guessed at.
+    root_opaque: usize,
+    total_assignments: usize,
+    total_opacity_sites: usize,
+    files_with_any_opacity: usize,
+    /// Files where the walker found NEITHER an assignment NOR an opacity
+    /// site -- the concerning bucket. Expected for files with no real
+    /// node config at all (rare for an actual nixosTest); unexpected
+    /// counts here on files that look real would mean a walker gap this
+    /// census didn't anticipate.
+    files_with_neither: usize,
+    opacity_reason_counts: std::collections::BTreeMap<String, usize>,
+}
+
+fn collect_nix_files(dir: &std::path::Path, out: &mut Vec<PathBuf>) -> std::io::Result<()> {
+    for entry in fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            collect_nix_files(&path, out)?;
+        } else if path.extension().and_then(|e| e.to_str()) == Some("nix") {
+            out.push(path);
+        }
+    }
+    Ok(())
+}
+
+fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
+    let mut files = Vec::new();
+    collect_nix_files(dir, &mut files)
+        .map_err(|e| anyhow::anyhow!("walking census directory {}: {e}", dir.display()))?;
+    files.sort();
+
+    let mut report = CensusReport::default();
+
+    for path in &files {
+        report.files_scanned += 1;
+        let src = match fs::read_to_string(path) {
+            Ok(s) => s,
+            Err(_) => continue, // unreadable (permissions, non-UTF8, ...) -- skip, not a parse error
+        };
+        let parse = rnix::Root::parse(&src);
+        if !parse.errors().is_empty() {
+            report.parse_errors += 1;
+            continue;
+        }
+        let root = parse.tree();
+        let file = path.display().to_string();
+
+        let unwrapped = unwrap_lambda_chain(root.syntax().clone());
+        let resolved = resolve_test_root(unwrapped.clone());
+        if resolved.kind() == NODE_ATTR_SET {
+            if resolved == unwrapped {
+                report.root_direct_attrset += 1;
+            } else {
+                report.root_import_wrapper += 1;
+            }
+        } else {
+            report.root_opaque += 1;
+        }
+
+        let (assignments, opacity) = scan_test_assignments(&file, &src, root.syntax());
+        report.total_assignments += assignments.len();
+        report.total_opacity_sites += opacity.len();
+        if !opacity.is_empty() {
+            report.files_with_any_opacity += 1;
+        }
+        if assignments.is_empty() && opacity.is_empty() {
+            report.files_with_neither += 1;
+            if std::env::var("OBA_CENSUS_DEBUG").is_ok() {
+                eprintln!("NEITHER: {file}");
+            }
+        }
+        for o in &opacity {
+            *report
+                .opacity_reason_counts
+                .entry(o.reason.to_string())
+                .or_insert(0) += 1;
+        }
+    }
+
+    if json {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+    } else {
+        println!("=== syntax-visibility census: {} ===", dir.display());
+        println!("files scanned:            {}", report.files_scanned);
+        println!("parse errors:              {}", report.parse_errors);
+        println!("root: direct attrset:     {}", report.root_direct_attrset);
+        println!("root: import-wrapper:     {}", report.root_import_wrapper);
+        println!("root: opaque/unrecognized: {}", report.root_opaque);
+        println!("total assignments found:  {}", report.total_assignments);
+        println!("total opacity sites:      {}", report.total_opacity_sites);
+        println!(
+            "files with any opacity:   {}",
+            report.files_with_any_opacity
+        );
+        println!(
+            "files with NEITHER (concerning bucket): {}",
+            report.files_with_neither
+        );
+        println!("opacity reasons:");
+        for (reason, count) in &report.opacity_reason_counts {
+            println!("  {count:5}  {reason}");
+        }
+    }
+
+    Ok(0)
+}
+
 #[derive(Serialize, Debug)]
 struct Summary {
     /// "PASS" only if every target resolved cleanly with no findings.
@@ -1268,10 +1700,19 @@ fn main() {
 }
 
 fn run(cli: &Cli) -> anyhow::Result<i32> {
-    let manifest_src = fs::read_to_string(&cli.targets)
-        .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", cli.targets.display()))?;
+    if let Some(dir) = &cli.census {
+        return run_census(dir, cli.json);
+    }
+
+    let targets_path = cli
+        .targets
+        .as_ref()
+        .ok_or_else(|| anyhow::anyhow!("either --targets or --census is required"))?;
+
+    let manifest_src = fs::read_to_string(targets_path)
+        .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", targets_path.display()))?;
     let manifest: TargetFile = toml::from_str(&manifest_src)
-        .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", cli.targets.display()))?;
+        .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
     let mut reports = Vec::new();
@@ -1437,5 +1878,59 @@ fn print_human(r: &TargetReport) {
                     .join("; ")
             ),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn path_eq(a: &[String], b: &[&str]) -> bool {
+        a.len() == b.len() && a.iter().zip(b.iter()).all(|(x, y)| x == y)
+    }
+
+    /// Scanner-level golden against real, unmodified nixpkgs source (not
+    /// a synthetic fixture): PhysShell/nixpkgs@5530e24f2:nixos/tests/
+    /// ifm.nix, vendored at fixtures/real/ifm-test.nix (locked in
+    /// fixtures/integrity-lock.toml). Proves the walker actually handles
+    /// mainstream nixosTest structure -- the nested `nodes = { server =
+    /// ...; };` form, and a dynamic `${config.services.ifm.dataDir}.d`
+    /// attrpath nested three levels deep -- on a file this project didn't
+    /// write and didn't shape to be convenient. After 559 files under
+    /// nixos/tests using `nodes = {` (H1.3 review), a synthetic-only
+    /// corpus stopped being enough evidence on its own.
+    #[test]
+    fn scanner_reads_real_ifm_test_correctly() {
+        let src = include_str!("../fixtures/real/ifm-test.nix");
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "ifm-test.nix must parse cleanly");
+        let (assignments, opacity) =
+            scan_test_assignments("ifm-test.nix", src, root.tree().syntax());
+
+        let find = |path: &[&str]| assignments.iter().find(|a| path_eq(&a.path, path));
+
+        let enable =
+            find(&["services", "ifm", "enable"]).expect("services.ifm.enable must be found");
+        assert_eq!(enable.instance.as_deref(), Some("server"));
+        assert_eq!(enable.value_class, ValueClass::Bool(true));
+
+        let port = find(&["services", "ifm", "port"]).expect("services.ifm.port must be found");
+        assert_eq!(port.value_source.trim(), "9001");
+
+        let data_dir =
+            find(&["services", "ifm", "dataDir"]).expect("services.ifm.dataDir must be found");
+        assert_eq!(data_dir.value_source.trim(), "\"/data\"");
+
+        // The dynamic ${config.services.ifm.dataDir}.d key inside
+        // systemd.tmpfiles.settings.ifm-data-dir must produce an explicit
+        // Opacity, not silent absence -- exactly the construct c24
+        // targets in isolation, confirmed here against the real file that
+        // motivated it.
+        assert!(
+            opacity
+                .iter()
+                .any(|o| path_eq(&o.path, &["systemd", "tmpfiles", "settings", "ifm-data-dir"])),
+            "the dynamic ${{config...}} key must be recorded as opacity, not silently skipped; got {opacity:?}"
+        );
     }
 }

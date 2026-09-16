@@ -8,5 +8,11 @@
   # of `transitions` and fell through to OBA001 -- a false "no evidence"
   # on a value that may well be the actual opposite outcome. Must be
   # TestValueUnresolved, not OBA001 and not a guessed PASS.
-  services.synth.qux = builtins.elem "x" [ "x" "y" ];
+  #
+  # Wrapped in nodes.machine, see c6a's fixture for why.
+  nodes.machine =
+    { ... }:
+    {
+      services.synth.qux = builtins.elem "x" [ "x" "y" ];
+    };
 }

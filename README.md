@@ -40,11 +40,21 @@ Given a NixOS module and a test file:
    is configurable) via a fixed, narrow grammar: `!= null`, `== null`,
    bare truthy, `!cfg.foo`, and `lib.{mkIf,optional,optionals,
    optionalString,optionalAttrs} cfg.foo`.
-3. Walks the test file's attrset tree (transparently unwrapping
-   `containers.<name>` / `nodes.<name>` lambda wrappers, which are
-   nixosTest scaffolding, not part of the option namespace) and finds
-   every leaf assignment, classifying each value's `ValueClass` the same
-   way as the defaults.
+3. Walks the test file as a small explicit state machine, not one function
+   accumulating special cases (H1.3 review) — `TestSpecRoot` (finds
+   `nodes`/`containers`, both the flat `nodes.foo = ...;` and nested
+   `nodes = { foo = ...; };` forms, and recognizes the
+   `import ./make-test-python.nix (...)` wrapper) → `ModuleRoot(instance)`
+   (where `imports` and `config = {...}` are meaningfully special,
+   *because* it's a module root — the same keys one level deeper are
+   ordinary option data) → `ConfigTree(instance)` (ordinary recursive
+   descent, reached identically from module-root shorthand or an explicit
+   `config` block, so both normalize to the same option-path namespace).
+   Every point the walker can't see into — `imports`, an instance/`config`
+   value that isn't a literal attrset, `inherit`, a dynamic `${...}` key,
+   an unrecognized root wrapper, a spec root with no recognized
+   `nodes`/`containers` at all — leaves an explicit `Opacity` record
+   rather than silently producing nothing.
 4. For each explicitly `watch`ed option, structurally matches test
    assignments against `option_prefix ++ predicate_path` (prefix supports
    a `*` wildcard for `attrsOf`-submodule instance names) and computes the
@@ -53,8 +63,8 @@ Given a NixOS module and a test file:
    *provably the opposite* of the default's, not merely "a different
    value" (see `c6a`/`c6b` below for why that distinction is load-bearing).
 
-Verdicts come from a 4-gate chain, each one a hard prerequisite for the next
-— `PASS` is unreachable unless all four resolved:
+Verdicts come from a 6-step gate chain, each one a hard prerequisite for
+the next — `PASS` is unreachable unless it resolves first:
 
 ```
 watch "database.socket"
@@ -412,11 +422,113 @@ confusing `OptionNotFound`/`PredicateNotFound` instead of the manifest
 error they actually are -- now rejected before any target runs, same as
 every other manifest-shape problem.
 
+## H1.3 review fixes + syntax-visibility census
+
+A fourth review found the sharpest gap across all four rounds, of exactly
+the kind this project exists to catch -- and, for the first time, backed
+it with a real corpus rather than a plausible scenario: **`nodes = {
+machine = ...; };` (the nested form) made the real assignment invisible to
+the walker**, which only ever recognized the flat `nodes.machine = ...;`
+form. Not an edge case: 559 files under `nixos/tests` use `nodes = {`.
+`nixos/tests/ifm.nix` is one of them -- a real, unmodified, currently
+upstream nixosTest, now vendored at `fixtures/real/ifm-test.nix` with a
+scanner-level unit test (`tests::scanner_reads_real_ifm_test_correctly`)
+proving the walker finds its real `services.ifm.{enable,port,dataDir}`
+assignments and flags its dynamic `${config.services.ifm.dataDir}.d` key
+as opacity, not silence.
+
+This forced the walker's actual redesign (not another `if` bolted onto
+the old one): three explicit contexts --`TestSpecRoot` /
+`ModuleRoot(instance)` / `ConfigTree(instance)` -- described in "What it
+does" above and in the comment above `scan_test_assignments`. Each fixed
+gap is pinned to its own `fixtures/synthetic/` case:
+
+| gap | fixture | must produce |
+|---|---|---|
+| nested `nodes = { machine = ...; };` form, opposite evidence | `c18` | `PASS` |
+| nested form, default-matching only | `c19` | `OBA001` |
+| entirely unrecognized root wrapper | `c20` | `TestConfigUnresolved` |
+| `import ./make-test-python.nix (...)` wrapper | `c21` | `PASS` (unwrapped, real evidence found) |
+| module-root `config = { ... };` | `c22` | `PASS` (path normalized, not `config.*`-prefixed) |
+| module-root `config = <opaque expr>;` | `c23` | `TestConfigUnresolved` |
+| `inherit` / a dynamic `${...}` attribute name | `c24` | `TestConfigUnresolved`, both recorded |
+
+`config` is intercepted only in `ModuleRoot` context specifically because
+the same key one level deeper (e.g. a genuine `containers.peer.config`
+*option*) is ordinary option data, not module syntax -- conflating them
+with a blanket "key named config" check anywhere in the tree would have
+been wrong in the other direction. Two bugs were caught live while
+building these fixtures, not by the reviewer: `c16`'s `let machineConfig =
+{...}; in { nodes.machine = machineConfig; }` never started walking at all
+(`unwrap_lambda_chain` didn't handle `NODE_LET_IN` as a root form), and
+several pre-H1.3 synthetic fixtures (`c6a`/`c6b`/`c11`) put their
+assignments directly at the test file's top level with no `nodes`/
+`containers` wrapper at all -- a fixture-authoring shortcut that real
+nixosTest files never take, and which the new `TestSpecRoot` context
+correctly stopped recognizing; fixed by making the fixtures realistic
+instead of loosening the walker back down to accept them.
+
+### Syntax-visibility census
+
+Per the review's own proposed closing move: not another round of "invent
+five synthetic cases, find a sixth on review," but a cheap, rnix-only pass
+over a real corpus -- no VM, no Nix evaluation -- checking one invariant:
+**every syntactic form either becomes a known `TestAssignment` or leaves
+an explicit `Opacity`; there is no third "silently continue" state for
+anything that could be option-relevant.** Built as `oba --census <dir>`
+(runs the test-file walker standalone, no module/option/predicate matching
+at all) and run against `nixos/tests` in the same nixpkgs checkout used
+for the golden corpus:
+
+```
+files scanned:             1609
+parse errors:               0
+root: direct attrset:      1389
+root: import-wrapper:        70
+root: opaque/unrecognized:  150
+total assignments found:  11351
+total opacity sites:       2488
+files with any opacity:    1156
+files with NEITHER:          14
+```
+
+"Files with NEITHER" (no assignment *and* no opacity -- the bucket that
+would mean the invariant is actually broken) started at **149**. Spot
+checks of the first several -- `atop.nix` (`{ justThePackage = runTest {
+nodes.machine = ...; ...}; defaults = runTest { ... }; ... }`, multiple
+independent scenarios keyed by name) and `agnos.nix` (a single `<name> =
+makeTest { nodes = ...; };` wrapper) -- surfaced a real, previously
+unanticipated convention: **test files with no top-level `nodes`/
+`containers` at all**, because the whole spec lives one level down inside
+one or more named `runTest`/`makeTest` calls. Rather than chase every
+test-builder-function name (open-ended, out of scope for this pass),
+`walk_test_spec_root` now records one whole-file opacity whenever it finds
+zero recognized `nodes`/`containers` bindings anywhere at the spec root,
+instead of silence. That took the bucket from 149 to **14** -- and every
+one of the remaining 14 was manually confirmed to be a real, legitimate
+case: `nodes.machine = { };` (or `{ ... }: { };`), an intentionally empty
+node config with nothing to find, not a walker gap (`simple-vm.nix`,
+`systemd-no-tainted.nix`, `kbd-setfont-decompress.nix`, and 11 others,
+all the same shape).
+
+The remaining 150 `root: opaque/unrecognized` files and the long tail of
+per-file opacity reasons (`imports`: 307, non-literal instance/value: 203,
+`inherit`: 126+2, dynamic keys: 67+35+5) are exactly what the invariant
+promises: known, named, non-silent gaps -- not claimed to be resolved by
+this pass, and not required to be. "They don't have to be supported. They
+have to not stay silent" was the explicit bar for closing this round, not
+"support 100% of nixpkgs's test syntax."
+
 ## Running
 
 ```
-cargo test    # the full acceptance suite (tests/golden.rs, tests/fixture_integrity.rs)
+cargo test    # the full acceptance suite (tests/golden.rs, tests/fixture_integrity.rs,
+              # plus a real-world unit test against fixtures/real/ifm-test.nix)
 cargo run -- --targets targets/golden.toml [--json]
+
+# syntax-visibility census against a real corpus, not option-branch
+# analysis -- no manifest, no module/option matching:
+cargo run -- --census /path/to/nixpkgs-checkout/nixos/tests [--json]
 
 # on-demand, needs a local nixpkgs checkout, not run by cargo test:
 scripts/verify-upstream.sh /path/to/nixpkgs-checkout
@@ -426,33 +538,42 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 
 - [x] A. reproduces the historical finding on the exact parent commit
 - [x] B. clears it on the exact fix commit, with evidence attached
-- [x] C. survives 16 adversarial/synthetic cases: `c2`–`c5` (original 4
-      kimai mutations), `c6a`/`c6b` (non-null-default false-positive + its
-      positive control), `c7` (unresolvable boolean default), `c8`
-      (missing declaration), `c9` (parse-error fail-closed), `c10`
-      (non-literal null-predicate default, AST- vs text-classified), `c11`
-      (unresolvable test value), `c12`/`c13` (empty watch / missing file,
-      both tool errors), `c15`/`c16` (test config hidden behind `imports`
-      / an instance-level alias — both `TestConfigUnresolved`), `c17`
-      (explicit opposite evidence still wins over an unrelated import
-      elsewhere in the file)
+- [x] C. survives 23 adversarial/synthetic/real-world cases: `c2`–`c5`
+      (original 4 kimai mutations), `c6a`/`c6b` (non-null-default
+      false-positive + its positive control), `c7` (unresolvable boolean
+      default), `c8` (missing declaration), `c9` (parse-error fail-closed),
+      `c10` (non-literal null-predicate default, AST- vs text-classified),
+      `c11` (unresolvable test value), `c12`/`c13` (empty watch / missing
+      file, both tool errors), `c15`/`c16` (test config hidden behind
+      `imports` / an instance-level alias — both `TestConfigUnresolved`),
+      `c17` (explicit opposite evidence still wins over an unrelated
+      import elsewhere in the file), `c18`/`c19` (nested `nodes = {`
+      form), `c20` (unrecognized root wrapper), `c21`
+      (`import ./make-test-python.nix (...)` wrapper unwrapped), `c22`/`c23`
+      (module-root `config`, literal and opaque), `c24` (`inherit` +
+      dynamic attrpath), plus a scanner-level unit test against real,
+      unmodified `nixos/tests/ifm.nix`
 - [x] D. produces source spans + evidence (file:line:col, matched assignment)
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 20 tests, all passing: 5 from the original spike, 5 from H1
+`cargo test` — 28 tests, all passing: 5 from the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,
 empty-watch-is-tool-error, missing-file-is-tool-error), 6 from H1.2
 (imports/alias → `TestConfigUnresolved`, opposite-evidence-wins positive
 control, its own opacity-detector positive assertion, CLI parse failure →
-`TOOL_ERROR`), 1 fixture integrity lock. `scripts/verify-upstream.sh`'s
-worktree fix and the CLI-level clap tests are exercised outside `cargo
-test` (a shell script and raw-process exit codes, respectively) but
-verified the same way as everything else in this project: by reproducing
-the actual bug first, then confirming the fix against it, not just
-reading the diff and hoping.
+`TOOL_ERROR`), 7 from H1.3 (nested nodes form ×2, unknown root, the
+make-test-python.nix wrapper, module-root config ×2, inherit+dynamic
+attrpath), 1 fixture integrity lock, 1 real-world scanner unit test
+against `fixtures/real/ifm-test.nix`. `scripts/verify-upstream.sh`'s
+worktree fix, the CLI-level clap tests, and the `--census` run against
+1609 real files are exercised outside `cargo test` (a shell script, raw
+process exit codes, and a full-corpus pass, respectively) but verified
+the same way as everything else in this project: by reproducing the
+actual bug first, then confirming the fix against it, not just reading
+the diff and hoping.
 
 ## Real bugs this spike itself found in its own implementation
 

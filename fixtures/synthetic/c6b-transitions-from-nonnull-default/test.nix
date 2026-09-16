@@ -5,5 +5,11 @@
   # this assignment's outcome = false). This is the positive control for
   # c6a: proves the outcome-transition model actually fires PASS when a
   # real transition exists, not just "always OBA001 now".
-  services.synth.foo = null;
+  #
+  # Wrapped in nodes.machine, see c6a's fixture for why.
+  nodes.machine =
+    { ... }:
+    {
+      services.synth.foo = null;
+    };
 }

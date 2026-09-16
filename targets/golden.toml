@@ -168,3 +168,63 @@ test = "fixtures/synthetic/c17-opposite-wins-over-import/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synth"]
 watch = ["foo"]
+
+# --- H1.3 review fixtures: test-spec/module-root syntax the walker used to
+# silently misread or skip (nested `nodes = {`, the make-test-python.nix
+# wrapper, module-root `config`, inherit, dynamic attrpaths). ---
+
+[[target]]
+name = "c18-nested-nodes-opposite"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c18-nested-nodes-opposite/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c19-nested-nodes-same"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c19-nested-nodes-same/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c20-unknown-root"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c20-unknown-root/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c21-make-test-wrapper"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c21-make-test-wrapper/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c22-module-root-config"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c22-module-root-config/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c23-module-root-opaque-config"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c23-module-root-opaque-config/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c24-inherit-and-dynamic"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c24-inherit-and-dynamic/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]

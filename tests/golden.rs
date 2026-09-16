@@ -550,3 +550,110 @@ fn h1_2_cli_parse_failure_is_tool_error_not_inconclusive() {
         "a missing required --targets argument must be TOOL_ERROR (3)"
     );
 }
+
+// --- H1.3 review fixes ---------------------------------------------------
+//
+// The sharpest gap across all three review rounds: OBA001 only ever
+// proved absence of *observed* evidence, not absence of activation. Two
+// completely ordinary nixosTest patterns -- `imports`, and a `let`-bound
+// alias for a node's config -- made the real assignment structurally
+// invisible to the walker, which silently found nothing and OBA001'd
+// exactly as if the option had never been touched. Confirmed against real
+// nixpkgs, not just plausible synthetic scenarios: 559 files under
+// nixos/tests use the nested `nodes = {` form, 95 use the
+// `import ./make-test-python.nix (...)` wrapper -- a census would have
+// produced industrial quantities of false findings. The walker is now an
+// explicit three-context state machine (TestSpecRoot / ModuleRoot /
+// ConfigTree, see the comment above `scan_test_assignments`) instead of
+// one function accumulating special cases.
+
+// Both forms of nodes/containers binding (flat, used everywhere else in
+// this corpus, and nested `nodes = { machine = ...; };`) must produce
+// identical verdicts for identical content.
+
+#[test]
+fn h1_3_nested_nodes_form_finds_opposite_evidence() {
+    let reports = run_golden();
+    let r = target(&reports, "c18-nested-nodes-opposite");
+    assert_eq!(verdict_kind(r, "foo"), "PASS");
+}
+
+#[test]
+fn h1_3_nested_nodes_form_still_oba001s_correctly() {
+    let reports = run_golden();
+    let r = target(&reports, "c19-nested-nodes-same");
+    assert_eq!(verdict_kind(r, "foo"), "OBA001");
+}
+
+// An entirely unrecognized root wrapper must never let content it can't
+// see into masquerade as "nothing happened here" -- TestConfigUnresolved,
+// not OBA001, regardless of what's actually inside the wrapper.
+
+#[test]
+fn h1_3_unknown_root_wrapper_is_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c20-unknown-root");
+    assert_eq!(verdict_kind(r, "foo"), "TestConfigUnresolved");
+}
+
+// The dominant real-world nixosTest wrapper (`import ./make-test-python.nix
+// (<lambda-or-attrset>)`) must be recognized and unwrapped, not treated
+// as just another unknown root.
+
+#[test]
+fn h1_3_make_test_python_wrapper_is_unwrapped() {
+    let reports = run_golden();
+    let r = target(&reports, "c21-make-test-wrapper");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "PASS",
+        "the import ./make-test-python.nix (...) wrapper must be transparently unwrapped, not treated as opaque"
+    );
+}
+
+// Module-root `config = { ... };` must normalize into the SAME option-path
+// namespace as top-level shorthand -- `services.synth.foo`, not
+// `config.services.synth.foo`, which would never match anything.
+
+#[test]
+fn h1_3_module_root_config_key_normalizes_path() {
+    let reports = run_golden();
+    let r = target(&reports, "c22-module-root-config");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "PASS",
+        "config = {{ ... }}'s contents must normalize into the same option-path namespace as top-level shorthand"
+    );
+}
+
+// But `config = <opaque expression>;` (a function call, not a literal
+// attrset) must still be treated as hiding anything -- `config` is only
+// special because it's module-root syntax, not because the key happens
+// to be named "config" anywhere in the tree.
+
+#[test]
+fn h1_3_module_root_opaque_config_is_inconclusive() {
+    let reports = run_golden();
+    let r = target(&reports, "c23-module-root-opaque-config");
+    assert_eq!(verdict_kind(r, "foo"), "TestConfigUnresolved");
+}
+
+// `inherit` and a dynamic `${...}` attribute name are both genuinely
+// untraceable by this walker -- neither should be silently skipped as if
+// nothing was there.
+
+#[test]
+fn h1_3_inherit_and_dynamic_attrpath_are_opacity_not_silence() {
+    let reports = run_golden();
+    let r = target(&reports, "c24-inherit-and-dynamic");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "TestConfigUnresolved",
+        "inherit / a dynamic attrpath must register as opacity, never silently skipped"
+    );
+    let opacity = r["test_config_opacity"].as_array().unwrap();
+    assert!(
+        opacity.len() >= 2,
+        "both the inherit and the dynamic attrpath should be recorded; got {opacity:?}"
+    );
+}

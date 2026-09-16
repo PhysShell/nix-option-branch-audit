@@ -69,3 +69,10 @@ repo = "PhysShell/nixpkgs"
 commit = "37f81efa4abf623009e474fa563a094658c25be6"
 upstream_path = "nixos/tests/davis.nix"
 sha256 = "0815127a34f1b41e9550e3973b578a26b708edd2f3a38db8659a98995eb49f78"
+
+[[fixture]]
+path = "fixtures/real/ifm-test.nix"
+repo = "PhysShell/nixpkgs"
+commit = "5530e24f2100f4c2ca766050a805a12d7541662f"
+upstream_path = "nixos/tests/ifm.nix"
+sha256 = "7dd644d17f75431034809b380998be4aa1198d0797b36b29fe8e1b124c9d15c5"
