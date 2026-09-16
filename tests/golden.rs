@@ -438,3 +438,115 @@ fn h1_1_missing_file_is_tool_error_not_finding() {
         "error should name the actual missing file; got: {stderr}"
     );
 }
+
+// --- H1.2 review fixes ---------------------------------------------------
+//
+// One more architectural gap, plus a clap exit-code contract leak and a
+// verify-upstream.sh bug (not covered by Rust tests, checked separately).
+
+/// Runs the binary with arbitrary raw CLI args (not the usual
+/// `--targets <manifest> --json`) -- for testing clap-level parse failures
+/// themselves, before any manifest is even looked at.
+fn run_raw_args(args: &[&str]) -> i32 {
+    let output = Command::new(env!("CARGO_BIN_EXE_oba"))
+        .current_dir(manifest_dir())
+        .args(args)
+        .output()
+        .expect("failed to run oba binary");
+    output
+        .status
+        .code()
+        .expect("process exited via signal, not code")
+}
+
+// H1.2-P0: a watched option that's never mentioned anywhere the walker CAN
+// see must be TestConfigUnresolved when the test config also contains
+// something the walker can't see into (imports, an alias) -- not silently
+// treated as "not activated" just because nothing matching was *found*.
+// The old code would OBA001 these exactly as if the option had genuinely
+// never been touched, which is a different claim: "not observed in the
+// part of the config I can read" vs "not activated". A census run over
+// real modules would otherwise produce OBA001 findings that are actually
+// just "config came in through `imports`".
+
+#[test]
+fn h1_2_imports_makes_result_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c15-imports");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "TestConfigUnresolved",
+        "an `imports` in the test config must not let OBA001 claim the option was never touched"
+    );
+}
+
+#[test]
+fn h1_2_instance_alias_makes_result_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c16-instance-alias");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "TestConfigUnresolved",
+        "`nodes.machine = someAlias;` must not let OBA001 claim the option was never touched"
+    );
+}
+
+// Positive control: an explicit, provable opposite-outcome assignment
+// found elsewhere in the same test file must win over an unrelated
+// opacity site -- existential evidence beats incompleteness that has
+// nothing to do with where the evidence was actually found.
+
+#[test]
+fn h1_2_explicit_opposite_evidence_wins_over_unrelated_import() {
+    let reports = run_golden();
+    let r = target(&reports, "c17-opposite-wins-over-import");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "PASS",
+        "a provable transition must not be downgraded to inconclusive just because \
+         an unrelated node elsewhere in the file also has an import"
+    );
+}
+
+// H1.2-P1: clap's own Error::exit() (invoked internally by the old
+// Cli::parse()) bypasses this tool's 4-state exit-code contract entirely --
+// a bad CLI invocation exited with *clap's* code (2 for a usage error),
+// indistinguishable from this tool's own INCONCLUSIVE (also 2), even
+// though no analysis ever ran. Fixed with try_parse() mapping onto
+// TOOL_ERROR (3) explicitly.
+
+// Positive assertion for the opacity detector itself: c17 has both a real
+// assignment AND an unrelated import, so `test_config_opacity` must
+// actually be non-empty -- a detector that silently stopped finding
+// opacity sites would make h1_2_explicit_opposite_evidence_wins_over_
+// unrelated_import pass for the wrong reason (no opacity to lose to,
+// rather than opposite evidence correctly outranking it).
+
+#[test]
+fn positive_assertions_c17_opacity_detector_found_the_import() {
+    let reports = run_golden();
+    let r = target(&reports, "c17-opposite-wins-over-import");
+    let opacity = r["test_config_opacity"].as_array().unwrap();
+    assert!(
+        !opacity.is_empty(),
+        "the opacity detector must have found the `other` node's import"
+    );
+    assert!(
+        opacity.iter().any(|o| o["instance"] == "other"),
+        "opacity should be attributed to the `other` instance; got {opacity:?}"
+    );
+}
+
+#[test]
+fn h1_2_cli_parse_failure_is_tool_error_not_inconclusive() {
+    assert_eq!(
+        run_raw_args(&["--bogus-flag-that-does-not-exist"]),
+        3,
+        "an unrecognized CLI flag must be TOOL_ERROR (3), not clap's own default exit code"
+    );
+    assert_eq!(
+        run_raw_args(&[]),
+        3,
+        "a missing required --targets argument must be TOOL_ERROR (3)"
+    );
+}

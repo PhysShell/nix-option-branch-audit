@@ -87,12 +87,21 @@ fn validate_manifest(m: &TargetFile) -> Result<(), String> {
         if !seen_names.insert(t.name.as_str()) {
             return Err(format!("duplicate target name: {}", t.name));
         }
-        if t.cfg_ident.trim().is_empty() {
-            return Err(format!("target {}: cfg_ident must not be empty", t.name));
+        if !is_valid_ident(&t.cfg_ident) {
+            return Err(format!(
+                "target {}: cfg_ident {:?} is not a valid identifier (a garbage cfg_ident would never match anything and silently surface as PredicateNotFound instead of the manifest error it actually is)",
+                t.name, t.cfg_ident
+            ));
         }
         if t.option_prefix.is_empty() {
             return Err(format!(
                 "target {}: option_prefix must not be empty",
+                t.name
+            ));
+        }
+        if t.option_prefix.iter().any(|s| s.trim().is_empty()) {
+            return Err(format!(
+                "target {}: option_prefix contains an empty segment",
                 t.name
             ));
         }
@@ -107,12 +116,27 @@ fn validate_manifest(m: &TargetFile) -> Result<(), String> {
             if w.trim().is_empty() {
                 return Err(format!("target {}: watch contains an empty entry", t.name));
             }
+            if w.split('.').any(|seg| seg.trim().is_empty()) {
+                return Err(format!(
+                    "target {}: watch entry {w:?} has an empty path segment (e.g. a stray \"..\")",
+                    t.name
+                ));
+            }
             if !seen_watch.insert(w.as_str()) {
                 return Err(format!("target {}: duplicate watch entry {w}", t.name));
             }
         }
     }
     Ok(())
+}
+
+fn is_valid_ident(s: &str) -> bool {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) if c.is_ascii_alphabetic() || c == '_' => {}
+        _ => return false,
+    }
+    chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
 // ---------------------------------------------------------------------
@@ -600,23 +624,86 @@ struct TestAssignment {
     span: Span,
 }
 
-fn scan_test_assignments(file: &str, src: &str, root: &SyntaxNode) -> Vec<TestAssignment> {
-    let mut out = Vec::new();
+/// A point in the test file's config where the walker had to stop looking
+/// -- not because there was nothing there, but because what's there isn't
+/// something it can see into: `imports = [ ./common.nix ];` (config lives
+/// in a file this tool never reads), a bare identifier alias
+/// (`nodes.machine = machineConfig;`), a function call (`mkMachineConfig
+/// {...}`, `mkMerge [...]`), or similar. `path` is the scope this opacity
+/// applies to: everything at or below it in the real option namespace may
+/// exist in the parts of the test config this walker couldn't see, so a
+/// watched option whose absolute path starts with `path` can't be safely
+/// declared un-activated just because no matching assignment was *found*.
+#[derive(Serialize, Debug, Clone)]
+struct Opacity {
+    path: Vec<String>,
+    instance: Option<String>,
+    reason: &'static str,
+    span: Span,
+}
+
+/// Would `node`'s value possibly contain further nested option keys if we
+/// could see into it? `false` for anything that's syntactically incapable
+/// of that (a string/number/list/path literal, or the literals
+/// `null`/`true`/`false`) -- those can't hide a `.bar` under them no
+/// matter what they evaluate to. `true` for everything else this walker
+/// doesn't already descend into directly (a bare identifier possibly
+/// aliasing an attrset, a function application, a conditional, a `with`,
+/// a `let`, ...): syntactically undecidable whether more structure is
+/// hiding there, so treated as "might be", not "isn't".
+fn could_contain_nested_options(node: &SyntaxNode) -> bool {
+    match node.kind() {
+        NODE_STRING | NODE_LITERAL | NODE_LIST | NODE_PATH => false,
+        NODE_IDENT => !matches!(
+            ident_text(node).as_deref(),
+            Some("null") | Some("true") | Some("false")
+        ),
+        _ => true,
+    }
+}
+
+fn scan_test_assignments(
+    file: &str,
+    src: &str,
+    root: &SyntaxNode,
+) -> (Vec<TestAssignment>, Vec<Opacity>) {
+    let mut assignments = Vec::new();
+    let mut opacity = Vec::new();
     // root is a Lambda `{ lib, ... }: { ... }` for every fixture in this corpus
     let body = unwrap_lambda_chain(root.clone());
     if body.kind() == NODE_ATTR_SET {
-        walk_test_block(file, src, &body, &mut Vec::new(), None, &mut out);
+        walk_test_block(
+            file,
+            src,
+            &body,
+            &mut Vec::new(),
+            None,
+            &mut assignments,
+            &mut opacity,
+        );
     }
-    out
+    (assignments, opacity)
 }
 
+/// Transparently unwraps `NODE_ROOT`, `NODE_LAMBDA` (`{ ... }: body`), and
+/// `NODE_LET_IN` (`let ...bindings...; in body`) down to whatever's
+/// underneath -- all three have the pattern "the meaningful continuation
+/// is the last node child", regardless of how many `let` bindings or
+/// lambda pattern entries precede it. `let ... in { ... }` is a common,
+/// completely legitimate nixosTest idiom (locally naming a value before
+/// using it); missing it isn't a syntax edge case, it's an entire
+/// mainstream pattern the walker would otherwise just silently stop at --
+/// caught when `c16-instance-alias`'s `let machineConfig = {...}; in {
+/// nodes.machine = machineConfig; }` produced a NODE_LET_IN root that
+/// `scan_test_assignments` never even started walking, before this
+/// function grew a `NODE_LET_IN` case to go with `NODE_ROOT`/`NODE_LAMBDA`.
 fn unwrap_lambda_chain(node: SyntaxNode) -> SyntaxNode {
     if node.kind() == NODE_ROOT {
         if let Some(child) = node.children().next() {
             return unwrap_lambda_chain(child);
         }
     }
-    if node.kind() == NODE_LAMBDA {
+    if node.kind() == NODE_LAMBDA || node.kind() == NODE_LET_IN {
         if let Some(body) = node.children().last() {
             return unwrap_lambda_chain(body);
         }
@@ -631,6 +718,7 @@ fn walk_test_block(
     path: &mut Vec<String>,
     instance: Option<String>,
     out: &mut Vec<TestAssignment>,
+    opacity: &mut Vec<Opacity>,
 ) {
     for entry in attrset.children() {
         if entry.kind() != NODE_ATTRPATH_VALUE {
@@ -646,6 +734,23 @@ fn walk_test_block(
         let Some(value) = children.next() else {
             continue;
         };
+
+        // `imports = [ ./common.nix ];` (at any nesting level, not just the
+        // instance top level) means there is more config for this scope
+        // living in a file this tool never reads. Its own value (a list of
+        // paths) is syntactically harmless under `could_contain_nested_
+        // options`, but the *presence* of the key itself is the signal --
+        // handled as its own case rather than folded into the general
+        // opacity check below.
+        if segs.last().map(String::as_str) == Some("imports") {
+            opacity.push(Opacity {
+                path: path.clone(),
+                instance: instance.clone(),
+                reason: "imports present -- config for this scope may live in an unread file",
+                span: span_of(file, src, &entry),
+            });
+            continue;
+        }
 
         let is_instance_binding =
             path.is_empty() && segs.len() == 2 && (segs[0] == "containers" || segs[0] == "nodes");
@@ -670,7 +775,19 @@ fn walk_test_block(
                     &mut fresh_path,
                     Some(segs[1].clone()),
                     out,
+                    opacity,
                 );
+            } else {
+                // The instance's config isn't a literal attrset at all --
+                // an alias (`nodes.machine = machineConfig;`), a function
+                // call, etc. The whole instance is opaque: we have no idea
+                // what options it does or doesn't set.
+                opacity.push(Opacity {
+                    path: Vec::new(),
+                    instance: Some(segs[1].clone()),
+                    reason: "instance config is not a literal attrset (alias, function call, or similar)",
+                    span: span_of(file, src, &entry),
+                });
             }
             continue;
         }
@@ -679,8 +796,16 @@ fn walk_test_block(
         let body = unwrap_lambda_chain(value.clone());
 
         if body.kind() == NODE_ATTR_SET {
-            walk_test_block(file, src, &body, path, instance.clone(), out);
+            walk_test_block(file, src, &body, path, instance.clone(), out, opacity);
         } else {
+            if could_contain_nested_options(&body) {
+                opacity.push(Opacity {
+                    path: path.clone(),
+                    instance: instance.clone(),
+                    reason: "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+                    span: span_of(file, src, &entry),
+                });
+            }
             out.push(TestAssignment {
                 path: path.clone(),
                 value_source: body.text().to_string(),
@@ -741,6 +866,26 @@ enum Verdict {
         predicate: Predicate,
         default_outcome: bool,
     },
+    /// A classifiable default was found, and no known opposite-outcome
+    /// evidence exists -- but somewhere in the test config that could
+    /// structurally contain this option (i.e. whose path is a prefix of
+    /// the option's full absolute path), the walker hit something it
+    /// can't see into: `imports`, an alias, a function call. The correct
+    /// claim here is "not observed in the part of the config this tool
+    /// can read", not "not activated" -- a silent absence caused by
+    /// incomplete visibility is a different fact from a silent absence
+    /// because the option genuinely was never touched, and OBA001 must
+    /// never conflate them (H1.2 review: without this, a census over real
+    /// modules would produce OBA001 findings that are actually just
+    /// "config came in through `imports` and my walker never saw it").
+    /// Known opposite-outcome evidence found *elsewhere* still wins over
+    /// this -- see `c17`: an explicit, provable transition is a stronger
+    /// claim than "some unrelated import exists", not a weaker one.
+    TestConfigUnresolved {
+        option: String,
+        predicate: Predicate,
+        default_outcome: bool,
+    },
     /// A predicate and a classifiable default were found, but no test
     /// assignment's value provably flips the predicate's outcome away from
     /// what the default produces.
@@ -776,6 +921,7 @@ impl Verdict {
                 | Verdict::PredicateNotFound { .. }
                 | Verdict::DefaultUnresolved { .. }
                 | Verdict::TestValueUnresolved { .. }
+                | Verdict::TestConfigUnresolved { .. }
         )
     }
 
@@ -796,6 +942,13 @@ struct TargetReport {
     discovered_options: Vec<OptionDecl>,
     discovered_predicates: Vec<Predicate>,
     matched_test_assignments: Vec<TestAssignment>,
+    /// Every place the test-file walker hit something it couldn't see
+    /// into, regardless of whether it turned out to matter for any
+    /// watched option (kept unfiltered here for the same reason
+    /// `discovered_options`/`discovered_predicates` are: so a human or a
+    /// positive-assertion test can see the scanner actually looked,
+    /// rather than trusting a verdict that claims it did).
+    test_config_opacity: Vec<Opacity>,
     verdicts: Vec<Verdict>,
 }
 
@@ -810,6 +963,37 @@ fn path_matches_prefix(full: &[String], prefix: &[String], suffix: &[String]) ->
     }
     for (i, s) in suffix.iter().enumerate() {
         if full[prefix.len() + i] != *s {
+            return false;
+        }
+    }
+    true
+}
+
+/// Is `short` a prefix of the absolute target path `prefix ++ suffix`
+/// (with `prefix`'s `*` wildcard segments matching anything)? Used to ask
+/// "could this opacity site's scope contain the watched option" -- an
+/// opacity recorded at `[]` (an entire instance being opaque) is trivially
+/// a prefix of everything, which is exactly right: if nothing about an
+/// instance's config was visible, no watched option under any path can be
+/// safely called un-activated there.
+fn path_is_prefix_of_target(short: &[String], prefix: &[String], suffix: &[String]) -> bool {
+    let target_len = prefix.len() + suffix.len();
+    // Strictly shorter, not `<=`: an opacity site recorded at exactly the
+    // watched option's own full path isn't "more nested structure might be
+    // hiding below" -- it *is* the leaf, and its value being unresolvable
+    // is TestValueUnresolved's question, not this one. Getting this wrong
+    // made c11 (a bare unresolvable leaf value, no nesting involved at
+    // all) misreport as TestConfigUnresolved instead of TestValueUnresolved.
+    if short.len() >= target_len {
+        return false;
+    }
+    for (i, seg) in short.iter().enumerate() {
+        let target_seg = if i < prefix.len() {
+            &prefix[i]
+        } else {
+            &suffix[i - prefix.len()]
+        };
+        if target_seg != "*" && target_seg != seg {
             return false;
         }
     }
@@ -880,6 +1064,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             discovered_options: Vec::new(),
             discovered_predicates: Vec::new(),
             matched_test_assignments: Vec::new(),
+            test_config_opacity: Vec::new(),
             verdicts: t
                 .watch
                 .iter()
@@ -898,7 +1083,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         module_root.syntax(),
         &t.cfg_ident,
     );
-    let assignments = scan_test_assignments(&test_file, &test_src, test_root.syntax());
+    let (assignments, opacity) = scan_test_assignments(&test_file, &test_src, test_root.syntax());
 
     let mut matched_assignments = Vec::new();
     let mut verdicts = Vec::new();
@@ -974,12 +1159,30 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             }
         }
 
+        // Does any part of the test config that could structurally contain
+        // this option live in a region the walker couldn't see into
+        // (imports, an alias, a function call)? Checked AFTER opposite
+        // evidence, never before: an explicit, provable transition found
+        // elsewhere in the file is a stronger claim than "some unrelated
+        // opacity also exists" (c17). Checked before TestValueUnresolved:
+        // "an entire region of config was invisible" is a more fundamental
+        // gap than "one specific value we did see was ambiguous".
+        let target_path_opaque = opacity
+            .iter()
+            .any(|o| path_is_prefix_of_target(&o.path, &t.option_prefix, &pred.path));
+
         if !opposite.is_empty() {
             verdicts.push(Verdict::Pass {
                 option: watched.clone(),
                 predicate: pred.clone(),
                 default_outcome,
                 evidence: opposite,
+            });
+        } else if target_path_opaque {
+            verdicts.push(Verdict::TestConfigUnresolved {
+                option: watched.clone(),
+                predicate: pred.clone(),
+                default_outcome,
             });
         } else if has_unresolved {
             verdicts.push(Verdict::TestValueUnresolved {
@@ -1002,6 +1205,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         discovered_options: options,
         discovered_predicates: predicates,
         matched_test_assignments: matched_assignments,
+        test_config_opacity: opacity,
         verdicts,
     })
 }
@@ -1036,7 +1240,24 @@ struct FullReport {
 /// FINDING, not even INCONCLUSIVE) is caught by
 /// `h1_1_missing_file_is_tool_error_not_finding` in tests/golden.rs.
 fn main() {
-    let cli = Cli::parse();
+    // `Cli::parse()` (used before H1.2) calls `clap`'s own `Error::exit()`
+    // internally on a bad CLI invocation, which prints and terminates the
+    // process with *clap's* exit code (0 for --help/--version, 2 for a
+    // genuine usage error) -- entirely bypassing this tool's own 4-state
+    // exit-code contract. `oba --bogus-flag` exited 2, indistinguishable
+    // from a real INCONCLUSIVE analysis result, even though no analysis
+    // ever ran. `try_parse()` instead hands the error back so it can be
+    // mapped onto TOOL_ERROR (3) like every other "never got to run" case.
+    let cli = match Cli::try_parse() {
+        Ok(cli) => cli,
+        Err(e) => {
+            let _ = e.print();
+            // clap still distinguishes "this was actually an error"
+            // (use_stderr) from a deliberate early exit like --help or
+            // --version, which isn't a tool failure and keeps exit 0.
+            std::process::exit(if e.use_stderr() { 3 } else { 0 });
+        }
+    };
     match run(&cli) {
         Ok(exit_code) => std::process::exit(exit_code),
         Err(e) => {
@@ -1149,6 +1370,25 @@ fn print_human(r: &TargetReport) {
             .collect::<Vec<_>>()
             .join(", ")
     );
+    println!(
+        "test_config_opacity: {}",
+        r.test_config_opacity
+            .iter()
+            .map(|o| format!(
+                "{}[{}]@{}:{} ({})",
+                if o.path.is_empty() {
+                    "<whole instance>".to_string()
+                } else {
+                    o.path.join(".")
+                },
+                o.instance.as_deref().unwrap_or("?"),
+                o.span.line,
+                o.span.col,
+                o.reason
+            ))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
     for v in &r.verdicts {
         match v {
             Verdict::OptionNotFound { option } => {
@@ -1159,6 +1399,9 @@ fn print_human(r: &TargetReport) {
             ),
             Verdict::DefaultUnresolved { option, .. } => println!(
                 "  DEFAULT_UNRESOLVED  {option}  (declared default's outcome under this predicate isn't a literal null/true/false)"
+            ),
+            Verdict::TestConfigUnresolved { option, .. } => println!(
+                "  TEST_CONFIG_UNRESOLVED  {option}  (part of the test config that could contain this option wasn't visible to the walker -- imports/alias/function call)"
             ),
             Verdict::TestValueUnresolved {
                 option,

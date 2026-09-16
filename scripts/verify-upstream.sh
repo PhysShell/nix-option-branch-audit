@@ -1,12 +1,24 @@
 #!/usr/bin/env bash
-# Re-derives each fixture's sha256 directly from the upstream commit named
-# in fixtures/integrity-lock.toml's repo/commit/upstream_path fields, via
-# `git show`, and compares against the locked hash AND the local fixture
-# file's actual hash. This is the actual provenance check -- "this hash
-# really did come from that exact commit" -- as opposed to
+# Re-derives each fixture's sha256 directly from the upstream COMMIT named
+# in fixtures/integrity-lock.toml's commit/upstream_path fields, via
+# `git show` against a local checkout, and compares against the locked
+# hash AND the local fixture file's actual hash. This is a real
+# provenance check for the commit/path/hash triple -- "this hash really
+# did come from that exact commit" -- as opposed to
 # tests/fixture_integrity.rs, which only checks the local fixture still
 # matches the locked hash (an integrity check, not a provenance check; see
 # that file's header for why they're deliberately separate).
+#
+# What this does NOT prove: that the locked `repo` field ("PhysShell/
+# nixpkgs") is actually what the passed-in checkout IS. `git show
+# <commit>:<path>` works against any local checkout that happens to have
+# that commit reachable, regardless of which remote(s) it's configured
+# with or what they're named -- `repo` is informational metadata here, not
+# independently verified. Not a problem for this corpus (there's one repo,
+# one person running this script against their own checkout of it), but
+# worth being honest about rather than overclaiming "verified against
+# PhysShell/nixpkgs" when what's actually verified is "verified against
+# whatever checkout you pointed this at".
 #
 # Requires a local checkout of the named repo (not fetched automatically --
 # this deliberately stays out of `cargo test` and off the network by
@@ -26,8 +38,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 LOCK_FILE="$ROOT_DIR/fixtures/integrity-lock.toml"
 
-if [ ! -d "$REPO_CHECKOUT/.git" ]; then
-  echo "error: $REPO_CHECKOUT is not a git checkout" >&2
+# Not `[ -d "$REPO_CHECKOUT/.git" ]`: a linked git worktree's `.git` is a
+# FILE containing `gitdir: ...`, not a directory, so a perfectly valid
+# worktree checkout would be wrongly rejected by a directory-only check.
+# Ask git itself instead of guessing about its on-disk layout.
+if ! git -C "$REPO_CHECKOUT" rev-parse --git-dir >/dev/null 2>&1; then
+  echo "error: $REPO_CHECKOUT is not a git checkout (git rev-parse --git-dir failed)" >&2
   exit 2
 fi
 

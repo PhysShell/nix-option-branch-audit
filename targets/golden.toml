@@ -139,3 +139,32 @@ test = "fixtures/synthetic/c11-unresolved-test-value/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synth"]
 watch = ["qux"]
+
+# --- H1.2 review fixtures: test-config visibility, not just value/default
+# classification. All three watch "foo" (default "/run/default.sock",
+# NullNeq predicate) against different shapes of test config the walker
+# either can or can't see into. ---
+
+[[target]]
+name = "c15-imports"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c15-imports/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c16-instance-alias"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c16-instance-alias/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c17-opposite-wins-over-import"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c17-opposite-wins-over-import/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]

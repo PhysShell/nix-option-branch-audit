@@ -67,31 +67,41 @@ watch "database.socket"
 3. default's ValueClass resolves        no → DefaultUnresolved (default is Unknown under this predicate)
    to a predicate outcome?
    ▼ yes
-4. among structurally-matching test assignments:
-   any known opposite-outcome value?   yes → PASS, with the opposite-outcome assignment(s) as evidence
+4. any known opposite-outcome         yes → PASS, with the opposite-outcome assignment(s) as evidence
+   test assignment?                       (wins even if 5/6 below would also fire -- see c17)
    ▼ no
-   any assignment's outcome Unknown?   yes → TestValueUnresolved (might be the opposite -- can't tell, don't guess)
+5. does any part of the test config     yes → TestConfigUnresolved (imports/alias/function call
+   that could structurally contain            hid a scope that might have set this option)
+   this option remain unseen by
+   the walker (imports, an alias,
+   a function call)?
+   ▼ no
+6. any matching assignment's          yes → TestValueUnresolved (might be the opposite -- can't
+   outcome Unknown?                        tell, don't guess)
    ▼ no
    → OBA001 (every matching assignment's outcome is known, and none of them differ from the default)
 ```
 
 Every verdict is one of `OptionNotFound` / `PredicateNotFound` /
-`DefaultUnresolved` / `TestValueUnresolved` (all **inconclusive** — the
-tool couldn't establish an opinion, distinct from and just as loud as a
-finding) / `OBA001` (a real finding) / `PASS` (proof of a branch-outcome
-transition). Process exit code is 4-state, not 3 — `0` = every watched
-option resolved to `PASS`; `1` = `FINDING`, at least one `OBA001` and
-nothing inconclusive; `2` = `INCONCLUSIVE`, takes precedence over
-`FINDING` (a run that couldn't fully evaluate everything has no business
-reporting itself as merely "found some bugs, otherwise clean"); `3` =
-`TOOL_ERROR` — the tool itself didn't run (bad manifest, a target's module/
-test file doesn't exist, malformed TOML). `2` and `3` look the same from a
-shell ("something's wrong") but are different claims to a machine
-consumer: "I analyzed this and couldn't prove anything" is not "I never
-got to analyze it" — see `h1_1_missing_file_is_tool_error_not_finding`,
-which exists because the pre-H1.1 code let exactly this distinction
-collapse (any `?`-propagated I/O error fell through to Rust's default
-error exit, indistinguishable from a real `FINDING`).
+`DefaultUnresolved` / `TestConfigUnresolved` / `TestValueUnresolved` (all
+**inconclusive** — the tool couldn't establish an opinion, distinct from
+and just as loud as a finding) / `OBA001` (a real finding) / `PASS` (proof
+of a branch-outcome transition). Process exit code is 4-state, not 3 —
+`0` = every watched option resolved to `PASS`; `1` = `FINDING`, at least
+one `OBA001` and nothing inconclusive; `2` = `INCONCLUSIVE`, takes
+precedence over `FINDING` (a run that couldn't fully evaluate everything
+has no business reporting itself as merely "found some bugs, otherwise
+clean"); `3` = `TOOL_ERROR` — the tool itself didn't run (bad manifest, a
+target's module/test file doesn't exist, malformed TOML, a bad CLI flag).
+`2` and `3` look the same from a shell ("something's wrong") but are
+different claims to a machine consumer: "I analyzed this and couldn't
+prove anything" is not "I never got to analyze it" — see
+`h1_1_missing_file_is_tool_error_not_finding` and
+`h1_2_cli_parse_failure_is_tool_error_not_inconclusive`, which exist
+because the pre-H1.1/pre-H1.2 code let exactly this distinction collapse
+twice, in two different places (a bubbled I/O error, and `clap`'s own
+`Error::exit()` running before this tool's exit-code contract even
+started applying).
 
 ## Non-goals (deliberate)
 
@@ -322,6 +332,86 @@ Two smaller items from the same review:
   build this corpus (all 8 fixtures OK; then deliberately corrupted one
   locked hash and confirmed it fails, before reverting).
 
+## H1.2 review fixes
+
+A third review found the sharpest gap yet -- the kind the whole project
+exists to catch -- plus a CLI-level exit-code leak and a `verify-upstream.sh`
+bug:
+
+- **P0 -- `OBA001` didn't actually prove absence of activation evidence,
+  only absence of *observed* evidence.** The test-file walker only ever
+  descends into literal `NODE_ATTR_SET` values. A perfectly ordinary
+  nixosTest pattern --
+  ```nix
+  nodes.machine = { ... }: { imports = [ ./common.nix ]; };
+  # or:
+  nodes.machine = machineConfig;  # a local `let`-bound alias
+  ```
+  -- makes the relevant assignment live somewhere the walker structurally
+  cannot see, and the old code just silently found nothing and reported
+  `OBA001`: "branch never exercised", when the honest claim is "not
+  observed in the part of the config I can read". Those are different
+  facts, and conflating them was exactly the failure mode this tool exists
+  to name in *other* tools. Fixed with a new `Opacity` record: every point
+  the walker gives up (an `imports` key at any nesting level; an instance
+  whose config isn't a literal attrset; any non-attrset value that could
+  structurally contain more nested options -- classified by AST kind, same
+  approach as `ValueClass`) is tracked with its scope. Gate 4 (now the
+  full 6-step chain above) checks, after opposite-outcome evidence and
+  before per-value ambiguity: does any opacity site's scope structurally
+  contain the watched option's absolute path? If so: `TestConfigUnresolved`,
+  not `OBA001`. Crucially, **existential positive evidence still wins**:
+  an explicit, provable transition found anywhere in the file outranks an
+  *unrelated* opacity site elsewhere (`c17` — a real transition in one
+  node, an unrelated `imports` in a different node, must still be `PASS`).
+  Without this fix, a census over real modules wouldn't find "uncovered
+  branches" -- it would find a mix of genuinely uncovered branches and
+  "config arrived via `imports` and the walker never saw it", indistinguishable
+  in the output. `c15-imports`, `c16-instance-alias`, `c17-opposite-wins-over-import`.
+
+  Building `c16` caught a second, independent bug live: `let machineConfig
+  = { ... }; in { nodes.machine = machineConfig; }` is a completely
+  ordinary nixosTest idiom, and the walker never even started for it --
+  `unwrap_lambda_chain` unwrapped `NODE_ROOT` and `NODE_LAMBDA` but not
+  `NODE_LET_IN`, so a file whose top level is `let ... in { ... }` (rather
+  than a bare lambda-to-attrset) silently produced zero assignments *and*
+  zero opacity records, not because the fixture was well-covered but
+  because the scanner never ran on it at all. Fixed by teaching
+  `unwrap_lambda_chain` the same "last child is the continuation" pattern
+  for `NODE_LET_IN` that it already used for `NODE_LAMBDA`.
+
+- **P1 -- a bad CLI invocation bypassed the exit-code contract entirely.**
+  `Cli::parse()` calls `clap`'s own `Error::exit()` internally on a bad
+  flag or a missing required argument, which prints and terminates the
+  process with *clap's* code (2 for a genuine usage error) before this
+  tool's `run()` -- and its whole 0/1/2/3 contract -- ever starts. `oba
+  --bogus-flag` exited 2, indistinguishable from a real `INCONCLUSIVE`
+  analysis result, despite no analysis ever running. Fixed with
+  `Cli::try_parse()`, mapping a genuine parse error onto `TOOL_ERROR` (3)
+  explicitly, while still letting `--help`/`--version` exit 0 as clap
+  intends. `h1_2_cli_parse_failure_is_tool_error_not_inconclusive`.
+
+- **P2 -- `verify-upstream.sh` rejected valid git worktrees.** It checked
+  `[ -d "$REPO_CHECKOUT/.git" ]`; a linked worktree's `.git` is a *file*
+  containing `gitdir: ...`, not a directory, so a perfectly valid worktree
+  checkout would be wrongly rejected. Fixed by asking git itself (`git -C
+  "$REPO_CHECKOUT" rev-parse --git-dir`) instead of guessing about
+  on-disk layout. Verified directly: the old check rejects a real `git
+  worktree add` output, the new one accepts it. Also softened the header
+  comment's claim -- the script proves the commit/path/hash triple, but
+  never independently validates that the passed-in checkout actually *is*
+  the named `repo` (any local checkout with the right commit reachable
+  will do); not a problem for this corpus, but `repo` is informational
+  metadata, not part of the proof, and the comment now says so.
+
+Two smaller items from the same review, folded into `validate_manifest`:
+`option_prefix`/`watch` entries with an empty segment (`option_prefix =
+["services", "", "foo"]`, `watch = ["database..socket"]`) and a
+non-identifier `cfg_ident` used to reach analysis and surface as a
+confusing `OptionNotFound`/`PredicateNotFound` instead of the manifest
+error they actually are -- now rejected before any target runs, same as
+every other manifest-shape problem.
+
 ## Running
 
 ```
@@ -336,23 +426,33 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 
 - [x] A. reproduces the historical finding on the exact parent commit
 - [x] B. clears it on the exact fix commit, with evidence attached
-- [x] C. survives 12 adversarial/synthetic cases: `c2`–`c5` (original 4
+- [x] C. survives 16 adversarial/synthetic cases: `c2`–`c5` (original 4
       kimai mutations), `c6a`/`c6b` (non-null-default false-positive + its
       positive control), `c7` (unresolvable boolean default), `c8`
       (missing declaration), `c9` (parse-error fail-closed), `c10`
       (non-literal null-predicate default, AST- vs text-classified), `c11`
       (unresolvable test value), `c12`/`c13` (empty watch / missing file,
-      both tool errors)
+      both tool errors), `c15`/`c16` (test config hidden behind `imports`
+      / an instance-level alias — both `TestConfigUnresolved`), `c17`
+      (explicit opposite evidence still wins over an unrelated import
+      elsewhere in the file)
 - [x] D. produces source spans + evidence (file:line:col, matched assignment)
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 15 tests, all passing: 5 from the original spike, 5 from H1
+`cargo test` — 20 tests, all passing: 5 from the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,
-empty-watch-is-tool-error, missing-file-is-tool-error), 1 fixture
-integrity lock.
+empty-watch-is-tool-error, missing-file-is-tool-error), 6 from H1.2
+(imports/alias → `TestConfigUnresolved`, opposite-evidence-wins positive
+control, its own opacity-detector positive assertion, CLI parse failure →
+`TOOL_ERROR`), 1 fixture integrity lock. `scripts/verify-upstream.sh`'s
+worktree fix and the CLI-level clap tests are exercised outside `cargo
+test` (a shell script and raw-process exit codes, respectively) but
+verified the same way as everything else in this project: by reproducing
+the actual bug first, then confirming the fix against it, not just
+reading the diff and hoping.
 
 ## Real bugs this spike itself found in its own implementation
 
