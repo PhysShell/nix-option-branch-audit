@@ -240,3 +240,23 @@ test = "fixtures/synthetic/c25-partial-root-opacity/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synth"]
 watch = ["foo"]
+
+# --- H1.3b review fixtures: the same "unrecognized entry silently
+# discarded" bug as c25, one level down inside the NESTED nodes = { ... };
+# form's own inner loop. ---
+
+[[target]]
+name = "c26-nested-instance-multisegment"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c26-nested-instance-multisegment/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c27-nested-instance-inherit"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c27-nested-instance-inherit/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]

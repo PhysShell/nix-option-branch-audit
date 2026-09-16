@@ -607,6 +607,60 @@ whatever else lives in the other ~1780 entries are exactly the deferred
 H1.3 review closed on; they're now visible and counted for the first time,
 which was the actual bar for this round, not resolving them.
 
+## H1.3b review fixes
+
+A sixth review pass, against `bf48d25` (H1.3a's root-entry allowlist +
+census fixes). Same class of bug, one level down: the NESTED `nodes = {
+...
+};` form's own inner loop (over each instance binding inside the
+attrset) only ever handled `inst_segs.len() == 1` (a plain instance name,
+`enter_instance`'d) and a dynamic `${...}` instance name — anything else,
+including a multi-segment attrpath directly under `nodes = { ... };`
+(`hidden.services.synth.foo = null;`, sugar for a second, malformed
+"instance") or an `inherit`, fell straight through the loop with neither
+an assignment nor an opacity record. Worse than the H1.3a root-level
+version of the same bug: because the normal sibling instance (`machine`)
+*was* found and recognized, this was invisible to every metric that
+existed at the time, including the brand-new `unclassified_root_entries`
+— the unrecognized entry is already inside a value H1.3a's allowlist
+check correctly accepted as `nodes = { ... };`, so it never even reaches
+that check. Fixed the same way as H1.3a: `NODE_INHERIT` under nested
+`nodes`/`containers` now produces opacity, and an `inst_segs.len() != 1`
+entry produces opacity instead of silently continuing past the loop
+iteration. Pinned by two new fixtures, `c26-nested-instance-multisegment`
+and `c27-nested-instance-inherit`, both a normal `machine` (no opposite
+evidence) next to the unrecognized entry — must be `TestConfigUnresolved`.
+Census gained the matching counter, `unclassified_instance_entries`,
+reported and JSON-tested the same way as its root-level sibling.
+
+As a closing mechanical check (not a new architectural review), every
+`continue` in all four walker contexts (`TestSpecRoot`'s two loops,
+`ModuleRoot`, `ConfigTree`/`walk_config_entry`) was re-read against one
+question: does this path skip an AST node kind that could carry NixOS
+module config without leaving an `Opacity`? Every remaining silent
+`continue` is now either a `NODE_ATTRPATH_VALUE`/`NODE_INHERIT` kind guard
+(no third child kind is reachable from a cleanly-parsed `NODE_ATTR_SET`)
+or a defensive `children().next()` `None` case that's structurally
+unreachable once rnix has parsed the node without errors (a
+`NODE_ATTRPATH_VALUE` always has both an attrpath and a value child by
+grammar) — not a live gap.
+
+Re-run against the same 1609-file `nixos/tests` checkout:
+
+```
+files with NEITHER (weaker bucket): 10   (was 12)
+unclassified root entries:        1903   (unchanged -- different bug)
+unclassified instance entries:       4
+```
+
+Small in absolute count (4 multi-segment-attrpath sites, plus 7 more
+caught by the same fix's `inherit`-under-nested-`nodes` case, both new
+`opacity_reason_counts` entries), but real, and exactly the shape that
+matters most: each one sits next to a normal, already-recognized sibling
+instance, which is precisely the condition under which every *other*
+gap-detection mechanism in this tool (both `files_with_neither` and
+`unclassified_root_entries`) stays blind.
+
 ## Running
 
 ```
@@ -626,7 +680,7 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 
 - [x] A. reproduces the historical finding on the exact parent commit
 - [x] B. clears it on the exact fix commit, with evidence attached
-- [x] C. survives 24 adversarial/synthetic/real-world cases: `c2`–`c5`
+- [x] C. survives 26 adversarial/synthetic/real-world cases: `c2`–`c5`
       (original 4 kimai mutations), `c6a`/`c6b` (non-null-default
       false-positive + its positive control), `c7` (unresolvable boolean
       default), `c8` (missing declaration), `c9` (parse-error fail-closed),
@@ -641,13 +695,15 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
       (module-root `config`, literal and opaque), `c24` (`inherit` +
       dynamic attrpath), `c25` (unrecognized root entry next to a normal
       node — `TestConfigUnresolved`, not silently dropped as metadata),
-      plus a scanner-level unit test against real, unmodified
-      `nixos/tests/ifm.nix`
+      `c26`/`c27` (multi-segment attrpath / `inherit` under nested
+      `nodes = { ... };`, the same bug one level down), plus a
+      scanner-level unit test against real, unmodified `nixos/tests/
+      ifm.nix`
 - [x] D. produces source spans + evidence (file:line:col, matched assignment)
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 31 tests, all passing: 5 from the original spike, 5 from H1
+`cargo test` — 34 tests, all passing: 5 from the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,
@@ -658,7 +714,9 @@ control, its own opacity-detector positive assertion, CLI parse failure →
 make-test-python.nix wrapper, module-root config ×2, inherit+dynamic
 attrpath), 3 from H1.3a (unclassified root entry → `TestConfigUnresolved`,
 `--targets`/`--census` CLI mutual exclusion, the census's own
-`unclassified_root_entries` metric), 1 fixture integrity lock, 1
+`unclassified_root_entries` metric), 3 from H1.3b (multi-segment attrpath
+and `inherit` under nested `nodes`, the census's own
+`unclassified_instance_entries` metric), 1 fixture integrity lock, 1
 real-world scanner unit test against `fixtures/real/ifm-test.nix`.
 `scripts/verify-upstream.sh`'s worktree fix, the CLI-level clap tests, and
 the `--census` run against 1609 real files are exercised outside

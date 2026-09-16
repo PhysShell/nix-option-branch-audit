@@ -832,6 +832,14 @@ const KNOWN_HARNESS_METADATA_KEYS: &[&str] = &[
 /// two can't drift apart.
 const REASON_UNCLASSIFIED_ROOT_ENTRY: &str = "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into";
 
+/// H1.3b review: the same problem as `REASON_UNCLASSIFIED_ROOT_ENTRY`, one
+/// level down -- an entry under the NESTED `nodes = { ... };` form that
+/// isn't a plain single-segment instance name (e.g. a multi-segment
+/// attrpath like `hidden.services.synth.foo = null;` sitting next to a
+/// normal `machine = ...;`). Shared with `run_census`'s
+/// `unclassified_instance_entries` counter.
+const REASON_UNCLASSIFIED_NESTED_INSTANCE_ENTRY: &str = "unrecognized entry under nested nodes/containers -- not a single-segment instance name; may itself carry option-relevant config this walker can't see into (e.g. a multi-segment attrpath)";
+
 /// TestSpecRoot: finds `nodes`/`containers` bindings, both forms --
 /// `nodes.foo = ...;` (flat) and `nodes = { foo = ...; bar = ...; };`
 /// (nested, equally common in real nixosTests). Every OTHER top-level key
@@ -917,6 +925,23 @@ fn walk_test_spec_root(
                 continue;
             }
             for inst_entry in body.children() {
+                // H1.3b review: this whole inner loop is a close relative
+                // of the H1.3a root-entry bug, one level down -- an
+                // unrecognized shape here was silently dropped instead of
+                // opacity'd, and unlike the root case, a normal sibling
+                // instance being present (e.g. `machine`) means neither
+                // `found_any_instance`-style fallbacks nor
+                // `REASON_UNCLASSIFIED_ROOT_ENTRY` ever see it: it's
+                // already inside the recognized `nodes = { ... };` value.
+                if inst_entry.kind() == NODE_INHERIT {
+                    opacity.push(Opacity {
+                        path: Vec::new(),
+                        instance: None,
+                        reason: "inherit binding under nested nodes/containers -- may pull in option-relevant values this walker can't trace",
+                        span: span_of(file, src, &inst_entry),
+                    });
+                    continue;
+                }
                 if inst_entry.kind() != NODE_ATTRPATH_VALUE {
                     continue;
                 }
@@ -946,6 +971,20 @@ fn walk_test_spec_root(
                         out,
                         opacity,
                     );
+                } else {
+                    // A multi-segment attrpath under `nodes = { ... };`
+                    // (e.g. `hidden.services.synth.foo = null;`) is not a
+                    // single instance-name binding this walker understands
+                    // -- silently falling through here (the H1.3b bug) let
+                    // a fully live sibling scenario's assignment vanish
+                    // with no trace, exactly like the root-level version
+                    // of this bug H1.3a just fixed one level up (c25/c26).
+                    opacity.push(Opacity {
+                        path: Vec::new(),
+                        instance: None,
+                        reason: REASON_UNCLASSIFIED_NESTED_INSTANCE_ENTRY,
+                        span: span_of(file, src, &inst_entry),
+                    });
                 }
             }
             continue;
@@ -1646,6 +1685,13 @@ struct CensusReport {
     /// field being explainable/zero-per-file, not `files_with_neither`
     /// alone.
     unclassified_root_entries: usize,
+    /// H1.3b review: the same "option-relevant syntax silently discarded"
+    /// count as `unclassified_root_entries`, but for entries under the
+    /// NESTED `nodes = { ... };` form specifically -- a file with a
+    /// normal, recognized sibling instance (so it's invisible to both
+    /// `files_with_neither` and `unclassified_root_entries`) can still
+    /// hide a multi-segment attrpath or `inherit` at this level.
+    unclassified_instance_entries: usize,
     opacity_reason_counts: std::collections::BTreeMap<String, usize>,
 }
 
@@ -1721,6 +1767,10 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
             .iter()
             .filter(|o| o.reason == REASON_UNCLASSIFIED_ROOT_ENTRY)
             .count();
+        report.unclassified_instance_entries += opacity
+            .iter()
+            .filter(|o| o.reason == REASON_UNCLASSIFIED_NESTED_INSTANCE_ENTRY)
+            .count();
         for o in &opacity {
             *report
                 .opacity_reason_counts
@@ -1752,6 +1802,10 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
         println!(
             "unclassified root entries (option-relevant syntax that could have been silently discarded): {}",
             report.unclassified_root_entries
+        );
+        println!(
+            "unclassified nested-instance entries (same, one level down inside nodes = {{ ... }}): {}",
+            report.unclassified_instance_entries
         );
         println!("opacity reasons:");
         for (reason, count) in &report.opacity_reason_counts {

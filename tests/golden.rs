@@ -752,3 +752,56 @@ fn h1_3a_census_counts_unclassified_root_entries() {
         "c25's hiddenScenario entry must be counted as an unclassified root entry; got {unclassified}"
     );
 }
+
+// --- H1.3b review fixes ---------------------------------------------------
+//
+// A close relative of the H1.3a bug, one level down: the NESTED
+// `nodes = { ... };` form's own inner loop only handled a plain
+// single-segment instance name (`enter_instance` on `inst_segs.len() ==
+// 1`) and a dynamic ("${...}") instance name -- anything else (a
+// multi-segment attrpath like `hidden.services.synth.foo = null;`, or an
+// `inherit`) fell through the loop with neither an assignment nor an
+// opacity record, even with a normal, correctly-recognized sibling
+// instance (`machine`) right next to it. Unlike the H1.3a root-level bug,
+// this one is invisible to BOTH `files_with_neither` (a real assignment
+// was found, from `machine`) AND `unclassified_root_entries` (the
+// unrecognized entry is already inside a recognized `nodes = { ... };`
+// value, not at the spec root) -- it needed its own census counter,
+// `unclassified_instance_entries`.
+
+#[test]
+fn h1_3b_nested_instance_multisegment_makes_result_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c26-nested-instance-multisegment");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "TestConfigUnresolved",
+        "a multi-segment attrpath under nested nodes = {{ ... }} must not be silently \
+         dropped just because a normal sibling instance was also found"
+    );
+}
+
+#[test]
+fn h1_3b_nested_instance_inherit_makes_result_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c27-nested-instance-inherit");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "TestConfigUnresolved",
+        "an inherit binding under nested nodes = {{ ... }} must not be silently dropped"
+    );
+}
+
+#[test]
+fn h1_3b_census_counts_unclassified_instance_entries() {
+    let (exit_code, report) =
+        run_census_json("fixtures/synthetic/c26-nested-instance-multisegment");
+    assert_eq!(exit_code, 0);
+    let unclassified = report["unclassified_instance_entries"]
+        .as_u64()
+        .expect("unclassified_instance_entries must be present in the census JSON");
+    assert!(
+        unclassified >= 1,
+        "c26's hidden.services.synth.foo entry must be counted; got {unclassified}"
+    );
+}
