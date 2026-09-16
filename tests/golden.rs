@@ -657,3 +657,98 @@ fn h1_3_inherit_and_dynamic_attrpath_are_opacity_not_silence() {
         "both the inherit and the dynamic attrpath should be recorded; got {opacity:?}"
     );
 }
+
+// --- H1.3a review fixes ---------------------------------------------------
+//
+// The H1.3 walker's TestSpecRoot context still had one architectural hole:
+// it inferred "not nodes/containers" implied "harmless harness metadata,
+// safe to ignore" -- true for `name`/`meta`/`testScript`, false for
+// anything else. A real-shaped adversarial example: a normal, fully-visible
+// `nodes.machine` next to a second scenario (`hiddenScenario = runTest {
+// nodes.other = ...; };`) that the walker can't see into at all. Because
+// SOME nodes/containers binding was found, the old whole-file fallback
+// (`found_any_instance`) never fired either -- the hidden scenario's real
+// opposite-outcome assignment vanished with zero trace anywhere in the
+// report. `walk_test_spec_root` now classifies every top-level key against
+// an explicit, source-verified allowlist of confirmed-safe metadata keys
+// (KNOWN_HARNESS_METADATA_KEYS) and opacity's anything else.
+
+#[test]
+fn h1_3a_unclassified_root_sibling_makes_result_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c25-partial-root-opacity");
+    assert_eq!(
+        verdict_kind(r, "foo"),
+        "TestConfigUnresolved",
+        "an unrecognized test-spec-root entry next to a normal nodes.machine must not be \
+         silently treated as harmless metadata just because nodes.machine was also found"
+    );
+    let opacity = r["test_config_opacity"].as_array().unwrap();
+    assert!(
+        opacity.iter().any(|o| o["reason"]
+            .as_str()
+            .unwrap_or("")
+            .starts_with("unrecognized test-spec-root entry")),
+        "the hiddenScenario entry must be recorded as opacity, not silently discarded; got {opacity:?}"
+    );
+}
+
+// clap's `conflicts_with` must reject --targets and --census together as a
+// CLI usage error (TOOL_ERROR, 3) -- previously `run()` silently preferred
+// --census and just ignored --targets, which is a config bug wearing the
+// costume of "it did something".
+
+#[test]
+fn h1_3a_targets_and_census_together_is_tool_error() {
+    assert_eq!(
+        run_raw_args(&["--targets", "targets/golden.toml", "--census", "fixtures"]),
+        3,
+        "passing both --targets and --census must be a CLI usage error, not a silent choice"
+    );
+}
+
+// The census's own new metric, exercised directly (not just inferred from
+// run_target's verdict): censusing c25's own fixture directory (NOT all of
+// fixtures/synthetic -- that also contains c9-parse-error's deliberately
+// malformed module.nix, which would make parse_errors > 0 for an unrelated
+// reason) must surface hiddenScenario as an unclassified root entry, and
+// must exit 0 -- this narrower directory has no unreadable files and no
+// parse errors.
+
+fn run_census_json(dir: &str) -> (i32, Value) {
+    let output = Command::new(env!("CARGO_BIN_EXE_oba"))
+        .current_dir(manifest_dir())
+        .args(["--census", dir, "--json"])
+        .output()
+        .expect("failed to run oba binary");
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let report: Value = serde_json::from_str(&stdout).unwrap_or_else(|e| {
+        panic!(
+            "census did not emit valid JSON: {e}\nstderr: {}\nstdout: {stdout}",
+            String::from_utf8_lossy(&output.stderr)
+        )
+    });
+    (
+        output
+            .status
+            .code()
+            .expect("process exited via signal, not code"),
+        report,
+    )
+}
+
+#[test]
+fn h1_3a_census_counts_unclassified_root_entries() {
+    let (exit_code, report) = run_census_json("fixtures/synthetic/c25-partial-root-opacity");
+    assert_eq!(
+        exit_code, 0,
+        "a directory with no unreadable files and no parse errors must census as exit 0"
+    );
+    let unclassified = report["unclassified_root_entries"]
+        .as_u64()
+        .expect("unclassified_root_entries must be present in the census JSON");
+    assert!(
+        unclassified >= 1,
+        "c25's hiddenScenario entry must be counted as an unclassified root entry; got {unclassified}"
+    );
+}

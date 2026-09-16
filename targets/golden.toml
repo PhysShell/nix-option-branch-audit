@@ -228,3 +228,15 @@ test = "fixtures/synthetic/c24-inherit-and-dynamic/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synth"]
 watch = ["foo"]
+
+# --- H1.3a review fixture: an unrecognized test-spec-root entry sitting
+# next to a normal, fully-visible nodes.machine must not be silently
+# treated as harmless metadata just because it isn't nodes/containers. ---
+
+[[target]]
+name = "c25-partial-root-opacity"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c25-partial-root-opacity/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]

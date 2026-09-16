@@ -519,6 +519,94 @@ this pass, and not required to be. "They don't have to be supported. They
 have to not stay silent" was the explicit bar for closing this round, not
 "support 100% of nixpkgs's test syntax."
 
+## H1.3a review fixes
+
+A fifth review pass, against `ef96244` (H1.3 + the first census run). The
+walker redesign itself held up; the gap was in `TestSpecRoot`'s own
+closing assumption. `walk_test_spec_root` treated "not `nodes`/
+`containers`" as proof of "harmless harness metadata" — true for `name`/
+`meta`/`testScript`, but never actually checked against anything, so a real
+second scenario sitting at the same level (`hiddenScenario = runTest {
+nodes.other = { ... }: { services.synth.foo = null; }; };`, right next to
+an ordinary, fully-visible `nodes.machine`) was silently discarded exactly
+like metadata — and because `nodes.machine` *was* found, the old
+whole-file fallback (which only fired when literally nothing was
+recognized) never fired either. Result: a real opposite-outcome assignment
+existed in the file, entirely invisible to the walker, with nothing in the
+report — no opacity, no assignment — hinting it was ever there. `sddm.nix`
+(named `default = runTest {...}; autoLogin = runTest {...};` scenarios,
+no root-level `nodes` at all) confirmed the shape is real, not contrived.
+
+Fixed by turning the assumption into an actual check. Every top-level
+test-spec-root key is now classified against `KNOWN_HARNESS_METADATA_KEYS`
+— a small allowlist built by reading the real schema
+(`nixos/lib/testing/{driver,meta,testScript,name,run}.nix` in nixpkgs),
+not guessed: only keys structurally incapable of carrying NixOS module
+config (`name`, `meta`, `testScript`, `enableOCR`, `skipLint`,
+`skipTypeCheck`, `globalTimeout`, `hostPkgs`, `passthru`, ...) are on it.
+Reading the schema turned up two keys that looked like plausible metadata
+and are not: `defaults`/`nodeDefaults`/`containerDefaults`/
+`extraBaseModules`/`extraBaseNodeModules` are documented as "NixOS
+configuration applied to all nodes" (real option data, deliberately kept
+off the allowlist), and `interactive` is documented to accept
+`interactive.nodes.<x> = { ... }` overrides (`nixos/lib/testing/
+interactive.nix`'s own doc example uses exactly that shape) — also kept
+off. Anything not on the allowlist, including the legacy `machine = { ...
+}: { ... };` single-node shorthand (a real, separate key from `nodes`,
+confirmed in `nixos/lib/testing/legacy.nix`), now gets its own `Opacity`
+record (`REASON_UNCLASSIFIED_ROOT_ENTRY`) instead of silent disposal.
+Pinned by `c25-partial-root-opacity`: a normal `nodes.machine` with no
+opposite evidence, next to a `hiddenScenario` the walker can't see into —
+must be `TestConfigUnresolved`, not `OBA001`.
+
+The census gained the metric this round's whole complaint was actually
+about. `files_with_neither` (no assignment *and* no opacity) is a weaker
+claim than it looks — a file can have 200 correctly-found assignments and
+one fully-invisible sibling scenario and still land in neither bucket. The
+census now also reports `unclassified_root_entries`
+(`unclassified_root_entries >= 1` for the c25 pattern specifically), and
+distinguishes "genuinely can't read a file" from "read fine, nothing
+there": `unreadable_files` is now tracked and reported separately, and the
+census's own exit code stopped being a hardcoded `0` regardless of what it
+found — `unreadable_files > 0` is now `TOOL_ERROR` (3, the corpus wasn't
+fully covered at all) and `parse_errors > 0` is `2` (covered, but not all
+analyzable), matching the same fail-closed discipline `run()` already
+applied to a real analysis run. `--targets` and `--census` are now also
+genuinely mutually exclusive (`conflicts_with` in clap) — previously
+passing both silently ran the census and ignored `--targets` instead of
+rejecting the combination.
+
+Re-run against the same `nixos/tests` checkout (1609 files, `--census`):
+
+```
+files scanned:             1609
+unreadable files:             0
+parse errors:                 0
+root: direct attrset:      1389
+root: import-wrapper:        70
+root: opaque/unrecognized:  150
+total assignments found:  11351
+total opacity sites:       4277
+files with any opacity:    1181
+files with NEITHER (weaker bucket): 12
+unclassified root entries (option-relevant syntax that could have been silently discarded): 1903
+```
+
+`files_with_neither` moved from 14 to 12 (two of the previous 14 turned
+out to have an unrecognized root entry alongside their empty `nodes`, so
+they now correctly land in "any opacity" instead). The number that
+actually matters is the new one: **1903 unclassified root entries** across
+a corpus that previously reported this bucket as invisible — the
+`unrecognized test-spec-root entry` reason alone accounts for all 1903 of
+them; a rough independent check (`grep -rlE '^\s*machine\s*='`) finds 119
+files using the `machine =` shorthand alone, confirming this is a real,
+sizeable, previously-silent bucket and not a rounding artifact. This pass
+does not resolve any of it — `machine`, `interactive.nodes.*`, and
+whatever else lives in the other ~1780 entries are exactly the deferred
+"they don't have to be supported, they have to not stay silent" cases the
+H1.3 review closed on; they're now visible and counted for the first time,
+which was the actual bar for this round, not resolving them.
+
 ## Running
 
 ```
@@ -538,7 +626,7 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 
 - [x] A. reproduces the historical finding on the exact parent commit
 - [x] B. clears it on the exact fix commit, with evidence attached
-- [x] C. survives 23 adversarial/synthetic/real-world cases: `c2`–`c5`
+- [x] C. survives 24 adversarial/synthetic/real-world cases: `c2`–`c5`
       (original 4 kimai mutations), `c6a`/`c6b` (non-null-default
       false-positive + its positive control), `c7` (unresolvable boolean
       default), `c8` (missing declaration), `c9` (parse-error fail-closed),
@@ -551,13 +639,15 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
       form), `c20` (unrecognized root wrapper), `c21`
       (`import ./make-test-python.nix (...)` wrapper unwrapped), `c22`/`c23`
       (module-root `config`, literal and opaque), `c24` (`inherit` +
-      dynamic attrpath), plus a scanner-level unit test against real,
-      unmodified `nixos/tests/ifm.nix`
+      dynamic attrpath), `c25` (unrecognized root entry next to a normal
+      node — `TestConfigUnresolved`, not silently dropped as metadata),
+      plus a scanner-level unit test against real, unmodified
+      `nixos/tests/ifm.nix`
 - [x] D. produces source spans + evidence (file:line:col, matched assignment)
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 28 tests, all passing: 5 from the original spike, 5 from H1
+`cargo test` — 31 tests, all passing: 5 from the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,
@@ -566,14 +656,16 @@ empty-watch-is-tool-error, missing-file-is-tool-error), 6 from H1.2
 control, its own opacity-detector positive assertion, CLI parse failure →
 `TOOL_ERROR`), 7 from H1.3 (nested nodes form ×2, unknown root, the
 make-test-python.nix wrapper, module-root config ×2, inherit+dynamic
-attrpath), 1 fixture integrity lock, 1 real-world scanner unit test
-against `fixtures/real/ifm-test.nix`. `scripts/verify-upstream.sh`'s
-worktree fix, the CLI-level clap tests, and the `--census` run against
-1609 real files are exercised outside `cargo test` (a shell script, raw
-process exit codes, and a full-corpus pass, respectively) but verified
-the same way as everything else in this project: by reproducing the
-actual bug first, then confirming the fix against it, not just reading
-the diff and hoping.
+attrpath), 3 from H1.3a (unclassified root entry → `TestConfigUnresolved`,
+`--targets`/`--census` CLI mutual exclusion, the census's own
+`unclassified_root_entries` metric), 1 fixture integrity lock, 1
+real-world scanner unit test against `fixtures/real/ifm-test.nix`.
+`scripts/verify-upstream.sh`'s worktree fix, the CLI-level clap tests, and
+the `--census` run against 1609 real files are exercised outside
+`cargo test` (a shell script, raw process exit codes, and a full-corpus
+pass, respectively) but verified the same way as everything else in this
+project: by reproducing the actual bug first, then confirming the fix
+against it, not just reading the diff and hoping.
 
 ## Real bugs this spike itself found in its own implementation
 

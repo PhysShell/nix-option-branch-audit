@@ -44,7 +44,7 @@ use clap::Parser;
 struct Cli {
     /// Path to a TOML target manifest (see targets/*.toml). Required
     /// unless --census is given.
-    #[arg(long)]
+    #[arg(long, conflicts_with = "census")]
     targets: Option<PathBuf>,
     /// Emit machine-readable JSON instead of the human report.
     #[arg(long)]
@@ -59,8 +59,10 @@ struct Cli {
     /// settled: does "no assignment found" mean "genuinely not there" or
     /// "the walker couldn't see this file's shape at all" more often than
     /// expected, across a real corpus rather than a handful of fixtures.
-    /// Mutually exclusive with --targets.
-    #[arg(long)]
+    /// Mutually exclusive with --targets (H1.3a: previously only enforced
+    /// by `run()` silently preferring --census and ignoring --targets when
+    /// both were given -- clap now rejects the combination outright).
+    #[arg(long, conflicts_with = "targets")]
     census: Option<PathBuf>,
 }
 
@@ -790,12 +792,58 @@ fn resolve_test_root(node: SyntaxNode) -> SyntaxNode {
     node
 }
 
+/// H1.3a review: the set of test-spec-root keys confirmed, by reading the
+/// real schema (`nixos/lib/testing/*.nix` in nixpkgs: driver.nix, meta.nix,
+/// testScript.nix, name.nix, run.nix), to be structurally incapable of
+/// carrying NixOS module config -- a string, a bool, a fixed-shape metadata
+/// attrset, a function over packages, or similar. Deliberately NOT on this
+/// list, because each one genuinely does carry option-relevant module
+/// config in real tests (verified in the same source): `machine` (the
+/// single-node shorthand for `nodes.machine`), `interactive` (documented to
+/// accept `interactive.nodes.<x> = {...}` overrides -- see
+/// nixos/lib/testing/interactive.nix's own doc example), `defaults`,
+/// `nodeDefaults`, `containerDefaults`, `extraBaseModules`,
+/// `extraBaseNodeModules` (all four are explicitly "NixOS configuration
+/// applied to all nodes/containers" per nodes.nix). Getting this allowlist
+/// wrong in the unsafe direction is exactly the bug this pass exists to
+/// close, so anything not independently confirmed safe stays OFF it.
+const KNOWN_HARNESS_METADATA_KEYS: &[&str] = &[
+    "name",
+    "meta",
+    "testScript",
+    "testScriptString",
+    "includeTestScriptReferences",
+    "withoutTestScriptReferences",
+    "enableOCR",
+    "skipLint",
+    "skipTypeCheck",
+    "logLevel",
+    "globalTimeout",
+    "extraPythonPackages",
+    "extraDriverArgs",
+    "hostPkgs",
+    "passthru",
+    "requiredFeatures",
+    "kvm",
+    "devnet",
+];
+
+/// Shared with `run_census`'s `unclassified_root_entries` counter, so the
+/// two can't drift apart.
+const REASON_UNCLASSIFIED_ROOT_ENTRY: &str = "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into";
+
 /// TestSpecRoot: finds `nodes`/`containers` bindings, both forms --
 /// `nodes.foo = ...;` (flat) and `nodes = { foo = ...; bar = ...; };`
-/// (nested, equally common in real nixosTests). Everything else at this
-/// level is test-harness metadata (`name`, `meta`, `testScript`), not
-/// option data, and is deliberately not recorded as an assignment or an
-/// opacity site -- there's nothing option-relevant here to miss.
+/// (nested, equally common in real nixosTests). Every OTHER top-level key
+/// is checked against `KNOWN_HARNESS_METADATA_KEYS`: a confirmed-safe key
+/// is genuinely not option data and is skipped; anything else gets its own
+/// `Opacity` record. H1.3a review: the previous version treated "not
+/// nodes/containers" as sufficient proof of "harmless metadata", which is
+/// false -- e.g. `hiddenScenario = runTest { nodes.other = {...}: {
+/// services.synth.foo = null; }; };` sitting next to a normal
+/// `nodes.machine` was silently discarded as if it were `name`/`meta`,
+/// even though it's a second, fully live test scenario this walker can't
+/// see into (c25).
 fn walk_test_spec_root(
     file: &str,
     src: &str,
@@ -813,21 +861,39 @@ fn walk_test_spec_root(
     // assignment nor an opacity site -- a silent "nothing here" that's
     // actually "an entire convention this walker doesn't parse into" --
     // which is exactly the failure mode this whole review round exists to
-    // eliminate. Rather than chase every test-builder-function-name
-    // variant (out of scope for this pass, and an open-ended list), any
-    // spec root with zero recognized nodes/containers bindings gets one
-    // whole-file opacity record instead of silence.
-    let mut found_any_instance = false;
+    // eliminate. This case is now also covered per-entry (below, via
+    // REASON_UNCLASSIFIED_ROOT_ENTRY), so this whole-file fallback now only
+    // fires for the genuinely-empty-attrset edge case; kept as a backstop
+    // rather than removed, since "zero entries at all" isn't reachable
+    // through the per-entry loop below.
+    let mut saw_any_entry = false;
 
     for entry in attrset.children() {
+        if entry.kind() == NODE_INHERIT {
+            saw_any_entry = true;
+            opacity.push(Opacity {
+                path: Vec::new(),
+                instance: None,
+                reason: "inherit binding at test spec root -- may pull in option-relevant values this walker can't trace",
+                span: span_of(file, src, &entry),
+            });
+            continue;
+        }
         if entry.kind() != NODE_ATTRPATH_VALUE {
             continue;
         }
+        saw_any_entry = true;
         let mut children = entry.children();
         let Some(attrpath) = children.next() else {
             continue;
         };
         let Some(segs) = attrpath_segments(&attrpath) else {
+            opacity.push(Opacity {
+                path: Vec::new(),
+                instance: None,
+                reason: "dynamic (\"${...}\") attribute name at test spec root -- can't be statically resolved",
+                span: span_of(file, src, &entry),
+            });
             continue;
         };
         let Some(value) = children.next() else {
@@ -835,13 +901,11 @@ fn walk_test_spec_root(
         };
 
         if segs.len() == 2 && (segs[0] == "nodes" || segs[0] == "containers") {
-            found_any_instance = true;
             enter_instance(file, src, &segs[1], &value, &entry, out, opacity);
             continue;
         }
 
         if segs.len() == 1 && (segs[0] == "nodes" || segs[0] == "containers") {
-            found_any_instance = true;
             let body = unwrap_lambda_chain(value.clone());
             if body.kind() != NODE_ATTR_SET {
                 opacity.push(Opacity {
@@ -884,14 +948,34 @@ fn walk_test_spec_root(
                     );
                 }
             }
+            continue;
+        }
+
+        // Neither a nodes/containers binding nor a confirmed-safe
+        // metadata key: H1.3a review -- must not assume an unrecognized
+        // shape is harmless just because it isn't nodes/containers. Could
+        // be another live test scenario (`hiddenScenario = runTest {
+        // nodes.other = ...; };`), a `machine` shorthand, an `interactive`
+        // override, or something not anticipated at all.
+        if !KNOWN_HARNESS_METADATA_KEYS.contains(&segs[0].as_str()) {
+            opacity.push(Opacity {
+                path: Vec::new(),
+                instance: None,
+                reason: REASON_UNCLASSIFIED_ROOT_ENTRY,
+                span: span_of(file, src, &entry),
+            });
         }
     }
 
-    if !found_any_instance {
+    // Only reachable now when the attrset has zero real entries at all
+    // (every unrecognized non-empty case already got its own per-entry
+    // Opacity above) -- kept as a backstop for that edge, not the general
+    // mechanism it used to be.
+    if !saw_any_entry {
         opacity.push(Opacity {
             path: Vec::new(),
             instance: None,
-            reason: "test spec root has no recognized nodes/containers binding -- possibly a multi-scenario file (each entry independently building its own test, e.g. `name = runTest { nodes = ...; };`) or another unrecognized convention",
+            reason: "test spec root attrset has no entries at all",
             span: span_of(file, src, attrset),
         });
     }
@@ -1526,6 +1610,11 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
 #[derive(Serialize, Debug, Default)]
 struct CensusReport {
     files_scanned: usize,
+    /// H1.3a review: previously silently `continue`d past an unreadable
+    /// file (permissions, non-UTF8, ...) with no record anywhere in the
+    /// report -- a census could "successfully" cover a corpus it never
+    /// fully read, and nothing about the printed report would say so.
+    unreadable_files: usize,
     parse_errors: usize,
     /// Root resolved directly to a literal attrset (no unwrapping needed
     /// beyond the ordinary lambda/let-in chain).
@@ -1544,6 +1633,19 @@ struct CensusReport {
     /// counts here on files that look real would mean a walker gap this
     /// census didn't anticipate.
     files_with_neither: usize,
+    /// H1.3a review: the metric that actually matters, and a strictly
+    /// stronger acceptance bar than `files_with_neither`. A file can have
+    /// 200 cleanly recognized assignments AND one fully invisible sibling
+    /// scenario (`hiddenScenario = runTest { ... };` next to a normal
+    /// `nodes.machine`) -- `files_with_neither` would call that file
+    /// clean, because *something* was found. This counts every
+    /// test-spec-root entry that was neither `nodes`/`containers` nor a
+    /// confirmed-safe metadata key (`REASON_UNCLASSIFIED_ROOT_ENTRY`),
+    /// i.e. every point option-relevant syntax could have been silently
+    /// discarded. The acceptance bar this pass exists to hit is this
+    /// field being explainable/zero-per-file, not `files_with_neither`
+    /// alone.
+    unclassified_root_entries: usize,
     opacity_reason_counts: std::collections::BTreeMap<String, usize>,
 }
 
@@ -1572,7 +1674,16 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
         report.files_scanned += 1;
         let src = match fs::read_to_string(path) {
             Ok(s) => s,
-            Err(_) => continue, // unreadable (permissions, non-UTF8, ...) -- skip, not a parse error
+            Err(_) => {
+                // Unreadable (permissions, non-UTF8, ...) is NOT the same
+                // fact as "read fine, parsed fine, genuinely found
+                // nothing" -- must be visible in the report and must fail
+                // the run closed (see the exit-code logic below), not
+                // silently drop the file from the corpus this census
+                // claims to have covered.
+                report.unreadable_files += 1;
+                continue;
+            }
         };
         let parse = rnix::Root::parse(&src);
         if !parse.errors().is_empty() {
@@ -1606,6 +1717,10 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
                 eprintln!("NEITHER: {file}");
             }
         }
+        report.unclassified_root_entries += opacity
+            .iter()
+            .filter(|o| o.reason == REASON_UNCLASSIFIED_ROOT_ENTRY)
+            .count();
         for o in &opacity {
             *report
                 .opacity_reason_counts
@@ -1618,20 +1733,25 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
         println!("{}", serde_json::to_string_pretty(&report)?);
     } else {
         println!("=== syntax-visibility census: {} ===", dir.display());
-        println!("files scanned:            {}", report.files_scanned);
+        println!("files scanned:             {}", report.files_scanned);
+        println!("unreadable files:          {}", report.unreadable_files);
         println!("parse errors:              {}", report.parse_errors);
-        println!("root: direct attrset:     {}", report.root_direct_attrset);
-        println!("root: import-wrapper:     {}", report.root_import_wrapper);
+        println!("root: direct attrset:      {}", report.root_direct_attrset);
+        println!("root: import-wrapper:      {}", report.root_import_wrapper);
         println!("root: opaque/unrecognized: {}", report.root_opaque);
-        println!("total assignments found:  {}", report.total_assignments);
-        println!("total opacity sites:      {}", report.total_opacity_sites);
+        println!("total assignments found:   {}", report.total_assignments);
+        println!("total opacity sites:       {}", report.total_opacity_sites);
         println!(
-            "files with any opacity:   {}",
+            "files with any opacity:    {}",
             report.files_with_any_opacity
         );
         println!(
-            "files with NEITHER (concerning bucket): {}",
+            "files with NEITHER (weaker bucket): {}",
             report.files_with_neither
+        );
+        println!(
+            "unclassified root entries (option-relevant syntax that could have been silently discarded): {}",
+            report.unclassified_root_entries
         );
         println!("opacity reasons:");
         for (reason, count) in &report.opacity_reason_counts {
@@ -1639,7 +1759,23 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
         }
     }
 
-    Ok(0)
+    // H1.3a review: this used to always return Ok(0), meaning "unreadable
+    // files exist" and "parse errors exist" were only visible if someone
+    // actually read the printed numbers. A census is evidence-gathering
+    // for a freeze decision, so it gets the same fail-closed exit-code
+    // discipline as `run()`: unreadable files mean the corpus wasn't fully
+    // covered at all (TOOL_ERROR, 3); parse errors mean some files were
+    // covered but not analyzable (INCONCLUSIVE-shaped, 2); anything else
+    // is a clean pass (0). `1` (FINDING) doesn't apply -- a census
+    // produces no verdicts to find.
+    if report.unreadable_files > 0 {
+        anyhow::bail!(
+            "{} file(s) under {} could not be read -- census does not cover the full corpus",
+            report.unreadable_files,
+            dir.display()
+        );
+    }
+    Ok(if report.parse_errors > 0 { 2 } else { 0 })
 }
 
 #[derive(Serialize, Debug)]
