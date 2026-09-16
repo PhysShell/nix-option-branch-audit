@@ -1,0 +1,83 @@
+# Golden corpus: the two commits from PhysShell/nixpkgs branch
+# fix/doctrine-unix-socket-param-name.
+#
+#   5530e24f2  parent of the fix (the actual nixpkgs bug, pre-existing)
+#   37f81efa4  first fix commit (module fix + v1 regression test, same commit)
+#
+# Expected, per the OBA/CDC/ROB split agreed on:
+#   kimai before -> OBA001 (branch never exercised with non-null database.socket)
+#   kimai after  -> PASS   (v1 test sets database.socket to a real path)
+#     Note: PASS here is *only* activation evidence. The v1 test's PASS does
+#     NOT mean the fix was proven correct end-to-end -- that took two more
+#     rounds (v2, v3) to establish, entirely on the ROB axis, which this
+#     tool does not attempt. Documented, not silently implied.
+#   davis before/after -> PREDICATE_NOT_FOUND in both. davis's branch is
+#     gated by `mysqlLocal = db.createLocally && db.driver == "mysql";`, a
+#     let-bound alias, not a direct `cfg.foo` select. Alias resolution is an
+#     explicit MVP non-goal; this is the honest result, not a false PASS.
+
+[[target]]
+name = "kimai-before"
+module = "fixtures/kimai/before/module.nix"
+test = "fixtures/kimai/before/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "davis-before"
+module = "fixtures/davis/before/module.nix"
+test = "fixtures/davis/before/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "davis"]
+watch = ["database.driver"]
+
+[[target]]
+name = "davis-after"
+module = "fixtures/davis/after/module.nix"
+test = "fixtures/davis/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "davis"]
+watch = ["database.driver"]
+
+# --- Adversarial mutations against the fixed kimai module (all expected OBA001) ---
+
+[[target]]
+name = "c2-remove-scenario"
+module = "fixtures/kimai/mutations/c2-remove-scenario/module.nix"
+test = "fixtures/kimai/mutations/c2-remove-scenario/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "c3-explicit-null"
+module = "fixtures/kimai/mutations/c3-explicit-null/module.nix"
+test = "fixtures/kimai/mutations/c3-explicit-null/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "c4-wrong-prefix"
+module = "fixtures/kimai/mutations/c4-wrong-prefix/module.nix"
+test = "fixtures/kimai/mutations/c4-wrong-prefix/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "c5-wrong-suffix"
+module = "fixtures/kimai/mutations/c5-wrong-suffix/module.nix"
+test = "fixtures/kimai/mutations/c5-wrong-suffix/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
