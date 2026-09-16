@@ -1,0 +1,21 @@
+# Every target here resolves cleanly (declaration found, predicate found,
+# default classifiable) -- no PredicateNotFound/OptionNotFound/
+# DefaultUnresolved anywhere. kimai-before is a genuine OBA001 finding.
+# For asserting exit code 1 / status "FINDING" in isolation, without
+# davis's PredicateNotFound pulling the whole run to INCONCLUSIVE.
+
+[[target]]
+name = "kimai-before"
+module = "fixtures/kimai/before/module.nix"
+test = "fixtures/kimai/before/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]

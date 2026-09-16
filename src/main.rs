@@ -216,7 +216,13 @@ struct Predicate {
     source: String,
 }
 
-const HELPER_NAMES: &[&str] = &["mkIf", "optional", "optionals", "optionalString", "optionalAttrs"];
+const HELPER_NAMES: &[&str] = &[
+    "mkIf",
+    "optional",
+    "optionals",
+    "optionalString",
+    "optionalAttrs",
+];
 
 fn scan_predicates(file: &str, src: &str, root: &SyntaxNode, cfg_ident: &str) -> Vec<Predicate> {
     let mut out = Vec::new();
@@ -336,7 +342,13 @@ fn scan_predicates(file: &str, src: &str, root: &SyntaxNode, cfg_ident: &str) ->
 }
 
 fn first_line(node: &SyntaxNode) -> String {
-    node.text().to_string().lines().next().unwrap_or("").trim().to_string()
+    node.text()
+        .to_string()
+        .lines()
+        .next()
+        .unwrap_or("")
+        .trim()
+        .to_string()
 }
 
 // ---------------------------------------------------------------------
@@ -525,9 +537,8 @@ fn walk_test_block(
             continue;
         };
 
-        let is_instance_binding = path.is_empty()
-            && segs.len() == 2
-            && (segs[0] == "containers" || segs[0] == "nodes");
+        let is_instance_binding =
+            path.is_empty() && segs.len() == 2 && (segs[0] == "containers" || segs[0] == "nodes");
 
         if is_instance_binding {
             // `containers.<name>` / `nodes.<name>` are nixosTest scaffolding,
@@ -542,7 +553,14 @@ fn walk_test_block(
             let body = unwrap_lambda_chain(value.clone());
             if body.kind() == NODE_ATTR_SET {
                 let mut fresh_path = Vec::new();
-                walk_test_block(file, src, &body, &mut fresh_path, Some(segs[1].clone()), out);
+                walk_test_block(
+                    file,
+                    src,
+                    &body,
+                    &mut fresh_path,
+                    Some(segs[1].clone()),
+                    out,
+                );
             }
             continue;
         }
@@ -574,28 +592,78 @@ fn walk_test_block(
 #[derive(Serialize, Debug)]
 #[serde(tag = "verdict")]
 enum Verdict {
-    /// No branch predicate for this watched option was found in the module
-    /// at all (e.g. hidden behind a `let`-bound alias -- out of MVP scope,
-    /// and intentionally NOT reported as PASS, so an aliased predicate
-    /// can't masquerade as a clean bill of health).
+    /// The module has no `mkOption { ... }` declaration for this watched
+    /// path at all. A prerequisite for everything downstream: PASS must
+    /// never be reachable without the declaration scanner having actually
+    /// found the option (previously it wasn't required -- a silently dead
+    /// declaration scanner couldn't have blocked a PASS).
+    OptionNotFound { option: String },
+    /// The declaration was found, but no direct `cfg.<path>` branch
+    /// predicate was found in the module (e.g. hidden behind a `let`-bound
+    /// alias -- out of MVP scope, and intentionally never folded into a
+    /// PASS, so an aliased predicate can't masquerade as a clean bill of
+    /// health).
     PredicateNotFound { option: String },
-    /// A predicate was found but no test assignment provides evidence the
-    /// branch was ever exercised with a non-default value.
+    /// The predicate was found, but its declared default value's boolean
+    /// outcome under this predicate can't be statically classified (e.g. a
+    /// `Truthy` predicate whose default is some non-literal expression, not
+    /// bare `true`/`false`). Without a default outcome there is nothing to
+    /// prove a *transition* away from, so no verdict is possible.
+    DefaultUnresolved {
+        option: String,
+        predicate: Predicate,
+    },
+    /// A predicate and a classifiable default were found, but no test
+    /// assignment's value provably flips the predicate's outcome away from
+    /// what the default produces.
     #[serde(rename = "OBA001")]
-    Oba001 { option: String, predicate: Predicate },
-    /// A predicate was found and at least one test assignment sets the
-    /// option outside its default equivalence class.
+    Oba001 {
+        option: String,
+        predicate: Predicate,
+        default_outcome: bool,
+    },
+    /// A predicate and a classifiable default were found, and at least one
+    /// test assignment's value provably evaluates the predicate to the
+    /// *opposite* outcome from the default -- i.e. the branch is proven to
+    /// have been taken down a different path than it would with no
+    /// configuration at all.
     #[serde(rename = "PASS")]
     Pass {
         option: String,
         predicate: Predicate,
+        default_outcome: bool,
         evidence: Vec<TestAssignment>,
     },
+}
+
+impl Verdict {
+    /// "We couldn't establish a verdict" -- distinct from, and just as
+    /// loud as, "we established a verdict and it's bad". A CI that only
+    /// alarms on OBA001 and treats every inconclusive silently as green is
+    /// exactly the failure mode `watch` was added to prevent.
+    fn is_inconclusive(&self) -> bool {
+        matches!(
+            self,
+            Verdict::OptionNotFound { .. }
+                | Verdict::PredicateNotFound { .. }
+                | Verdict::DefaultUnresolved { .. }
+        )
+    }
+
+    fn is_finding(&self) -> bool {
+        matches!(self, Verdict::Oba001 { .. })
+    }
 }
 
 #[derive(Serialize, Debug)]
 struct TargetReport {
     name: String,
+    /// Non-empty only when the module or test file failed to parse
+    /// cleanly. Fail closed: a target with parse errors gets no per-watch
+    /// verdicts at all (they'd be scanning a tree rnix patched together
+    /// around damage, not the real one) -- the parse errors themselves
+    /// count as inconclusive.
+    parse_errors: Vec<String>,
     discovered_options: Vec<OptionDecl>,
     discovered_predicates: Vec<Predicate>,
     matched_test_assignments: Vec<TestAssignment>,
@@ -619,14 +687,27 @@ fn path_matches_prefix(full: &[String], prefix: &[String], suffix: &[String]) ->
     true
 }
 
-fn is_default_class(kind: &PredicateKind, default_source: Option<&str>, value_source: &str) -> bool {
+/// The boolean outcome of evaluating `kind`'s predicate expression with the
+/// literal `value_source` substituted in, when that's staticaly decidable
+/// from the raw source text alone -- `None` means genuinely unknown, not
+/// "assume it doesn't count" and not "assume it does". This is deliberately
+/// narrow: only the literal tokens `null`/`true`/`false` are understood.
+/// Anything else (an interpolated string, a let-bound alias, an arbitrary
+/// expression) is honestly unresolvable rather than guessed at.
+fn predicate_outcome(kind: &PredicateKind, value_source: &str) -> Option<bool> {
     let v = value_source.trim();
     match kind {
-        PredicateKind::NullNeq | PredicateKind::NullEq => v == "null",
-        PredicateKind::Truthy(_) | PredicateKind::NegTruthy => match default_source {
-            Some(d) => v == d.trim(),
-            // unknown default: don't claim non-default evidence either way
-            None => true,
+        PredicateKind::NullNeq => Some(v != "null"),
+        PredicateKind::NullEq => Some(v == "null"),
+        PredicateKind::Truthy(_) => match v {
+            "true" => Some(true),
+            "false" => Some(false),
+            _ => None,
+        },
+        PredicateKind::NegTruthy => match v {
+            "true" => Some(false),
+            "false" => Some(true),
+            _ => None,
         },
     }
 }
@@ -637,11 +718,44 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
     let module_file = t.module.display().to_string();
     let test_file = t.test.display().to_string();
 
-    let module_root = rnix::Root::parse(&module_src).tree();
-    let test_root = rnix::Root::parse(&test_src).tree();
+    let module_parse = rnix::Root::parse(&module_src);
+    let test_parse = rnix::Root::parse(&test_src);
+
+    let mut parse_errors: Vec<String> = Vec::new();
+    for e in module_parse.errors() {
+        parse_errors.push(format!("{module_file}: {e}"));
+    }
+    for e in test_parse.errors() {
+        parse_errors.push(format!("{test_file}: {e}"));
+    }
+
+    if !parse_errors.is_empty() {
+        // Fail closed: don't scan a tree rnix stitched together around
+        // damage and pretend the resulting (dis)coveries mean anything.
+        return Ok(TargetReport {
+            name: t.name.clone(),
+            parse_errors,
+            discovered_options: Vec::new(),
+            discovered_predicates: Vec::new(),
+            matched_test_assignments: Vec::new(),
+            verdicts: t
+                .watch
+                .iter()
+                .map(|w| Verdict::OptionNotFound { option: w.clone() })
+                .collect(),
+        });
+    }
+
+    let module_root = module_parse.tree();
+    let test_root = test_parse.tree();
 
     let options = scan_options(&module_file, &module_src, module_root.syntax());
-    let predicates = scan_predicates(&module_file, &module_src, module_root.syntax(), &t.cfg_ident);
+    let predicates = scan_predicates(
+        &module_file,
+        &module_src,
+        module_root.syntax(),
+        &t.cfg_ident,
+    );
     let assignments = scan_test_assignments(&test_file, &test_src, test_root.syntax());
 
     let mut matched_assignments = Vec::new();
@@ -649,6 +763,20 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
 
     for watched in &t.watch {
         let watched_path: Vec<String> = watched.split('.').map(|s| s.to_string()).collect();
+
+        // Gate 1: the declaration scanner must have actually found this
+        // option. A dead/broken declaration scanner must never be able to
+        // silently let a PASS through -- see the H1 review that caught
+        // this: default_source was previously optional at the point PASS
+        // became reachable.
+        let Some(decl) = options.iter().find(|o| o.path == watched_path) else {
+            verdicts.push(Verdict::OptionNotFound {
+                option: watched.clone(),
+            });
+            continue;
+        };
+
+        // Gate 2: a direct branch predicate referencing it.
         let Some(pred) = predicates.iter().find(|p| p.path == watched_path) else {
             verdicts.push(Verdict::PredicateNotFound {
                 option: watched.clone(),
@@ -656,9 +784,30 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             continue;
         };
 
-        let default_decl = options.iter().find(|o| o.path == pred.path);
-        let default_source = default_decl.and_then(|o| o.default_source.as_deref());
+        // Gate 3: the default's outcome under this predicate must be
+        // statically classifiable, or there's no baseline to prove a
+        // transition away from.
+        let Some(default_outcome) = decl
+            .default_source
+            .as_deref()
+            .and_then(|d| predicate_outcome(&pred.kind, d))
+        else {
+            verdicts.push(Verdict::DefaultUnresolved {
+                option: watched.clone(),
+                predicate: pred.clone(),
+            });
+            continue;
+        };
 
+        // Gate 4: a structurally-bound test assignment whose value's
+        // outcome under this predicate is the *opposite* of the default's
+        // -- not merely "not textually equal to the default", which is a
+        // different (and, for non-null defaults, wrong) question. See the
+        // H1 review: `default = "/run/default.sock"; cfg.foo != null` with
+        // a test assignment of the exact same string used to read as
+        // "non-default evidence" under a textual-equality check, even
+        // though both default and test land in the *same* predicate
+        // outcome (true) and no branch transition is proven at all.
         let matches: Vec<TestAssignment> = assignments
             .iter()
             .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
@@ -666,32 +815,53 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             .collect();
         matched_assignments.extend(matches.clone());
 
-        let non_default: Vec<TestAssignment> = matches
+        let transitions: Vec<TestAssignment> = matches
             .into_iter()
-            .filter(|a| !is_default_class(&pred.kind, default_source, &a.value_source))
+            .filter(|a| predicate_outcome(&pred.kind, &a.value_source) == Some(!default_outcome))
             .collect();
 
-        if non_default.is_empty() {
+        if transitions.is_empty() {
             verdicts.push(Verdict::Oba001 {
                 option: watched.clone(),
                 predicate: pred.clone(),
+                default_outcome,
             });
         } else {
             verdicts.push(Verdict::Pass {
                 option: watched.clone(),
                 predicate: pred.clone(),
-                evidence: non_default,
+                default_outcome,
+                evidence: transitions,
             });
         }
     }
 
     Ok(TargetReport {
         name: t.name.clone(),
+        parse_errors,
         discovered_options: options,
         discovered_predicates: predicates,
         matched_test_assignments: matched_assignments,
         verdicts,
     })
+}
+
+#[derive(Serialize, Debug)]
+struct Summary {
+    /// "PASS" only if every target resolved cleanly with no findings.
+    /// "FINDING" if at least one OBA001 and nothing inconclusive.
+    /// "INCONCLUSIVE" takes precedence over FINDING: a run that couldn't
+    /// fully evaluate some watched option has no business claiming to have
+    /// swept the rest cleanly, regardless of what else it found.
+    status: &'static str,
+    findings: usize,
+    inconclusive: usize,
+}
+
+#[derive(Serialize, Debug)]
+struct FullReport {
+    summary: Summary,
+    targets: Vec<TargetReport>,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -703,25 +873,57 @@ fn main() -> anyhow::Result<()> {
         reports.push(run_target(t)?);
     }
 
-    if cli.json {
-        println!("{}", serde_json::to_string_pretty(&reports)?);
+    let findings = reports
+        .iter()
+        .flat_map(|r| &r.verdicts)
+        .filter(|v| v.is_finding())
+        .count();
+    let inconclusive = reports
+        .iter()
+        .flat_map(|r| &r.verdicts)
+        .filter(|v| v.is_inconclusive())
+        .count();
+    let parse_failed_targets = reports
+        .iter()
+        .filter(|r| !r.parse_errors.is_empty())
+        .count();
+
+    let (exit_code, status) = if inconclusive > 0 || parse_failed_targets > 0 {
+        (2, "INCONCLUSIVE")
+    } else if findings > 0 {
+        (1, "FINDING")
     } else {
+        (0, "PASS")
+    };
+
+    if cli.json {
+        let full = FullReport {
+            summary: Summary {
+                status,
+                findings,
+                inconclusive,
+            },
+            targets: reports,
+        };
+        println!("{}", serde_json::to_string_pretty(&full)?);
+    } else {
+        println!("=== summary: {status}  findings={findings}  inconclusive={inconclusive} ===");
         for r in &reports {
             print_human(r);
         }
     }
 
-    let has_oba001 = reports
-        .iter()
-        .any(|r| r.verdicts.iter().any(|v| matches!(v, Verdict::Oba001 { .. })));
-    if has_oba001 {
-        std::process::exit(1);
-    }
-    Ok(())
+    std::process::exit(exit_code);
 }
 
 fn print_human(r: &TargetReport) {
     println!("=== target: {} ===", r.name);
+    if !r.parse_errors.is_empty() {
+        for e in &r.parse_errors {
+            println!("  PARSE_ERROR  {e}");
+        }
+        return;
+    }
     println!(
         "discovered_options: {}",
         r.discovered_options
@@ -734,7 +936,13 @@ fn print_human(r: &TargetReport) {
         "discovered_predicates: {}",
         r.discovered_predicates
             .iter()
-            .map(|p| format!("{}({:?})@{}:{}", p.path.join("."), p.kind, p.span.line, p.span.col))
+            .map(|p| format!(
+                "{}({:?})@{}:{}",
+                p.path.join("."),
+                p.kind,
+                p.span.line,
+                p.span.col
+            ))
             .collect::<Vec<_>>()
             .join(", ")
     );
@@ -755,19 +963,30 @@ fn print_human(r: &TargetReport) {
     );
     for v in &r.verdicts {
         match v {
+            Verdict::OptionNotFound { option } => {
+                println!("  OPTION_NOT_FOUND  {option}  (declaration scanner found no mkOption for this path)")
+            }
             Verdict::PredicateNotFound { option } => println!(
                 "  PREDICATE_NOT_FOUND  {option}  (no direct cfg.<path> branch found -- likely aliased, out of MVP scope)"
             ),
-            Verdict::Oba001 { option, predicate } => println!(
-                "  OBA001  {option}  [{}:{}]  `{}`",
+            Verdict::DefaultUnresolved { option, .. } => println!(
+                "  DEFAULT_UNRESOLVED  {option}  (declared default's outcome under this predicate isn't a literal null/true/false)"
+            ),
+            Verdict::Oba001 {
+                option,
+                predicate,
+                default_outcome,
+            } => println!(
+                "  OBA001  {option}  default_outcome={default_outcome}  [{}:{}]  `{}`",
                 predicate.span.line, predicate.span.col, predicate.source
             ),
             Verdict::Pass {
                 option,
+                default_outcome,
                 evidence,
                 ..
             } => println!(
-                "  PASS    {option}  evidence: {}",
+                "  PASS    {option}  default_outcome={default_outcome}  evidence: {}",
                 evidence
                     .iter()
                     .map(|e| format!(

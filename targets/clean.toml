@@ -1,0 +1,13 @@
+# A manifest with exactly one target that fully resolves to PASS, nothing
+# else -- for asserting exit code 0 / status "PASS" in isolation. Mixing
+# this with davis (PredicateNotFound) or the OBA001 mutations in the same
+# manifest would make the exit code always INCONCLUSIVE or FINDING, so it
+# needs its own file.
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]

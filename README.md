@@ -40,11 +40,33 @@ Given a NixOS module and a test file:
    a `*` wildcard for `attrsOf`-submodule instance names) and classifies
    each match as inside or outside the option's default-value class.
 
-Verdicts: `PredicateNotFound` (no direct `cfg.<path>` branch found — most
-often a `let`-bound alias, explicitly out of scope, see below), `OBA001`
-(predicate found, no non-default test evidence), `PASS` (predicate found,
-non-default test evidence exists, with the matching assignment(s) attached
-as evidence).
+Verdicts come from a 4-gate chain, each one a hard prerequisite for the next
+— `PASS` is unreachable unless all four resolved:
+
+```
+watch "database.socket"
+   │
+   ▼
+1. mkOption declaration found?         no → OptionNotFound
+   ▼ yes
+2. direct cfg.<path> predicate found?  no → PredicateNotFound (often a let-alias, out of scope)
+   ▼ yes
+3. default's outcome under the         no → DefaultUnresolved (default isn't a literal null/true/false)
+   predicate statically classifiable?
+   ▼ yes
+4. a structurally-bound test           no → OBA001
+   assignment flips the outcome?      yes → PASS, with the flipping assignment(s) as evidence
+```
+
+Every verdict is one of `OptionNotFound` / `PredicateNotFound` /
+`DefaultUnresolved` (all **inconclusive** — the tool couldn't establish an
+opinion, distinct from and just as loud as a finding) / `OBA001` (a real
+finding) / `PASS` (proof of a branch-outcome transition). Process exit
+code: `0` = every watched option resolved to `PASS`; `1` = `FINDING`, at
+least one `OBA001` and nothing inconclusive; `2` = `INCONCLUSIVE`, takes
+precedence over `FINDING` — a run that couldn't fully evaluate everything
+has no business reporting itself as merely "found some bugs, otherwise
+clean".
 
 ## Non-goals (deliberate)
 
@@ -75,14 +97,18 @@ $ cargo run -- --targets targets/golden.toml
 |---|---|---|
 | `kimai-before` | `OBA001` on `database.socket` | ✅ |
 | `kimai-after` | `PASS` on `database.socket`, evidence from `socketMachine` | ✅ |
-| `davis-before` | `PredicateNotFound` on `database.driver` | ✅ |
-| `davis-after` | `PredicateNotFound` on `database.driver` | ✅ |
+| `davis-before` | `OptionNotFound` on `database.driver` | ✅ |
+| `davis-after` | `OptionNotFound` on `database.driver` | ✅ |
 
-davis's branch is gated by `mysqlLocal = db.createLocally && db.driver ==
-"mysql";` — a `let`-bound alias, not a direct `cfg.foo` select. That's the
-real reason it stays `PredicateNotFound` on *both* commits: this MVP is
-honestly telling you it didn't look hard enough to have an opinion, rather
-than quietly passing something it never actually checked.
+davis fails at gate 1: it declares options via the flat
+`options.services.davis = { ... };` attrpath form, which the (deliberately
+narrow) declaration scanner doesn't recognize — see "Real bugs" below. Even
+if it did, davis's branch is gated by `mysqlLocal = db.createLocally &&
+db.driver == "mysql";`, a `let`-bound alias, not a direct `cfg.foo` select,
+so it would fail at gate 2 instead. Either way, `INCONCLUSIVE`, never a
+guessed `PASS`: this MVP is honestly telling you it didn't look hard
+enough to have an opinion, rather than quietly passing something it never
+actually checked.
 
 **Why `kimai-after` matters as a worked example of the OBA/ROB split**:
 the v1 regression test added in `37f81efa4` already satisfies OBA (it does
@@ -112,6 +138,66 @@ matcher into a false `PASS`:
 proves it's structurally path-bound, not a suffix grep; `c5` proves
 evidence doesn't leak across sibling options under the same submodule.
 
+## H1 hardening pass
+
+A review of `56bfed8` before extending the corpus found three real
+correctness issues — two of them "correct by accident on this specific
+corpus", not correct in general. All three fixed, each pinned to a fixture
+that specifically demonstrates it (`fixtures/synthetic/`, a minimal module
+independent of kimai/davis, isolating the fix from the rest of the corpus):
+
+1. **`PredicateNotFound` (and friends) exited 0.** A detector that
+   couldn't evaluate a watched option looked identical to a clean sweep to
+   any CI gate keyed off exit code alone — precisely the "detector died,
+   green light stayed on" failure mode `watch` was added to prevent in the
+   first place. Fixed: three-state exit code (`0` clean / `1` finding /
+   `2` inconclusive, inconclusive takes precedence), verified in
+   `h1_exit_codes_distinguish_clean_finding_and_inconclusive` against three
+   dedicated manifests (`targets/clean.toml`, `targets/findings-only.toml`)
+   plus the mixed `golden.toml`.
+
+2. **Default-class membership was textual equality, not predicate-outcome
+   transition.** `is_default_class()` compared a test value's raw source
+   text against the default's raw source text. For a `!= null` predicate
+   with a `null` default (kimai's actual case) that's accidentally
+   equivalent to the right answer. For a `!= null` predicate with a
+   **non-null** default, it's wrong: assigning the option's own non-null
+   default read as "not literally `null`, therefore non-default evidence"
+   — a real `PASS` that proves no branch transition happened at all.
+   Fixed with `predicate_outcome()`: compute the predicate's boolean
+   outcome for both the default and the test value, and only count
+   evidence where they *differ*. `c6a-same-as-nonnull-default` /
+   `c6b-transitions-from-nonnull-default` are the isolated repro + positive
+   control (`h1_outcome_transition_not_textual_equality`). A default whose
+   outcome isn't a literal `null`/`true`/`false` — i.e. genuinely
+   unclassifiable, not silently guessed either way — now reports
+   `DefaultUnresolved` (`c7-unresolved-default`,
+   `h1_unresolvable_default_is_inconclusive_not_guessed`).
+
+3. **`PASS` was reachable without the declaration scanner having found
+   anything.** `default_source` was an `Option`, quietly `None`-able, and
+   nothing gated on it existing. Fixed: declaration lookup is now gate 1,
+   hard-required before gate 2 (predicate) is even attempted —
+   `c8-option-not-found` watches a path with no `mkOption` at all and
+   confirms `OptionNotFound`, not a silent `PASS`
+   (`h1_declaration_is_a_mandatory_gate`).
+
+Two smaller items from the same review, also done:
+
+- **Parse errors now fail closed.** rnix is error-tolerant and returns a
+  partial tree even on malformed input; previously that partial tree was
+  scanned anyway. A target with any parse error now short-circuits to
+  `parse_errors` + `INCONCLUSIVE` before touching the (unreliable) tree at
+  all — `c9-parse-error`, `h1_parse_errors_fail_closed`.
+- **Fixture provenance is now locked, not asserted in a comment.**
+  `fixtures/provenance.toml` pins each vendored kimai/davis fixture file to
+  its exact upstream commit + sha256; `tests/provenance.rs` recomputes and
+  compares on every `cargo test` run. A fixture silently "cleaned up for
+  convenience" six months from now fails loudly instead of the suite
+  staying green while "real historical commit" quietly becomes fiction —
+  verified to actually catch drift, not just pass trivially, by tampering
+  with a fixture and confirming the test fails before reverting.
+
 ## Running
 
 ```
@@ -123,10 +209,17 @@ cargo run -- --targets targets/golden.toml [--json]
 
 - [x] A. reproduces the historical finding on the exact parent commit
 - [x] B. clears it on the exact fix commit, with evidence attached
-- [x] C. survives 4 adversarial mutations
+- [x] C. survives 8 adversarial/synthetic mutations (4 original + 4 from H1:
+      non-null-default false-positive, its positive control, unresolvable
+      default, missing declaration)
 - [x] D. produces source spans + evidence (file:line:col, matched assignment)
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
+
+`cargo test` — 11 tests, all passing: 5 from the original spike, 5 from
+H1 (exit codes, parse-errors-fail-closed, outcome-transition +
+positive-control, unresolvable-default, mandatory-declaration-gate), 1
+fixture provenance lock.
 
 ## Real bugs this spike itself found in its own implementation
 
@@ -150,12 +243,35 @@ site) — fixing it naively would produce option paths inconsistent with how
 the predicate scanner reports paths for a `cfg` bound below the top level,
 which is the same class of problem as the `mysqlLocal` alias gap.
 
-## Explicit follow-ups (not this spike)
+## Explicit follow-ups (deliberately not this pass)
 
-- `let`-bound alias resolution (unblocks davis's actual `database.driver`
-  predicate)
+Per the stated order: harden Layer 1 to a place it's actually trustworthy
+*before* extending it, not alongside. In particular, **alias resolution is
+next but wasn't touched in H1 on purpose** — expanding `foo = cfg.x; if
+foo then ...` before the outcome-transition semantics above were nailed
+down would have meant building on the wrong foundation. It also reveals
+that `Option → Predicate` is too simple a model the moment it's attempted
+for real: davis's actual gate is `mysqlLocal = db.createLocally &&
+db.driver == "mysql"`, a conjunction over *two* options, which means
+evidence has to be proven as a conjunction inside a single node/container
+instance, not as two independently-satisfied option assignments that
+happen to appear anywhere in the test file. `TestAssignment.instance`
+already exists for diagnostics; it becomes semantically load-bearing the
+moment conjunctions are supported.
+
+- **H2**: a small predicate IR (`Null`, `Bool`, `Eq literal`, `Not`, `And`
+  / `Or`) plus local immutable `let`-alias expansion — unblocks davis's
+  real predicate.
+- **Davis golden**: `mysqlLocal` resolves, and evidence is required to
+  satisfy the full conjunction within one `nodes.machine3`-style instance,
+  not scattered across unrelated nodes.
 - flat-dotted `options.a.b.c = { ... };` recognition, done consistently
-  with `cfg_ident` scope resolution
+  with `cfg_ident` scope resolution (see the H1-era comment at
+  `scan_options`'s call site for why a naive fix here was reverted rather
+  than shipped half-right).
 - CDC (consumer contract drift) and ROB (runtime observability) as
   separate tools/layers, per the explicit non-conflation this spec insisted
-  on from the start
+  on from the start.
+- Only *after* the davis golden lands: a small real census (20–30 web-app
+  modules), not before — numbers without knowing what they mean yet aren't
+  worth collecting.

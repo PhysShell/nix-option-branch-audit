@@ -1,0 +1,65 @@
+# Locks each vendored (non-mutation, non-synthetic) fixture file to the
+# exact upstream commit + sha256 it was pulled from, verified against
+# tests/provenance.rs. Without this, "these fixtures are the real
+# 5530e24f2/37f81efa4 commits" is just a comment someone could silently
+# invalidate by "cleaning up" a fixture for convenience six months from
+# now, with the test suite staying green the whole time.
+#
+# Regenerate a hash after a deliberate fixture update with:
+#   sha256sum fixtures/<path>
+
+[[fixture]]
+path = "fixtures/kimai/before/module.nix"
+repo = "PhysShell/nixpkgs"
+commit = "5530e24f2100f4c2ca766050a805a12d7541662f"
+upstream_path = "nixos/modules/services/web-apps/kimai.nix"
+sha256 = "e1fe9a6ff7b6645918a4ecff92b23ebfb4b3b911c257eb0002d975c70a13cdc2"
+
+[[fixture]]
+path = "fixtures/kimai/before/test.nix"
+repo = "PhysShell/nixpkgs"
+commit = "5530e24f2100f4c2ca766050a805a12d7541662f"
+upstream_path = "nixos/tests/kimai.nix"
+sha256 = "c93ea34409ad62a6f16c07577fa96b51d7ad76e8f55b542e51da2bed776fb9cc"
+
+[[fixture]]
+path = "fixtures/kimai/after/module.nix"
+repo = "PhysShell/nixpkgs"
+commit = "37f81efa4abf623009e474fa563a094658c25be6"
+upstream_path = "nixos/modules/services/web-apps/kimai.nix"
+sha256 = "dae2bb76847ea5f3b4608c803ee5b5a57bf2023b9e5f0c61ca23700b0c51b6ac"
+
+[[fixture]]
+path = "fixtures/kimai/after/test.nix"
+repo = "PhysShell/nixpkgs"
+commit = "37f81efa4abf623009e474fa563a094658c25be6"
+upstream_path = "nixos/tests/kimai.nix"
+sha256 = "e8dd88656c26aee828e0cae6211f6b1dd9648ffa0ff16dbc954e4b95dea44c56"
+
+[[fixture]]
+path = "fixtures/davis/before/module.nix"
+repo = "PhysShell/nixpkgs"
+commit = "5530e24f2100f4c2ca766050a805a12d7541662f"
+upstream_path = "nixos/modules/services/web-apps/davis.nix"
+sha256 = "2aad411b7635bc08a5f875ff3aa9801938af6337382b5a545f1877932cdc17b9"
+
+[[fixture]]
+path = "fixtures/davis/before/test.nix"
+repo = "PhysShell/nixpkgs"
+commit = "5530e24f2100f4c2ca766050a805a12d7541662f"
+upstream_path = "nixos/tests/davis.nix"
+sha256 = "00c03beea82e18575fdc5cd0c90799d8f1f3096c45f9e512042c5b930af9c30b"
+
+[[fixture]]
+path = "fixtures/davis/after/module.nix"
+repo = "PhysShell/nixpkgs"
+commit = "37f81efa4abf623009e474fa563a094658c25be6"
+upstream_path = "nixos/modules/services/web-apps/davis.nix"
+sha256 = "79eafbb9873d86da629969bfdc545f2c1367811f2e0d839dd5a7b4ef9c51dcde"
+
+[[fixture]]
+path = "fixtures/davis/after/test.nix"
+repo = "PhysShell/nixpkgs"
+commit = "37f81efa4abf623009e474fa563a094658c25be6"
+upstream_path = "nixos/tests/davis.nix"
+sha256 = "0815127a34f1b41e9550e3973b578a26b708edd2f3a38db8659a98995eb49f78"

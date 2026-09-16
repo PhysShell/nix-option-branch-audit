@@ -1,0 +1,12 @@
+# A single target whose module deliberately fails to parse (unbalanced
+# braces). Asserts fail-closed behavior: no per-watch verdicts get
+# computed off a tree rnix patched together around the damage, and the
+# whole run reports INCONCLUSIVE / exit 2.
+
+[[target]]
+name = "c9-parse-error"
+module = "fixtures/synthetic/c9-parse-error/module.nix"
+test = "fixtures/synthetic/c9-parse-error/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]

@@ -81,3 +81,39 @@ test = "fixtures/kimai/mutations/c5-wrong-suffix/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "kimai", "sites", "*"]
 watch = ["database.socket"]
+
+# --- H1 review fixtures: isolate the outcome-transition model itself,
+# independent of the real corpus (synthetic module: options.foo has a
+# non-null default, options.bar has a non-literal default). ---
+
+[[target]]
+name = "c6a-same-as-nonnull-default"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c6b-transitions-from-nonnull-default"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c6b-transitions-from-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
+
+[[target]]
+name = "c7-unresolved-default"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["bar"]
+
+[[target]]
+name = "c8-option-not-found"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["doesNotExist"]

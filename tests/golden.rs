@@ -16,21 +16,41 @@ fn manifest_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
 }
 
-fn run_golden() -> Vec<Value> {
+struct GoldenRun {
+    full: Value,
+    exit_code: i32,
+}
+
+fn run_manifest(manifest: &str) -> GoldenRun {
     let output = Command::new(env!("CARGO_BIN_EXE_oba"))
         .current_dir(manifest_dir())
-        .args(["--targets", "targets/golden.toml", "--json"])
+        .args(["--targets", manifest, "--json"])
         .output()
         .expect("failed to run oba binary");
-    // exit code is expected to be 1 (some targets are OBA001 by design), so
-    // don't assert on status -- only that stdout parses.
     let stdout = String::from_utf8_lossy(&output.stdout);
-    serde_json::from_str(&stdout).unwrap_or_else(|e| {
+    let full: Value = serde_json::from_str(&stdout).unwrap_or_else(|e| {
         panic!(
             "oba did not emit valid JSON: {e}\nstderr: {}\nstdout: {stdout}",
             String::from_utf8_lossy(&output.stderr)
         )
-    })
+    });
+    GoldenRun {
+        full,
+        exit_code: output
+            .status
+            .code()
+            .expect("process exited via signal, not code"),
+    }
+}
+
+fn run_golden() -> Vec<Value> {
+    run_manifest("targets/golden.toml")
+        .full
+        .get("targets")
+        .expect("top-level JSON must have a targets array")
+        .as_array()
+        .expect("targets is an array")
+        .clone()
 }
 
 fn target<'a>(reports: &'a [Value], name: &str) -> &'a Value {
@@ -46,7 +66,8 @@ fn verdict_kind(report: &Value, option: &str) -> String {
         .expect("verdicts array")
         .iter()
         .find(|v| v["option"] == option)
-        .unwrap_or_else(|| panic!("no verdict for option {option} in {}", report["name"]))["verdict"]
+        .unwrap_or_else(|| panic!("no verdict for option {option} in {}", report["name"]))
+        ["verdict"]
         .as_str()
         .expect("verdict tag is a string")
         .to_string()
@@ -65,7 +86,15 @@ fn positive_assertions_kimai_after_found_real_things() {
         .as_array()
         .unwrap()
         .iter()
-        .map(|o| o["path"].as_array().unwrap().iter().map(|s| s.as_str().unwrap()).collect::<Vec<_>>().join("."))
+        .map(|o| {
+            o["path"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|s| s.as_str().unwrap())
+                .collect::<Vec<_>>()
+                .join(".")
+        })
         .collect();
     assert!(
         options.contains(&"database.socket".to_string()),
@@ -76,7 +105,15 @@ fn positive_assertions_kimai_after_found_real_things() {
         .as_array()
         .unwrap()
         .iter()
-        .map(|p| p["path"].as_array().unwrap().iter().map(|s| s.as_str().unwrap()).collect::<Vec<_>>().join("."))
+        .map(|p| {
+            p["path"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|s| s.as_str().unwrap())
+                .collect::<Vec<_>>()
+                .join(".")
+        })
         .collect();
     assert!(
         predicates.contains(&"database.socket".to_string()),
@@ -87,10 +124,24 @@ fn positive_assertions_kimai_after_found_real_things() {
         .as_array()
         .unwrap()
         .iter()
-        .map(|a| format!("{}[{}]", a["path"].as_array().unwrap().iter().map(|s| s.as_str().unwrap()).collect::<Vec<_>>().join("."), a["instance"].as_str().unwrap_or("?")))
+        .map(|a| {
+            format!(
+                "{}[{}]",
+                a["path"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|s| s.as_str().unwrap())
+                    .collect::<Vec<_>>()
+                    .join("."),
+                a["instance"].as_str().unwrap_or("?")
+            )
+        })
         .collect();
     assert!(
-        assignments.iter().any(|a| a.contains("database.socket") && a.contains("socketMachine")),
+        assignments
+            .iter()
+            .any(|a| a.contains("database.socket") && a.contains("socketMachine")),
         "scanner must match socketMachine's database.socket assignment; got {assignments:?}"
     );
 }
@@ -118,23 +169,29 @@ fn golden_b_fix_commit_shows_pass_with_evidence() {
         .iter()
         .find(|v| v["option"] == "database.socket")
         .unwrap();
-    let evidence = v["evidence"].as_array().expect("PASS verdict must carry evidence");
+    let evidence = v["evidence"]
+        .as_array()
+        .expect("PASS verdict must carry evidence");
     assert!(!evidence.is_empty(), "PASS must not have empty evidence");
     assert_eq!(evidence[0]["instance"], "socketMachine");
 }
 
-// --- davis: honest PREDICATE_NOT_FOUND, not a false PASS, on both commits
-// (the branch is gated by the `mysqlLocal` let-alias, out of MVP scope).
+// --- davis: honest OptionNotFound, not a false PASS, on both commits.
+// davis.nix uses the flat `options.services.davis = { ... };` attrpath
+// form, which the (deliberately narrow) declaration scanner doesn't
+// recognize -- so it fails at gate 1 (declaration) before ever reaching
+// gate 2 (the `mysqlLocal` let-alias predicate, also out of MVP scope).
+// Either gate failing first is fine; what matters is it's never PASS.
 
 #[test]
 fn davis_predicate_is_honestly_reported_as_not_found() {
     let reports = run_golden();
     for name in ["davis-before", "davis-after"] {
         let r = target(&reports, name);
-        assert_eq!(
-            verdict_kind(r, "database.driver"),
-            "PredicateNotFound",
-            "target {name} must not silently PASS or silently omit the watched option"
+        let kind = verdict_kind(r, "database.driver");
+        assert!(
+            kind == "OptionNotFound" || kind == "PredicateNotFound",
+            "target {name} must not silently PASS or silently omit the watched option; got {kind}"
         );
     }
 }
@@ -159,4 +216,118 @@ fn golden_c_mutations_all_stay_oba001() {
             "mutation {name} must not produce a false PASS"
         );
     }
+}
+
+// --- H1 review fixes ---------------------------------------------------
+//
+// Three real correctness issues, found by review of the pre-H1 code, not
+// by this test suite (it was green the whole time): PredicateNotFound
+// exited 0, is_default_class() checked textual equality to the default
+// instead of predicate *outcome* (silently correct for kimai's null
+// default only, wrong the moment a default is non-null), and PASS was
+// reachable without the declaration scanner having found anything. Every
+// fix below is pinned to the specific fixture that demonstrates it, not
+// just re-asserted against the existing corpus.
+
+// H1-1: PredicateNotFound (and friends) must make the whole run exit
+// non-zero, distinctly from a genuine OBA001 finding -- a detector that
+// couldn't evaluate something must never look like "all clear" to CI.
+
+#[test]
+fn h1_exit_codes_distinguish_clean_finding_and_inconclusive() {
+    let clean = run_manifest("targets/clean.toml");
+    assert_eq!(clean.exit_code, 0);
+    assert_eq!(clean.full["summary"]["status"], "PASS");
+
+    let findings = run_manifest("targets/findings-only.toml");
+    assert_eq!(findings.exit_code, 1);
+    assert_eq!(findings.full["summary"]["status"], "FINDING");
+    assert_eq!(findings.full["summary"]["findings"], 1);
+    assert_eq!(findings.full["summary"]["inconclusive"], 0);
+
+    // golden.toml mixes real OBA001 findings with davis's honest
+    // OptionNotFound -- inconclusive must take precedence over finding in
+    // both the exit code and the summary status, per the explicit ask:
+    // a run that couldn't fully evaluate everything has no business
+    // reporting itself as merely "found some bugs, otherwise clean".
+    let mixed = run_manifest("targets/golden.toml");
+    assert_eq!(mixed.exit_code, 2);
+    assert_eq!(mixed.full["summary"]["status"], "INCONCLUSIVE");
+    assert!(mixed.full["summary"]["findings"].as_u64().unwrap() > 0);
+    assert!(mixed.full["summary"]["inconclusive"].as_u64().unwrap() > 0);
+}
+
+// H1-1b: parse errors specifically must fail the whole target closed --
+// no per-watch verdict gets computed off a tree rnix patched together
+// around the damage.
+
+#[test]
+fn h1_parse_errors_fail_closed() {
+    let run = run_manifest("targets/parse-error.toml");
+    assert_eq!(run.exit_code, 2);
+    assert_eq!(run.full["summary"]["status"], "INCONCLUSIVE");
+    let targets = run.full["targets"].as_array().unwrap();
+    assert_eq!(targets.len(), 1);
+    let parse_errors = targets[0]["parse_errors"].as_array().unwrap();
+    assert!(
+        !parse_errors.is_empty(),
+        "malformed module.nix must produce parse_errors"
+    );
+    // and no verdict should be a PASS or OBA001 computed off the broken tree
+    for v in targets[0]["verdicts"].as_array().unwrap() {
+        assert!(
+            v["verdict"] != "PASS" && v["verdict"] != "OBA001",
+            "a target with parse errors must never produce a scan-derived verdict"
+        );
+    }
+}
+
+// H1-2: the outcome-transition model, not textual equality to the
+// default. c6a is the exact scenario from the review: a non-null default
+// (`"/run/default.sock"`), a test assignment of the *same* string. The
+// old code read this as "not equal to null => non-default evidence" and
+// would have reported PASS despite proving no branch transition at all.
+// c6b is the positive control in the same module: assigning `null`
+// (genuinely the opposite predicate outcome) must still produce PASS, so
+// the fix isn't just "never PASS again".
+
+#[test]
+fn h1_outcome_transition_not_textual_equality() {
+    let reports = run_golden();
+
+    let same_as_default = target(&reports, "c6a-same-as-nonnull-default");
+    assert_eq!(
+        verdict_kind(same_as_default, "foo"),
+        "OBA001",
+        "assigning the option's own non-null default must not count as activation evidence"
+    );
+
+    let real_transition = target(&reports, "c6b-transitions-from-nonnull-default");
+    assert_eq!(
+        verdict_kind(real_transition, "foo"),
+        "PASS",
+        "assigning null against a non-null default IS a genuine predicate-outcome transition"
+    );
+}
+
+// H1-2b: a default whose outcome can't be statically classified (not a
+// literal null/true/false) must report DefaultUnresolved, not silently
+// treat "unknown" as either "counts" or "doesn't count".
+
+#[test]
+fn h1_unresolvable_default_is_inconclusive_not_guessed() {
+    let reports = run_golden();
+    let r = target(&reports, "c7-unresolved-default");
+    assert_eq!(verdict_kind(r, "bar"), "DefaultUnresolved");
+}
+
+// H1-3: PASS must be structurally unreachable without the declaration
+// scanner having found the option first -- watching a path with no
+// mkOption at all must report OptionNotFound, the new first gate.
+
+#[test]
+fn h1_declaration_is_a_mandatory_gate() {
+    let reports = run_golden();
+    let r = target(&reports, "c8-option-not-found");
+    assert_eq!(verdict_kind(r, "doesNotExist"), "OptionNotFound");
 }
