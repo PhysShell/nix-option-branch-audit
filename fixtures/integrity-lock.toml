@@ -1,9 +1,15 @@
-# Locks each vendored (non-mutation, non-synthetic) fixture file to the
-# exact upstream commit + sha256 it was pulled from, verified against
-# tests/provenance.rs. Without this, "these fixtures are the real
-# 5530e24f2/37f81efa4 commits" is just a comment someone could silently
-# invalidate by "cleaning up" a fixture for convenience six months from
-# now, with the test suite staying green the whole time.
+# Locks each vendored (non-mutation, non-synthetic) fixture file's sha256,
+# checked offline by tests/fixture_integrity.rs on every `cargo test`.
+# repo/commit/upstream_path are provenance CLAIMS, not independently
+# re-verified by that test (no network/checkout in a normal test run) --
+# only the sha256 field is actually enforced there. The claims themselves
+# are re-derivable and checkable with `scripts/verify-upstream.sh` against
+# a real nixpkgs checkout, on demand, not as part of `cargo test`.
+#
+# Without the sha256 check at least, "these fixtures are the real
+# 5530e24f2/37f81efa4 commits" would be just a comment someone could
+# silently invalidate by "cleaning up" a fixture for convenience six months
+# from now, with the test suite staying green the whole time.
 #
 # Regenerate a hash after a deliberate fixture update with:
 #   sha256sum fixtures/<path>

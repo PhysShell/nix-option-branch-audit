@@ -1,18 +1,31 @@
 //! oba — Option Branch Activation evidence for NixOS modules.
 //!
 //! Layer 1 only, per the explicit non-goals agreed on:
-//!   - This answers "was this option's branch ever exercised with a
-//!     non-default value by a test", NOT "does the branch's value reach a
-//!     consumer with the right name" (that is CDC, a separate tool) and NOT
-//!     "does the value actually change observed runtime behavior" (that is
-//!     ROB — the pdo_mysql.default_socket confound from this session is
-//!     exactly why OBA PASS must never be read as "works end-to-end").
-//!   - No VM tests are run. No upstream consumer is consulted. The tool does
-//!     not know what Doctrine is.
+//!   - This answers "did a test ever drive this branch's predicate to the
+//!     *opposite* boolean outcome from what the option's own default
+//!     produces", NOT "does the branch's value reach a consumer with the
+//!     right name" (that is CDC, a separate tool) and NOT "does the value
+//!     actually change observed runtime behavior" (that is ROB — the
+//!     pdo_mysql.default_socket confound from the session this tool grew
+//!     out of is exactly why OBA PASS must never be read as "works
+//!     end-to-end").
+//!   - No VM tests are run. No upstream consumer is consulted. No Nix
+//!     evaluation happens — `ValueClass` is a syntax-level classifier, not
+//!     an interpreter. The tool doesn't know what Doctrine is.
 //!   - cfg-alias resolution (`foo = cfg.x; if foo != null then ...`) is out
-//!     of scope for this MVP and reported as PREDICATE_NOT_FOUND rather than
+//!     of scope for this MVP and reported as PredicateNotFound rather than
 //!     silently skipped, so a target with an aliased predicate (davis in
 //!     this corpus) doesn't masquerade as a clean PASS.
+//!
+//! Every watched option's verdict comes from a hard 4-gate chain — see
+//! `run_target` — where any gate failing short-circuits to an inconclusive
+//! verdict rather than falling through to a guess: declaration found →
+//! predicate found → default's ValueClass resolves to a predicate outcome
+//! → a structurally-matching test assignment provably flips that outcome.
+//! Exit code is 4-state: 0 clean / 1 FINDING / 2 INCONCLUSIVE (takes
+//! precedence over FINDING) / 3 TOOL_ERROR (the analysis never ran at all
+//! — bad manifest, missing files — distinct from INCONCLUSIVE, where it
+//! ran but couldn't prove something).
 
 use rnix::SyntaxKind::*;
 use rnix::{SyntaxNode, SyntaxToken};
@@ -54,8 +67,52 @@ struct Target {
     /// verdict -- PredicateNotFound if the scanner found no direct branch for
     /// it, so an aliased or missed predicate can never just be silently
     /// absent from the report and mistaken for "nothing to see here".
-    #[serde(default)]
+    /// Required and validated non-empty by `validate_manifest` -- a target
+    /// with nothing to watch would scan everything and assert nothing,
+    /// exiting 0 with zero findings and zero inconclusive: the exact same
+    /// "detector died, green light stayed on" failure mode this field
+    /// exists to prevent in the first place, just one level up the stack.
     watch: Vec<String>,
+}
+
+fn validate_manifest(m: &TargetFile) -> Result<(), String> {
+    if m.target.is_empty() {
+        return Err("manifest has no [[target]] entries".to_string());
+    }
+    let mut seen_names = std::collections::HashSet::new();
+    for t in &m.target {
+        if t.name.trim().is_empty() {
+            return Err("a target has an empty name".to_string());
+        }
+        if !seen_names.insert(t.name.as_str()) {
+            return Err(format!("duplicate target name: {}", t.name));
+        }
+        if t.cfg_ident.trim().is_empty() {
+            return Err(format!("target {}: cfg_ident must not be empty", t.name));
+        }
+        if t.option_prefix.is_empty() {
+            return Err(format!(
+                "target {}: option_prefix must not be empty",
+                t.name
+            ));
+        }
+        if t.watch.is_empty() {
+            return Err(format!(
+                "target {}: watch must not be empty (a target that watches nothing proves nothing)",
+                t.name
+            ));
+        }
+        let mut seen_watch = std::collections::HashSet::new();
+        for w in &t.watch {
+            if w.trim().is_empty() {
+                return Err(format!("target {}: watch contains an empty entry", t.name));
+            }
+            if !seen_watch.insert(w.as_str()) {
+                return Err(format!("target {}: duplicate watch entry {w}", t.name));
+            }
+        }
+    }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------
@@ -189,6 +246,50 @@ fn call_head_name(node: &SyntaxNode) -> Option<String> {
         return segs.last().cloned();
     }
     None
+}
+
+// ---------------------------------------------------------------------
+// Value classification: a small, syntax-level classifier, NOT a textual
+// comparison. H1's `is_default_class()` compared raw source text and was
+// accidentally correct only because kimai's null default happens to be
+// the literal token "null"; H1.1's review caught the general case: a
+// `!= null` predicate with a non-literal default/test value (an `if`
+// expression, another option's alias, `lib.mkDefault null`, ...) has no
+// text that equals "null" even when its runtime value definitely is null.
+// This classifies by AST node kind instead, and is honestly Unknown for
+// anything it can't decide from syntax alone -- never guessed either way.
+// ---------------------------------------------------------------------
+
+#[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+enum ValueClass {
+    /// The literal identifier `null`.
+    Null,
+    /// The literal identifier `true` or `false`.
+    Bool(bool),
+    /// A syntactic form that can never evaluate to `null` regardless of
+    /// what it contains: a string, number, list, attrset, or path
+    /// literal. Doesn't need to know the *value* to know it isn't null.
+    DefinitelyNonNull,
+    /// Anything else: function application, `if`/`let`/`with`, a
+    /// `cfg.foo`-style select, a bare identifier referring to some other
+    /// binding, `lib.mkDefault x`, etc. Statically undecidable from
+    /// syntax alone without evaluating Nix, which this tool doesn't do.
+    Unknown,
+}
+
+fn classify_value(node: &SyntaxNode) -> ValueClass {
+    match node.kind() {
+        NODE_IDENT => match ident_text(node).as_deref() {
+            Some("null") => ValueClass::Null,
+            Some("true") => ValueClass::Bool(true),
+            Some("false") => ValueClass::Bool(false),
+            _ => ValueClass::Unknown, // a reference to some other binding
+        },
+        NODE_STRING | NODE_LITERAL | NODE_ATTR_SET | NODE_LIST | NODE_PATH => {
+            ValueClass::DefinitelyNonNull
+        }
+        _ => ValueClass::Unknown,
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -363,6 +464,11 @@ struct OptionDecl {
     /// path relative to the enclosing `options = { ... }` block
     path: Vec<String>,
     default_source: Option<String>,
+    /// `None` iff there's no `default = ...;` field at all; `Some(Unknown)`
+    /// for a present-but-non-literal default (an `if`, an alias select, a
+    /// helper call like `lib.mkDefault x`, ...) -- these are meaningfully
+    /// different results and both must survive to gate 3 in `run_target`.
+    default_class: Option<ValueClass>,
     span: Span,
 }
 
@@ -431,10 +537,13 @@ fn walk_options_block(
         path.extend(segs.clone());
 
         if is_mk_option_call(&value) {
-            let default_source = mk_option_field(&value, "default").map(|n| n.text().to_string());
+            let default_node = mk_option_field(&value, "default");
+            let default_source = default_node.as_ref().map(|n| n.text().to_string());
+            let default_class = default_node.as_ref().map(classify_value);
             out.push(OptionDecl {
                 path: path.clone(),
                 default_source,
+                default_class,
                 span: span_of(file, src, &entry),
             });
         } else if value.kind() == NODE_ATTR_SET {
@@ -485,6 +594,7 @@ fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
 struct TestAssignment {
     path: Vec<String>,
     value_source: String,
+    value_class: ValueClass,
     /// nearest enclosing `containers.<x>` / `nodes.<x>` instance name, if any
     instance: Option<String>,
     span: Span,
@@ -574,6 +684,7 @@ fn walk_test_block(
             out.push(TestAssignment {
                 path: path.clone(),
                 value_source: body.text().to_string(),
+                value_class: classify_value(&body),
                 instance: instance.clone(),
                 span: span_of(file, src, &entry),
             });
@@ -613,6 +724,23 @@ enum Verdict {
         option: String,
         predicate: Predicate,
     },
+    /// A classifiable default was found, and at least one structurally
+    /// matching test assignment exists, but its value's outcome under this
+    /// predicate can't be statically classified either (an expression, an
+    /// alias, ...) -- and none of the *other* matching assignments (if
+    /// any) is a known opposite-outcome value. The honest answer here is
+    /// "can't tell", not "assume it doesn't count": an unresolvable test
+    /// value might well be the one that actually flips the branch (see the
+    /// H1.1 review's `builtins.elem "x" [ "x" "y" ]` example, which *is*
+    /// `true` at runtime but is statically opaque). Silently treating
+    /// `None` as "no evidence" was exactly this tool's own fail-closed
+    /// principle broken on the test-value side after fixing it on the
+    /// default side in H1.
+    TestValueUnresolved {
+        option: String,
+        predicate: Predicate,
+        default_outcome: bool,
+    },
     /// A predicate and a classifiable default were found, but no test
     /// assignment's value provably flips the predicate's outcome away from
     /// what the default produces.
@@ -647,6 +775,7 @@ impl Verdict {
             Verdict::OptionNotFound { .. }
                 | Verdict::PredicateNotFound { .. }
                 | Verdict::DefaultUnresolved { .. }
+                | Verdict::TestValueUnresolved { .. }
         )
     }
 
@@ -687,34 +816,47 @@ fn path_matches_prefix(full: &[String], prefix: &[String], suffix: &[String]) ->
     true
 }
 
-/// The boolean outcome of evaluating `kind`'s predicate expression with the
-/// literal `value_source` substituted in, when that's staticaly decidable
-/// from the raw source text alone -- `None` means genuinely unknown, not
-/// "assume it doesn't count" and not "assume it does". This is deliberately
-/// narrow: only the literal tokens `null`/`true`/`false` are understood.
-/// Anything else (an interpolated string, a let-bound alias, an arbitrary
-/// expression) is honestly unresolvable rather than guessed at.
-fn predicate_outcome(kind: &PredicateKind, value_source: &str) -> Option<bool> {
-    let v = value_source.trim();
+/// The boolean outcome of evaluating `kind`'s predicate expression given a
+/// value already classified as `class` -- `None` means genuinely unknown,
+/// not "assume it doesn't count" and not "assume it does". Note this is a
+/// pure function of (PredicateKind, ValueClass): `DefinitelyNonNull` is
+/// enough to resolve a null-check regardless of what the value actually
+/// contains (a string can never be null), but never enough to resolve a
+/// truthy-check (a `DefinitelyNonNull` string is not "true").
+fn predicate_outcome(kind: &PredicateKind, class: ValueClass) -> Option<bool> {
     match kind {
-        PredicateKind::NullNeq => Some(v != "null"),
-        PredicateKind::NullEq => Some(v == "null"),
-        PredicateKind::Truthy(_) => match v {
-            "true" => Some(true),
-            "false" => Some(false),
+        PredicateKind::NullNeq => match class {
+            ValueClass::Null => Some(false),
+            ValueClass::Bool(_) | ValueClass::DefinitelyNonNull => Some(true),
+            ValueClass::Unknown => None,
+        },
+        PredicateKind::NullEq => match class {
+            ValueClass::Null => Some(true),
+            ValueClass::Bool(_) | ValueClass::DefinitelyNonNull => Some(false),
+            ValueClass::Unknown => None,
+        },
+        PredicateKind::Truthy(_) => match class {
+            ValueClass::Bool(b) => Some(b),
             _ => None,
         },
-        PredicateKind::NegTruthy => match v {
-            "true" => Some(false),
-            "false" => Some(true),
+        PredicateKind::NegTruthy => match class {
+            ValueClass::Bool(b) => Some(!b),
             _ => None,
         },
     }
 }
 
 fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
-    let module_src = fs::read_to_string(&t.module)?;
-    let test_src = fs::read_to_string(&t.test)?;
+    let module_src = fs::read_to_string(&t.module).map_err(|e| {
+        anyhow::anyhow!(
+            "target {}: reading module {}: {e}",
+            t.name,
+            t.module.display()
+        )
+    })?;
+    let test_src = fs::read_to_string(&t.test).map_err(|e| {
+        anyhow::anyhow!("target {}: reading test {}: {e}", t.name, t.test.display())
+    })?;
     let module_file = t.module.display().to_string();
     let test_file = t.test.display().to_string();
 
@@ -786,11 +928,15 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
 
         // Gate 3: the default's outcome under this predicate must be
         // statically classifiable, or there's no baseline to prove a
-        // transition away from.
+        // transition away from. Classified from the actual default AST
+        // node (ValueClass), not a textual comparison -- see H1.1: a
+        // `!= null` default that's an `if` expression, an alias select, or
+        // `lib.mkDefault null` has no text equal to "null" even when its
+        // runtime value definitely is, so a text check would wrongly call
+        // it "definitely non-null" instead of honestly Unknown.
         let Some(default_outcome) = decl
-            .default_source
-            .as_deref()
-            .and_then(|d| predicate_outcome(&pred.kind, d))
+            .default_class
+            .and_then(|c| predicate_outcome(&pred.kind, c))
         else {
             verdicts.push(Verdict::DefaultUnresolved {
                 option: watched.clone(),
@@ -800,14 +946,17 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         };
 
         // Gate 4: a structurally-bound test assignment whose value's
-        // outcome under this predicate is the *opposite* of the default's
-        // -- not merely "not textually equal to the default", which is a
-        // different (and, for non-null defaults, wrong) question. See the
-        // H1 review: `default = "/run/default.sock"; cfg.foo != null` with
-        // a test assignment of the exact same string used to read as
-        // "non-default evidence" under a textual-equality check, even
-        // though both default and test land in the *same* predicate
-        // outcome (true) and no branch transition is proven at all.
+        // outcome under this predicate is the *opposite* of the default's.
+        // Three-way split, not a binary filter: a matching assignment
+        // whose own outcome is Unknown (e.g. `builtins.elem "x" [ "x" "y"
+        // ]` -- statically opaque, but genuinely `true` at runtime) must
+        // NOT be silently treated as "no evidence" just because it fails
+        // an `== Some(opposite)` filter. That's the same fail-closed
+        // principle this tool applies to the default (gate 3) not being
+        // applied to the test side -- caught by the H1.1 review. A known
+        // opposite-outcome assignment takes precedence over an unresolved
+        // one if both are present: real evidence beats an unrelated
+        // ambiguity elsewhere in the same test file.
         let matches: Vec<TestAssignment> = assignments
             .iter()
             .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
@@ -815,23 +964,34 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             .collect();
         matched_assignments.extend(matches.clone());
 
-        let transitions: Vec<TestAssignment> = matches
-            .into_iter()
-            .filter(|a| predicate_outcome(&pred.kind, &a.value_source) == Some(!default_outcome))
-            .collect();
+        let mut opposite = Vec::new();
+        let mut has_unresolved = false;
+        for a in &matches {
+            match predicate_outcome(&pred.kind, a.value_class) {
+                Some(o) if o == !default_outcome => opposite.push(a.clone()),
+                Some(_) => {} // known, but same outcome as the default -- no evidence, but not ambiguous either
+                None => has_unresolved = true,
+            }
+        }
 
-        if transitions.is_empty() {
-            verdicts.push(Verdict::Oba001 {
+        if !opposite.is_empty() {
+            verdicts.push(Verdict::Pass {
+                option: watched.clone(),
+                predicate: pred.clone(),
+                default_outcome,
+                evidence: opposite,
+            });
+        } else if has_unresolved {
+            verdicts.push(Verdict::TestValueUnresolved {
                 option: watched.clone(),
                 predicate: pred.clone(),
                 default_outcome,
             });
         } else {
-            verdicts.push(Verdict::Pass {
+            verdicts.push(Verdict::Oba001 {
                 option: watched.clone(),
                 predicate: pred.clone(),
                 default_outcome,
-                evidence: transitions,
             });
         }
     }
@@ -864,12 +1024,40 @@ struct FullReport {
     targets: Vec<TargetReport>,
 }
 
-fn main() -> anyhow::Result<()> {
+/// Exit codes are a 4-state scheme, not 3: `0` clean analysis / `1` a
+/// genuine finding / `2` analysis completed but some watched option
+/// couldn't be resolved / `3` the tool itself didn't run at all (bad
+/// manifest, missing files, I/O). `2` and `3` look similar from a shell
+/// ("something's wrong") but mean structurally different things to a
+/// machine consumer -- "I analyzed this and couldn't prove anything" is
+/// not the same claim as "I never got to analyze it". Collapsing them
+/// (the H1 state of this file: any `?`-propagated I/O/parse/manifest
+/// error fell through to Rust's default error exit code, typically `1` --
+/// FINDING, not even INCONCLUSIVE) is caught by
+/// `h1_1_missing_file_is_tool_error_not_finding` in tests/golden.rs.
+fn main() {
     let cli = Cli::parse();
-    let manifest: TargetFile = toml::from_str(&fs::read_to_string(&cli.targets)?)?;
+    match run(&cli) {
+        Ok(exit_code) => std::process::exit(exit_code),
+        Err(e) => {
+            eprintln!("TOOL_ERROR: {e:#}");
+            std::process::exit(3);
+        }
+    }
+}
+
+fn run(cli: &Cli) -> anyhow::Result<i32> {
+    let manifest_src = fs::read_to_string(&cli.targets)
+        .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", cli.targets.display()))?;
+    let manifest: TargetFile = toml::from_str(&manifest_src)
+        .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", cli.targets.display()))?;
+    validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
     let mut reports = Vec::new();
     for t in &manifest.target {
+        // run_target's own `?`s (missing module/test file, etc.) bubble up
+        // here as a genuine tool error too -- a target naming a file that
+        // doesn't exist is a manifest problem, not an OBA001 finding.
         reports.push(run_target(t)?);
     }
 
@@ -913,7 +1101,7 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
-    std::process::exit(exit_code);
+    Ok(exit_code)
 }
 
 fn print_human(r: &TargetReport) {
@@ -971,6 +1159,13 @@ fn print_human(r: &TargetReport) {
             ),
             Verdict::DefaultUnresolved { option, .. } => println!(
                 "  DEFAULT_UNRESOLVED  {option}  (declared default's outcome under this predicate isn't a literal null/true/false)"
+            ),
+            Verdict::TestValueUnresolved {
+                option,
+                default_outcome,
+                ..
+            } => println!(
+                "  TEST_VALUE_UNRESOLVED  {option}  default_outcome={default_outcome}  (a matching test assignment's value isn't statically classifiable, and no other match is a known opposite outcome)"
             ),
             Verdict::Oba001 {
                 option,

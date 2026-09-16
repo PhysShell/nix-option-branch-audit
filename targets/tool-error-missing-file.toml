@@ -1,0 +1,11 @@
+# module points at a path that doesn't exist. Must be a tool error
+# (exit 3), never a FINDING (exit 1) -- a missing fixture/module is a
+# manifest problem, not an OBA001.
+
+[[target]]
+name = "c13-missing-file"
+module = "fixtures/synthetic/this-file-does-not-exist.nix"
+test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]

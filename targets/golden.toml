@@ -11,10 +11,14 @@
 #     NOT mean the fix was proven correct end-to-end -- that took two more
 #     rounds (v2, v3) to establish, entirely on the ROB axis, which this
 #     tool does not attempt. Documented, not silently implied.
-#   davis before/after -> PREDICATE_NOT_FOUND in both. davis's branch is
-#     gated by `mysqlLocal = db.createLocally && db.driver == "mysql";`, a
-#     let-bound alias, not a direct `cfg.foo` select. Alias resolution is an
-#     explicit MVP non-goal; this is the honest result, not a false PASS.
+#   davis before/after -> OPTION_NOT_FOUND in both (gate 1: davis.nix uses
+#     the flat `options.services.davis = { ... };` attrpath form, which the
+#     declaration scanner doesn't recognize -- see the comment at
+#     scan_options's call site). Even if it did, davis's branch is gated by
+#     `mysqlLocal = db.createLocally && db.driver == "mysql";`, a let-bound
+#     alias, not a direct `cfg.foo` select, so it would fail at gate 2
+#     instead. Alias resolution is an explicit MVP non-goal; either way
+#     this is the honest result, not a false PASS.
 
 [[target]]
 name = "kimai-before"
@@ -117,3 +121,21 @@ test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synth"]
 watch = ["doesNotExist"]
+
+# --- H1.1 review fixtures ---
+
+[[target]]
+name = "c10-null-expression-default"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["baz"]
+
+[[target]]
+name = "c11-unresolved-test-value"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c11-unresolved-test-value/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["qux"]

@@ -1,0 +1,14 @@
+# A target with `watch = []` -- a target watching nothing proves nothing,
+# and previously exited 0 with zero findings and zero inconclusive, the
+# same "detector died, green light stayed on" failure mode `watch` itself
+# exists to catch, just one level up the stack. Must be rejected by
+# validate_manifest() as a tool/config error (exit 3), never silently
+# accepted as a clean PASS.
+
+[[target]]
+name = "c12-empty-watch"
+module = "fixtures/synthetic/module.nix"
+test = "fixtures/synthetic/c6a-same-as-nonnull-default/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = []

@@ -43,6 +43,24 @@ fn run_manifest(manifest: &str) -> GoldenRun {
     }
 }
 
+/// For tool-error cases: stdout is empty (the error happens before any
+/// printing) so there's nothing to parse as JSON -- just the exit code and
+/// stderr matter.
+fn run_manifest_raw(manifest: &str) -> (i32, String) {
+    let output = Command::new(env!("CARGO_BIN_EXE_oba"))
+        .current_dir(manifest_dir())
+        .args(["--targets", manifest, "--json"])
+        .output()
+        .expect("failed to run oba binary");
+    (
+        output
+            .status
+            .code()
+            .expect("process exited via signal, not code"),
+        String::from_utf8_lossy(&output.stderr).to_string(),
+    )
+}
+
 fn run_golden() -> Vec<Value> {
     run_manifest("targets/golden.toml")
         .full
@@ -185,13 +203,19 @@ fn golden_b_fix_commit_shows_pass_with_evidence() {
 
 #[test]
 fn davis_predicate_is_honestly_reported_as_not_found() {
+    // Tightened per H1.1 review: the previous OR-of-two-verdicts version
+    // would have silently accepted a regression where the declaration
+    // scanner starts finding davis's flat-dotted option form but hits the
+    // mysqlLocal alias gap instead (or vice versa) -- a golden this loose
+    // can't tell "still exactly the documented gap" from "a different gap
+    // now". Pin the exact, currently-true gate.
     let reports = run_golden();
     for name in ["davis-before", "davis-after"] {
         let r = target(&reports, name);
-        let kind = verdict_kind(r, "database.driver");
-        assert!(
-            kind == "OptionNotFound" || kind == "PredicateNotFound",
-            "target {name} must not silently PASS or silently omit the watched option; got {kind}"
+        assert_eq!(
+            verdict_kind(r, "database.driver"),
+            "OptionNotFound",
+            "target {name} must not silently PASS or silently omit the watched option"
         );
     }
 }
@@ -330,4 +354,87 @@ fn h1_declaration_is_a_mandatory_gate() {
     let reports = run_golden();
     let r = target(&reports, "c8-option-not-found");
     assert_eq!(verdict_kind(r, "doesNotExist"), "OptionNotFound");
+}
+
+// --- H1.1 review fixes ---------------------------------------------------
+//
+// Four more correctness edge cases, again found by review of green code,
+// not by this suite failing: gate 4's outcome filter silently dropped
+// unresolvable test values into OBA001 (the exact fail-closed principle
+// H1 applied to the *default* side, broken on the *test-value* side);
+// the null-predicate outcome function was still comparing raw text
+// instead of classifying the actual AST node, so a non-literal default
+// or test value could be wrongly declared "definitely non-null"; an
+// empty `watch = []` silently produced a clean PASS; and a missing
+// module/test file (or any other manifest/I/O failure) exited through
+// Rust's default error code, indistinguishable from a genuine FINDING.
+
+// H1.1-1: an unresolvable test value must not silently vanish from gate 4's
+// evidence search. qux's default is a *known* `false` (isolating this from
+// the default-side bug below); the test assigns `builtins.elem "x" [ "x"
+// "y" ]`, which is `true` at runtime but syntactically opaque.
+
+#[test]
+fn h1_1_unresolved_test_value_is_inconclusive_not_oba001() {
+    let reports = run_golden();
+    let r = target(&reports, "c11-unresolved-test-value");
+    assert_eq!(
+        verdict_kind(r, "qux"),
+        "TestValueUnresolved",
+        "an unresolvable matching test value must never be silently treated as 'no evidence'"
+    );
+}
+
+// H1.1-2: predicate_outcome() for null predicates must classify the
+// default's actual AST node, not compare its raw text to the string
+// "null". baz's default is `if builtins.pathExists /etc/synth-baz then
+// null else "/run/other.sock"` -- its text is never literally "null", but
+// its ValueClass must still be Unknown (not "definitely non-null" from a
+// naive text mismatch), so gate 3 must not silently resolve it.
+
+#[test]
+fn h1_1_null_predicate_default_is_ast_classified_not_textual() {
+    let reports = run_golden();
+    let r = target(&reports, "c10-null-expression-default");
+    assert_eq!(
+        verdict_kind(r, "baz"),
+        "DefaultUnresolved",
+        "a non-literal default under a null predicate must be Unknown, not guessed non-null from text"
+    );
+}
+
+// H1.1-3: a target with watch = [] must never silently pass -- it checks
+// nothing and would otherwise exit 0 with zero findings and zero
+// inconclusive, the same "detector died, green light stayed on" failure
+// mode `watch` itself exists to prevent, one level up the stack.
+
+#[test]
+fn h1_1_empty_watch_is_tool_error() {
+    let (exit_code, stderr) = run_manifest_raw("targets/tool-error-empty-watch.toml");
+    assert_eq!(
+        exit_code, 3,
+        "an empty watch list must be a tool/config error (3), never a passing analysis"
+    );
+    assert!(
+        stderr.contains("watch"),
+        "error message should name the actual problem; got: {stderr}"
+    );
+}
+
+// H1.1-4: a missing module/test file must be TOOL_ERROR (3), never
+// FINDING (1) -- before this fix, any `?`-propagated I/O error fell
+// through to Rust's default error exit code, which happened to collide
+// with this tool's own definition of "genuine OBA001 finding".
+
+#[test]
+fn h1_1_missing_file_is_tool_error_not_finding() {
+    let (exit_code, stderr) = run_manifest_raw("targets/tool-error-missing-file.toml");
+    assert_eq!(
+        exit_code, 3,
+        "a missing module/test file must be TOOL_ERROR (3), never FINDING (1)"
+    );
+    assert!(
+        stderr.contains("this-file-does-not-exist"),
+        "error should name the actual missing file; got: {stderr}"
+    );
 }
