@@ -12,10 +12,23 @@ name: Kani proofs
 # guessed. GitHub-hosted runners have meaningfully more RAM/CPU
 # headroom for exactly this kind of proof.
 #
-# Reuse survey (AGENTS.md step 3/5): the official, actively-maintained
-# `model-checking/kani-github-action` (published by the same org that
-# maintains Kani itself) handles toolchain install + `cargo kani`
-# invocation -- no reason to hand-roll that setup.
+# Reuse survey (AGENTS.md step 3/5): tried the official
+# `model-checking/kani-github-action` first (both published tags, `v1`
+# and `v1.1`). Both failed the very first real run in ~25-30s, before
+# ever reaching Kani itself, with "The version of Kani installed was
+# different than the one requested" -- reproduced locally: their shared
+# `install-kani.sh` extracts the installed version via `kani --version |
+# awk '{print $2}'`, but `kani --version`'s real output is two lines
+# ("Kani Rust Verifier 0.68.0 (standalone)" / "CBMC 6.11.0"), so field 2
+# of line 1 is "Rust", not the version number -- a confirmed upstream
+# parsing bug, not a config problem on this side (pinning `kani-version`
+# explicitly, tried first, changes which comparison branch runs but not
+# this mis-parse). `v1.1`'s copy of the same script additionally has
+# `if [$? -eq 0]` / `if ["$x" != "$y"]` -- missing spaces around `[`,
+# invalid bash test syntax. Composing around it: still uses Kani's own
+# published `kani-verifier` crate and `cargo kani`, the same commands
+# the action itself would run -- only the action's own broken
+# self-verification wrapper is skipped.
 
 on:
   push:
@@ -29,20 +42,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Kani
+        run: |
+          cargo install --locked kani-verifier
+          cargo kani setup
       - name: Run Kani proofs
-        uses: model-checking/kani-github-action@v1
-        with:
-          # Pinned, not the action's own `latest` default: with
-          # `kani-version: latest`, the action's install script
-          # cross-checks the installed version against `cargo search
-          # kani-verifier`'s output -- `cargo search` is effectively
-          # deprecated on crates.io and returned a stale/empty result in
-          # the first real run here, so the action failed fast (~25s,
-          # before ever reaching Kani itself) with "the version of Kani
-          # installed was different than the one requested", even though
-          # the actual install succeeded. Pinning sidesteps that broken
-          # comparison path in the action's own install-kani.sh entirely
-          # (an explicit version skips the `cargo search` branch).
-          # Matches the version already verified working locally when
-          # this workflow was written.
-          kani-version: '0.68.0'
+        run: cargo kani
