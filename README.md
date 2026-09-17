@@ -759,11 +759,80 @@ one.
 10 in `main.rs`'s own unit-test module) — was 34 at the H1.3b freeze: +1
 golden (`h2_gate1_davis_flat_option_root_is_discovered`) and +9 new unit
 tests for the pure IR (`scanner_reads_real_ifm_test_correctly` was already
-counted in H1.3's tally). Next commit:
-narrow lexical alias resolution (`db → cfg.database`, `mysqlLocal → And(
-...)`, multi-hop, cycles → unresolved), the counterfactual per-option
-gate-4 rewrite this whole model exists to enable, and the davis
-acceptance case actually reaching `PASS`.
+counted in H1.3's tally).
+
+## H2 — Kleene refinement + lexical alias resolver (not yet wired into run_target)
+
+Two follow-up steps on commit 1, requested on review before the
+counterfactual gate-4 rewrite:
+
+**`eval_pred`'s `And`/`Or` refined to strong (Kleene) three-valued
+logic.** The original version required *both* operands to resolve,
+reasoning that was the safer fail-closed choice — that reasoning was
+wrong, not just cautious. A known-`false` operand pins `And`'s result to
+`false` regardless of the *other* operand's resolution: real Nix's `a &&
+b` either short-circuits on a `false` `a` without forcing `b` at all, or
+forces `b` and gets exactly the value already known statically — both
+paths land on `false`. Symmetrically for a known-`true` operand under
+`Or`. Verified with both operand orderings (the known value can be on
+either side) and by re-running all four existing `proptest` properties
+unchanged afterward — including the monotonicity property this refinement
+could plausibly have threatened.
+
+**A narrow lexical alias resolver**, reference-resolution based (walks
+the existing tree, never rewrites or re-parses text): `resolve_ident_binding`
+walks outward from a use site through enclosing `let`/lambda scopes,
+nearest-binding-wins, stopping at the first scope that defines the name.
+`lower_value_expr`/`lower_pred` switched from `Option<_>` to
+`Result<_, ResolveFailure>` (`Unbound`/`Cycle`/`UnsupportedScope`/
+`UnsupportedExpression`) — a bare `None` was fine while the IR was only
+unit-tested in isolation, but once this feeds the real verdict chain, "no
+predicate" and "a real alias this resolver can't trace" are different
+facts a report reader needs to tell apart (the same reason `Opacity`
+carries a `reason` string instead of being a bare marker). Select aliases
+(`db = cfg.database;`) splice the remaining path onto the resolved base;
+expression aliases used bare as a condition (`if mysqlLocal then ...`)
+resolve and lower the *bound* expression as a `Pred` directly, not as a
+value reference — the two alias shapes are distinguished by what they
+resolve to, never guessed from spelling. `with`, `inherit`, function
+parameters, and a `rec` attrset's internal mutual visibility are each
+explicitly `UnsupportedScope`, not silently skipped.
+
+Also added, per explicit review request: a safety gate on the gate-1 flat-
+option-root fix. Before this, a manifest could claim `cfg_ident =
+"otherCfg"` with `option_prefix = ["services","davis"]` and have
+declarations from one scope silently correlated with predicates from a
+completely different one — a manifest-induced false correlation, not a
+tool bug exactly, but not something this tool should be able to produce
+either. `cfg_ident_binds_to_prefix` checks that the module's own
+`cfg_ident = config.<path>;` binding actually matches `option_prefix`
+before the flat-root walk proceeds.
+
+Eight new adversarial resolver tests, not just the one happy Davis
+path: multi-hop select alias (`a = cfg.database; b = a;` resolving
+through both hops), a cyclic alias (`a = b; b = a;`, must fail as `Cycle`
+not a stack overflow), nested `let` shadowing (nearest binding wins),
+lambda-parameter shadowing, a `@`-pattern-bind shadowing, a
+function-produced alias (`db = someFunction cfg.database;`, must stay
+unresolved, never assumed to equal its argument), and both directions of
+the `cfg_ident`/`option_prefix` safety gate (matches → declaration found;
+mismatch → correlation refused). **One of these caught a real bug before
+it ever reached a golden fixture**: the lambda-shadowing test initially
+failed — `resolve_ident_binding` checked for a bare `NODE_IDENT` lambda
+parameter, but rnix's actual AST wraps a simple `x:` parameter in
+`NODE_IDENT_PARAM` (confirmed with a throwaway AST-dump probe test, not
+assumed from the type name), so `x` inside a lambda body was silently
+resolving *past* the lambda's own parameter to an outer alias of the same
+name — exactly the kind of wrong-shadowing bug this resolver exists to
+prevent, on the simplest possible lambda form. Fixed, and the same probe
+caught that `NODE_PAT_BIND` (the `@args` binding) needed the identical
+fix, pinned by its own test.
+
+54 tests total (was 44): +3 for `eval_pred`'s Kleene refinement, +6
+adversarial resolver tests, +1 for the `cfg_ident`/`option_prefix` safety
+gate. Still not wired into `run_target` -- the dead_code warnings on the
+IR/resolver are expected until the counterfactual gate-4 rewrite (next)
+actually calls into this.
 
 ## Running
 
@@ -807,11 +876,11 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 44 tests, all passing (34 at the H1.3b/H1-freeze point
-below, +1 golden and +9 unit tests from H2 commit 1's gate-1 fix and pure
-Predicate IR — see "H2" above; H2 hasn't added new `cN`-numbered fixtures
-yet, so criterion C's case list stays as of the freeze): 5 from the
-original spike, 5 from H1
+`cargo test` — 54 tests, all passing (34 at the H1.3b/H1-freeze point
+below, +1 golden and +19 unit tests from H2's gate-1 fix, pure Predicate
+IR, `eval_pred` refinement, and lexical alias resolver — see "H2" above;
+H2 hasn't added new `cN`-numbered fixtures yet, so criterion C's case
+list stays as of the freeze): 5 from the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,

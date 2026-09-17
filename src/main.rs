@@ -534,14 +534,59 @@ struct OptionDecl {
 /// (kimai's shape) simply never matches here and falls through to the
 /// nested form instead, unchanged -- this fix doesn't alter kimai's path
 /// at all.
+/// Safety gate for the flat-option-root fix, added on review: does
+/// `cfg_ident`'s own module-level binding (`cfg = config.services.davis;`)
+/// actually point at the same absolute path as the target's
+/// `option_prefix`? Without this check, a flat `options.<option_prefix> =
+/// {...};` root gets silently correlated with predicates matched against
+/// `cfg_ident` purely because the *manifest* says they share a prefix --
+/// a manifest with `cfg_ident = "otherCfg"` and `option_prefix =
+/// ["services","davis"]` could pair declarations from one scope with
+/// predicates from a completely different one, a manifest-induced false
+/// correlation this tool has no business producing. A flat search for
+/// the first `NODE_ATTRPATH_VALUE` binding `cfg_ident` anywhere in the
+/// module -- not a full scope-aware walk from a specific use site, since
+/// this only needs to check the module's own top-level `let cfg = ...;`
+/// idiom, the same flat scan `scan_predicates` already uses for its own
+/// purposes.
+fn cfg_ident_binds_to_prefix(root: &SyntaxNode, cfg_ident: &str, option_prefix: &[String]) -> bool {
+    for node in root.descendants() {
+        if node.kind() != NODE_ATTRPATH_VALUE {
+            continue;
+        }
+        let mut children = node.children();
+        let Some(attrpath) = children.next() else {
+            continue;
+        };
+        let Some(segs) = attrpath_segments(&attrpath) else {
+            continue;
+        };
+        if segs.len() != 1 || segs[0] != cfg_ident {
+            continue;
+        }
+        let Some(value) = children.next() else {
+            continue;
+        };
+        let Some((root_name, path)) = as_select(&value) else {
+            continue;
+        };
+        return root_name == "config" && path == option_prefix;
+    }
+    false
+}
+
 fn scan_options(
     file: &str,
     src: &str,
     root: &SyntaxNode,
+    cfg_ident: &str,
     option_prefix: &[String],
 ) -> Vec<OptionDecl> {
     let mut out = Vec::new();
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
+    let flat_root_is_safe = prefix_is_concrete
+        && !option_prefix.is_empty()
+        && cfg_ident_binds_to_prefix(root, cfg_ident, option_prefix);
     for node in root.descendants() {
         if node.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -565,8 +610,7 @@ fn scan_options(
             continue;
         }
 
-        if prefix_is_concrete
-            && !option_prefix.is_empty()
+        if flat_root_is_safe
             && segs.len() == option_prefix.len() + 1
             && segs[0] == "options"
             && segs[1..] == option_prefix[..]
@@ -747,30 +791,230 @@ enum Pred {
     Or(Box<Pred>, Box<Pred>),
 }
 
+/// Why `lower_pred`/`lower_value_expr` couldn't produce an IR value.
+/// H2 commit 1 used a bare `Option<_>`, which was fine while the IR was
+/// only unit-tested in isolation -- but once this lowering feeds the real
+/// verdict chain, a bare `None` starts meaning too many different things
+/// at once ("no predicate here at all" vs. "there's a real alias this
+/// resolver just can't trace yet" vs. "cyclic aliasing" are very
+/// different facts a report reader needs to tell apart, the same way
+/// `Opacity`'s `reason` field exists so H1's walker never collapses
+/// "gave up" into one undifferentiated bucket). Reviewed and fixed before
+/// this landed in `run_target`, not after.
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum ResolveFailure {
+    /// An identifier with no reachable binding in any enclosing scope.
+    Unbound(String),
+    /// Resolving this identifier required passing through the same name
+    /// twice -- a cyclic alias, never followed indefinitely. Carries the
+    /// chain of names that led back to itself.
+    Cycle(Vec<String>),
+    /// A scope construct this resolver deliberately doesn't model:
+    /// `with` (dynamic, can't be resolved statically), a function
+    /// parameter (bound to a runtime argument, not a lexical alias to
+    /// any expression), `inherit` (would need to trace an outer scope or
+    /// an arbitrary expression further), or a `rec` attrset's own
+    /// internal mutual visibility (a materially different scoping rule
+    /// from `let`, and not how real modules alias predicates in
+    /// practice).
+    UnsupportedScope(&'static str),
+    /// A syntactic shape this pure IR (`Pred`/`ValueExpr`) can't
+    /// represent at all, even after alias resolution successfully found
+    /// a binding -- an operator this IR doesn't model, a helper call, a
+    /// non-boolean-shaped resolved expression, and so on.
+    UnsupportedExpression,
+}
+
+/// The chain of alias names currently being resolved, used purely for
+/// cycle detection (`a = b; b = a;` must fail as `Cycle`, never recurse
+/// until the stack overflows).
+type AliasChain = Vec<String>;
+
+/// Resolves a bare identifier used at `ident_node`'s position to the
+/// `SyntaxNode` of whatever expression it's lexically bound to, by
+/// walking outward through enclosing scopes and stopping at the first one
+/// that defines `name` (nearest-binding-wins -- correct lexical
+/// shadowing: `let x = cfg.a; in let x = cfg.b; in x` resolves `x` to
+/// `cfg.b`, not `cfg.a`). Reference resolution only -- this never
+/// rewrites or re-parses any text, it just walks the existing tree and
+/// hands back a pointer into it.
+fn resolve_ident_binding(
+    ident_node: &SyntaxNode,
+    name: &str,
+) -> Result<SyntaxNode, ResolveFailure> {
+    for ancestor in ident_node.ancestors().skip(1) {
+        match ancestor.kind() {
+            NODE_LET_IN => {
+                let mut children: Vec<SyntaxNode> = ancestor.children().collect();
+                if children.pop().is_none() {
+                    continue; // no body -- malformed, nothing to bind here
+                }
+                for entry in &children {
+                    match entry.kind() {
+                        NODE_ATTRPATH_VALUE => {
+                            let mut c = entry.children();
+                            let (Some(attrpath), Some(value)) = (c.next(), c.next()) else {
+                                continue;
+                            };
+                            if let Some(segs) = attrpath_segments(&attrpath) {
+                                if segs.len() == 1 && segs[0] == name {
+                                    return Ok(value);
+                                }
+                            }
+                        }
+                        NODE_INHERIT
+                            if entry.children().any(|c| {
+                                c.kind() == NODE_IDENT && ident_text(&c).as_deref() == Some(name)
+                            }) =>
+                        {
+                            return Err(ResolveFailure::UnsupportedScope("inherit"));
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            NODE_LAMBDA => {
+                // A simple `x: body` parameter is `NODE_IDENT_PARAM`
+                // (which itself wraps an inner `NODE_IDENT` child) --
+                // NOT a bare `NODE_IDENT` directly. Caught live by
+                // `lambda_parameter_shadows_outer_alias_and_is_unsupported`:
+                // matching on `NODE_IDENT` here let `x` inside a lambda
+                // body silently resolve past the lambda's own parameter
+                // to an outer `x = cfg.a;` alias -- exactly the kind of
+                // wrong-shadowing bug this whole function exists to
+                // prevent, on the simplest possible lambda form.
+                let shadows =
+                    ancestor
+                        .children()
+                        .next()
+                        .is_some_and(|pattern| match pattern.kind() {
+                            NODE_IDENT_PARAM => {
+                                pattern
+                                    .children()
+                                    .next()
+                                    .and_then(|id| ident_text(&id))
+                                    .as_deref()
+                                    == Some(name)
+                            }
+                            NODE_PATTERN => pattern.children().any(|child| {
+                                matches!(
+                                    child.kind(),
+                                    NODE_PAT_ENTRY | NODE_IDENT_PARAM | NODE_PAT_BIND
+                                ) && child
+                                    .children()
+                                    .next()
+                                    .and_then(|id| ident_text(&id))
+                                    .as_deref()
+                                    == Some(name)
+                            }),
+                            _ => false,
+                        });
+                if shadows {
+                    return Err(ResolveFailure::UnsupportedScope("function parameter"));
+                }
+            }
+            NODE_WITH => {
+                return Err(ResolveFailure::UnsupportedScope("with"));
+            }
+            NODE_ATTR_SET => {
+                let is_rec = ancestor
+                    .children_with_tokens()
+                    .filter_map(|e| e.into_token())
+                    .any(|t| t.kind() == TOKEN_REC);
+                let binds_name = ancestor.children().any(|entry| {
+                    entry.kind() == NODE_ATTRPATH_VALUE
+                        && entry
+                            .children()
+                            .next()
+                            .and_then(|ap| attrpath_segments(&ap))
+                            .is_some_and(|segs| segs.len() == 1 && segs[0] == name)
+                });
+                if is_rec && binds_name {
+                    return Err(ResolveFailure::UnsupportedScope("rec attrset"));
+                }
+            }
+            _ => {}
+        }
+    }
+    Err(ResolveFailure::Unbound(name.to_string()))
+}
+
+/// Shared cycle-checking + scope-resolution wrapper: if `name` is already
+/// in `chain`, fails as `Cycle` instead of resolving further; otherwise
+/// resolves `name`'s binding and recurses into `lower_bound` with `name`
+/// pushed onto `chain` (popped again before returning), so a cycle
+/// spanning multiple hops (`a -> b -> a`) is caught regardless of which
+/// hop closes the loop.
+fn resolve_alias_recursively<T>(
+    ident_node: &SyntaxNode,
+    name: &str,
+    chain: &mut AliasChain,
+    lower_bound: impl FnOnce(&SyntaxNode, &mut AliasChain) -> Result<T, ResolveFailure>,
+) -> Result<T, ResolveFailure> {
+    if chain.iter().any(|n| n == name) {
+        let mut c = chain.clone();
+        c.push(name.to_string());
+        return Err(ResolveFailure::Cycle(c));
+    }
+    let bound_node = resolve_ident_binding(ident_node, name)?;
+    chain.push(name.to_string());
+    let result = lower_bound(&bound_node, chain);
+    chain.pop();
+    result
+}
+
 /// Lowers a value-position expression into the pure IR: a `cfg_ident`-
 /// rooted select becomes `Ref`; the literals `null`/`true`/`false`/a
-/// plain string become `Literal`. `None` for anything else -- this
-/// commit has no alias/scope resolution yet (that lands in the next
-/// commit), so a bare identifier referring to some other binding (e.g.
-/// `db` in `db.driver`) is honestly unresolved here, never assumed to be
-/// absent or to evaluate to any particular thing.
-fn lower_value_expr(node: &SyntaxNode, cfg_ident: &str) -> Option<ValueExpr> {
-    if let Some((root_name, path)) = as_select(node) {
-        return if root_name == cfg_ident {
-            Some(ValueExpr::Ref(path))
-        } else {
-            None
+/// plain string become `Literal`. A `cfg_ident`-rooted select reached
+/// *through* an alias (`db.driver` where `db = cfg.database;`) resolves
+/// the alias and splices the remaining path onto the resolved base --
+/// select aliases and expression aliases are genuinely different shapes
+/// (a select alias's resolved form must itself be a `Ref` for splicing to
+/// make sense; resolving to a `Literal` or anything else is
+/// `UnsupportedExpression`, not silently dropped).
+fn lower_value_expr(node: &SyntaxNode, cfg_ident: &str) -> Result<ValueExpr, ResolveFailure> {
+    lower_value_expr_chained(node, cfg_ident, &mut Vec::new())
+}
+
+fn lower_value_expr_chained(
+    node: &SyntaxNode,
+    cfg_ident: &str,
+    chain: &mut AliasChain,
+) -> Result<ValueExpr, ResolveFailure> {
+    if node.kind() == NODE_SELECT {
+        let (root_name, path) = as_select(node).ok_or(ResolveFailure::UnsupportedExpression)?;
+        if root_name == cfg_ident {
+            return Ok(ValueExpr::Ref(path));
+        }
+        let root_node = node
+            .children()
+            .next()
+            .ok_or(ResolveFailure::UnsupportedExpression)?;
+        let base = resolve_alias_recursively(&root_node, &root_name, chain, |bound, chain| {
+            lower_value_expr_chained(bound, cfg_ident, chain)
+        })?;
+        return match base {
+            ValueExpr::Ref(mut prefix) => {
+                prefix.extend(path);
+                Ok(ValueExpr::Ref(prefix))
+            }
+            ValueExpr::Literal(_) => Err(ResolveFailure::UnsupportedExpression),
         };
     }
     match node.kind() {
         NODE_IDENT => match ident_text(node).as_deref() {
-            Some("null") => Some(ValueExpr::Literal(Scalar::Null)),
-            Some("true") => Some(ValueExpr::Literal(Scalar::Bool(true))),
-            Some("false") => Some(ValueExpr::Literal(Scalar::Bool(false))),
-            _ => None,
+            Some("null") => Ok(ValueExpr::Literal(Scalar::Null)),
+            Some("true") => Ok(ValueExpr::Literal(Scalar::Bool(true))),
+            Some("false") => Ok(ValueExpr::Literal(Scalar::Bool(false))),
+            Some(name) => resolve_alias_recursively(node, name, chain, |bound, chain| {
+                lower_value_expr_chained(bound, cfg_ident, chain)
+            }),
+            None => Err(ResolveFailure::UnsupportedExpression),
         },
-        NODE_STRING => string_text(node).map(|s| ValueExpr::Literal(Scalar::Str(s))),
-        _ => None,
+        NODE_STRING => string_text(node)
+            .map(|s| ValueExpr::Literal(Scalar::Str(s)))
+            .ok_or(ResolveFailure::UnsupportedExpression),
+        _ => Err(ResolveFailure::UnsupportedExpression),
     }
 }
 
@@ -779,54 +1023,97 @@ fn lower_value_expr(node: &SyntaxNode, cfg_ident: &str) -> Option<ValueExpr> {
 /// reference used directly as a condition (`Eq(ref, true)`), `!p`
 /// (`Not(p)`), `a && b` / `a || b` (`And`/`Or`). Uses rnix's typed
 /// `ast::BinOp`/`ast::UnaryOp` operator classification (see the reuse
-/// survey above) instead of hand-matching tokens. `None` for anything
-/// unrepresentable -- a bare alias identifier used directly as a
-/// condition (unresolved until the next commit's alias resolution), a
-/// helper call, a non-boolean-shaped expression, or an operator this IR
-/// doesn't model (`<`, string ops, arithmetic, ...).
-fn lower_pred(node: &SyntaxNode, cfg_ident: &str) -> Option<Pred> {
+/// survey above) instead of hand-matching tokens.
+///
+/// A bare alias identifier used *directly as a condition* (`if
+/// mysqlLocal then ...`) is resolved and lowered as a `Pred` directly,
+/// not as a value reference: `mysqlLocal`'s binding is a whole compound
+/// boolean expression (`db.createLocally && db.driver == "mysql"`), not
+/// an option path, so the alias denotes the predicate itself, not
+/// something to wrap in `Eq(_, true)`. That wrapping only applies to a
+/// genuine `cfg_ident`-rooted option reference (possibly reached through
+/// a *select* alias like `db`, handled by `lower_value_expr`) used as a
+/// condition -- the two alias shapes are distinguished purely by what
+/// they're bound to, discovered by attempting the resolution and looking
+/// at the result, never guessed from the identifier's own spelling.
+fn lower_pred(node: &SyntaxNode, cfg_ident: &str) -> Result<Pred, ResolveFailure> {
+    lower_pred_chained(node, cfg_ident, &mut Vec::new())
+}
+
+fn lower_pred_chained(
+    node: &SyntaxNode,
+    cfg_ident: &str,
+    chain: &mut AliasChain,
+) -> Result<Pred, ResolveFailure> {
     let node = unwrap_paren(node.clone());
     if let Some(bin) = rnix::ast::BinOp::cast(node.clone()) {
-        let op = bin.operator()?;
-        let lhs_node = bin.lhs()?.syntax().clone();
-        let rhs_node = bin.rhs()?.syntax().clone();
+        let op = bin
+            .operator()
+            .ok_or(ResolveFailure::UnsupportedExpression)?;
+        let lhs_node = bin
+            .lhs()
+            .ok_or(ResolveFailure::UnsupportedExpression)?
+            .syntax()
+            .clone();
+        let rhs_node = bin
+            .rhs()
+            .ok_or(ResolveFailure::UnsupportedExpression)?
+            .syntax()
+            .clone();
         return match op {
-            rnix::ast::BinOpKind::And => Some(Pred::And(
-                Box::new(lower_pred(&lhs_node, cfg_ident)?),
-                Box::new(lower_pred(&rhs_node, cfg_ident)?),
+            rnix::ast::BinOpKind::And => Ok(Pred::And(
+                Box::new(lower_pred_chained(&lhs_node, cfg_ident, chain)?),
+                Box::new(lower_pred_chained(&rhs_node, cfg_ident, chain)?),
             )),
-            rnix::ast::BinOpKind::Or => Some(Pred::Or(
-                Box::new(lower_pred(&lhs_node, cfg_ident)?),
-                Box::new(lower_pred(&rhs_node, cfg_ident)?),
+            rnix::ast::BinOpKind::Or => Ok(Pred::Or(
+                Box::new(lower_pred_chained(&lhs_node, cfg_ident, chain)?),
+                Box::new(lower_pred_chained(&rhs_node, cfg_ident, chain)?),
             )),
-            rnix::ast::BinOpKind::Equal => Some(Pred::Eq(
-                lower_value_expr(&lhs_node, cfg_ident)?,
-                lower_value_expr(&rhs_node, cfg_ident)?,
+            rnix::ast::BinOpKind::Equal => Ok(Pred::Eq(
+                lower_value_expr_chained(&lhs_node, cfg_ident, chain)?,
+                lower_value_expr_chained(&rhs_node, cfg_ident, chain)?,
             )),
-            rnix::ast::BinOpKind::NotEqual => Some(Pred::Not(Box::new(Pred::Eq(
-                lower_value_expr(&lhs_node, cfg_ident)?,
-                lower_value_expr(&rhs_node, cfg_ident)?,
+            rnix::ast::BinOpKind::NotEqual => Ok(Pred::Not(Box::new(Pred::Eq(
+                lower_value_expr_chained(&lhs_node, cfg_ident, chain)?,
+                lower_value_expr_chained(&rhs_node, cfg_ident, chain)?,
             )))),
-            _ => None,
+            _ => Err(ResolveFailure::UnsupportedExpression),
         };
     }
     if let Some(un) = rnix::ast::UnaryOp::cast(node.clone()) {
-        return if un.operator()? == rnix::ast::UnaryOpKind::Invert {
-            let inner = un.expr()?.syntax().clone();
-            Some(Pred::Not(Box::new(lower_pred(&inner, cfg_ident)?)))
+        return if un.operator() == Some(rnix::ast::UnaryOpKind::Invert) {
+            let inner = un
+                .expr()
+                .ok_or(ResolveFailure::UnsupportedExpression)?
+                .syntax()
+                .clone();
+            Ok(Pred::Not(Box::new(lower_pred_chained(
+                &inner, cfg_ident, chain,
+            )?)))
         } else {
-            None
+            Err(ResolveFailure::UnsupportedExpression)
         };
     }
-    // A bare reference used directly as a condition: `if cfg.foo then
-    // ...` lowers to `cfg.foo == true`. Only a `Ref` counts here -- a
-    // bare `Literal` (e.g. a stray `if true then ...`) isn't a real
-    // option-branch predicate, so it's left unresolved rather than
-    // fabricating trivial evidence.
-    match lower_value_expr(&node, cfg_ident) {
-        Some(v @ ValueExpr::Ref(_)) => Some(Pred::Eq(v, ValueExpr::Literal(Scalar::Bool(true)))),
-        _ => None,
+    if node.kind() == NODE_SELECT {
+        let v = lower_value_expr_chained(&node, cfg_ident, chain)?;
+        return match v {
+            ValueExpr::Ref(_) => Ok(Pred::Eq(v, ValueExpr::Literal(Scalar::Bool(true)))),
+            ValueExpr::Literal(_) => Err(ResolveFailure::UnsupportedExpression),
+        };
     }
+    if node.kind() == NODE_IDENT {
+        let name = ident_text(&node).ok_or(ResolveFailure::UnsupportedExpression)?;
+        if name == "true" || name == "false" {
+            // A stray `if true then ...`/`if false then ...` isn't a
+            // real option-branch predicate -- left unresolved rather
+            // than fabricating trivial evidence.
+            return Err(ResolveFailure::UnsupportedExpression);
+        }
+        return resolve_alias_recursively(&node, &name, chain, |bound, chain| {
+            lower_pred_chained(bound, cfg_ident, chain)
+        });
+    }
+    Err(ResolveFailure::UnsupportedExpression)
 }
 
 /// Evaluates a `ValueExpr` against a concrete environment: `env` supplies
@@ -1759,6 +2046,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         &module_file,
         &module_src,
         module_root.syntax(),
+        &t.cfg_ident,
         &t.option_prefix,
     );
     let predicates = scan_predicates(
@@ -2405,14 +2693,14 @@ mod tests {
     fn lower_pred_handles_the_direct_h1_forms() {
         assert_eq!(
             lower_pred(&parse_expr("cfg.foo != null"), "cfg"),
-            Some(Pred::Not(Box::new(Pred::Eq(
+            Ok(Pred::Not(Box::new(Pred::Eq(
                 ValueExpr::Ref(vec!["foo".into()]),
                 ValueExpr::Literal(Scalar::Null),
             ))))
         );
         assert_eq!(
             lower_pred(&parse_expr("cfg.foo == null"), "cfg"),
-            Some(Pred::Eq(
+            Ok(Pred::Eq(
                 ValueExpr::Ref(vec!["foo".into()]),
                 ValueExpr::Literal(Scalar::Null),
             ))
@@ -2422,14 +2710,14 @@ mod tests {
         // `Truthy` semantics.
         assert_eq!(
             lower_pred(&parse_expr("cfg.foo"), "cfg"),
-            Some(Pred::Eq(
+            Ok(Pred::Eq(
                 ValueExpr::Ref(vec!["foo".into()]),
                 ValueExpr::Literal(Scalar::Bool(true)),
             ))
         );
         assert_eq!(
             lower_pred(&parse_expr("!cfg.foo"), "cfg"),
-            Some(Pred::Not(Box::new(Pred::Eq(
+            Ok(Pred::Not(Box::new(Pred::Eq(
                 ValueExpr::Ref(vec!["foo".into()]),
                 ValueExpr::Literal(Scalar::Bool(true)),
             ))))
@@ -2438,17 +2726,15 @@ mod tests {
 
     #[test]
     fn lower_pred_handles_compound_forms_new_in_h2() {
-        // The exact real-world davis.nix chain this commit exists to move
-        // towards: `db.createLocally && db.driver == "mysql"` -- here with
-        // `db` already replaced by `cfg` directly (no alias resolution
-        // yet, that's the next commit), isolating just the `&&`/string-
-        // literal-equality lowering.
+        // Compound forms with `db` already replaced by `cfg` directly,
+        // isolating the `&&`/string-literal-equality lowering itself from
+        // alias resolution (covered separately below).
         assert_eq!(
             lower_pred(
                 &parse_expr(r#"cfg.createLocally && cfg.driver == "mysql""#),
                 "cfg"
             ),
-            Some(Pred::And(
+            Ok(Pred::And(
                 Box::new(Pred::Eq(
                     ValueExpr::Ref(vec!["createLocally".into()]),
                     ValueExpr::Literal(Scalar::Bool(true)),
@@ -2461,7 +2747,7 @@ mod tests {
         );
         assert_eq!(
             lower_pred(&parse_expr("cfg.a || cfg.b"), "cfg"),
-            Some(Pred::Or(
+            Ok(Pred::Or(
                 Box::new(Pred::Eq(
                     ValueExpr::Ref(vec!["a".into()]),
                     ValueExpr::Literal(Scalar::Bool(true)),
@@ -2475,18 +2761,209 @@ mod tests {
     }
 
     #[test]
-    fn lower_pred_is_none_for_unsupported_shapes_not_silently_something_else() {
+    fn lower_pred_is_unresolved_for_unsupported_shapes_not_silently_something_else() {
         // A helper call: not a shape this IR represents.
         assert_eq!(
             lower_pred(&parse_expr(r#"builtins.elem "x" [ "x" "y" ]"#), "cfg"),
-            None
+            Err(ResolveFailure::UnsupportedExpression)
         );
-        // A bare alias identifier used directly as a condition: genuinely
-        // unresolved until the next commit's alias resolution exists --
-        // must never be silently treated as `false`/absent.
-        assert_eq!(lower_pred(&parse_expr("mysqlLocal"), "cfg"), None);
+        // A bare identifier with no enclosing binding at all (this test
+        // parses a bare top-level expression, no `let`/lambda around it)
+        // -- genuinely unbound, never silently treated as `false`/absent.
+        assert_eq!(
+            lower_pred(&parse_expr("mysqlLocal"), "cfg"),
+            Err(ResolveFailure::Unbound("mysqlLocal".into()))
+        );
         // An operator this IR doesn't model.
-        assert_eq!(lower_pred(&parse_expr("cfg.a < cfg.b"), "cfg"), None);
+        assert_eq!(
+            lower_pred(&parse_expr("cfg.a < cfg.b"), "cfg"),
+            Err(ResolveFailure::UnsupportedExpression)
+        );
+    }
+
+    // --- Alias resolution: adversarial cases, not just the one happy
+    // Davis path. Per review: a resolver only proven against one real
+    // module is a resolver that's only proven against one real module.
+
+    /// Parses `src` as `let ...; in <body>` and returns `<body>`'s syntax
+    /// node -- still positioned inside the `let`'s scope (its ancestors
+    /// include the `NODE_LET_IN`), exactly like a real predicate
+    /// expression `scan_predicates` would encounter nested inside a
+    /// module's own `let cfg = ...; in { ... };`.
+    fn let_body(src: &str) -> SyntaxNode {
+        let expr = parse_expr(src);
+        assert_eq!(
+            expr.kind(),
+            NODE_LET_IN,
+            "expected a let..in expression: {src}"
+        );
+        expr.children().last().expect("let..in must have a body")
+    }
+
+    #[test]
+    fn multi_hop_select_alias_resolves() {
+        // a = cfg.database; b = a; -- resolving `b.driver` must chase
+        // through BOTH hops (b -> a -> cfg.database) to land on
+        // `Ref(["database","driver"])`, not stop at the first hop.
+        assert_eq!(
+            lower_pred(
+                &let_body(r#"let a = cfg.database; b = a; in b.driver == "mysql""#),
+                "cfg"
+            ),
+            Ok(Pred::Eq(
+                ValueExpr::Ref(vec!["database".into(), "driver".into()]),
+                ValueExpr::Literal(Scalar::Str("mysql".into())),
+            ))
+        );
+    }
+
+    #[test]
+    fn cyclic_alias_is_unresolved_not_a_stack_overflow() {
+        // a = b; b = a; -- must fail as Cycle, not recurse until the
+        // stack dies. The exact chain contents matter less than the
+        // *shape* of the failure (Cycle, not a panic or a wrong answer).
+        let result = lower_pred(&let_body("let a = b; b = a; in a"), "cfg");
+        match result {
+            Err(ResolveFailure::Cycle(chain)) => {
+                assert!(
+                    chain.len() >= 2,
+                    "cycle chain should record at least the two names involved; got {chain:?}"
+                );
+            }
+            other => panic!("expected Cycle, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn nested_let_shadowing_nearest_binding_wins() {
+        // let x = cfg.a; in let x = cfg.b; in x -- the inner `x` shadows
+        // the outer one; resolving the body's bare `x` must land on
+        // cfg.b, never cfg.a.
+        let outer = parse_expr("let x = cfg.a; in let x = cfg.b; in x");
+        assert_eq!(outer.kind(), NODE_LET_IN);
+        let inner = outer.children().last().unwrap();
+        assert_eq!(inner.kind(), NODE_LET_IN);
+        let innermost_body = inner.children().last().unwrap();
+
+        assert_eq!(
+            lower_pred(&innermost_body, "cfg"),
+            Ok(Pred::Eq(
+                ValueExpr::Ref(vec!["b".into()]),
+                ValueExpr::Literal(Scalar::Bool(true)),
+            )),
+            "nearest binding must win -- resolving to cfg.a here would be wrong shadowing"
+        );
+    }
+
+    #[test]
+    fn lambda_parameter_shadows_outer_alias_and_is_unsupported() {
+        // let x = cfg.a; in x: x != null -- inside the lambda body, `x`
+        // is the lambda's OWN parameter (a runtime argument, not a
+        // lexical alias to any expression), shadowing the outer
+        // `x = cfg.a`. Must be UnsupportedScope, never silently resolved
+        // to the outer alias.
+        let outer = parse_expr("let x = cfg.a; in x: x != null");
+        assert_eq!(outer.kind(), NODE_LET_IN);
+        let lambda = outer.children().last().unwrap();
+        assert_eq!(lambda.kind(), NODE_LAMBDA);
+        let lambda_body = lambda.children().last().unwrap();
+
+        assert_eq!(
+            lower_pred(&lambda_body, "cfg"),
+            Err(ResolveFailure::UnsupportedScope("function parameter"))
+        );
+    }
+
+    #[test]
+    fn pattern_bind_at_name_also_shadows() {
+        // let args = cfg.a; in ({ x, ... }@args: args) -- the `@args`
+        // binding (NODE_PAT_BIND) is just as much a real lambda
+        // parameter as a plain `NODE_IDENT_PARAM`, binding `args` to the
+        // whole passed-in attrset. Caught by the same AST-shape probe
+        // that found the NODE_IDENT_PARAM bug above: NODE_PAT_BIND was
+        // initially missing from the PATTERN-branch shadow check
+        // alongside it.
+        let outer = parse_expr("let args = cfg.a; in ({ x, ... }@args: args)");
+        assert_eq!(outer.kind(), NODE_LET_IN);
+        let lambda_or_paren = outer.children().last().unwrap();
+        let lambda = if lambda_or_paren.kind() == NODE_PAREN {
+            lambda_or_paren.children().next().unwrap()
+        } else {
+            lambda_or_paren
+        };
+        assert_eq!(lambda.kind(), NODE_LAMBDA);
+        let lambda_body = lambda.children().last().unwrap();
+
+        assert_eq!(
+            lower_pred(&lambda_body, "cfg"),
+            Err(ResolveFailure::UnsupportedScope("function parameter"))
+        );
+    }
+
+    #[test]
+    fn function_produced_alias_is_unresolved_not_assumed_to_be_its_argument() {
+        // db = someFunction cfg.database; -- `db` is NOT the same thing
+        // as `cfg.database`; whatever someFunction does to it is opaque
+        // to this resolver, so `db.driver` must stay unresolved rather
+        // than being silently treated as `cfg.database.driver`.
+        assert_eq!(
+            lower_pred(
+                &let_body(r#"let db = someFunction cfg.database; in db.driver == "mysql""#),
+                "cfg"
+            ),
+            Err(ResolveFailure::UnsupportedExpression)
+        );
+    }
+
+    #[test]
+    fn scan_options_flat_root_requires_cfg_to_actually_match_option_prefix() {
+        // Positive control: cfg really does bind to config.services.davis,
+        // matching option_prefix -- the flat root must be walked.
+        let good = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.davis;
+            in
+            {
+              options.services.davis = {
+                foo = lib.mkOption { default = null; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(good);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "davis".to_string()];
+        let opts = scan_options("m.nix", good, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["foo"])),
+            "cfg matches option_prefix -- flat root must be discovered; got {opts:?}"
+        );
+
+        // The actual safety-gate case: manifest claims option_prefix =
+        // ["services","davis"], but this module's own cfg binds to a
+        // completely different scope. Correlating them anyway would be a
+        // manifest-induced false correlation -- must NOT walk the flat
+        // root just because option_prefix happens to line up textually
+        // with the declaration path.
+        let bad = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.wrongScope;
+            in
+            {
+              options.services.davis = {
+                foo = lib.mkOption { default = null; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(bad);
+        assert!(root.errors().is_empty());
+        let opts = scan_options("m.nix", bad, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.is_empty(),
+            "cfg binds to a different scope than option_prefix claims -- must not correlate; \
+             got {opts:?}"
+        );
     }
 
     // --- H1/H2 compatibility: the new IR+evaluator must reproduce H1's
