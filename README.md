@@ -891,6 +891,101 @@ sections above — corrected.
 
 56 tests total (was 54).
 
+## H2 — counterfactual gate 4, wired in: the davis acceptance case
+
+The point of all of H2 so far. `run_target`'s gate 2/4 now has a real H2
+path, tried only when H1's own unary predicate scan finds nothing for the
+watched option (H1's byte-for-byte behavior on every unary target is
+completely unchanged — verified by re-running the full suite after
+wiring, not just argued):
+
+1. **`KnownValue`, not a fabricated placeholder.** Reviewed before
+   wiring: the environment domain needed to distinguish "known non-null,
+   but exact value withheld" (`KnownValue::DefinitelyNonNull`, only ever
+   proves a null-comparison) from "known to be exactly this scalar"
+   (`KnownValue::Exact`, proves any equality) — collapsing them (e.g. into
+   a fake `Scalar::Str("placeholder")`, as the earlier compatibility
+   tests did) would let the evaluator draw equality conclusions
+   (`"placeholder" == "mysql"`) it has no basis for. `classify_known_value`
+   mirrors `classify_value`/`ValueClass` but preserves exact literal
+   content; `TestAssignment`/`OptionDecl` each gained a `known_value`/
+   `default_known_value` field alongside their existing H1 ones.
+2. **Every predicate referencing the watched option, not just the first
+   one found.** `scan_resolved_predicates` finds every branch-condition
+   site (`if`/`mkIf`/`optional`/...) and lowers each through `lower_pred`
+   — for a *concrete* `option_prefix`, each site is also verified with
+   `resolve_cfg_root(condition_site, cfg_ident) == option_prefix`, the
+   same declaration-side safety check applied to the predicate side of
+   the correlation (wildcarded targets like kimai skip this, unchanged
+   from before). An earlier version of the counterfactual gate picked
+   only the *first* resolved predicate referencing the watched option --
+   reviewed and generalized: davis's real `database.driver` is referenced
+   by both a simple `db.driver == "sqlite"` check *and* the compound
+   `mysqlLocal` alias, and "the predicate" stopped being a well-defined
+   singular concept the moment more than one could exist. Every candidate
+   is now evaluated; a witness through *any* of them is existential
+   evidence, and what happened with every candidate (not just the winning
+   one) survives into a new `predicate_attempts` field, so a `PASS`
+   never silently hides that a different predicate on the same option was
+   inconclusive.
+3. **Per-instance, never cross-instance.** For each real test instance
+   that explicitly assigns the watched option `x`, two hypothetical
+   environments — everything *else* the predicate references held at
+   whatever *that instance* actually did (or the option's own declared
+   default, if untouched) — differing only in whether `x` is at its
+   declared default or this instance's test value. Deliberately never
+   merges assignments from different `nodes`/`containers` instances into
+   one synthetic environment, which would prove something about two
+   independent machines' combined state that no real Nix evaluation ever
+   produces.
+
+**The davis acceptance case, on real code, both directions.** Watching
+`database.driver`: both `davis-before` and `davis-after` correctly `PASS`
+— but *not* via `mysqlLocal`. `machine1` sets `database.driver =
+"postgresql"` in both fixtures (default is `"sqlite"`), which is real,
+legitimate evidence against the simple `db.driver == "sqlite"` predicate
+regardless of whether any mysql scenario exists at all. Caught during
+this pass, before assuming the acceptance case was satisfied: numerically
+matching "both PASS" isn't the same claim as "the compound alias resolver
+works", and the two were conflated at first. `predicate_attempts` makes
+the actual, separate claim directly assertable:
+`davis_after_witnesses_the_mysql_local_compound_alias` checks that the
+`mysqlLocal`-sourced attempt (an `And(...)` in the reported IR, not just
+a source string that happens to mention the name) is `witnessed: true`
+(`machine3`, added alongside the real fix, sets `driver = "mysql"`, with
+`createLocally` at its declared-default `true`: `false -> true`).
+`davis_before_does_not_witness_the_mysql_local_compound_alias` is the
+negative control on the exact same predicate (`mysqlLocal`'s own
+definition is byte-for-byte identical between before/after) — real
+evidence exists (`machine1`/`machine2` are both consistently
+non-mysql), but never a transition, so `witnessed: false`, never
+silently omitted or silently counted as a win.
+
+**Four adversarial cases beyond davis**, in a dedicated synthetic module
+(`fixtures/synthetic/h2-compound/`) isolating the same
+`createLocally && driver == "mysql"` shape from any real-corpus noise,
+each verified to produce exactly its predicted verdict:
+
+| case | scenario | verdict |
+|---|---|---|
+| 2: absorbed watched change | `createLocally=false`, `driver`: sqlite→mysql | `OBA001` — the other operand already pins the predicate false; the watched option's own change never flips anything |
+| 3: symmetric watch | same instance, watching `createLocally` instead: true→false | `PASS` — proves causation is attributed to whichever option is actually watched |
+| 4: per-instance anti-cross-contamination | nodeA (`driver=mysql, createLocally=false`), nodeB (`createLocally=true`) | `OBA001` for `driver` — if nodeB's `createLocally=true` ever leaked into nodeA's evaluation this would wrongly `PASS` |
+| 5: unknown context | `driver=mysql` known; the other operand's default is a non-literal expression, never assigned anywhere | `TestValueUnresolved` — never silently `OBA001` (false "no evidence") or `PASS` (fabricated transition) |
+
+62 tests total (was 56): the old single-predicate davis golden test
+replaced by 3 (direct-predicate PASS, mysqlLocal-witnessed positive
+control, mysqlLocal-unwitnessed negative control) plus 4 new golden tests
+for the synthetic adversarial cases — net +6 in `tests/golden.rs` (33 →
+39).
+
+Deliberately not done in this pass, per explicit scope: mutation testing
+against the new IR/evaluator/resolver/counterfactual-gate (next, now that
+the pure core is fully wired into real verdicts); Kani/bounded model
+checking (only after mutation testing, only if small and useful); no
+Z3/SMT (`Eq`/`Not`/`And`/`Or` over concrete finite values evaluates
+directly).
+
 ## Running
 
 ```
@@ -933,12 +1028,13 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 56 tests, all passing (34 at the H1.3b/H1-freeze point
-below, +1 golden and +21 unit tests from H2's gate-1 fix, pure Predicate
-IR, `eval_pred` refinement, lexical alias resolver, and the scope-aware
-safety-gate fix — see "H2" above; H2 hasn't added new `cN`-numbered
-fixtures yet, so criterion C's case list stays as of the freeze): 5 from
-the original spike, 5 from H1
+`cargo test` — 62 tests, all passing (34 at the H1.3b/H1-freeze point
+below, +28 from H2: gate-1 fix, pure Predicate IR, `eval_pred`
+refinement, lexical alias resolver, the scope-aware safety-gate fix, and
+the counterfactual gate 4 wiring with the davis acceptance case + 4
+synthetic adversarial cases — see "H2" above; H2 hasn't added new
+`cN`-numbered fixtures yet, so criterion C's case list below stays as of
+the H1 freeze): 5 from the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,

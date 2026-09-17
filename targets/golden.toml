@@ -260,3 +260,40 @@ test = "fixtures/synthetic/c27-nested-instance-inherit/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synth"]
 watch = ["foo"]
+
+# --- H2 counterfactual gate adversarial cases (2-5), isolating davis's
+# real mysqlLocal shape (a compound predicate over two options) from any
+# real-corpus noise. Case 1 is davis itself (see
+# davis_after_witnesses_the_mysql_local_compound_alias in tests/golden.rs). ---
+
+[[target]]
+name = "h2-case2-absorbed-watched-change"
+module = "fixtures/synthetic/h2-compound/module.nix"
+test = "fixtures/synthetic/h2-compound/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthCompound"]
+watch = ["database.driver"]
+
+[[target]]
+name = "h2-case3-symmetric-watch"
+module = "fixtures/synthetic/h2-compound/module.nix"
+test = "fixtures/synthetic/h2-compound/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthCompound"]
+watch = ["database.createLocally"]
+
+[[target]]
+name = "h2-case4-per-instance-isolation"
+module = "fixtures/synthetic/h2-compound/module.nix"
+test = "fixtures/synthetic/h2-compound/test-cross-instance.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthCompound"]
+watch = ["database.driver"]
+
+[[target]]
+name = "h2-case5-unknown-context"
+module = "fixtures/synthetic/h2-unknown-context/module.nix"
+test = "fixtures/synthetic/h2-unknown-context/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthUnknown"]
+watch = ["database.driver"]

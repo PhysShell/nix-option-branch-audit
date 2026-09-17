@@ -513,6 +513,10 @@ struct OptionDecl {
     /// helper call like `lib.mkDefault x`, ...) -- these are meaningfully
     /// different results and both must survive to gate 3 in `run_target`.
     default_class: Option<ValueClass>,
+    /// H2: the exact `KnownValue` of the default, when classifiable --
+    /// see `TestAssignment::known_value` for why `default_class` alone
+    /// isn't enough for the counterfactual gate.
+    default_known_value: Option<KnownValue>,
     span: Span,
 }
 
@@ -624,10 +628,12 @@ fn walk_options_block(
             let default_node = mk_option_field(&value, "default");
             let default_source = default_node.as_ref().map(|n| n.text().to_string());
             let default_class = default_node.as_ref().map(classify_value);
+            let default_known_value = default_node.as_ref().and_then(classify_known_value);
             out.push(OptionDecl {
                 path: path.clone(),
                 default_source,
                 default_class,
+                default_known_value,
                 span: span_of(file, src, &entry),
             });
         } else if value.kind() == NODE_ATTR_SET {
@@ -748,21 +754,61 @@ fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
 /// readability in the IR types below.
 type OptionPath = Vec<String>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 enum Scalar {
     Null,
     Bool(bool),
     Str(String),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// An environment value as actually known at counterfactual-evaluation
+/// time (see the counterfactual gate below), distinct from `Scalar`
+/// (which only appears as a *literal in source*). `Exact` covers a value
+/// this tool pinned down precisely (`null`/`true`/`false`/a specific
+/// string literal, from either an explicit test assignment or a
+/// classifiable declared default). `DefinitelyNonNull` covers a value
+/// classified as `ValueClass::DefinitelyNonNull` in H1's sense (a
+/// string/number/list/attrset/path literal) whose *exact* contents this
+/// tool didn't bother extracting (a list or attrset literal has no
+/// `Scalar` representation at all) -- reviewed and deliberately NOT
+/// collapsed into a fabricated placeholder `Scalar`: doing that would let
+/// the evaluator draw equality conclusions (`"placeholder" == "mysql"`)
+/// it has no actual basis for. `DefinitelyNonNull` only ever proves a
+/// null-comparison's outcome (see `eval_known_eq`), never an equality
+/// against a *specific* other value.
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+enum KnownValue {
+    Exact(Scalar),
+    DefinitelyNonNull,
+}
+
+/// Classifies an AST node's *known* runtime value the same way H1's
+/// `classify_value`/`ValueClass` does, but preserving the exact literal
+/// content (`Scalar`) when the node is one of `null`/`true`/`false`/a
+/// plain string, instead of collapsing it into a class. `None` where
+/// `ValueClass` would say `Unknown` -- genuinely not statically knowable.
+fn classify_known_value(node: &SyntaxNode) -> Option<KnownValue> {
+    match node.kind() {
+        NODE_IDENT => match ident_text(node).as_deref() {
+            Some("null") => Some(KnownValue::Exact(Scalar::Null)),
+            Some("true") => Some(KnownValue::Exact(Scalar::Bool(true))),
+            Some("false") => Some(KnownValue::Exact(Scalar::Bool(false))),
+            _ => None,
+        },
+        NODE_STRING => string_text(node).map(|s| KnownValue::Exact(Scalar::Str(s))),
+        NODE_LITERAL | NODE_ATTR_SET | NODE_LIST | NODE_PATH => Some(KnownValue::DefinitelyNonNull),
+        _ => None,
+    }
+}
+
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 enum ValueExpr {
     /// A `cfg_ident`-rooted select, e.g. `cfg.database.driver`.
     Ref(OptionPath),
     Literal(Scalar),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 enum Pred {
     Eq(ValueExpr, ValueExpr),
     Not(Box<Pred>),
@@ -1149,6 +1195,95 @@ fn lower_pred_chained(
     Err(ResolveFailure::UnsupportedExpression)
 }
 
+/// An H2 predicate found and successfully lowered to the pure `Pred` IR
+/// -- unlike H1's `Predicate` (which only ever represents a single
+/// `cfg.<path>` unary check), `ir` may be a compound expression over
+/// multiple options, and `refs` lists every one of them.
+#[derive(Serialize, Debug, Clone)]
+struct ResolvedPredicate {
+    ir: Pred,
+    refs: Vec<OptionPath>,
+    span: Span,
+    source: String,
+}
+
+/// Finds every branch-condition site H1's `scan_predicates` also looks
+/// at (`if <cond> then ...`, `lib.mkIf`/`mkIf`/`optional`/`optionals`/
+/// `optionalString`/`optionalAttrs <cond> ...`) and lowers each
+/// condition through `lower_pred`. Unlike `scan_predicates`, this isn't
+/// restricted to conditions that are a single direct `cfg.<path>` select
+/// -- `lower_pred`'s alias resolution means a condition like `if
+/// mysqlLocal then ...` (a `let`-bound alias to a compound expression)
+/// is found and represented here too. Conditions `lower_pred` can't
+/// represent are silently skipped, same as H1's own scanner skips
+/// non-`cfg`-rooted conditions -- absence here isn't itself a claim of
+/// anything; `run_target` still falls back to H1's unary path first, and
+/// a truly unfindable predicate still surfaces as `PredicateNotFound`.
+///
+/// For a *concrete* `option_prefix` (no `"*"` wildcard), each condition
+/// site is additionally verified with `resolve_cfg_root(condition_site,
+/// cfg_ident) == option_prefix` before being accepted -- the same
+/// declaration-site safety check `scan_options` uses, applied here to
+/// the predicate side of the correlation (reviewed: a `cfg`-rooted
+/// select passing `lower_pred` only proves the *spelling* matches
+/// `cfg_ident`, not that *this occurrence*, in its own lexical scope,
+/// actually resolves to this target's `option_prefix` -- a predicate
+/// found inside an unrelated shadowed scope must never be attributed to
+/// this target). A wildcarded `option_prefix` (kimai's shape) skips this
+/// extra check entirely and keeps trusting `cfg_ident` by spelling alone,
+/// same as H1 always has -- requiring an absolute `cfg = config.a.b;`
+/// proof would break the attrsOf-submodule idiom wildcarded targets rely
+/// on, which was never in scope for this fix.
+fn scan_resolved_predicates(
+    file: &str,
+    src: &str,
+    root: &SyntaxNode,
+    cfg_ident: &str,
+    option_prefix: &[String],
+) -> Vec<ResolvedPredicate> {
+    let mut out = Vec::new();
+    let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
+    for node in root.descendants() {
+        let cond = match node.kind() {
+            NODE_IF_ELSE => node.children().next(),
+            NODE_APPLY => {
+                if node
+                    .parent()
+                    .map(|p| p.kind() == NODE_APPLY)
+                    .unwrap_or(false)
+                {
+                    None
+                } else {
+                    let (head, args) = flatten_apply(&node);
+                    call_head_name(&head)
+                        .filter(|name| HELPER_NAMES.contains(&name.as_str()))
+                        .and(args.into_iter().next())
+                }
+            }
+            _ => None,
+        };
+        let Some(cond) = cond else { continue };
+        let Ok(ir) = lower_pred(&cond, cfg_ident) else {
+            continue;
+        };
+        if prefix_is_concrete && !option_prefix.is_empty() {
+            match resolve_cfg_root(&cond, cfg_ident) {
+                Ok(resolved) if resolved == option_prefix => {}
+                _ => continue,
+            }
+        }
+        let mut refs = Vec::new();
+        refs_in_pred(&ir, &mut refs);
+        out.push(ResolvedPredicate {
+            ir,
+            refs,
+            span: span_of(file, src, &node),
+            source: first_line(&node),
+        });
+    }
+    out
+}
+
 /// Evaluates a `ValueExpr` against a concrete environment: `env` supplies
 /// the currently-known `Scalar` for every option path this evaluation
 /// cares about. `None` means "this environment doesn't (yet) say", not
@@ -1156,11 +1291,29 @@ fn lower_pred_chained(
 /// result.
 fn eval_value_expr(
     v: &ValueExpr,
-    env: &std::collections::HashMap<OptionPath, Scalar>,
-) -> Option<Scalar> {
+    env: &std::collections::HashMap<OptionPath, KnownValue>,
+) -> Option<KnownValue> {
     match v {
-        ValueExpr::Literal(s) => Some(s.clone()),
+        ValueExpr::Literal(s) => Some(KnownValue::Exact(s.clone())),
         ValueExpr::Ref(path) => env.get(path).cloned(),
+    }
+}
+
+/// Equality between two `KnownValue`s, the same fail-closed idiom as
+/// everything else here: `None` means genuinely undecidable, not "assume
+/// unequal". Two `Exact` values compare directly. A `DefinitelyNonNull`
+/// against a known `null` is always `false` (a non-null value can never
+/// equal `null`, regardless of which non-null value it actually is) --
+/// but a `DefinitelyNonNull` against anything else (another
+/// `DefinitelyNonNull`, or a specific non-null `Exact` value) is
+/// undecidable: knowing only "not null" is not enough to know whether two
+/// values are the same non-null value.
+fn eval_known_eq(a: &KnownValue, b: &KnownValue) -> Option<bool> {
+    match (a, b) {
+        (KnownValue::Exact(x), KnownValue::Exact(y)) => Some(x == y),
+        (KnownValue::DefinitelyNonNull, KnownValue::Exact(Scalar::Null))
+        | (KnownValue::Exact(Scalar::Null), KnownValue::DefinitelyNonNull) => Some(false),
+        _ => None,
     }
 }
 
@@ -1182,12 +1335,12 @@ fn eval_value_expr(
 /// value.) Only when neither operand pins the result down (e.g.
 /// `And(unknown, true)`, or a genuinely unresolved operand on both sides)
 /// does the combinator itself become unresolved.
-fn eval_pred(p: &Pred, env: &std::collections::HashMap<OptionPath, Scalar>) -> Option<bool> {
+fn eval_pred(p: &Pred, env: &std::collections::HashMap<OptionPath, KnownValue>) -> Option<bool> {
     match p {
         Pred::Eq(a, b) => {
             let a = eval_value_expr(a, env)?;
             let b = eval_value_expr(b, env)?;
-            Some(a == b)
+            eval_known_eq(&a, &b)
         }
         Pred::Not(inner) => eval_pred(inner, env).map(|b| !b),
         Pred::And(a, b) => match (eval_pred(a, env), eval_pred(b, env)) {
@@ -1203,6 +1356,28 @@ fn eval_pred(p: &Pred, env: &std::collections::HashMap<OptionPath, Scalar>) -> O
     }
 }
 
+/// Every `OptionPath` a `Pred` references (via `ValueExpr::Ref`), in
+/// traversal order, duplicates included -- callers that need a set
+/// dedupe themselves. Used by the counterfactual gate to know exactly
+/// which options a predicate's evaluation depends on before building an
+/// environment for it.
+fn refs_in_pred(p: &Pred, out: &mut Vec<OptionPath>) {
+    match p {
+        Pred::Eq(a, b) => {
+            for v in [a, b] {
+                if let ValueExpr::Ref(path) = v {
+                    out.push(path.clone());
+                }
+            }
+        }
+        Pred::Not(inner) => refs_in_pred(inner, out),
+        Pred::And(a, b) | Pred::Or(a, b) => {
+            refs_in_pred(a, out);
+            refs_in_pred(b, out);
+        }
+    }
+}
+
 // ---------------------------------------------------------------------
 // Test-file leaf assignment discovery (test.nix): walks AttrSets,
 // transparently unwrapping Lambda bodies (containers.X = { ... }: { ... };),
@@ -1214,6 +1389,13 @@ struct TestAssignment {
     path: Vec<String>,
     value_source: String,
     value_class: ValueClass,
+    /// H2: the exact `KnownValue` (preserving literal content, e.g. the
+    /// actual string `"mysql"`, not just "definitely non-null") when
+    /// classifiable -- `value_class` alone isn't enough for the
+    /// counterfactual gate, which needs to evaluate equality against
+    /// *specific* literals like `db.driver == "mysql"`, not just
+    /// null-ness.
+    known_value: Option<KnownValue>,
     /// nearest enclosing `containers.<x>` / `nodes.<x>` instance name, if any
     instance: Option<String>,
     span: Span,
@@ -1810,6 +1992,7 @@ fn walk_config_entry(
             path: path.clone(),
             value_source: body.text().to_string(),
             value_class: classify_value(&body),
+            known_value: classify_known_value(&body),
             instance,
             span: span_of(file, src, entry),
         });
@@ -1823,6 +2006,35 @@ fn walk_config_entry(
 // ---------------------------------------------------------------------
 // Matching + verdict
 // ---------------------------------------------------------------------
+
+/// Which predicate model actually produced a verdict: H1's original
+/// unary `Predicate` (a single `cfg.<path>` check), or H2's compound
+/// `ResolvedPredicate` (a boolean expression over one or more options,
+/// reached through `lower_pred` and possibly alias resolution). `run_target`
+/// always tries the H1 path first; `PredicateRef::Resolved` only ever
+/// appears when H1's own unary scan found nothing for the watched option.
+#[derive(Serialize, Debug, Clone)]
+#[serde(untagged)]
+enum PredicateRef {
+    Unary(Predicate),
+    Resolved(ResolvedPredicate),
+}
+
+impl PredicateRef {
+    fn span(&self) -> &Span {
+        match self {
+            PredicateRef::Unary(p) => &p.span,
+            PredicateRef::Resolved(p) => &p.span,
+        }
+    }
+
+    fn source(&self) -> &str {
+        match self {
+            PredicateRef::Unary(p) => &p.source,
+            PredicateRef::Resolved(p) => &p.source,
+        }
+    }
+}
 
 #[derive(Serialize, Debug)]
 #[serde(tag = "verdict")]
@@ -1846,7 +2058,7 @@ enum Verdict {
     /// prove a *transition* away from, so no verdict is possible.
     DefaultUnresolved {
         option: String,
-        predicate: Predicate,
+        predicate: PredicateRef,
     },
     /// A classifiable default was found, and at least one structurally
     /// matching test assignment exists, but its value's outcome under this
@@ -1860,10 +2072,19 @@ enum Verdict {
     /// `None` as "no evidence" was exactly this tool's own fail-closed
     /// principle broken on the test-value side after fixing it on the
     /// default side in H1.
+    /// `default_outcome` is `Option` (not `bool`, unlike `Pass`) because
+    /// H2's per-instance counterfactual model has no single instance-
+    /// independent "the" default outcome the way H1's unary model always
+    /// did -- other options referenced by a compound predicate can differ
+    /// per instance, so "the default outcome" is only well-defined
+    /// relative to a *specific* instance (as it is for `Pass`, reporting
+    /// the witnessing instance's own). When no instance produced one,
+    /// this is honestly `None`, not a guessed/global value.
     TestValueUnresolved {
         option: String,
-        predicate: Predicate,
-        default_outcome: bool,
+        predicate: PredicateRef,
+        default_outcome: Option<bool>,
+        predicate_attempts: Vec<PredicateAttempt>,
     },
     /// A classifiable default was found, and no known opposite-outcome
     /// evidence exists -- but somewhere in the test config that could
@@ -1882,8 +2103,11 @@ enum Verdict {
     /// claim than "some unrelated import exists", not a weaker one.
     TestConfigUnresolved {
         option: String,
-        predicate: Predicate,
-        default_outcome: bool,
+        predicate: PredicateRef,
+        default_outcome: Option<bool>,
+        /// H2 only (empty for H1's unary path -- see `PredicateAttempt`'s
+        /// own doc comment).
+        predicate_attempts: Vec<PredicateAttempt>,
     },
     /// A predicate and a classifiable default were found, but no test
     /// assignment's value provably flips the predicate's outcome away from
@@ -1891,8 +2115,9 @@ enum Verdict {
     #[serde(rename = "OBA001")]
     Oba001 {
         option: String,
-        predicate: Predicate,
-        default_outcome: bool,
+        predicate: PredicateRef,
+        default_outcome: Option<bool>,
+        predicate_attempts: Vec<PredicateAttempt>,
     },
     /// A predicate and a classifiable default were found, and at least one
     /// test assignment's value provably evaluates the predicate to the
@@ -1902,10 +2127,42 @@ enum Verdict {
     #[serde(rename = "PASS")]
     Pass {
         option: String,
-        predicate: Predicate,
+        predicate: PredicateRef,
         default_outcome: bool,
         evidence: Vec<TestAssignment>,
+        predicate_attempts: Vec<PredicateAttempt>,
     },
+}
+
+/// H2: one option can be referenced by more than one branch predicate
+/// (davis's `database.driver` is referenced by a simple `db.driver ==
+/// "sqlite"` check AND by the compound `mysqlLocal` alias, among others)
+/// -- "the predicate" stopped being a well-defined singular concept the
+/// moment H2 could see more than one. Reviewed and fixed: `run_target`'s
+/// H2 path now evaluates *every* predicate referencing a watched option
+/// (not just the first found in document order, which was an accident of
+/// AST traversal order, not a real semantic choice), and this records
+/// what happened with each one so a PASS never silently hides that a
+/// *different* predicate on the same option was inconclusive, and an
+/// inconclusive verdict never silently hides that some OTHER predicate on
+/// the same option already had real (if non-transitioning) evidence.
+/// Always empty for verdicts produced by H1's original unary path -- that
+/// model only ever considers exactly one predicate by construction, so
+/// there is nothing this field would add.
+#[derive(Serialize, Debug, Clone)]
+struct PredicateAttempt {
+    predicate: PredicateRef,
+    /// `Some(true)`: at least one test instance witnessed a provable
+    /// transition through this predicate (this is the predicate a `PASS`
+    /// verdict's own top-level `predicate`/`evidence` fields describe, if
+    /// it's the one that won; other witnessing predicates, if any, are
+    /// listed here too, not silently dropped just because one was picked
+    /// as primary). `Some(false)`: real evidence existed for this
+    /// predicate (every attempted instance fully resolved) but no
+    /// instance ever demonstrated a transition. `None`: every attempt at
+    /// this predicate was unresolved (a required value or context was
+    /// missing).
+    witnessed: Option<bool>,
 }
 
 impl Verdict {
@@ -1940,6 +2197,13 @@ struct TargetReport {
     parse_errors: Vec<String>,
     discovered_options: Vec<OptionDecl>,
     discovered_predicates: Vec<Predicate>,
+    /// H2: every branch-condition site (`if`/`mkIf`/`optional`/...)
+    /// successfully lowered through `lower_pred` -- unlike
+    /// `discovered_predicates`, may include compound expressions over
+    /// multiple options, reached through alias resolution. Kept
+    /// unfiltered for the same transparency reason as the H1 fields
+    /// above it.
+    resolved_predicates: Vec<ResolvedPredicate>,
     matched_test_assignments: Vec<TestAssignment>,
     /// Every place the test-file walker hit something it couldn't see
     /// into, regardless of whether it turned out to matter for any
@@ -2029,6 +2293,275 @@ fn predicate_outcome(kind: &PredicateKind, class: ValueClass) -> Option<bool> {
     }
 }
 
+/// Every referenced option's `KnownValue` at its own declared default --
+/// shared by `evaluate_predicate_witness`'s default-side environment and
+/// `h2_counterfactual_verdict`'s diagnostic reporting, so the two can't
+/// drift apart on what "the default" means for a given predicate.
+fn declared_defaults_for(
+    pred: &ResolvedPredicate,
+    options: &[OptionDecl],
+) -> std::collections::HashMap<OptionPath, KnownValue> {
+    let mut declared_defaults = std::collections::HashMap::new();
+    for r in &pred.refs {
+        if let Some(decl) = options.iter().find(|o| &o.path == r) {
+            if let Some(kv) = &decl.default_known_value {
+                declared_defaults.insert(r.clone(), kv.clone());
+            }
+        }
+    }
+    declared_defaults
+}
+
+enum PredicateWitnessOutcome {
+    /// At least one test instance's own value for the watched option
+    /// provably flipped this predicate's outcome away from its default.
+    Witness {
+        default_outcome: bool,
+        evidence: TestAssignment,
+    },
+    /// Every instance this predicate could be evaluated for was fully
+    /// resolved (or no instance assigned the watched option at all), but
+    /// none ever demonstrated a transition -- H1's OBA001 shape, per
+    /// predicate.
+    EvidenceNoTransition,
+    /// At least one attempted instance couldn't be evaluated at all (a
+    /// required value -- the watched option's own test value, or another
+    /// referenced option's context -- was unresolvable).
+    Unresolved,
+}
+
+/// Evaluates one candidate predicate's counterfactual witness across
+/// every real test instance that explicitly assigns the watched option
+/// `x`: two hypothetical environments per instance -- everything *else*
+/// the predicate references held at whatever that instance actually did
+/// (or this option's own declared default, if the instance didn't touch
+/// it), differing only in whether `x` itself is at its declared default
+/// or this instance's test value. Deliberately per instance, never
+/// merging assignments from different `nodes`/`containers` instances into
+/// one synthetic environment -- that would prove something about two
+/// independent machines' combined state, which no single real Nix
+/// evaluation ever does.
+fn evaluate_predicate_witness(
+    pred: &ResolvedPredicate,
+    watched_path: &[String],
+    options: &[OptionDecl],
+    assignments: &[TestAssignment],
+    t: &Target,
+) -> PredicateWitnessOutcome {
+    let declared_defaults = declared_defaults_for(pred, options);
+
+    // Every distinct instance that explicitly assigns `x` -- an instance
+    // that never touches `x` at all has nothing to counterfactually
+    // compare against its own default and is correctly never considered.
+    let mut instances_assigning_x: Vec<Option<String>> = Vec::new();
+    for a in assignments {
+        if path_matches_prefix(&a.path, &t.option_prefix, watched_path)
+            && !instances_assigning_x.contains(&a.instance)
+        {
+            instances_assigning_x.push(a.instance.clone());
+        }
+    }
+
+    let mut has_unresolved = false;
+
+    for instance in &instances_assigning_x {
+        let Some(x_assignment) = assignments.iter().find(|a| {
+            &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, watched_path)
+        }) else {
+            continue; // unreachable: `instance` was derived from this same scan
+        };
+        let Some(x_test_value) = &x_assignment.known_value else {
+            // The watched option's own test value isn't statically
+            // classifiable -- can't build a test-side environment at all
+            // for this instance. Fail-closed: contributes to Unresolved,
+            // never silently skipped.
+            has_unresolved = true;
+            continue;
+        };
+
+        // Every OTHER referenced option, held at whatever THIS instance
+        // actually assigned it, or this option's own declared default if
+        // the instance didn't touch it. Deliberately the SAME for both
+        // the default-env and test-env below -- only `x` varies between
+        // the two hypothetical worlds.
+        let mut env: std::collections::HashMap<OptionPath, KnownValue> =
+            std::collections::HashMap::new();
+        for r in &pred.refs {
+            if r == watched_path {
+                continue;
+            }
+            let value = assignments
+                .iter()
+                .find(|a| {
+                    &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, r)
+                })
+                .and_then(|a| a.known_value.clone())
+                .or_else(|| declared_defaults.get(r).cloned());
+            if let Some(v) = value {
+                env.insert(r.clone(), v);
+            }
+            // Absent from `env` entirely if unresolvable either way --
+            // `eval_pred`'s own Kleene semantics decide whether that
+            // still permits a conclusion (e.g. another `false` operand
+            // already pins an `And`) or leaves the outcome `None`.
+        }
+
+        let mut default_env = env.clone();
+        if let Some(d) = declared_defaults.get(watched_path) {
+            default_env.insert(watched_path.to_vec(), d.clone());
+        }
+        let mut test_env = env;
+        test_env.insert(watched_path.to_vec(), x_test_value.clone());
+
+        let default_outcome = eval_pred(&pred.ir, &default_env);
+        let test_outcome = eval_pred(&pred.ir, &test_env);
+
+        match (default_outcome, test_outcome) {
+            (Some(d), Some(t2)) if d != t2 => {
+                return PredicateWitnessOutcome::Witness {
+                    default_outcome: d,
+                    evidence: x_assignment.clone(),
+                };
+            }
+            (Some(_), Some(_)) => {
+                // Real evidence, both sides fully resolved, but this
+                // instance's own value didn't flip the predicate. Doesn't
+                // end the search: another instance might still witness a
+                // real transition through this same predicate.
+            }
+            _ => {
+                has_unresolved = true;
+            }
+        }
+    }
+
+    if has_unresolved {
+        PredicateWitnessOutcome::Unresolved
+    } else {
+        PredicateWitnessOutcome::EvidenceNoTransition
+    }
+}
+
+/// H2's counterfactual replacement for H1's unary gate 4, tried only when
+/// H1's own unary predicate scan found nothing for the watched option
+/// (see `run_target`). Reviewed and generalized from an earlier version
+/// that only ever looked at the *first* resolved predicate referencing
+/// the watched option: an option can legitimately be referenced by more
+/// than one branch predicate (davis's real `database.driver` is
+/// referenced by a simple `db.driver == "sqlite"` check *and* by the
+/// compound `mysqlLocal` alias) -- "the predicate" stopped being a
+/// well-defined singular concept the moment more than one could exist,
+/// and picking "whichever the AST walk happened to reach first" was an
+/// accident of traversal order, not a real semantic choice. Every
+/// candidate predicate is now evaluated (`evaluate_predicate_witness`,
+/// above); a witness through *any* of them is existential evidence, same
+/// priority H1's own gate 4 already established: `PASS` beats unrelated
+/// test-config opacity, which beats an unresolved attempt
+/// (`TestValueUnresolved`), which beats "real evidence exists somewhere
+/// but never demonstrated a transition" (`OBA001`). What happened with
+/// every candidate -- not just the winning one -- survives into
+/// `predicate_attempts`, so a `PASS` never silently hides that a
+/// *different* predicate on the same option was inconclusive, and an
+/// inconclusive verdict never silently hides that some other predicate
+/// already had real evidence.
+///
+/// Returns `None` only when no resolved predicate references `x` at all
+/// (the caller then reports `PredicateNotFound`, same as H1).
+fn h2_counterfactual_verdict(
+    watched: &str,
+    watched_path: &[String],
+    options: &[OptionDecl],
+    resolved_predicates: &[ResolvedPredicate],
+    assignments: &[TestAssignment],
+    opacity: &[Opacity],
+    t: &Target,
+) -> Option<Verdict> {
+    let candidates: Vec<&ResolvedPredicate> = resolved_predicates
+        .iter()
+        .filter(|p| p.refs.iter().any(|r| r == watched_path))
+        .collect();
+    if candidates.is_empty() {
+        return None;
+    }
+
+    let mut attempts: Vec<PredicateAttempt> = Vec::new();
+    let mut winner: Option<(PredicateRef, bool, TestAssignment)> = None;
+
+    for pred in &candidates {
+        let outcome = evaluate_predicate_witness(pred, watched_path, options, assignments, t);
+        let witnessed = match &outcome {
+            PredicateWitnessOutcome::Witness { .. } => Some(true),
+            PredicateWitnessOutcome::EvidenceNoTransition => Some(false),
+            PredicateWitnessOutcome::Unresolved => None,
+        };
+        attempts.push(PredicateAttempt {
+            predicate: PredicateRef::Resolved((*pred).clone()),
+            witnessed,
+        });
+        if let PredicateWitnessOutcome::Witness {
+            default_outcome,
+            evidence,
+        } = outcome
+        {
+            if winner.is_none() {
+                winner = Some((
+                    PredicateRef::Resolved((*pred).clone()),
+                    default_outcome,
+                    evidence,
+                ));
+            }
+        }
+    }
+
+    if let Some((predicate, default_outcome, evidence)) = winner {
+        return Some(Verdict::Pass {
+            option: watched.to_string(),
+            predicate,
+            default_outcome,
+            evidence: vec![evidence],
+            predicate_attempts: attempts,
+        });
+    }
+
+    let target_path_opaque = opacity
+        .iter()
+        .any(|o| path_is_prefix_of_target(&o.path, &t.option_prefix, watched_path));
+    let has_unresolved = attempts.iter().any(|a| a.witnessed.is_none());
+
+    // Best-effort diagnostic default_outcome, from the first candidate:
+    // every referenced option at its own declared default, no
+    // per-instance overrides. Reporting only -- which `Verdict` variant
+    // gets chosen is driven entirely by `attempts`/`target_path_opaque`
+    // above, never by this value.
+    let diagnostic_default_outcome = candidates
+        .first()
+        .and_then(|p| eval_pred(&p.ir, &declared_defaults_for(p, options)));
+    let primary_predicate = PredicateRef::Resolved((*candidates[0]).clone());
+
+    if target_path_opaque {
+        Some(Verdict::TestConfigUnresolved {
+            option: watched.to_string(),
+            predicate: primary_predicate,
+            default_outcome: diagnostic_default_outcome,
+            predicate_attempts: attempts,
+        })
+    } else if has_unresolved {
+        Some(Verdict::TestValueUnresolved {
+            option: watched.to_string(),
+            predicate: primary_predicate,
+            default_outcome: diagnostic_default_outcome,
+            predicate_attempts: attempts,
+        })
+    } else {
+        Some(Verdict::Oba001 {
+            option: watched.to_string(),
+            predicate: primary_predicate,
+            default_outcome: diagnostic_default_outcome,
+            predicate_attempts: attempts,
+        })
+    }
+}
+
 fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
     let module_src = fs::read_to_string(&t.module).map_err(|e| {
         anyhow::anyhow!(
@@ -2062,6 +2595,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             parse_errors,
             discovered_options: Vec::new(),
             discovered_predicates: Vec::new(),
+            resolved_predicates: Vec::new(),
             matched_test_assignments: Vec::new(),
             test_config_opacity: Vec::new(),
             verdicts: t
@@ -2088,6 +2622,13 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         module_root.syntax(),
         &t.cfg_ident,
     );
+    let resolved_predicates = scan_resolved_predicates(
+        &module_file,
+        &module_src,
+        module_root.syntax(),
+        &t.cfg_ident,
+        &t.option_prefix,
+    );
     let (assignments, opacity) = scan_test_assignments(&test_file, &test_src, test_root.syntax());
 
     let mut matched_assignments = Vec::new();
@@ -2108,11 +2649,33 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             continue;
         };
 
-        // Gate 2: a direct branch predicate referencing it.
+        // Gate 2: a direct branch predicate referencing it. H1's own
+        // unary scan (a single `cfg.<path>` check) is tried first,
+        // unconditionally and unchanged -- every H1-era target's verdict
+        // is byte-for-byte identical to before this fallback existed,
+        // since a unary predicate always matches here and the H2 path
+        // below is never even reached for it. Only when H1's scan finds
+        // nothing does H2's compound counterfactual model (alias
+        // resolution + per-instance evaluation, see
+        // `h2_counterfactual_verdict`) get a chance -- this is exactly
+        // how `mysqlLocal`-style aliased/compound predicates (davis's
+        // real case) get a verdict without touching how any existing
+        // unary target is evaluated.
         let Some(pred) = predicates.iter().find(|p| p.path == watched_path) else {
-            verdicts.push(Verdict::PredicateNotFound {
-                option: watched.clone(),
-            });
+            match h2_counterfactual_verdict(
+                watched,
+                &watched_path,
+                &options,
+                &resolved_predicates,
+                &assignments,
+                &opacity,
+                t,
+            ) {
+                Some(verdict) => verdicts.push(verdict),
+                None => verdicts.push(Verdict::PredicateNotFound {
+                    option: watched.clone(),
+                }),
+            }
             continue;
         };
 
@@ -2130,7 +2693,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         else {
             verdicts.push(Verdict::DefaultUnresolved {
                 option: watched.clone(),
-                predicate: pred.clone(),
+                predicate: PredicateRef::Unary(pred.clone()),
             });
             continue;
         };
@@ -2179,27 +2742,31 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         if !opposite.is_empty() {
             verdicts.push(Verdict::Pass {
                 option: watched.clone(),
-                predicate: pred.clone(),
+                predicate: PredicateRef::Unary(pred.clone()),
                 default_outcome,
                 evidence: opposite,
+                predicate_attempts: Vec::new(),
             });
         } else if target_path_opaque {
             verdicts.push(Verdict::TestConfigUnresolved {
                 option: watched.clone(),
-                predicate: pred.clone(),
-                default_outcome,
+                predicate: PredicateRef::Unary(pred.clone()),
+                default_outcome: Some(default_outcome),
+                predicate_attempts: Vec::new(),
             });
         } else if has_unresolved {
             verdicts.push(Verdict::TestValueUnresolved {
                 option: watched.clone(),
-                predicate: pred.clone(),
-                default_outcome,
+                predicate: PredicateRef::Unary(pred.clone()),
+                default_outcome: Some(default_outcome),
+                predicate_attempts: Vec::new(),
             });
         } else {
             verdicts.push(Verdict::Oba001 {
                 option: watched.clone(),
-                predicate: pred.clone(),
-                default_outcome,
+                predicate: PredicateRef::Unary(pred.clone()),
+                default_outcome: Some(default_outcome),
+                predicate_attempts: Vec::new(),
             });
         }
     }
@@ -2209,6 +2776,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         parse_errors,
         discovered_options: options,
         discovered_predicates: predicates,
+        resolved_predicates,
         matched_test_assignments: matched_assignments,
         test_config_opacity: opacity,
         verdicts,
@@ -2620,15 +3188,18 @@ fn print_human(r: &TargetReport) {
                 default_outcome,
                 ..
             } => println!(
-                "  TEST_VALUE_UNRESOLVED  {option}  default_outcome={default_outcome}  (a matching test assignment's value isn't statically classifiable, and no other match is a known opposite outcome)"
+                "  TEST_VALUE_UNRESOLVED  {option}  default_outcome={default_outcome:?}  (a matching test assignment's value isn't statically classifiable, and no other match is a known opposite outcome)"
             ),
             Verdict::Oba001 {
                 option,
                 predicate,
                 default_outcome,
+                ..
             } => println!(
-                "  OBA001  {option}  default_outcome={default_outcome}  [{}:{}]  `{}`",
-                predicate.span.line, predicate.span.col, predicate.source
+                "  OBA001  {option}  default_outcome={default_outcome:?}  [{}:{}]  `{}`",
+                predicate.span().line,
+                predicate.span().col,
+                predicate.source()
             ),
             Verdict::Pass {
                 option,
@@ -3113,22 +3684,27 @@ mod tests {
 
     // --- H1/H2 compatibility: the new IR+evaluator must reproduce H1's
     // existing predicate_outcome() table for every unary case that table
-    // actually covers. `ValueClass::DefinitelyNonNull` is represented in
-    // the environment as a concrete placeholder scalar (`Scalar::Str`) --
-    // any concrete non-null value proves a null-comparison's outcome,
-    // which is exactly what `DefinitelyNonNull` meant in H1 too.
-    // `ValueClass::Unknown` is represented as the path being *absent* from
-    // the environment, matching `eval_value_expr`'s own "unresolved, not a
-    // guess" semantics. One case is deliberately NOT covered here:
-    // `Truthy`/`NegTruthy` combined with `DefinitelyNonNull` returned
-    // `None` in H1's table, but H1 never actually reached that state
-    // through any real predicate + default/test-value combination in the
-    // golden suite -- a `Truthy` predicate's operand must be a real Nix
-    // bool for evaluation to succeed at all, so "known non-null, exact
-    // value withheld" was already a degenerate corner of the old model,
-    // not a case this IR needs to preserve bit-for-bit.
+    // actually covers. `ValueClass::DefinitelyNonNull` is represented as
+    // the real `KnownValue::DefinitelyNonNull` (not a fabricated
+    // placeholder scalar -- see `KnownValue`'s own doc comment): any
+    // concrete non-null value proves a null-comparison's outcome, which is
+    // exactly what `DefinitelyNonNull` meant in H1 too, and
+    // `eval_known_eq` encodes exactly that without needing to know which
+    // non-null value it actually is. `ValueClass::Unknown` is represented
+    // as the path being *absent* from the environment, matching
+    // `eval_value_expr`'s own "unresolved, not a guess" semantics. One
+    // case is deliberately NOT covered here: `Truthy`/`NegTruthy` combined
+    // with `DefinitelyNonNull` returned `None` in H1's table, but H1 never
+    // actually reached that state through any real predicate +
+    // default/test-value combination in the golden suite -- a `Truthy`
+    // predicate's operand must be a real Nix bool for evaluation to
+    // succeed at all, so "known non-null, exact value withheld" was
+    // already a degenerate corner of the old model, not a case this IR
+    // needs to preserve bit-for-bit.
 
-    fn env_of(pairs: &[(&[&str], Scalar)]) -> std::collections::HashMap<OptionPath, Scalar> {
+    fn env_of(
+        pairs: &[(&[&str], KnownValue)],
+    ) -> std::collections::HashMap<OptionPath, KnownValue> {
         pairs
             .iter()
             .map(|(path, s)| (path.iter().map(|s| s.to_string()).collect(), s.clone()))
@@ -3148,18 +3724,21 @@ mod tests {
 
         // NullNeq (cfg.foo != null)
         assert_eq!(
-            eval_pred(&neq, &env_of(&[(&["foo"], Scalar::Null)])),
+            eval_pred(
+                &neq,
+                &env_of(&[(&["foo"], KnownValue::Exact(Scalar::Null))])
+            ),
             predicate_outcome(&PredicateKind::NullNeq, ValueClass::Null),
-        );
-        assert_eq!(
-            eval_pred(&neq, &env_of(&[(&["foo"], Scalar::Bool(true))])),
-            predicate_outcome(&PredicateKind::NullNeq, ValueClass::Bool(true)),
         );
         assert_eq!(
             eval_pred(
                 &neq,
-                &env_of(&[(&["foo"], Scalar::Str("placeholder".into()))])
+                &env_of(&[(&["foo"], KnownValue::Exact(Scalar::Bool(true)))])
             ),
+            predicate_outcome(&PredicateKind::NullNeq, ValueClass::Bool(true)),
+        );
+        assert_eq!(
+            eval_pred(&neq, &env_of(&[(&["foo"], KnownValue::DefinitelyNonNull)])),
             predicate_outcome(&PredicateKind::NullNeq, ValueClass::DefinitelyNonNull),
         );
         assert_eq!(
@@ -3169,18 +3748,18 @@ mod tests {
 
         // NullEq (cfg.foo == null) -- same environments, the other predicate.
         assert_eq!(
-            eval_pred(&eq, &env_of(&[(&["foo"], Scalar::Null)])),
+            eval_pred(&eq, &env_of(&[(&["foo"], KnownValue::Exact(Scalar::Null))])),
             predicate_outcome(&PredicateKind::NullEq, ValueClass::Null),
-        );
-        assert_eq!(
-            eval_pred(&eq, &env_of(&[(&["foo"], Scalar::Bool(true))])),
-            predicate_outcome(&PredicateKind::NullEq, ValueClass::Bool(true)),
         );
         assert_eq!(
             eval_pred(
                 &eq,
-                &env_of(&[(&["foo"], Scalar::Str("placeholder".into()))])
+                &env_of(&[(&["foo"], KnownValue::Exact(Scalar::Bool(true)))])
             ),
+            predicate_outcome(&PredicateKind::NullEq, ValueClass::Bool(true)),
+        );
+        assert_eq!(
+            eval_pred(&eq, &env_of(&[(&["foo"], KnownValue::DefinitelyNonNull)])),
             predicate_outcome(&PredicateKind::NullEq, ValueClass::DefinitelyNonNull),
         );
         assert_eq!(
@@ -3199,11 +3778,17 @@ mod tests {
 
         for b in [true, false] {
             assert_eq!(
-                eval_pred(&truthy, &env_of(&[(&["foo"], Scalar::Bool(b))])),
+                eval_pred(
+                    &truthy,
+                    &env_of(&[(&["foo"], KnownValue::Exact(Scalar::Bool(b)))])
+                ),
                 predicate_outcome(&PredicateKind::Truthy("if".into()), ValueClass::Bool(b)),
             );
             assert_eq!(
-                eval_pred(&neg_truthy, &env_of(&[(&["foo"], Scalar::Bool(b))])),
+                eval_pred(
+                    &neg_truthy,
+                    &env_of(&[(&["foo"], KnownValue::Exact(Scalar::Bool(b)))])
+                ),
                 predicate_outcome(&PredicateKind::NegTruthy, ValueClass::Bool(b)),
             );
         }
@@ -3364,23 +3949,6 @@ mod tests {
         Pred::Not(Box::new(true_pred()))
     }
 
-    fn refs_in_pred(p: &Pred, out: &mut Vec<OptionPath>) {
-        match p {
-            Pred::Eq(a, b) => {
-                for v in [a, b] {
-                    if let ValueExpr::Ref(path) = v {
-                        out.push(path.clone());
-                    }
-                }
-            }
-            Pred::Not(inner) => refs_in_pred(inner, out),
-            Pred::And(a, b) | Pred::Or(a, b) => {
-                refs_in_pred(a, out);
-                refs_in_pred(b, out);
-            }
-        }
-    }
-
     proptest::proptest! {
         #[test]
         fn not_not_is_identity(p in arb_pred(), env in arb_value_expr()) {
@@ -3390,8 +3958,10 @@ mod tests {
             // environment (double negation of an Option<bool> via `.map`
             // is the identity), full, partial, or empty alike, so a full
             // arbitrary HashMap generator adds no extra coverage here.
-            let env: std::collections::HashMap<OptionPath, Scalar> = match env {
-                ValueExpr::Ref(path) => [(path, Scalar::Bool(true))].into_iter().collect(),
+            let env: std::collections::HashMap<OptionPath, KnownValue> = match env {
+                ValueExpr::Ref(path) => {
+                    [(path, KnownValue::Exact(Scalar::Bool(true)))].into_iter().collect()
+                }
                 ValueExpr::Literal(_) => std::collections::HashMap::new(),
             };
             proptest::prop_assert_eq!(
@@ -3434,10 +4004,10 @@ mod tests {
             paths.sort();
             paths.dedup();
 
-            let full_env: std::collections::HashMap<OptionPath, Scalar> = paths
+            let full_env: std::collections::HashMap<OptionPath, KnownValue> = paths
                 .iter()
                 .cloned()
-                .map(|path| (path, Scalar::Bool(true)))
+                .map(|path| (path, KnownValue::Exact(Scalar::Bool(true))))
                 .collect();
             let full_result = eval_pred(&p, &full_env);
 

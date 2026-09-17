@@ -78,14 +78,17 @@ fn target<'a>(reports: &'a [Value], name: &str) -> &'a Value {
         .unwrap_or_else(|| panic!("no report for target {name}"))
 }
 
-fn verdict_kind(report: &Value, option: &str) -> String {
+fn verdict_obj<'a>(report: &'a Value, option: &str) -> &'a Value {
     report["verdicts"]
         .as_array()
         .expect("verdicts array")
         .iter()
         .find(|v| v["option"] == option)
         .unwrap_or_else(|| panic!("no verdict for option {option} in {}", report["name"]))
-        ["verdict"]
+}
+
+fn verdict_kind(report: &Value, option: &str) -> String {
+    verdict_obj(report, option)["verdict"]
         .as_str()
         .expect("verdict tag is a string")
         .to_string()
@@ -202,28 +205,173 @@ fn golden_b_fix_commit_shows_pass_with_evidence() {
 // Either gate failing first is fine; what matters is it's never PASS.
 
 #[test]
-fn davis_predicate_is_honestly_reported_as_not_found() {
-    // H2 gate-1 fix: `scan_options` now resolves davis's flat-dotted
-    // `options.services.davis = { ... };` root against the target's own
-    // `option_prefix` (["services","davis"]), so `database.driver` is no
-    // longer silently un-findable -- gate 1 passes. The gate that now
-    // honestly fails is gate 2: `mysqlLocal` (a `let`-bound alias to
-    // `db.createLocally && db.driver == "mysql"`) isn't a direct
-    // `cfg.database.driver` select, so no predicate is found yet. That's
-    // exactly the alias-resolution gap H2 exists to close next (see the
-    // Predicate IR / reuse-survey doc comment) -- pinned here as
-    // `PredicateNotFound`, not `OptionNotFound`, so a regression in either
-    // direction (gate 1 breaking again, or gate 2 silently starting to
-    // match something it shouldn't) is caught.
+fn davis_database_driver_passes_via_a_direct_predicate() {
+    // H2 gate-1 fix (already landed) made database.driver findable at
+    // all: `scan_options` resolves davis's flat-dotted
+    // `options.services.davis = { ... };` root against option_prefix, so
+    // gate 1 passes for both davis-before/after.
+    //
+    // The real davis.nix DATABASE_URL construction is an if/else-if
+    // chain -- three *independent* NODE_IF_ELSE conditions, not one:
+    // `if db.driver == "sqlite" then ... else if pgsqlLocal then ...
+    // else if mysqlLocal then ...`. H2's multi-predicate gate 2/4
+    // evaluates every predicate referencing database.driver, not just
+    // the first one found in document order (an earlier version of this
+    // gate did exactly that, and picked `db.driver == "sqlite"` --
+    // reviewed as an accident of AST traversal order, not a real
+    // semantic choice, and fixed). `machine1` in BOTH before and after
+    // sets `database.driver = "postgresql"` (default is `"sqlite"`),
+    // which is real, legitimate activation evidence for the simple
+    // `db.driver == "sqlite"` predicate regardless of whether any mysql
+    // scenario exists at all -- so both targets correctly PASS through
+    // it. This is NOT the mysqlLocal/compound-alias proof (see the
+    // dedicated test below for that) -- it's a different, equally real
+    // predicate on the same watched option, and the point of this test
+    // is specifically that H2 doesn't hide it.
     let reports = run_golden();
     for name in ["davis-before", "davis-after"] {
         let r = target(&reports, name);
         assert_eq!(
             verdict_kind(r, "database.driver"),
-            "PredicateNotFound",
-            "target {name} must not silently PASS or silently omit the watched option"
+            "PASS",
+            "target {name}: machine1's database.driver = \"postgresql\" is real evidence \
+             against the db.driver == \"sqlite\" predicate regardless of any mysql scenario"
         );
     }
+}
+
+// The actual H2 acceptance case: davis's real `mysqlLocal = db.createLocally
+// && db.driver == "mysql";` alias -- a compound expression over TWO
+// options, reached only through `db -> cfg.database` select-alias
+// resolution AND whole-expression alias resolution for the bare
+// `mysqlLocal` identifier used as a condition. `predicate_attempts` (added
+// specifically so a PASS via one predicate never hides what happened with
+// others on the same option) makes this directly assertable: davis-after
+// must show a *witnessed* attempt whose lowered IR is the mysqlLocal
+// compound; davis-before -- same module, same predicate, only the test
+// file differs -- must show that exact same predicate present but NOT
+// witnessed, a real negative control proving the distinction isn't
+// vacuous.
+
+fn mysql_local_attempt(verdict: &Value) -> &Value {
+    verdict["predicate_attempts"]
+        .as_array()
+        .expect("predicate_attempts array")
+        .iter()
+        .find(|a| {
+            a["predicate"]["source"]
+                .as_str()
+                .map(|s| s.contains("mysqlLocal"))
+                .unwrap_or(false)
+        })
+        .expect("a predicate_attempts entry for the mysqlLocal-sourced condition must exist")
+}
+
+#[test]
+fn davis_after_witnesses_the_mysql_local_compound_alias() {
+    let reports = run_golden();
+    let r = target(&reports, "davis-after");
+    let verdict = verdict_obj(r, "database.driver");
+    let attempt = mysql_local_attempt(verdict);
+    assert_eq!(
+        attempt["witnessed"], true,
+        "machine3 (driver=\"mysql\", createLocally defaults to true) must witness a real \
+         false->true transition through the resolved mysqlLocal compound predicate; got {attempt:?}"
+    );
+    // And the IR itself, not just the fact that *a* condition happened to
+    // be labeled "mysqlLocal" -- proves alias resolution actually
+    // reconstructed the real compound expression, not something else
+    // that merely mentions the name.
+    let ir = &attempt["predicate"]["ir"];
+    assert!(
+        ir.get("And").is_some(),
+        "the resolved mysqlLocal predicate's IR must be an And(...) compound; got {ir:?}"
+    );
+}
+
+#[test]
+fn davis_before_does_not_witness_the_mysql_local_compound_alias() {
+    // Negative control: same module (mysqlLocal's definition is byte-for-
+    // byte identical between before/after -- only the Doctrine DSN
+    // parameter name differs elsewhere), but before/test.nix has no mysql
+    // scenario at all. If this ever flipped to witnessed=true, the
+    // counterfactual evaluator would be proving something no real test
+    // assignment actually demonstrates.
+    let reports = run_golden();
+    let r = target(&reports, "davis-before");
+    let verdict = verdict_obj(r, "database.driver");
+    let attempt = mysql_local_attempt(verdict);
+    assert_eq!(
+        attempt["witnessed"], false,
+        "davis-before has no mysql test scenario -- mysqlLocal must show real-but-unwitnessed \
+         evidence (machine1/machine2 are both postgresql, so createLocally=true but \
+         driver!=\"mysql\" every time), not a witness; got {attempt:?}"
+    );
+}
+
+// --- H2 counterfactual gate adversarial cases 2-5, isolating davis's real
+// mysqlLocal shape (a compound predicate over two options) from any
+// real-corpus noise, so each specific failure mode has a fixture that
+// exercises nothing else. Case 1 is davis itself, above.
+
+#[test]
+fn h2_case2_absorbed_watched_change_is_not_pass() {
+    // createLocally=false, driver: sqlite(default) -> mysql(test). The
+    // compound predicate is false both times (createLocally=false alone
+    // already pins it) -- the watched option's own change is absorbed by
+    // the other operand. Must be OBA001, not PASS: presence of
+    // `driver = "mysql"` alone is never sufficient evidence.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case2-absorbed-watched-change");
+    assert_eq!(verdict_kind(r, "database.driver"), "OBA001");
+}
+
+#[test]
+fn h2_case3_symmetric_watch_is_pass() {
+    // Same instance as case 2, watching the OTHER operand instead:
+    // createLocally true(default) -> false(test), with driver=mysql held
+    // fixed at this instance's own value throughout. true -> false is a
+    // real transition -- proves the system attributes causation to
+    // whichever option is actually watched, not just "the compound
+    // predicate was true somewhere".
+    let reports = run_golden();
+    let r = target(&reports, "h2-case3-symmetric-watch");
+    assert_eq!(verdict_kind(r, "database.createLocally"), "PASS");
+}
+
+#[test]
+fn h2_case4_per_instance_isolation_prevents_cross_contamination() {
+    // nodeA (driver=mysql, createLocally=false) and nodeB
+    // (createLocally=true) are two independent machines. If nodeB's
+    // createLocally=true ever leaked into nodeA's evaluation, this would
+    // wrongly PASS (false&&false=false -> true&&true=true). Only nodeA
+    // explicitly assigns database.driver, so only nodeA is considered,
+    // and nodeA's OWN createLocally=false must be what's used -- giving
+    // OBA001, the same absorbed-change shape as case 2.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case4-per-instance-isolation");
+    assert_eq!(
+        verdict_kind(r, "database.driver"),
+        "OBA001",
+        "nodeB's createLocally=true must never leak into nodeA's own counterfactual \
+         environment -- if it had, this would wrongly be PASS"
+    );
+}
+
+#[test]
+fn h2_case5_unknown_context_is_inconclusive_never_a_guess() {
+    // driver=mysql is perfectly well known, but the predicate's OTHER
+    // operand (flag) is unresolvable everywhere (never assigned, default
+    // is a non-literal expression). Must weaken to inconclusive, never
+    // silently become OBA001 (a false claim of "no evidence") or PASS (a
+    // fabricated transition this tool has no basis for).
+    let reports = run_golden();
+    let r = target(&reports, "h2-case5-unknown-context");
+    assert_eq!(
+        verdict_kind(r, "database.driver"),
+        "TestValueUnresolved",
+        "an unresolvable co-operand must weaken the verdict, never be silently ignored"
+    );
 }
 
 // Positive assertion for the H2 gate-1 fix itself: without this, the test
