@@ -844,14 +844,24 @@ fn eval_value_expr(
     }
 }
 
-/// Evaluates a `Pred` against a concrete environment. `None` propagates
-/// fail-closed through every combinator: `And`/`Or` do NOT short-circuit
-/// on a known operand the way Nix's own `&&`/`||` would at the *value*
-/// level, because at the *evidence* level an unresolved operand means
-/// this pass genuinely doesn't know whether the real Nix evaluation would
-/// have short-circuited past it or not -- treating `And(unknown, false)`
-/// as `Some(false)` would be assuming the right operand was never forced,
-/// which this static pass has no basis for claiming.
+/// Evaluates a `Pred` against a concrete environment. `Eq`/`Not` propagate
+/// `None` fail-closed the obvious way. `And`/`Or` use strong (Kleene)
+/// three-valued logic instead of requiring *both* operands to resolve: a
+/// known `false` operand pins `And`'s result to `false` regardless of
+/// whether the other operand resolves, and symmetrically a known `true`
+/// operand pins `Or` to `true`. This is sound, not just convenient: real
+/// Nix's `a && b` either short-circuits on a `false` `a` without forcing
+/// `b` at all, or forces `b` and gets exactly the value we already
+/// statically know it to have -- both branches land on `false`, so which
+/// one Nix actually takes at runtime doesn't change the answer. (An
+/// earlier version of this function instead required `?` on both
+/// operands unconditionally, reasoning that was the safer fail-closed
+/// choice -- reviewed and corrected: refusing to conclude anything from a
+/// known-false operand was needlessly pessimistic, not actually safer,
+/// since the conclusion holds regardless of the unresolved operand's real
+/// value.) Only when neither operand pins the result down (e.g.
+/// `And(unknown, true)`, or a genuinely unresolved operand on both sides)
+/// does the combinator itself become unresolved.
 fn eval_pred(p: &Pred, env: &std::collections::HashMap<OptionPath, Scalar>) -> Option<bool> {
     match p {
         Pred::Eq(a, b) => {
@@ -860,16 +870,16 @@ fn eval_pred(p: &Pred, env: &std::collections::HashMap<OptionPath, Scalar>) -> O
             Some(a == b)
         }
         Pred::Not(inner) => eval_pred(inner, env).map(|b| !b),
-        Pred::And(a, b) => {
-            let a = eval_pred(a, env)?;
-            let b = eval_pred(b, env)?;
-            Some(a && b)
-        }
-        Pred::Or(a, b) => {
-            let a = eval_pred(a, env)?;
-            let b = eval_pred(b, env)?;
-            Some(a || b)
-        }
+        Pred::And(a, b) => match (eval_pred(a, env), eval_pred(b, env)) {
+            (Some(false), _) | (_, Some(false)) => Some(false),
+            (Some(true), Some(true)) => Some(true),
+            _ => None,
+        },
+        Pred::Or(a, b) => match (eval_pred(a, env), eval_pred(b, env)) {
+            (Some(true), _) | (_, Some(true)) => Some(true),
+            (Some(false), Some(false)) => Some(false),
+            _ => None,
+        },
     }
 }
 
@@ -2582,6 +2592,105 @@ mod tests {
         assert_eq!(
             eval_pred(&neg_truthy, &env_of(&[])),
             predicate_outcome(&PredicateKind::NegTruthy, ValueClass::Unknown),
+        );
+    }
+
+    // --- Kleene short-circuit refinement of eval_pred's And/Or, added on
+    // review of commit 1: a known operand can pin the combined result even
+    // when the *other* operand is unresolved. Symmetric -- it doesn't
+    // matter which side carries the known absorbing value, since the
+    // underlying claim ("a && b is false because b is false, regardless of
+    // a's real value") holds either way. `p_true`/`p_false` are `Pred`s
+    // with no `Ref` inside, so they evaluate the same in any environment.
+
+    fn p_true() -> Pred {
+        Pred::Eq(
+            ValueExpr::Literal(Scalar::Bool(true)),
+            ValueExpr::Literal(Scalar::Bool(true)),
+        )
+    }
+
+    fn p_false() -> Pred {
+        Pred::Not(Box::new(p_true()))
+    }
+
+    fn p_unknown() -> Pred {
+        // A Ref to a path that's never in the environment used below.
+        Pred::Eq(
+            ValueExpr::Ref(vec!["never-bound".into()]),
+            ValueExpr::Literal(Scalar::Bool(true)),
+        )
+    }
+
+    #[test]
+    fn eval_pred_and_short_circuits_on_a_known_false_operand_either_side() {
+        let empty = std::collections::HashMap::new();
+        assert_eq!(
+            eval_pred(
+                &Pred::And(Box::new(p_false()), Box::new(p_unknown())),
+                &empty
+            ),
+            Some(false),
+            "false && unknown must be false (real Nix never forces the right side)"
+        );
+        assert_eq!(
+            eval_pred(
+                &Pred::And(Box::new(p_unknown()), Box::new(p_false())),
+                &empty
+            ),
+            Some(false),
+            "unknown && false must also be false: whichever real value the left side \
+             turns out to have, the result is false either way"
+        );
+    }
+
+    #[test]
+    fn eval_pred_or_short_circuits_on_a_known_true_operand_either_side() {
+        let empty = std::collections::HashMap::new();
+        assert_eq!(
+            eval_pred(&Pred::Or(Box::new(p_true()), Box::new(p_unknown())), &empty),
+            Some(true),
+            "true || unknown must be true"
+        );
+        assert_eq!(
+            eval_pred(&Pred::Or(Box::new(p_unknown()), Box::new(p_true())), &empty),
+            Some(true),
+            "unknown || true must also be true, symmetrically"
+        );
+    }
+
+    #[test]
+    fn eval_pred_and_or_stay_unresolved_when_no_operand_pins_the_result() {
+        let empty = std::collections::HashMap::new();
+        assert_eq!(
+            eval_pred(
+                &Pred::And(Box::new(p_true()), Box::new(p_unknown())),
+                &empty
+            ),
+            None,
+            "true && unknown genuinely depends on the unknown operand"
+        );
+        assert_eq!(
+            eval_pred(
+                &Pred::And(Box::new(p_unknown()), Box::new(p_true())),
+                &empty
+            ),
+            None,
+        );
+        assert_eq!(
+            eval_pred(
+                &Pred::Or(Box::new(p_false()), Box::new(p_unknown())),
+                &empty
+            ),
+            None,
+            "false || unknown genuinely depends on the unknown operand"
+        );
+        assert_eq!(
+            eval_pred(
+                &Pred::Or(Box::new(p_unknown()), Box::new(p_false())),
+                &empty
+            ),
+            None,
         );
     }
 
