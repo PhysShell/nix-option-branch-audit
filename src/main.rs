@@ -516,8 +516,32 @@ struct OptionDecl {
     span: Span,
 }
 
-fn scan_options(file: &str, src: &str, root: &SyntaxNode) -> Vec<OptionDecl> {
+/// H2 gate-1 fix: nixpkgs modules use two conventions for declaring
+/// options -- nested (`options = { foo = ...; };`, e.g. kimai's per-site
+/// `siteOpts` submodule, where "options" is already relative to that
+/// submodule's own scope) and flat-dotted (`options.services.davis = {
+/// ...};`, e.g. real davis.nix, which roots its whole option tree at the
+/// exact same absolute path its own `cfg = config.services.davis;`
+/// binding uses). The flat form is resolved generically against the
+/// *target's own* `option_prefix` from the manifest -- never hardcoded to
+/// any specific module or path. If the segments after the leading
+/// "options" exactly match `option_prefix` (only possible when
+/// `option_prefix` is fully concrete: a wildcard `"*"` is a runtime
+/// attrsOf-submodule instance name, which can never appear literally in a
+/// module's own static declaration path), that root's contents are
+/// already cfg-relative once the shared prefix is stripped, and get
+/// walked exactly like the nested form. A wildcarded `option_prefix`
+/// (kimai's shape) simply never matches here and falls through to the
+/// nested form instead, unchanged -- this fix doesn't alter kimai's path
+/// at all.
+fn scan_options(
+    file: &str,
+    src: &str,
+    root: &SyntaxNode,
+    option_prefix: &[String],
+) -> Vec<OptionDecl> {
     let mut out = Vec::new();
+    let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
     for node in root.descendants() {
         if node.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -529,29 +553,26 @@ fn scan_options(file: &str, src: &str, root: &SyntaxNode) -> Vec<OptionDecl> {
         let Some(segs) = attrpath_segments(&attrpath) else {
             continue;
         };
-        // KNOWN GAP, deliberately not patched: nixpkgs modules use two
-        // conventions for the options block -- nested (`options = { foo =
-        // ...; };`, matched here) and flat-dotted (`options.services.davis =
-        // { ... };`, e.g. davis.nix). The flat form isn't handled: naively
-        // seeding the walk with the trailing segments ("services","davis")
-        // would make discovered option paths inconsistent with how the
-        // predicate scanner reports paths (always relative to cfg_ident,
-        // which for davis is bound at exactly the "services.davis" level --
-        // aligning the two requires knowing that `cfg = config.services.
-        // davis` binding, i.e. real alias/scope resolution, which is the
-        // same out-of-scope machinery as the mysqlLocal case). Reporting
-        // nothing here is more honest than reporting paths that would
-        // silently fail to correlate with predicates later.
-        if segs != vec!["options".to_string()] {
-            continue;
-        }
         let Some(value) = children.next() else {
             continue;
         };
         if value.kind() != NODE_ATTR_SET {
             continue;
         }
-        walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
+
+        if segs == ["options"] {
+            walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
+            continue;
+        }
+
+        if prefix_is_concrete
+            && !option_prefix.is_empty()
+            && segs.len() == option_prefix.len() + 1
+            && segs[0] == "options"
+            && segs[1..] == option_prefix[..]
+        {
+            walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
+        }
     }
     out
 }
@@ -626,6 +647,230 @@ fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
         }
     }
     None
+}
+
+// ---------------------------------------------------------------------
+// H2: reuse survey (per AGENTS.md, recorded before writing any of the code
+// below).
+//
+// Checked, this session, against the actual dependency already vendored
+// in Cargo.lock: rnix 0.11's typed `ast` module (`rnix::ast::{BinOp,
+// UnaryOp, BinOpKind, UnaryOpKind}`) -- confirmed by reading
+// `~/.cargo/registry/.../rnix-0.11.0/src/ast/{nodes.rs,operators.rs}`
+// directly, not assumed from the changelog. `BinOp::operator() ->
+// Option<BinOpKind>` and `UnaryOp::operator() -> Option<UnaryOpKind>`
+// already classify `&&`/`||`/`==`/`!=`/`!` into a clean enum from a
+// single call, replacing what would otherwise be more hand-rolled
+// `TOKEN_AND_AND`/`TOKEN_OR_OR`/... matching (the existing H1 code already
+// hand-matches `TOKEN_NOT_EQUAL`/`TOKEN_EQUAL`/`TOKEN_INVERT` for the
+// narrower unary case, in `scan_predicates` below and `NegTruthy`
+// handling -- left as-is there since H1 is frozen; used going forward in
+// `lower_pred`/`lower_value_expr`). This is a zero-cost reuse: no new
+// dependency, no API surface beyond what `rowan::ast::AstNode` (already
+// imported) already requires.
+//
+// Checked, not vendored, kept as reference/design input only (per the
+// user's own prior research, cross-checked against what's structurally
+// plausible for each project, not independently re-verified line-by-line
+// in this session): `oxalica/nil`'s name-resolution
+// (`crates/ide/src/def/nameres.rs`) implements full lexical scope
+// resolution over `let`/`rec`/`with`/function params, but lives inside
+// nil's own IDE crate graph (a Salsa incremental-computation database, and
+// its own syntax-tree model layered over rnix) -- pulling in the
+// algorithm would mean pulling in most of nil's architecture along with
+// it for one function's worth of logic. `nixd`/`libnixf`'s semantic
+// variable lookup is a C++ stack built on the real Nix evaluator
+// libraries -- not a Rust dependency at all, and far heavier than a small
+// rnix-based checker needs. Tvix has a real Nix evaluator with its own
+// scope tracking, live and correct by construction, but "vendor an
+// evaluator" is a different, heavier tool than this one; kept in mind as
+// a possible future *differential oracle* (run both, compare) rather than
+// something to embed in the analysis core.
+//
+// What's actually reused: rnix's typed AST directly, as above. What's
+// reused as a design reference, not code: nil's general shape of "resolve
+// an identifier by walking enclosing scopes outward, stop at the first
+// binding, treat shadowing and cycles explicitly" -- standard lexical
+// scoping, applied narrowly (see the alias-resolution work landing in the
+// next commit) to exactly `let`/`rec` bindings and function parameters,
+// not a general Nix evaluator.
+//
+// The concrete project-specific gap that remains, and that no reused
+// artifact fills: a *non-evaluating*, fail-closed resolver that maps a
+// `let`-bound identifier used inside a `cfg`-rooted predicate/value
+// expression back to either something this pure IR can represent (a
+// select rooted at `cfg_ident`, a literal, or a whole aliased boolean
+// expression) or an explicit `None` -- never a guess, never partial Nix
+// evaluation, no `with`, no dynamic attribute names, no imports.
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// H2: a pure Predicate IR (Pred/ValueExpr/Scalar), independent of the
+// H1-era `PredicateKind` enum above (kept as-is; H1 is frozen). Unlike
+// `PredicateKind`, this represents a predicate as an actual boolean
+// expression tree over option references, so a compound condition like
+// `db.createLocally && db.driver == "mysql"` can be represented and
+// evaluated as itself, rather than forcing every predicate down to
+// "truthy/falsy check of exactly one option's value" the way H1's model
+// does. Every lowering function below returns `Option<_>`, not a guess:
+// `None` means "this syntactic shape isn't representable in this pure
+// IR", propagated by `?` rather than silently discarded -- the same
+// fail-closed idiom `ValueClass`/`predicate_outcome` already use
+// throughout H1.
+// ---------------------------------------------------------------------
+
+/// A dotted option path, relative to `cfg_ident` -- e.g. `cfg.database.
+/// driver` lowers to `["database", "driver"]`. Same representation
+/// `Predicate.path`/`OptionDecl.path` already use; aliased here for
+/// readability in the IR types below.
+type OptionPath = Vec<String>;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum Scalar {
+    Null,
+    Bool(bool),
+    Str(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum ValueExpr {
+    /// A `cfg_ident`-rooted select, e.g. `cfg.database.driver`.
+    Ref(OptionPath),
+    Literal(Scalar),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum Pred {
+    Eq(ValueExpr, ValueExpr),
+    Not(Box<Pred>),
+    And(Box<Pred>, Box<Pred>),
+    Or(Box<Pred>, Box<Pred>),
+}
+
+/// Lowers a value-position expression into the pure IR: a `cfg_ident`-
+/// rooted select becomes `Ref`; the literals `null`/`true`/`false`/a
+/// plain string become `Literal`. `None` for anything else -- this
+/// commit has no alias/scope resolution yet (that lands in the next
+/// commit), so a bare identifier referring to some other binding (e.g.
+/// `db` in `db.driver`) is honestly unresolved here, never assumed to be
+/// absent or to evaluate to any particular thing.
+fn lower_value_expr(node: &SyntaxNode, cfg_ident: &str) -> Option<ValueExpr> {
+    if let Some((root_name, path)) = as_select(node) {
+        return if root_name == cfg_ident {
+            Some(ValueExpr::Ref(path))
+        } else {
+            None
+        };
+    }
+    match node.kind() {
+        NODE_IDENT => match ident_text(node).as_deref() {
+            Some("null") => Some(ValueExpr::Literal(Scalar::Null)),
+            Some("true") => Some(ValueExpr::Literal(Scalar::Bool(true))),
+            Some("false") => Some(ValueExpr::Literal(Scalar::Bool(false))),
+            _ => None,
+        },
+        NODE_STRING => string_text(node).map(|s| ValueExpr::Literal(Scalar::Str(s))),
+        _ => None,
+    }
+}
+
+/// Lowers a boolean-valued expression into the pure `Pred` IR: `a != b`
+/// (`Not(Eq(a,b))`), `a == b` (`Eq(a,b)`), a bare `cfg_ident`-rooted
+/// reference used directly as a condition (`Eq(ref, true)`), `!p`
+/// (`Not(p)`), `a && b` / `a || b` (`And`/`Or`). Uses rnix's typed
+/// `ast::BinOp`/`ast::UnaryOp` operator classification (see the reuse
+/// survey above) instead of hand-matching tokens. `None` for anything
+/// unrepresentable -- a bare alias identifier used directly as a
+/// condition (unresolved until the next commit's alias resolution), a
+/// helper call, a non-boolean-shaped expression, or an operator this IR
+/// doesn't model (`<`, string ops, arithmetic, ...).
+fn lower_pred(node: &SyntaxNode, cfg_ident: &str) -> Option<Pred> {
+    let node = unwrap_paren(node.clone());
+    if let Some(bin) = rnix::ast::BinOp::cast(node.clone()) {
+        let op = bin.operator()?;
+        let lhs_node = bin.lhs()?.syntax().clone();
+        let rhs_node = bin.rhs()?.syntax().clone();
+        return match op {
+            rnix::ast::BinOpKind::And => Some(Pred::And(
+                Box::new(lower_pred(&lhs_node, cfg_ident)?),
+                Box::new(lower_pred(&rhs_node, cfg_ident)?),
+            )),
+            rnix::ast::BinOpKind::Or => Some(Pred::Or(
+                Box::new(lower_pred(&lhs_node, cfg_ident)?),
+                Box::new(lower_pred(&rhs_node, cfg_ident)?),
+            )),
+            rnix::ast::BinOpKind::Equal => Some(Pred::Eq(
+                lower_value_expr(&lhs_node, cfg_ident)?,
+                lower_value_expr(&rhs_node, cfg_ident)?,
+            )),
+            rnix::ast::BinOpKind::NotEqual => Some(Pred::Not(Box::new(Pred::Eq(
+                lower_value_expr(&lhs_node, cfg_ident)?,
+                lower_value_expr(&rhs_node, cfg_ident)?,
+            )))),
+            _ => None,
+        };
+    }
+    if let Some(un) = rnix::ast::UnaryOp::cast(node.clone()) {
+        return if un.operator()? == rnix::ast::UnaryOpKind::Invert {
+            let inner = un.expr()?.syntax().clone();
+            Some(Pred::Not(Box::new(lower_pred(&inner, cfg_ident)?)))
+        } else {
+            None
+        };
+    }
+    // A bare reference used directly as a condition: `if cfg.foo then
+    // ...` lowers to `cfg.foo == true`. Only a `Ref` counts here -- a
+    // bare `Literal` (e.g. a stray `if true then ...`) isn't a real
+    // option-branch predicate, so it's left unresolved rather than
+    // fabricating trivial evidence.
+    match lower_value_expr(&node, cfg_ident) {
+        Some(v @ ValueExpr::Ref(_)) => Some(Pred::Eq(v, ValueExpr::Literal(Scalar::Bool(true)))),
+        _ => None,
+    }
+}
+
+/// Evaluates a `ValueExpr` against a concrete environment: `env` supplies
+/// the currently-known `Scalar` for every option path this evaluation
+/// cares about. `None` means "this environment doesn't (yet) say", not
+/// "false" -- callers must not conflate an absent lookup with a negative
+/// result.
+fn eval_value_expr(
+    v: &ValueExpr,
+    env: &std::collections::HashMap<OptionPath, Scalar>,
+) -> Option<Scalar> {
+    match v {
+        ValueExpr::Literal(s) => Some(s.clone()),
+        ValueExpr::Ref(path) => env.get(path).cloned(),
+    }
+}
+
+/// Evaluates a `Pred` against a concrete environment. `None` propagates
+/// fail-closed through every combinator: `And`/`Or` do NOT short-circuit
+/// on a known operand the way Nix's own `&&`/`||` would at the *value*
+/// level, because at the *evidence* level an unresolved operand means
+/// this pass genuinely doesn't know whether the real Nix evaluation would
+/// have short-circuited past it or not -- treating `And(unknown, false)`
+/// as `Some(false)` would be assuming the right operand was never forced,
+/// which this static pass has no basis for claiming.
+fn eval_pred(p: &Pred, env: &std::collections::HashMap<OptionPath, Scalar>) -> Option<bool> {
+    match p {
+        Pred::Eq(a, b) => {
+            let a = eval_value_expr(a, env)?;
+            let b = eval_value_expr(b, env)?;
+            Some(a == b)
+        }
+        Pred::Not(inner) => eval_pred(inner, env).map(|b| !b),
+        Pred::And(a, b) => {
+            let a = eval_pred(a, env)?;
+            let b = eval_pred(b, env)?;
+            Some(a && b)
+        }
+        Pred::Or(a, b) => {
+            let a = eval_pred(a, env)?;
+            let b = eval_pred(b, env)?;
+            Some(a || b)
+        }
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -1500,7 +1745,12 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
     let module_root = module_parse.tree();
     let test_root = test_parse.tree();
 
-    let options = scan_options(&module_file, &module_src, module_root.syntax());
+    let options = scan_options(
+        &module_file,
+        &module_src,
+        module_root.syntax(),
+        &t.option_prefix,
+    );
     let predicates = scan_predicates(
         &module_file,
         &module_src,
@@ -2122,5 +2372,354 @@ mod tests {
                 .any(|o| path_eq(&o.path, &["systemd", "tmpfiles", "settings", "ifm-data-dir"])),
             "the dynamic ${{config...}} key must be recorded as opacity, not silently skipped; got {opacity:?}"
         );
+    }
+
+    // --- H2 commit 1: pure Predicate IR (Pred/ValueExpr/Scalar) ---------
+    //
+    // Not yet wired into run_target/scan_predicates -- these are unit
+    // tests of the standalone lowering functions and evaluator, proving
+    // the pure core is correct in isolation before the next commit wires
+    // alias resolution and the counterfactual gate-4 rewrite on top of it.
+
+    fn parse_expr(src: &str) -> SyntaxNode {
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "test fixture must parse: {src}");
+        root.tree()
+            .syntax()
+            .children()
+            .next()
+            .expect("root must have exactly one expression child")
+    }
+
+    #[test]
+    fn lower_pred_handles_the_direct_h1_forms() {
+        assert_eq!(
+            lower_pred(&parse_expr("cfg.foo != null"), "cfg"),
+            Some(Pred::Not(Box::new(Pred::Eq(
+                ValueExpr::Ref(vec!["foo".into()]),
+                ValueExpr::Literal(Scalar::Null),
+            ))))
+        );
+        assert_eq!(
+            lower_pred(&parse_expr("cfg.foo == null"), "cfg"),
+            Some(Pred::Eq(
+                ValueExpr::Ref(vec!["foo".into()]),
+                ValueExpr::Literal(Scalar::Null),
+            ))
+        );
+        // A bare cfg-rooted reference used directly as a condition (`if
+        // cfg.foo then ...`) lowers to `cfg.foo == true`, matching H1's
+        // `Truthy` semantics.
+        assert_eq!(
+            lower_pred(&parse_expr("cfg.foo"), "cfg"),
+            Some(Pred::Eq(
+                ValueExpr::Ref(vec!["foo".into()]),
+                ValueExpr::Literal(Scalar::Bool(true)),
+            ))
+        );
+        assert_eq!(
+            lower_pred(&parse_expr("!cfg.foo"), "cfg"),
+            Some(Pred::Not(Box::new(Pred::Eq(
+                ValueExpr::Ref(vec!["foo".into()]),
+                ValueExpr::Literal(Scalar::Bool(true)),
+            ))))
+        );
+    }
+
+    #[test]
+    fn lower_pred_handles_compound_forms_new_in_h2() {
+        // The exact real-world davis.nix chain this commit exists to move
+        // towards: `db.createLocally && db.driver == "mysql"` -- here with
+        // `db` already replaced by `cfg` directly (no alias resolution
+        // yet, that's the next commit), isolating just the `&&`/string-
+        // literal-equality lowering.
+        assert_eq!(
+            lower_pred(
+                &parse_expr(r#"cfg.createLocally && cfg.driver == "mysql""#),
+                "cfg"
+            ),
+            Some(Pred::And(
+                Box::new(Pred::Eq(
+                    ValueExpr::Ref(vec!["createLocally".into()]),
+                    ValueExpr::Literal(Scalar::Bool(true)),
+                )),
+                Box::new(Pred::Eq(
+                    ValueExpr::Ref(vec!["driver".into()]),
+                    ValueExpr::Literal(Scalar::Str("mysql".into())),
+                )),
+            ))
+        );
+        assert_eq!(
+            lower_pred(&parse_expr("cfg.a || cfg.b"), "cfg"),
+            Some(Pred::Or(
+                Box::new(Pred::Eq(
+                    ValueExpr::Ref(vec!["a".into()]),
+                    ValueExpr::Literal(Scalar::Bool(true)),
+                )),
+                Box::new(Pred::Eq(
+                    ValueExpr::Ref(vec!["b".into()]),
+                    ValueExpr::Literal(Scalar::Bool(true)),
+                )),
+            ))
+        );
+    }
+
+    #[test]
+    fn lower_pred_is_none_for_unsupported_shapes_not_silently_something_else() {
+        // A helper call: not a shape this IR represents.
+        assert_eq!(
+            lower_pred(&parse_expr(r#"builtins.elem "x" [ "x" "y" ]"#), "cfg"),
+            None
+        );
+        // A bare alias identifier used directly as a condition: genuinely
+        // unresolved until the next commit's alias resolution exists --
+        // must never be silently treated as `false`/absent.
+        assert_eq!(lower_pred(&parse_expr("mysqlLocal"), "cfg"), None);
+        // An operator this IR doesn't model.
+        assert_eq!(lower_pred(&parse_expr("cfg.a < cfg.b"), "cfg"), None);
+    }
+
+    // --- H1/H2 compatibility: the new IR+evaluator must reproduce H1's
+    // existing predicate_outcome() table for every unary case that table
+    // actually covers. `ValueClass::DefinitelyNonNull` is represented in
+    // the environment as a concrete placeholder scalar (`Scalar::Str`) --
+    // any concrete non-null value proves a null-comparison's outcome,
+    // which is exactly what `DefinitelyNonNull` meant in H1 too.
+    // `ValueClass::Unknown` is represented as the path being *absent* from
+    // the environment, matching `eval_value_expr`'s own "unresolved, not a
+    // guess" semantics. One case is deliberately NOT covered here:
+    // `Truthy`/`NegTruthy` combined with `DefinitelyNonNull` returned
+    // `None` in H1's table, but H1 never actually reached that state
+    // through any real predicate + default/test-value combination in the
+    // golden suite -- a `Truthy` predicate's operand must be a real Nix
+    // bool for evaluation to succeed at all, so "known non-null, exact
+    // value withheld" was already a degenerate corner of the old model,
+    // not a case this IR needs to preserve bit-for-bit.
+
+    fn env_of(pairs: &[(&[&str], Scalar)]) -> std::collections::HashMap<OptionPath, Scalar> {
+        pairs
+            .iter()
+            .map(|(path, s)| (path.iter().map(|s| s.to_string()).collect(), s.clone()))
+            .collect()
+    }
+
+    #[test]
+    fn h1_compat_null_predicates() {
+        let neq = Pred::Not(Box::new(Pred::Eq(
+            ValueExpr::Ref(vec!["foo".into()]),
+            ValueExpr::Literal(Scalar::Null),
+        )));
+        let eq = Pred::Eq(
+            ValueExpr::Ref(vec!["foo".into()]),
+            ValueExpr::Literal(Scalar::Null),
+        );
+
+        // NullNeq (cfg.foo != null)
+        assert_eq!(
+            eval_pred(&neq, &env_of(&[(&["foo"], Scalar::Null)])),
+            predicate_outcome(&PredicateKind::NullNeq, ValueClass::Null),
+        );
+        assert_eq!(
+            eval_pred(&neq, &env_of(&[(&["foo"], Scalar::Bool(true))])),
+            predicate_outcome(&PredicateKind::NullNeq, ValueClass::Bool(true)),
+        );
+        assert_eq!(
+            eval_pred(
+                &neq,
+                &env_of(&[(&["foo"], Scalar::Str("placeholder".into()))])
+            ),
+            predicate_outcome(&PredicateKind::NullNeq, ValueClass::DefinitelyNonNull),
+        );
+        assert_eq!(
+            eval_pred(&neq, &env_of(&[])),
+            predicate_outcome(&PredicateKind::NullNeq, ValueClass::Unknown),
+        );
+
+        // NullEq (cfg.foo == null) -- same environments, the other predicate.
+        assert_eq!(
+            eval_pred(&eq, &env_of(&[(&["foo"], Scalar::Null)])),
+            predicate_outcome(&PredicateKind::NullEq, ValueClass::Null),
+        );
+        assert_eq!(
+            eval_pred(&eq, &env_of(&[(&["foo"], Scalar::Bool(true))])),
+            predicate_outcome(&PredicateKind::NullEq, ValueClass::Bool(true)),
+        );
+        assert_eq!(
+            eval_pred(
+                &eq,
+                &env_of(&[(&["foo"], Scalar::Str("placeholder".into()))])
+            ),
+            predicate_outcome(&PredicateKind::NullEq, ValueClass::DefinitelyNonNull),
+        );
+        assert_eq!(
+            eval_pred(&eq, &env_of(&[])),
+            predicate_outcome(&PredicateKind::NullEq, ValueClass::Unknown),
+        );
+    }
+
+    #[test]
+    fn h1_compat_truthy_predicates() {
+        let truthy = Pred::Eq(
+            ValueExpr::Ref(vec!["foo".into()]),
+            ValueExpr::Literal(Scalar::Bool(true)),
+        );
+        let neg_truthy = Pred::Not(Box::new(truthy.clone()));
+
+        for b in [true, false] {
+            assert_eq!(
+                eval_pred(&truthy, &env_of(&[(&["foo"], Scalar::Bool(b))])),
+                predicate_outcome(&PredicateKind::Truthy("if".into()), ValueClass::Bool(b)),
+            );
+            assert_eq!(
+                eval_pred(&neg_truthy, &env_of(&[(&["foo"], Scalar::Bool(b))])),
+                predicate_outcome(&PredicateKind::NegTruthy, ValueClass::Bool(b)),
+            );
+        }
+        assert_eq!(
+            eval_pred(&truthy, &env_of(&[])),
+            predicate_outcome(&PredicateKind::Truthy("if".into()), ValueClass::Unknown),
+        );
+        assert_eq!(
+            eval_pred(&neg_truthy, &env_of(&[])),
+            predicate_outcome(&PredicateKind::NegTruthy, ValueClass::Unknown),
+        );
+    }
+
+    // --- Property-based tests (proptest) over the pure IR -- the
+    // "property-based tests" evidence tier AGENTS.md asks for, ahead of
+    // mutation testing (task #8, once alias resolution exists too).
+
+    fn arb_scalar() -> impl proptest::strategy::Strategy<Value = Scalar> {
+        use proptest::prelude::*;
+        prop_oneof![
+            Just(Scalar::Null),
+            any::<bool>().prop_map(Scalar::Bool),
+            "[a-c]{1,3}".prop_map(Scalar::Str),
+        ]
+    }
+
+    fn arb_value_expr() -> impl proptest::strategy::Strategy<Value = ValueExpr> {
+        use proptest::prelude::*;
+        prop_oneof![
+            prop::collection::vec("[a-c]", 1..=2).prop_map(ValueExpr::Ref),
+            arb_scalar().prop_map(ValueExpr::Literal),
+        ]
+    }
+
+    fn arb_pred() -> impl proptest::strategy::Strategy<Value = Pred> {
+        use proptest::prelude::*;
+        let leaf = (arb_value_expr(), arb_value_expr()).prop_map(|(a, b)| Pred::Eq(a, b));
+        leaf.prop_recursive(4, 32, 3, |inner| {
+            prop_oneof![
+                inner.clone().prop_map(|p| Pred::Not(Box::new(p))),
+                (inner.clone(), inner.clone())
+                    .prop_map(|(a, b)| Pred::And(Box::new(a), Box::new(b))),
+                (inner.clone(), inner).prop_map(|(a, b)| Pred::Or(Box::new(a), Box::new(b))),
+            ]
+        })
+    }
+
+    /// Always evaluates to `Some(true)` regardless of environment (no
+    /// `Ref` inside) -- the neutral element `And(p, true_pred()) == p`
+    /// needs.
+    fn true_pred() -> Pred {
+        Pred::Eq(
+            ValueExpr::Literal(Scalar::Bool(true)),
+            ValueExpr::Literal(Scalar::Bool(true)),
+        )
+    }
+
+    fn false_pred() -> Pred {
+        Pred::Not(Box::new(true_pred()))
+    }
+
+    fn refs_in_pred(p: &Pred, out: &mut Vec<OptionPath>) {
+        match p {
+            Pred::Eq(a, b) => {
+                for v in [a, b] {
+                    if let ValueExpr::Ref(path) = v {
+                        out.push(path.clone());
+                    }
+                }
+            }
+            Pred::Not(inner) => refs_in_pred(inner, out),
+            Pred::And(a, b) | Pred::Or(a, b) => {
+                refs_in_pred(a, out);
+                refs_in_pred(b, out);
+            }
+        }
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn not_not_is_identity(p in arb_pred(), env in arb_value_expr()) {
+            // `env` here just forces proptest to exercise a handful of
+            // concrete single-path environments as a cheap source of
+            // variety; `Not(Not(p)) == p` provably holds for *any*
+            // environment (double negation of an Option<bool> via `.map`
+            // is the identity), full, partial, or empty alike, so a full
+            // arbitrary HashMap generator adds no extra coverage here.
+            let env: std::collections::HashMap<OptionPath, Scalar> = match env {
+                ValueExpr::Ref(path) => [(path, Scalar::Bool(true))].into_iter().collect(),
+                ValueExpr::Literal(_) => std::collections::HashMap::new(),
+            };
+            proptest::prop_assert_eq!(
+                eval_pred(&Pred::Not(Box::new(Pred::Not(Box::new(p.clone())))), &env),
+                eval_pred(&p, &env)
+            );
+        }
+
+        #[test]
+        fn and_true_is_identity(p in arb_pred()) {
+            let env = std::collections::HashMap::new();
+            proptest::prop_assert_eq!(
+                eval_pred(&Pred::And(Box::new(p.clone()), Box::new(true_pred())), &env),
+                eval_pred(&p, &env)
+            );
+        }
+
+        #[test]
+        fn or_false_is_identity(p in arb_pred()) {
+            let env = std::collections::HashMap::new();
+            proptest::prop_assert_eq!(
+                eval_pred(&Pred::Or(Box::new(p.clone()), Box::new(false_pred())), &env),
+                eval_pred(&p, &env)
+            );
+        }
+
+        // The property behind H1's own fail-closed discipline, generalized:
+        // starting from an environment that fully resolves `p`, deleting
+        // any single entry must never turn a known `Some(b)` into a
+        // *different* known result -- it may only weaken to `None`. This is
+        // the Pred/evaluator-level version of "replacing known input with
+        // unknown may weaken a conclusion but must never create PASS or
+        // OBA001" (the run_target-level guarantee lands with the
+        // counterfactual gate-4 rewrite in the next commit, built on top of
+        // this).
+        #[test]
+        fn removing_a_known_value_never_flips_a_known_result(p in arb_pred()) {
+            let mut paths = Vec::new();
+            refs_in_pred(&p, &mut paths);
+            paths.sort();
+            paths.dedup();
+
+            let full_env: std::collections::HashMap<OptionPath, Scalar> = paths
+                .iter()
+                .cloned()
+                .map(|path| (path, Scalar::Bool(true)))
+                .collect();
+            let full_result = eval_pred(&p, &full_env);
+
+            for path in &paths {
+                let mut weakened = full_env.clone();
+                weakened.remove(path);
+                let weakened_result = eval_pred(&p, &weakened);
+                proptest::prop_assert!(
+                    weakened_result.is_none() || weakened_result == full_result,
+                    "removing {:?} changed a known result from {:?} to {:?}",
+                    path, full_result, weakened_result
+                );
+            }
+        }
     }
 }

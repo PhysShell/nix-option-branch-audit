@@ -203,19 +203,60 @@ fn golden_b_fix_commit_shows_pass_with_evidence() {
 
 #[test]
 fn davis_predicate_is_honestly_reported_as_not_found() {
-    // Tightened per H1.1 review: the previous OR-of-two-verdicts version
-    // would have silently accepted a regression where the declaration
-    // scanner starts finding davis's flat-dotted option form but hits the
-    // mysqlLocal alias gap instead (or vice versa) -- a golden this loose
-    // can't tell "still exactly the documented gap" from "a different gap
-    // now". Pin the exact, currently-true gate.
+    // H2 gate-1 fix: `scan_options` now resolves davis's flat-dotted
+    // `options.services.davis = { ... };` root against the target's own
+    // `option_prefix` (["services","davis"]), so `database.driver` is no
+    // longer silently un-findable -- gate 1 passes. The gate that now
+    // honestly fails is gate 2: `mysqlLocal` (a `let`-bound alias to
+    // `db.createLocally && db.driver == "mysql"`) isn't a direct
+    // `cfg.database.driver` select, so no predicate is found yet. That's
+    // exactly the alias-resolution gap H2 exists to close next (see the
+    // Predicate IR / reuse-survey doc comment) -- pinned here as
+    // `PredicateNotFound`, not `OptionNotFound`, so a regression in either
+    // direction (gate 1 breaking again, or gate 2 silently starting to
+    // match something it shouldn't) is caught.
     let reports = run_golden();
     for name in ["davis-before", "davis-after"] {
         let r = target(&reports, name);
         assert_eq!(
             verdict_kind(r, "database.driver"),
-            "OptionNotFound",
+            "PredicateNotFound",
             "target {name} must not silently PASS or silently omit the watched option"
+        );
+    }
+}
+
+// Positive assertion for the H2 gate-1 fix itself: without this, the test
+// above would trivially pass for the wrong reason if `scan_options`
+// regressed back to finding nothing at all (also `PredicateNotFound`... no,
+// actually `OptionNotFound` -- but a positive assertion on the actual
+// discovered path is still the only way to prove gate 1 specifically
+// succeeded, not just that *some* inconclusive verdict came out).
+
+#[test]
+fn h2_gate1_davis_flat_option_root_is_discovered() {
+    let reports = run_golden();
+    for name in ["davis-before", "davis-after"] {
+        let r = target(&reports, name);
+        let options: Vec<String> = r["discovered_options"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|o| {
+                o["path"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|s| s.as_str().unwrap())
+                    .collect::<Vec<_>>()
+                    .join(".")
+            })
+            .collect();
+        assert!(
+            options.contains(&"database.driver".to_string()),
+            "target {name}: scan_options must discover database.driver via the flat \
+             `options.services.davis = {{ ... }};` root now that it's resolved against \
+             option_prefix; got {options:?}"
         );
     }
 }

@@ -661,6 +661,110 @@ instance, which is precisely the condition under which every *other*
 gap-detection mechanism in this tool (both `files_with_neither` and
 `unclassified_root_entries`) stays blind.
 
+## H1: FROZEN at `fa953d6`
+
+Six review rounds (H1 → H1.3b), each finding a real bug, closed the walker's
+one governing invariant on the supported syntactic subset: every construct
+either resolves to a known `TestAssignment` or leaves an explicit
+`Opacity` — never silence. `AGENTS.md`'s closing line applies here
+directly: *"A frozen layer is reopened only by a concrete counterexample,
+invalidated assumption, or downstream requirement, not for naming cleanup
+or speculative completeness."* The ~1900 unsupported syntactic forms the
+census counts (`machine =` shorthand, `interactive.nodes.*`, ...) are not
+a debt against this freeze — they were never required to be understood,
+only required to never silently disappear, and the census proves they
+don't.
+
+## H2 (in progress) — commit 1: reuse survey, gate-1 fix, pure Predicate IR
+
+H1's declaration/predicate model has one governing assumption baked in:
+a predicate is a unary check of exactly one option's value
+(`ValueClass` → `bool`). Real modules break this. `davis.nix`'s actual
+MySQL branch is gated by `mysqlLocal = db.createLocally && db.driver ==
+"mysql";` — a `let`-bound alias to a *compound* boolean expression over
+*two* options, referenced elsewhere as a bare condition
+(`if mysqlLocal then ...`). No amount of hardening the H1 walker touches
+this; it needs a different predicate model. H2 builds that model, staged
+across two commits per an explicit reviewer request to keep failures
+attributable rather than landing one large change.
+
+**Reuse survey** (required by `AGENTS.md` before writing any of the code
+below; the full writeup is a doc comment directly above the IR in
+`src/main.rs`, not duplicated here). Checked and independently confirmed
+this session: rnix 0.11's typed `ast` module
+(`rnix::ast::{BinOp, UnaryOp, BinOpKind, UnaryOpKind}`) already classifies
+`&&`/`||`/`==`/`!=`/`!` into a clean enum via `.operator()`, read directly
+from the vendored crate source rather than assumed — used going forward
+in the new lowering code, zero new dependencies. Checked and kept as
+design reference only (not vendored): `oxalica/nil`'s name-resolution
+(full lexical scoping, but embedded in its own Salsa/IDE architecture —
+importing the algorithm would mean importing most of the crate graph
+around it), `nixd`/`libnixf` (a C++ stack over the real Nix evaluator, not
+a Rust dependency at all), and Tvix (a real evaluator with its own scope
+tracking — noted as a possible future *differential oracle*, not
+something to embed in the analysis core). The actual project-specific gap
+no reused artifact fills: a small, non-evaluating, fail-closed resolver
+for exactly the alias shapes real nixpkgs modules use — landing in the
+next commit, not this one.
+
+**Gate-1 fix.** `scan_options` only recognized the nested `options = {
+...};` form (kimai's shape); davis's real, flat `options.services.davis =
+{ ...};` root made `database.driver` permanently undiscoverable, so
+`davis-before`/`davis-after` failed at gate 1 (`OptionNotFound`) before
+ever reaching the alias gap. Fixed generically against the *target's own*
+`option_prefix` from the manifest — never hardcoded to davis or any other
+module: if the segments after a leading `options` exactly match
+`option_prefix` (only possible when `option_prefix` is fully concrete; a
+wildcard `"*"` can never appear literally in a module's own static
+declaration path, so wildcarded targets like kimai's simply fall through
+to the unchanged nested-form branch). `davis-before`/`davis-after` now
+correctly reach gate 2 and fail there instead
+(`PredicateNotFound` — the honest, next gap, not a false pass).
+
+**Pure Predicate IR.** A `Pred`/`ValueExpr`/`Scalar` type, independent of
+H1's `PredicateKind` (left untouched — H1 is frozen): `Pred::{Eq, Not,
+And, Or}` over `ValueExpr::{Ref(OptionPath), Literal(Scalar)}`. Two pure
+functions — `lower_pred`/`lower_value_expr` (AST → `Option<Pred>` /
+`Option<ValueExpr>`, `None` for anything unrepresentable, never a guess)
+and `eval_pred`/`eval_value_expr` (`Pred` + a concrete environment →
+`Option<bool>`/`Option<Scalar>`, `And`/`Or` deliberately do **not**
+short-circuit on a known operand — an unresolved operand means this
+static pass genuinely doesn't know whether real Nix evaluation would have
+forced it, so it can't claim to know the combined outcome either). Not
+yet wired into `run_target`'s actual gate 2–4 logic; that wiring, together
+with alias resolution, is the next commit.
+
+Verified with 10 unit tests: direct-form lowering (`!=`, `==`, bare
+truthy, `!`, `&&`, `||`) matches H1's shapes exactly; compound forms
+(`db.createLocally && db.driver == "mysql"`, without alias resolution yet)
+lower correctly; unsupported shapes (`builtins.elem ...`, a bare alias
+ident used as a condition, `<`) are `None`, not a guess; two example-based
+compatibility tests reproduce H1's entire `predicate_outcome()` table for
+`NullNeq`/`NullEq`/`Truthy`/`NegTruthy` exactly via the new evaluator
+(one theoretical corner — `Truthy` combined with `ValueClass::
+DefinitelyNonNull` — is explicitly *not* reproduced and documented why: no
+real predicate + value combination in the golden suite ever reaches it,
+since a `Truthy` predicate's operand must be a real Nix bool for
+evaluation to succeed at all); and four `proptest` property tests —
+`Not(Not(p)) == p`, `And(p, true) == p`, `Or(p, false) == p`, and the
+one that matters most going into the next commit: deleting any single
+entry from an environment that fully resolves `p` never flips a known
+result to a *different* known result, only ever weakens it to `None`.
+`proptest` added as a dev-dependency per `AGENTS.md`'s reuse-first rule
+applied to the test infrastructure itself — the maintained, standard Rust
+property-testing crate, not a hand-rolled generator loop mislabeled as
+one.
+
+44 tests total (33 in `tests/golden.rs`, 1 in `tests/fixture_integrity.rs`,
+10 in `main.rs`'s own unit-test module) — was 34 at the H1.3b freeze: +1
+golden (`h2_gate1_davis_flat_option_root_is_discovered`) and +9 new unit
+tests for the pure IR (`scanner_reads_real_ifm_test_correctly` was already
+counted in H1.3's tally). Next commit:
+narrow lexical alias resolution (`db → cfg.database`, `mysqlLocal → And(
+...)`, multi-hop, cycles → unresolved), the counterfactual per-option
+gate-4 rewrite this whole model exists to enable, and the davis
+acceptance case actually reaching `PASS`.
+
 ## Running
 
 ```
@@ -703,7 +807,11 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 34 tests, all passing: 5 from the original spike, 5 from H1
+`cargo test` — 44 tests, all passing (34 at the H1.3b/H1-freeze point
+below, +1 golden and +9 unit tests from H2 commit 1's gate-1 fix and pure
+Predicate IR — see "H2" above; H2 hasn't added new `cN`-numbered fixtures
+yet, so criterion C's case list stays as of the freeze): 5 from the
+original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,

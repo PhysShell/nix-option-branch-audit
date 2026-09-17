@@ -19,3 +19,10 @@ anyhow = "1"
 
 [dev-dependencies]
 sha2 = "0.10"
+# H2: genuine property-based testing for the pure Predicate IR/evaluator
+# (Pred::Not/And/Or algebraic laws, monotonicity under partial
+# environments) -- the maintained, standard Rust property-testing crate
+# (AGENTS.md reuse-first rule step 3, applied to the test infrastructure
+# itself: hand-rolling a small ad hoc generator loop and calling it
+# "property testing" would just be a differently-shaped unit test).
+proptest = "1"
