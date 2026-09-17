@@ -1177,6 +1177,110 @@ commit itself — is closed); Kani/bounded model checking (only after
 mutation testing, only if small and useful); no Z3/SMT (`Eq`/`Not`/`And`/
 `Or` over concrete finite values evaluates directly).
 
+## Mutation testing (`cargo-mutants`), narrow semantic core
+
+H2.2 closed, so this is the first time `cargo-mutants` actually runs
+against real, wired-in logic rather than a dead-code pure core. Scoped
+deliberately narrow, not the whole file: `eval_known_eq`, `eval_pred`,
+`resolve_alias_recursively`, `lower_value_expr_chained`,
+`lower_pred_chained`, `collect_reachable_refs`, `evaluate_predicate_witness`,
+and `run_target`'s aggregation block — the functions that actually decide
+a verdict, not scanning/plumbing code around them.
+
+```
+cargo mutants -F 'eval_known_eq|eval_pred|resolve_alias_recursively|lower_value_expr_chained|lower_pred_chained|collect_reachable_refs|evaluate_predicate_witness|run_target' -j 1
+```
+
+**First run: 64 mutants — 51 caught, 5 unviable, 8 survived.** The 5
+unviable are all `replace FUNCTION with Default::default()` mutants
+against types (`T`, `ValueExpr`, `Pred`, `PredicateWitnessOutcome`,
+`TargetReport`) that don't implement `Default` — rejected by the type
+system itself, not a test gap. Every survivor was individually read
+against the actual code and classified — none dismissed on the strength
+of "the suite is green":
+
+- **`collect_reachable_refs`'s own alias-following cycle guard**
+  (`!chain.iter().any(|n| n == &name)` → `!=`) survived because the only
+  existing alias-hidden fixture (`h2-alias-hidden-unresolved`) starts its
+  own alias-following with an EMPTY chain, where the mutated guard
+  happens to coincide with the correct (permissive) answer — the bug only
+  shows up two hops deep, where a *different* name already sits in the
+  chain and the mutated logic wrongly reads "still resolving this
+  particular name" as "block everything." New fixture
+  `h2-alias-hidden-two-hop` (`hidden` → `mid` →
+  `someUnsupportedHelper cfg.database.driver`) isolates exactly that
+  depth. **Real gap, closed.**
+- **`run_target`'s H1-gate-4 opposite-outcome match guard**
+  (`o == !default_outcome` → constant `false`) survived against the
+  ENTIRE existing golden suite. Root cause, verified by hand: every
+  existing PASS-via-H1 fixture uses a bare `cfg.foo` select or a null
+  comparison, and H2's OWN scanner independently rediscovers and
+  re-evaluates the identical logical predicate as its own
+  `ResolvedPredicate` — so H2's redundant witness silently masks H1's own
+  detection logic being completely broken. In effect, H1's gate-4 code
+  had become dead weight for every fixture that existed, and nothing
+  would have caught it regressing. New fixture
+  `h2-scope-shadowed-h1-only` isolates H1-only coverage: the sole
+  predicate on `flag` sits behind a LOCALLY shadowed `cfg` binding that
+  H2's scope-aware `resolve_cfg_root` correctly excludes from
+  `resolved_predicates` (spelling matches `cfg_ident`, lexical scope
+  doesn't) — so no H2 candidate exists anywhere in the module to
+  redundantly confirm the transition. **Real gap, closed** — and a
+  genuinely useful thing to have learned about the current architecture
+  independent of the mutation itself: H1's own gate 4 is currently
+  live/load-bearing only for spelling-shadowed edge cases, not the common
+  path.
+- **Five more survivors, all in purely-diagnostic fields never asserted
+  anywhere**: `PredicateAttempt.witnessed` for the H1 (`Unary`) attempt
+  specifically (only H2 `Resolved` attempts were ever checked before);
+  `DefaultUnresolved`'s embedded `predicate` field (verdict *tag* was
+  checked, not which predicate got attached to it); `diagnostic_default_outcome`'s
+  two lookups (H1-side and H2-side) — asserting the VALUE on the two most
+  obvious existing fixtures (kimai, `h2-compound`) turned out to be
+  insufficient to kill either: kimai's H1 lookup mutation still fell
+  through to a coincidentally-correct H2 `.or_else` fallback, and
+  `h2-compound`'s H2 lookup mutation still matched via the compound
+  predicate's OTHER ref (`refs` has 2 entries, `.any()` stays true either
+  way). Both needed purpose-built single-source fixtures instead
+  (`h2-case12`/`h2-case13`: zero-H2-candidates and single-ref-H2-only,
+  respectively) before they actually killed anything — confirmed by
+  re-running `cargo mutants --iterate` against the same output directory
+  after each fix, not assumed. `ResolveFailure::TrivialConstant` vs
+  `Unbound` for a bare `true`/`false` condition got a direct unit test
+  instead of chasing it through a verdict (it never affects one — a bare
+  `true`/`false` lowers as a `Literal`, contributing no reachable ref
+  either way). **All five real (if low-severity) gaps, closed.**
+- **`evaluate_predicate_witness`'s `instances_assigning_x` membership
+  check** (`&&` → `||`) survived and stayed survived through every fix
+  above. Confirmed **equivalent**, not a gap: broadening membership only
+  adds instances that never actually assigned the watched option, and
+  the very next line's `x_assignment` lookup (which still correctly
+  filters on `path_matches_prefix`) silently drops every one of them via
+  its own `else { continue; }` before any other computation runs — no
+  output is ever observably different. Documented in place (a comment at
+  the mutation site) so a future mutation-testing pass doesn't waste time
+  rediscovering the same non-gap.
+
+**Second and third `cargo mutants --iterate` runs** (resuming against the
+same `-o` output directory, so only previously-uncaught mutants re-run)
+confirmed each fix in turn: 8 → 3 → 1 survivor, the final 1 being the
+confirmed-equivalent case above. 71 tests total (66 → 71: 2 new golden
+fixtures for the two real semantic gaps, 2 more for the two diagnostic-
+field gaps that needed dedicated isolation, 1 new unit test for
+`TrivialConstant`, plus assertion strengthening on 3 already-existing
+tests that didn't by themselves kill anything).
+
+**One environment note, not a code issue**: `cargo-mutants` running in
+the background left this VPS's shared `CARGO_TARGET_DIR` (used across
+several unrelated projects on this machine) in a state where a
+subsequently-run `cargo test` intermittently failed with `fixtures/
+integrity-lock.toml must exist` — a stale test binary with a
+compile-time-baked `CARGO_MANIFEST_DIR` pointing at a path that no
+longer existed, not a real fixture problem. `cargo clean -p oba` before
+trusting any `cargo test` run immediately after a `cargo-mutants`
+invocation resolves it; `env -u CARGO_TARGET_DIR` on the `cargo mutants`
+invocation itself reduces but doesn't eliminate the risk.
+
 ## Running
 
 ```

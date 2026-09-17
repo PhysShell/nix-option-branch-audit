@@ -329,3 +329,35 @@ test = "fixtures/synthetic/h2-default-unresolved-rescue/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synthDefaultRescue"]
 watch = ["flag"]
+
+[[target]]
+name = "h2-case10-alias-hidden-two-hop"
+module = "fixtures/synthetic/h2-alias-hidden-two-hop/module.nix"
+test = "fixtures/synthetic/h2-alias-hidden-two-hop/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthTwoHop"]
+watch = ["database.driver"]
+
+[[target]]
+name = "h2-case11-scope-shadowed-h1-only"
+module = "fixtures/synthetic/h2-scope-shadowed-h1-only/module.nix"
+test = "fixtures/synthetic/h2-scope-shadowed-h1-only/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthScopeShadow"]
+watch = ["flag"]
+
+[[target]]
+name = "h2-case12-scope-shadowed-h1-only-no-transition"
+module = "fixtures/synthetic/h2-scope-shadowed-h1-only/module.nix"
+test = "fixtures/synthetic/h2-scope-shadowed-h1-only/test-no-transition.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthScopeShadow"]
+watch = ["flag"]
+
+[[target]]
+name = "h2-case13-single-ref-h2-only"
+module = "fixtures/synthetic/h2-single-ref-h2-only/module.nix"
+test = "fixtures/synthetic/h2-single-ref-h2-only/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthSingleRefH2Only"]
+watch = ["x"]

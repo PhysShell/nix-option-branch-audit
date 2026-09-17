@@ -174,6 +174,30 @@ fn golden_a_parent_commit_shows_oba001() {
     let reports = run_golden();
     let r = target(&reports, "kimai-before");
     assert_eq!(verdict_kind(r, "database.socket"), "OBA001");
+
+    // General correctness check on a purely-diagnostic field that was
+    // never asserted anywhere before this pass. NOTE: this does NOT by
+    // itself kill the mutation-testing survivor on
+    // `diagnostic_default_outcome`'s H1-side lookup (`predicates.iter()
+    // .find(|p| p.path == watched_path)`, `==` flipped to `!=`) --
+    // kimai's real module has several OTHER predicates for other
+    // options, and the mutated lookup's `.and_then(...)` chain still
+    // ends up `None` for most of them, falling through to the `.or_else`
+    // H2 fallback, which independently re-derives the SAME correct
+    // value for `database.socket` (H2 recognizes the identical `!= null`
+    // predicate too) -- the fallback rescues the mutation exactly the
+    // way H2 rescues H1's own gate-4 elsewhere in this file. See
+    // `h2_case12_...` below for the fixture that actually isolates and
+    // kills this specific lookup (H1 finds a classifiable predicate, H2
+    // has ZERO candidates for the same option, so no fallback exists to
+    // mask a broken H1 lookup).
+    let v = verdict_obj(r, "database.socket");
+    assert_eq!(
+        v["default_outcome"],
+        serde_json::json!(false),
+        "diagnostic default_outcome must reflect this option's OWN default outcome, not an \
+         unrelated predicate's"
+    );
 }
 
 // --- B: clears on the exact fix commit, with real evidence attached.
@@ -195,6 +219,29 @@ fn golden_b_fix_commit_shows_pass_with_evidence() {
         .expect("PASS verdict must carry evidence");
     assert!(!evidence.is_empty(), "PASS must not have empty evidence");
     assert_eq!(evidence[0]["instance"], "socketMachine");
+
+    // Mutation-testing survivor: `run_target`'s H1-gate-4 attempt-
+    // classification (`witnessed: if !opposite.is_empty() { Some(true) }
+    // ...`) had its `!` deleted and survived, because no test checked
+    // the H1-sourced (`PredicateRef::Unary`) entry in `predicate_attempts`
+    // specifically -- only H2-sourced (`Resolved`) entries were ever
+    // asserted on (see the mysqlLocal tests below). `database.socket`'s
+    // real `!= null` predicate is independently found and evaluated by
+    // BOTH H1 (`Unary`, distinguished by having a `kind` field, no `ir`)
+    // and H2 (`Resolved`, has `ir`/`refs`) -- assert the H1 one
+    // specifically reports `witnessed: true`, not just that SOME attempt
+    // in the array does.
+    let attempts = v["predicate_attempts"]
+        .as_array()
+        .expect("predicate_attempts array");
+    let unary_attempt = attempts
+        .iter()
+        .find(|a| a["predicate"].get("kind").is_some())
+        .expect("an H1 (Unary) predicate_attempts entry must exist for database.socket");
+    assert_eq!(
+        unary_attempt["witnessed"], true,
+        "H1's own gate-4 opposite-outcome detection must report witnessed:true here"
+    );
 }
 
 // --- davis: honest OptionNotFound, not a false PASS, on both commits.
@@ -324,6 +371,26 @@ fn h2_case2_absorbed_watched_change_is_not_pass() {
     let reports = run_golden();
     let r = target(&reports, "h2-case2-absorbed-watched-change");
     assert_eq!(verdict_kind(r, "database.driver"), "OBA001");
+
+    // General correctness check, same "never asserted before" gap as
+    // golden_a above. NOTE: this does NOT by itself kill the mutation-
+    // testing survivor on `diagnostic_default_outcome`'s H2-side fallback
+    // lookup (`resolved_predicates.iter().find(|p| p.refs.iter().any(|r|
+    // r == &watched_path))`, `==` flipped to `!=`) -- `p`'s `refs` here
+    // is TWO entries (`createLocally` and `driver`, the compound
+    // predicate's both operands), so `.any(|r| r != watched_path)` is
+    // STILL true (via the OTHER ref) even under the mutation, and
+    // `.find()` locates the exact same predicate either way. See
+    // `h2_case13_...` below for the fixture that actually isolates and
+    // kills this lookup (a SINGLE-ref H2-only predicate, where a broken
+    // `!=` filter finds nothing at all).
+    let v = verdict_obj(r, "database.driver");
+    assert_eq!(
+        v["default_outcome"],
+        serde_json::json!(false),
+        "diagnostic default_outcome must come from the actual H2 candidate referencing this \
+         option, not an unrelated lookup mismatch"
+    );
 }
 
 #[test]
@@ -444,6 +511,115 @@ fn h2_case9_h2_candidate_rescues_a_false_default_unresolved() {
         "PASS",
         "an H1 predicate whose default can't classify must not block a separate, \
          fully H2-resolvable predicate on the same option from witnessing a real transition"
+    );
+}
+
+#[test]
+fn h2_case10_alias_hidden_two_hop_relevance_blocks_a_false_oba001() {
+    // Mutation-testing survivor on `collect_reachable_refs`'s own
+    // alias-following cycle-guard (`!chain.iter().any(|n| n == &name)`
+    // mutated to use `!=`): the single-hop `h2-alias-hidden-unresolved`
+    // fixture doesn't exercise this, because its own alias-following
+    // step always starts with an EMPTY chain, where a broken guard
+    // happens to coincide with the correct (permissive) answer. Two
+    // hops (`hidden` -> `mid` -> `someUnsupportedHelper
+    // cfg.database.driver`) is the minimum depth where the mutated
+    // guard actually diverges: chain is non-empty by the second hop,
+    // and the buggy version wrongly blocks resolving `mid` (any
+    // *different* name already in the chain wrongly reads as "still
+    // resolving," not "not yet visited"). Must be TestValueUnresolved,
+    // not a false OBA001 from silently losing the reachable
+    // `database.driver` reference two hops down.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case10-alias-hidden-two-hop");
+    assert_eq!(
+        verdict_kind(r, "database.driver"),
+        "TestValueUnresolved",
+        "a cfg reference reachable only through a 2-hop alias chain must still be found by \
+         collect_reachable_refs, not lost at the second hop"
+    );
+}
+
+#[test]
+fn h2_case11_h1_own_evidence_detection_is_not_dead_code() {
+    // Mutation-testing survivor: `run_target`'s H1-gate-4 opposite-outcome
+    // match guard (`o == !default_outcome`) mutated to a constant
+    // `false` survived against the ENTIRE existing golden suite --
+    // because every existing PASS-via-H1 fixture uses a bare `cfg.foo`
+    // select, which H2's OWN scanner independently rediscovers and
+    // re-evaluates as its own `ResolvedPredicate` (`Eq(Ref(foo), true)`)
+    // -- so H2's redundant witness silently masked H1's own detection
+    // logic being completely broken. This fixture isolates H1's gate 4:
+    // the only predicate for `flag` is visible through a LOCALLY
+    // shadowed `cfg` binding that H2's scope-aware `resolve_cfg_root`
+    // correctly excludes from `resolved_predicates` (spelling matches,
+    // scope doesn't) -- so H2 provides NO redundant coverage here at
+    // all. If H1's own opposite-outcome detection were silently broken,
+    // this target has nothing else to fall back on and would wrongly
+    // report OBA001 instead of PASS.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case11-scope-shadowed-h1-only");
+    assert_eq!(
+        verdict_kind(r, "flag"),
+        "PASS",
+        "H1's own gate-4 opposite-outcome detection must still work when no H2 candidate \
+         exists to redundantly confirm the same transition"
+    );
+}
+
+#[test]
+fn h2_case12_diagnostic_default_outcome_h1_only_lookup() {
+    // Mutation-testing survivor: `diagnostic_default_outcome`'s H1-side
+    // lookup (`predicates.iter().find(|p| p.path == watched_path)`,
+    // `==` flipped to `!=`) survived against `golden_a`'s kimai fixture
+    // because kimai's OTHER predicates gave the mutated lookup something
+    // to (wrongly) match, whose failure then fell through to an H2
+    // `.or_else` fallback that independently re-derived the correct
+    // answer anyway. This target reuses `h2-case11`'s module (the ONLY
+    // predicate for `flag` is scope-shadowed away from H2 entirely, so
+    // `resolved_predicates` has ZERO candidates for `flag` -- no
+    // fallback exists here at all) but with `flag` held at its own
+    // default (no transition) instead of case11's flipped value, so the
+    // verdict is OBA001, not PASS, and we actually reach the diagnostic
+    // computation. `flag`'s default is `false`
+    // (`Truthy(Bool(false))=Some(false)`) -- computed PURELY through the
+    // H1 lookup this mutant targets.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case12-scope-shadowed-h1-only-no-transition");
+    assert_eq!(verdict_kind(r, "flag"), "OBA001");
+    let v = verdict_obj(r, "flag");
+    assert_eq!(
+        v["default_outcome"],
+        serde_json::json!(false),
+        "with zero H2 candidates for this option, diagnostic_default_outcome must still come \
+         from H1's own (correctly-matched) predicate lookup"
+    );
+}
+
+#[test]
+fn h2_case13_diagnostic_default_outcome_h2_only_single_ref_lookup() {
+    // Mutation-testing survivor: `diagnostic_default_outcome`'s H2-side
+    // fallback lookup (`resolved_predicates.iter().find(|p| p.refs
+    // .iter().any(|r| r == &watched_path))`, `==` flipped to `!=`)
+    // survived against `h2_case2`'s compound (two-ref) predicate,
+    // because a mutated `!=` filter still matches via the predicate's
+    // OTHER ref. `x == true` is a SINGLE-ref predicate H1 doesn't
+    // recognize at all (a general `==` comparison, not a null-check or
+    // bare select) -- H1 finds nothing, and the mutated H2 lookup's
+    // `.any(|r| r != watched_path)` over a ONE-element `refs` list is
+    // unconditionally false, so `.find()` locates nothing and the
+    // diagnostic value would silently become `None` under the mutation.
+    // `x`'s default is `false`, held at default (no transition) -> OBA001,
+    // `Eq(Ref(x), Literal(Bool(true)))` at `x=false` is `false`.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case13-single-ref-h2-only");
+    assert_eq!(verdict_kind(r, "x"), "OBA001");
+    let v = verdict_obj(r, "x");
+    assert_eq!(
+        v["default_outcome"],
+        serde_json::json!(false),
+        "a single-ref H2-only predicate must still populate diagnostic_default_outcome \
+         correctly, not silently become None"
     );
 }
 
@@ -630,6 +806,22 @@ fn h1_unresolvable_default_is_inconclusive_not_guessed() {
     let reports = run_golden();
     let r = target(&reports, "c7-unresolved-default");
     assert_eq!(verdict_kind(r, "bar"), "DefaultUnresolved");
+
+    // Mutation-testing survivor: the H2.2-fixup re-lookup of H1's own
+    // predicate for the `DefaultUnresolved` verdict's embedded
+    // `predicate` field (`predicates.iter().find(|p| p.path ==
+    // watched_path)`) had its `==` flipped to `!=` and survived, because
+    // only the verdict TAG was ever asserted -- with `!=`, `.find()`
+    // would silently pick a DIFFERENT option's predicate out of this
+    // module's several (`foo`/`baz`/`qux` all have their own), not
+    // `bar`'s. Assert the embedded predicate is actually `bar`'s own.
+    let v = verdict_obj(r, "bar");
+    assert_eq!(
+        v["predicate"]["path"],
+        serde_json::json!(["bar"]),
+        "DefaultUnresolved's embedded predicate must be the watched option's own, not an \
+         unrelated one found by a mismatched lookup"
+    );
 }
 
 // H1-3: PASS must be structurally unreachable without the declaration

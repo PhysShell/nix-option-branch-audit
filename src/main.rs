@@ -2501,6 +2501,17 @@ fn evaluate_predicate_witness(
     // Every distinct instance that explicitly assigns `x` -- an instance
     // that never touches `x` at all has nothing to counterfactually
     // compare against its own default and is correctly never considered.
+    //
+    // Mutation-testing note: flipping this `&&` to `||` survives the
+    // full test suite -- confirmed EQUIVALENT, not a real gap. It would
+    // over-populate `instances_assigning_x` with irrelevant instances,
+    // but the `x_assignment` lookup right below (which still correctly
+    // filters on `path_matches_prefix`) silently drops every one of them
+    // via its own `else { continue; }` before any other computation
+    // happens, so no output is ever observably different. Left as `&&`
+    // for clarity/correctness-by-construction, not "because a mutant
+    // said so" -- but recorded here so a future reader re-running
+    // mutation testing doesn't waste time chasing it as a live gap.
     let mut instances_assigning_x: Vec<Option<String>> = Vec::new();
     for a in assignments {
         if path_matches_prefix(&a.path, &t.option_prefix, watched_path)
@@ -3573,6 +3584,30 @@ mod tests {
         assert_eq!(
             lower_pred(&parse_expr("cfg.a < cfg.b"), "cfg"),
             Err(ResolveFailure::UnsupportedExpression)
+        );
+    }
+
+    #[test]
+    fn lower_pred_reports_a_bare_true_or_false_condition_as_trivial_constant() {
+        // Mutation-testing survivor: `if name == "true" || name ==
+        // "false"` (the guard gating `TrivialConstant`) had its `||`
+        // flipped to `&&`, which makes the guard permanently false (a
+        // string can never equal both literals at once) and survived
+        // against the whole golden suite -- because every existing
+        // fixture's `mkIf true {...}` wrapper only affects
+        // `unresolved_predicate_sites`' CONTENTS (an `UnsupportedExpression`/
+        // `Unbound("true")` entry with empty `refs`, since a bare `true`
+        // ident still lowers cleanly as a `ValueExpr::Literal` and
+        // contributes no reachable ref), never any watched option's
+        // actual verdict. Pinned directly at the unit level instead of
+        // trying to observe it through a verdict.
+        assert_eq!(
+            lower_pred(&parse_expr("true"), "cfg"),
+            Err(ResolveFailure::TrivialConstant)
+        );
+        assert_eq!(
+            lower_pred(&parse_expr("false"), "cfg"),
+            Err(ResolveFailure::TrivialConstant)
         );
     }
 
