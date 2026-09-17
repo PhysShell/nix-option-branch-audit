@@ -894,10 +894,13 @@ sections above — corrected.
 ## H2 — counterfactual gate 4, wired in: the davis acceptance case
 
 The point of all of H2 so far. `run_target`'s gate 2/4 now has a real H2
-path, tried only when H1's own unary predicate scan finds nothing for the
-watched option (H1's byte-for-byte behavior on every unary target is
-completely unchanged — verified by re-running the full suite after
-wiring, not just argued):
+path. (This paragraph originally said the H2 path only ran when H1's own
+unary predicate scan found nothing for the watched option — that was the
+shape as first wired, and it was wrong: see H2.2 Finding 2 below, which
+replaced it with unconditional aggregation. H1's byte-for-byte behavior on
+every unary-only target is still completely unchanged — verified by
+re-running the full suite after every change in this section, not just
+argued.)
 
 1. **`KnownValue`, not a fabricated placeholder.** Reviewed before
    wiring: the environment domain needed to distinguish "known non-null,
@@ -979,12 +982,131 @@ control, mysqlLocal-unwitnessed negative control) plus 4 new golden tests
 for the synthetic adversarial cases — net +6 in `tests/golden.rs` (33 →
 39).
 
+This counterfactual wiring was deliberately *not* frozen as terminal H2 —
+reviewed once more before mutation testing, below.
+
+## H2.2 — corrective pass on the counterfactual wiring (three findings)
+
+A close read of the wiring above (not just "tests pass") found three real
+gaps, two capable of producing a false strong verdict. Fixed with a
+dedicated regression fixture per finding, none deferred:
+
+1. **An explicit-but-opaque co-operand must never silently become its own
+   declared default.** `evaluate_predicate_witness`'s per-`r`-in-`refs`
+   lookup used to be `assignments.find(...).and_then(|a|
+   a.known_value.clone()).or_else(|| declared_defaults.get(r).cloned())`
+   — `.and_then` collapses "explicitly assigned here, but to something
+   unclassifiable" and "never assigned at all" into the same `None`, so
+   *either* fell through to `r`'s own declared default. Concretely: an
+   instance setting `createLocally = builtins.pathExists /etc/flag;` (an
+   opaque expression) alongside `driver = "mysql"` would silently
+   evaluate `p = true && driver == "mysql"` (`createLocally`'s declared
+   default substituted for its real, unknown value) — a false `PASS` on
+   `driver`'s clean sqlite→mysql transition. Fixed by looking up the
+   instance's own assignment first and using its `known_value` (`None`
+   included) directly, falling back to the declared default *only* when
+   there is no assignment for this instance at all. Regression:
+   `h2_case6_explicit_opaque_co_operand_is_never_treated_as_its_own_default`
+   (`fixtures/synthetic/h2-compound/test-opaque-other-operand.nix`) —
+   must be `TestValueUnresolved`, was silently `PASS` before the fix.
+2. **H1's own predicate and every H2 `ResolvedPredicate` must be
+   aggregated together, not "H1 first, H2 only as a fallback when H1
+   finds nothing."** The original wiring's `h2_counterfactual_verdict`
+   function was called only from the `else` branch of `predicates
+   .iter().find(...)` — the moment H1's own unary walker found *any*
+   predicate for the watched option (even one that never witnesses
+   anything, e.g. an unrelated `cfg.foo != null` guard sitting next to a
+   real compound predicate the option also participates in), H2's
+   compound candidates were never even evaluated, silently downgrading a
+   possible `PASS` to `OBA001`. The standalone function was deleted and
+   `run_target`'s gate 2-4 block rewritten to collect H1's own predicate
+   (if any) and every H2 `ResolvedPredicate` referencing the watched
+   option into one `Vec<PredicateAttempt>`, evaluated unconditionally; a
+   witness through *any* candidate wins. (This unification is also what
+   the davis acceptance case above already exercised — the same
+   machinery, just no longer gated behind "H1 found nothing".)
+3. **A branch-condition site that fails to lower must not silently
+   vanish — and relevance took three attempts, each proven wrong or
+   incomplete empirically before the next one landed.** `scan_resolved_predicates`
+   used to `continue` straight past whatever `lower_pred` couldn't
+   handle — the identical "not found reads as genuinely absent" shape
+   H1's frozen walker spent three review rounds closing, now reopened in
+   H2's own scanner. Fixed with a new `UnresolvedPredicateSite { span,
+   source, failure, refs }`, returned alongside the resolved predicates
+   and surfaced on `TargetReport`. `ResolveFailure::TrivialConstant` (a
+   bare `true`/`false` condition, `mkIf true {...}`) is excluded outright
+   from the very first version — its outcome is fully known, so unlike
+   every other failure it carries no risk of hiding evidence. Everything
+   else needed real iteration on *relevance*:
+   - **Attempt 1 — "inside the module's `config` block".** Wrong: kimai's
+     own `config = mkIf (eachSite != { }) (mkMerge [ ... ]);` *is* (part
+     of) its `config` value, so this wouldn't have excluded it at all.
+   - **Attempt 2 — "the failed condition's own text literally mentions
+     `cfg_ident`"**, target-wide (any qualifying site anywhere in the
+     target weakens *every* watched option's verdict). This correctly
+     excluded kimai's `eachSite != {}` (an existence check unrelated to
+     any single option, whose unresolvable half is a bare `{}` literal)
+     and the synthetic `if builtins.pathExists /etc/synth-baz ...` false
+     positive (lives inside an option's own `default = ...;`, never
+     mentions `cfg` either) — but was unsound the moment it shipped,
+     caught in the very next review round: a condition site can be a
+     bare alias identifier (`suspicious`) whose *binding*, not its own
+     syntax, is what references `cfg` (`suspicious =
+     someUnsupportedHelper cfg.database.driver;`) — exactly the "alias
+     hides the real reference" shape H2's own resolver exists to see
+     *through* for successful lowerings, silently blind to it on the
+     failure path. The target-wide scope made this tolerable by
+     accident (over-inclusion, not under-inclusion, was attempt 2's
+     failure mode) — but under-inclusion directly produces a false
+     `OBA001` on exactly the watched option this project exists to
+     protect, so it couldn't stand once spotted.
+   - **Attempt 3 (current) — collect every option path *reachable* from
+     the failed condition, including through alias resolution, and match
+     it against the specific watched option, not target-wide.**
+     `collect_reachable_refs` reuses the exact same
+     `lower_value_expr_chained`/`resolve_ident_binding`/`AliasChain`
+     primitives the successful-lowering path already uses (no second
+     independent resolver, per explicit review instruction — this
+     project had already been "hit twice" for maintaining two
+     implementations of the same scoping semantics, see the
+     `resolve_cfg_root` history above), just with a relaxed success
+     criterion: find any `Ref` anywhere reachable from the failed node,
+     even inside an alias's binding, even when the whole expression
+     doesn't lower. `run_target` then matches a site's `refs` against
+     `watched_path` directly, replacing the target-wide boolean
+     entirely. Both of attempt 2's real fixtures still resolve correctly
+     under attempt 3, for the right reason this time: kimai's `eachSite
+     != {}` now collects `refs = [["sites"]]` (genuinely cfg-rooted, via
+     `eachSite = cfg.sites;`, but never matches an unrelated watched
+     option like `database.socket`) — no longer excluded by an accident
+     of spelling, excluded because it's genuinely about a different
+     option. `someUnsupportedHelper cfg.database.driver` hidden behind
+     `suspicious` now collects `refs = [["database","driver"]]`,
+     correctly matching when that's the watched option.
+
+   Three regressions, one retired: the 5 golden tests that regressed
+   against attempt 2's naive predecessor stay green; the original
+   `h2_case7_relevant_unresolved_site_blocks_a_false_oba001` fixture had
+   to be *rebuilt*, not just re-verified — its unresolved site referenced
+   an unrelated option (`items`), which was sufficient evidence under
+   attempt 2's target-wide gate but is (correctly) no longer sufficient
+   under attempt 3's per-option gate, so the fixture now has the
+   unresolved site's failing argument be a direct `cfg.watched` select
+   instead; new `h2_case8_alias_hidden_unresolved_relevance_blocks_a_false_oba001`
+   (`fixtures/synthetic/h2-alias-hidden-unresolved/`) is the alias-hidden
+   positive control that actually falsified attempt 2.
+
+65 tests total (62 → 65): 3 new/rebuilt golden tests (39 → 42 in
+`tests/golden.rs`); `collect_reachable_refs` itself is only exercised
+through the golden suite, no dedicated unit test — its real fixtures
+(kimai, the two synthetic alias cases) are the test vectors, not
+synthesized inputs.
+
 Deliberately not done in this pass, per explicit scope: mutation testing
 against the new IR/evaluator/resolver/counterfactual-gate (next, now that
-the pure core is fully wired into real verdicts); Kani/bounded model
-checking (only after mutation testing, only if small and useful); no
-Z3/SMT (`Eq`/`Not`/`And`/`Or` over concrete finite values evaluates
-directly).
+H2.2's correctness pass is closed); Kani/bounded model checking (only
+after mutation testing, only if small and useful); no Z3/SMT (`Eq`/`Not`/
+`And`/`Or` over concrete finite values evaluates directly).
 
 ## Running
 

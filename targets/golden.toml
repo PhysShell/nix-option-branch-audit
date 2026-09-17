@@ -297,3 +297,27 @@ test = "fixtures/synthetic/h2-unknown-context/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synthUnknown"]
 watch = ["database.driver"]
+
+[[target]]
+name = "h2-case6-opaque-other-operand"
+module = "fixtures/synthetic/h2-compound/module.nix"
+test = "fixtures/synthetic/h2-compound/test-opaque-other-operand.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthCompound"]
+watch = ["database.driver"]
+
+[[target]]
+name = "h2-case7-unresolved-relevant-site"
+module = "fixtures/synthetic/h2-unresolved-relevant-site/module.nix"
+test = "fixtures/synthetic/h2-unresolved-relevant-site/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthUnresolvedSite"]
+watch = ["watched"]
+
+[[target]]
+name = "h2-case8-alias-hidden-unresolved-relevance"
+module = "fixtures/synthetic/h2-alias-hidden-unresolved/module.nix"
+test = "fixtures/synthetic/h2-alias-hidden-unresolved/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthHidden"]
+watch = ["database.driver"]

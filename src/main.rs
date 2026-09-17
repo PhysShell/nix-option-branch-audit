@@ -826,7 +826,7 @@ enum Pred {
 /// `Opacity`'s `reason` field exists so H1's walker never collapses
 /// "gave up" into one undifferentiated bucket). Reviewed and fixed before
 /// this landed in `run_target`, not after.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 enum ResolveFailure {
     /// An identifier with no reachable binding in any enclosing scope.
     Unbound(String),
@@ -848,6 +848,18 @@ enum ResolveFailure {
     /// a binding -- an operator this IR doesn't model, a helper call, a
     /// non-boolean-shaped resolved expression, and so on.
     UnsupportedExpression,
+    /// A condition that's literally the constant `true` or `false` (`if
+    /// true then ...`, `mkIf true {...}`) -- not a real option-branch
+    /// predicate, but also not a risk: unlike every other
+    /// `UnsupportedExpression`, this failure carries zero uncertainty
+    /// about what the condition evaluates to. Kept as its own variant
+    /// specifically so callers deciding "does an unresolved site block a
+    /// negative conclusion" (see `scan_resolved_predicates`'s
+    /// `unresolved_sites`) can tell it apart from a genuine unknown --
+    /// reviewed after a synthetic adversarial fixture's own `mkIf true
+    /// {...}` wrapper was initially (wrongly) treated as exactly that
+    /// kind of risk.
+    TrivialConstant,
 }
 
 /// The chain of alias names currently being resolved, used purely for
@@ -1185,8 +1197,11 @@ fn lower_pred_chained(
         if name == "true" || name == "false" {
             // A stray `if true then ...`/`if false then ...` isn't a
             // real option-branch predicate -- left unresolved rather
-            // than fabricating trivial evidence.
-            return Err(ResolveFailure::UnsupportedExpression);
+            // than fabricating trivial evidence, but as `TrivialConstant`
+            // specifically: its outcome is fully known (it's the literal
+            // itself), so it carries none of the uncertainty a genuine
+            // `UnsupportedExpression` does.
+            return Err(ResolveFailure::TrivialConstant);
         }
         return resolve_alias_recursively(&node, &name, chain, |bound, chain| {
             lower_pred_chained(bound, cfg_ident, chain)
@@ -1205,6 +1220,30 @@ struct ResolvedPredicate {
     refs: Vec<OptionPath>,
     span: Span,
     source: String,
+}
+
+/// A branch-condition site `scan_resolved_predicates` found but couldn't
+/// lower to the pure IR -- reviewed and made visible on purpose, not
+/// silently dropped: an unrelated helper function's `if isInt v then ...`
+/// (unrelated to any option) is syntactically indistinguishable, without
+/// deeper analysis, from a genuine option-branch predicate this resolver
+/// simply doesn't understand yet. See `run_target`'s use of this for why
+/// that distinction matters -- a target with unresolved sites can't
+/// honestly claim `OBA001` ("no evidence anywhere") when part of its own
+/// branch logic was never actually looked at.
+#[derive(Serialize, Debug, Clone)]
+struct UnresolvedPredicateSite {
+    span: Span,
+    source: String,
+    failure: ResolveFailure,
+    /// Every option path reachably referenced by the failed condition,
+    /// found by `collect_reachable_refs` even though the condition as a
+    /// whole couldn't lower -- may be empty (nothing cfg-rooted found
+    /// anywhere reachable). This is what `run_target` matches against a
+    /// specific watched option; see the doc comment on
+    /// `collect_reachable_refs` for why a target-wide "any site exists"
+    /// gate isn't used instead.
+    refs: Vec<OptionPath>,
 }
 
 /// Finds every branch-condition site H1's `scan_predicates` also looks
@@ -1234,14 +1273,103 @@ struct ResolvedPredicate {
 /// same as H1 always has -- requiring an absolute `cfg = config.a.b;`
 /// proof would break the attrsOf-submodule idiom wildcarded targets rely
 /// on, which was never in scope for this fix.
+///
+/// Returns unresolved sites alongside the resolved ones -- reviewed: an
+/// earlier version silently `continue`d past whatever `lower_pred`
+/// couldn't handle, the same "not found" reads as "genuinely absent"
+/// silent-failure shape H1's own walker spent three review rounds
+/// closing. A site scoped away by the `resolve_cfg_root` check above
+/// (successfully lowered, but proven to belong to a different scope) is
+/// NOT counted as unresolved -- that's a confident negative, not an
+/// unknown. `ResolveFailure::TrivialConstant` (`if true then ...`) is
+/// also excluded: its outcome is fully known, so unlike every other
+/// failure it carries no actual risk of hiding evidence.
+///
+/// Every `UnresolvedPredicateSite` also records every option path
+/// *reachably referenced* by the failed condition (`collect_reachable_refs`,
+/// below), even though the condition as a whole couldn't be lowered --
+/// this is what lets `run_target` gate a specific watched option's
+/// verdict, not the whole target. Reviewed twice, both times by finding
+/// a real gap empirically rather than guessing:
+///
+/// - First attempt: exclude a failed site unless it's inside the
+///   module's `config = ...;` value. Wrong -- kimai's own `config = mkIf
+///   (eachSite != { }) (mkMerge [ ... ]);` IS (part of) its `config`
+///   value, so this wouldn't have excluded it at all.
+/// - Second attempt: exclude a failed site unless its own text literally
+///   contains the token `cfg_ident`. This correctly excluded kimai's
+///   `eachSite != {}` (an existence check unrelated to any single
+///   option, whose unresolvable half is a bare `{}` literal) and the
+///   synthetic `if builtins.pathExists /etc/synth-baz ...` case (lives
+///   inside an option's own `default = ...;`, never mentions `cfg`
+///   either) -- but H2's own alias resolver made this unsound the moment
+///   it shipped: a condition site can be a bare alias identifier
+///   (`suspicious`) whose *binding*, not its own syntax, is what
+///   actually references `cfg` (`suspicious = someUnsupportedHelper
+///   cfg.database.driver;`) -- the same "alias hides the real reference"
+///   shape the resolver exists to see THROUGH for successful lowerings,
+///   now silently blind to it on the failure path. A target-wide gate
+///   made this tolerable by accident (over-inclusion was the failure
+///   mode, not under-inclusion), but per-option gating (this version)
+///   cannot tolerate under-inclusion: a false negative here directly
+///   produces a false `OBA001` on exactly the watched option this whole
+///   project exists to protect.
+///
+/// Fixed by collecting refs, not by re-deciding relevance with a second
+/// independent scan: `collect_reachable_refs` reuses the exact same
+/// `lower_value_expr_chained`/`resolve_ident_binding`/`AliasChain`
+/// primitives the successful-lowering path already uses, just with a
+/// relaxed success criterion (any `Ref` found *anywhere* reachable from
+/// the failed node, including through alias resolution, not "the whole
+/// expression lowers"). `run_target` then matches a site's `refs`
+/// against the specific watched option being evaluated -- kimai's
+/// `eachSite != {}` now correctly resolves to `refs = [["sites"]]`
+/// (genuinely cfg-rooted, but never matches `database.socket`) while
+/// `suspicious`'s hidden `cfg.database.driver` resolves to `refs =
+/// [["database","driver"]]` (correctly matches when THAT'S the watched
+/// option). No target-wide fallback remains -- per-option matching
+/// subsumes it exactly, without the over-inclusion the target-wide
+/// version depended on.
+fn collect_reachable_refs(
+    node: &SyntaxNode,
+    cfg_ident: &str,
+    chain: &mut AliasChain,
+    out: &mut Vec<OptionPath>,
+) {
+    match lower_value_expr_chained(node, cfg_ident, chain) {
+        Ok(ValueExpr::Ref(path)) => {
+            out.push(path);
+            return;
+        }
+        Ok(ValueExpr::Literal(_)) => return,
+        Err(_) => {}
+    }
+    if node.kind() == NODE_IDENT {
+        if let Some(name) = ident_text(node) {
+            if !chain.iter().any(|n| n == &name) {
+                if let Ok(bound) = resolve_ident_binding(node, &name) {
+                    chain.push(name);
+                    collect_reachable_refs(&bound, cfg_ident, chain, out);
+                    chain.pop();
+                }
+            }
+        }
+        return;
+    }
+    for child in node.children() {
+        collect_reachable_refs(&child, cfg_ident, chain, out);
+    }
+}
+
 fn scan_resolved_predicates(
     file: &str,
     src: &str,
     root: &SyntaxNode,
     cfg_ident: &str,
     option_prefix: &[String],
-) -> Vec<ResolvedPredicate> {
+) -> (Vec<ResolvedPredicate>, Vec<UnresolvedPredicateSite>) {
     let mut out = Vec::new();
+    let mut unresolved = Vec::new();
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
     for node in root.descendants() {
         let cond = match node.kind() {
@@ -1263,8 +1391,20 @@ fn scan_resolved_predicates(
             _ => None,
         };
         let Some(cond) = cond else { continue };
-        let Ok(ir) = lower_pred(&cond, cfg_ident) else {
-            continue;
+        let ir = match lower_pred(&cond, cfg_ident) {
+            Ok(ir) => ir,
+            Err(ResolveFailure::TrivialConstant) => continue,
+            Err(failure) => {
+                let mut refs = Vec::new();
+                collect_reachable_refs(&cond, cfg_ident, &mut Vec::new(), &mut refs);
+                unresolved.push(UnresolvedPredicateSite {
+                    span: span_of(file, src, &node),
+                    source: first_line(&node),
+                    failure,
+                    refs,
+                });
+                continue;
+            }
         };
         if prefix_is_concrete && !option_prefix.is_empty() {
             match resolve_cfg_root(&cond, cfg_ident) {
@@ -1281,7 +1421,7 @@ fn scan_resolved_predicates(
             source: first_line(&node),
         });
     }
-    out
+    (out, unresolved)
 }
 
 /// Evaluates a `ValueExpr` against a concrete environment: `env` supplies
@@ -2204,6 +2344,14 @@ struct TargetReport {
     /// unfiltered for the same transparency reason as the H1 fields
     /// above it.
     resolved_predicates: Vec<ResolvedPredicate>,
+    /// H2: every branch-condition site found but NOT lowerable -- kept
+    /// visible for the same reason as every other opacity-shaped field in
+    /// this report, and directly load-bearing for `run_target`'s own
+    /// verdicts: a target with unresolved sites can't honestly conclude
+    /// `OBA001` for a watched option with no witness, since one of those
+    /// sites could be a predicate this resolver simply doesn't understand
+    /// yet, not proof that no such predicate exists.
+    unresolved_predicate_sites: Vec<UnresolvedPredicateSite>,
     matched_test_assignments: Vec<TestAssignment>,
     /// Every place the test-file walker hit something it couldn't see
     /// into, regardless of whether it turned out to matter for any
@@ -2317,7 +2465,7 @@ enum PredicateWitnessOutcome {
     /// provably flipped this predicate's outcome away from its default.
     Witness {
         default_outcome: bool,
-        evidence: TestAssignment,
+        evidence: Vec<TestAssignment>,
     },
     /// Every instance this predicate could be evaluated for was fully
     /// resolved (or no instance assigned the watched option at all), but
@@ -2390,13 +2538,21 @@ fn evaluate_predicate_witness(
             if r == watched_path {
                 continue;
             }
-            let value = assignments
-                .iter()
-                .find(|a| {
-                    &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, r)
-                })
-                .and_then(|a| a.known_value.clone())
-                .or_else(|| declared_defaults.get(r).cloned());
+            // Reviewed: an explicit assignment that exists but isn't
+            // classifiable (`known_value: None`) must NEVER fall back to
+            // the declared default -- "explicitly set to something this
+            // walker can't read" is not the same fact as "never touched",
+            // the exact fail-closed distinction H1's own `TestValueUnresolved`
+            // already exists to protect elsewhere. The two `None` cases
+            // (no assignment at all, vs. an assignment this tool can't
+            // classify) must NOT be collapsed by a blanket `.or_else`.
+            let assigned = assignments.iter().find(|a| {
+                &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, r)
+            });
+            let value = match assigned {
+                Some(a) => a.known_value.clone(),
+                None => declared_defaults.get(r).cloned(),
+            };
             if let Some(v) = value {
                 env.insert(r.clone(), v);
             }
@@ -2420,7 +2576,7 @@ fn evaluate_predicate_witness(
             (Some(d), Some(t2)) if d != t2 => {
                 return PredicateWitnessOutcome::Witness {
                     default_outcome: d,
-                    evidence: x_assignment.clone(),
+                    evidence: vec![x_assignment.clone()],
                 };
             }
             (Some(_), Some(_)) => {
@@ -2439,126 +2595,6 @@ fn evaluate_predicate_witness(
         PredicateWitnessOutcome::Unresolved
     } else {
         PredicateWitnessOutcome::EvidenceNoTransition
-    }
-}
-
-/// H2's counterfactual replacement for H1's unary gate 4, tried only when
-/// H1's own unary predicate scan found nothing for the watched option
-/// (see `run_target`). Reviewed and generalized from an earlier version
-/// that only ever looked at the *first* resolved predicate referencing
-/// the watched option: an option can legitimately be referenced by more
-/// than one branch predicate (davis's real `database.driver` is
-/// referenced by a simple `db.driver == "sqlite"` check *and* by the
-/// compound `mysqlLocal` alias) -- "the predicate" stopped being a
-/// well-defined singular concept the moment more than one could exist,
-/// and picking "whichever the AST walk happened to reach first" was an
-/// accident of traversal order, not a real semantic choice. Every
-/// candidate predicate is now evaluated (`evaluate_predicate_witness`,
-/// above); a witness through *any* of them is existential evidence, same
-/// priority H1's own gate 4 already established: `PASS` beats unrelated
-/// test-config opacity, which beats an unresolved attempt
-/// (`TestValueUnresolved`), which beats "real evidence exists somewhere
-/// but never demonstrated a transition" (`OBA001`). What happened with
-/// every candidate -- not just the winning one -- survives into
-/// `predicate_attempts`, so a `PASS` never silently hides that a
-/// *different* predicate on the same option was inconclusive, and an
-/// inconclusive verdict never silently hides that some other predicate
-/// already had real evidence.
-///
-/// Returns `None` only when no resolved predicate references `x` at all
-/// (the caller then reports `PredicateNotFound`, same as H1).
-fn h2_counterfactual_verdict(
-    watched: &str,
-    watched_path: &[String],
-    options: &[OptionDecl],
-    resolved_predicates: &[ResolvedPredicate],
-    assignments: &[TestAssignment],
-    opacity: &[Opacity],
-    t: &Target,
-) -> Option<Verdict> {
-    let candidates: Vec<&ResolvedPredicate> = resolved_predicates
-        .iter()
-        .filter(|p| p.refs.iter().any(|r| r == watched_path))
-        .collect();
-    if candidates.is_empty() {
-        return None;
-    }
-
-    let mut attempts: Vec<PredicateAttempt> = Vec::new();
-    let mut winner: Option<(PredicateRef, bool, TestAssignment)> = None;
-
-    for pred in &candidates {
-        let outcome = evaluate_predicate_witness(pred, watched_path, options, assignments, t);
-        let witnessed = match &outcome {
-            PredicateWitnessOutcome::Witness { .. } => Some(true),
-            PredicateWitnessOutcome::EvidenceNoTransition => Some(false),
-            PredicateWitnessOutcome::Unresolved => None,
-        };
-        attempts.push(PredicateAttempt {
-            predicate: PredicateRef::Resolved((*pred).clone()),
-            witnessed,
-        });
-        if let PredicateWitnessOutcome::Witness {
-            default_outcome,
-            evidence,
-        } = outcome
-        {
-            if winner.is_none() {
-                winner = Some((
-                    PredicateRef::Resolved((*pred).clone()),
-                    default_outcome,
-                    evidence,
-                ));
-            }
-        }
-    }
-
-    if let Some((predicate, default_outcome, evidence)) = winner {
-        return Some(Verdict::Pass {
-            option: watched.to_string(),
-            predicate,
-            default_outcome,
-            evidence: vec![evidence],
-            predicate_attempts: attempts,
-        });
-    }
-
-    let target_path_opaque = opacity
-        .iter()
-        .any(|o| path_is_prefix_of_target(&o.path, &t.option_prefix, watched_path));
-    let has_unresolved = attempts.iter().any(|a| a.witnessed.is_none());
-
-    // Best-effort diagnostic default_outcome, from the first candidate:
-    // every referenced option at its own declared default, no
-    // per-instance overrides. Reporting only -- which `Verdict` variant
-    // gets chosen is driven entirely by `attempts`/`target_path_opaque`
-    // above, never by this value.
-    let diagnostic_default_outcome = candidates
-        .first()
-        .and_then(|p| eval_pred(&p.ir, &declared_defaults_for(p, options)));
-    let primary_predicate = PredicateRef::Resolved((*candidates[0]).clone());
-
-    if target_path_opaque {
-        Some(Verdict::TestConfigUnresolved {
-            option: watched.to_string(),
-            predicate: primary_predicate,
-            default_outcome: diagnostic_default_outcome,
-            predicate_attempts: attempts,
-        })
-    } else if has_unresolved {
-        Some(Verdict::TestValueUnresolved {
-            option: watched.to_string(),
-            predicate: primary_predicate,
-            default_outcome: diagnostic_default_outcome,
-            predicate_attempts: attempts,
-        })
-    } else {
-        Some(Verdict::Oba001 {
-            option: watched.to_string(),
-            predicate: primary_predicate,
-            default_outcome: diagnostic_default_outcome,
-            predicate_attempts: attempts,
-        })
     }
 }
 
@@ -2596,6 +2632,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             discovered_options: Vec::new(),
             discovered_predicates: Vec::new(),
             resolved_predicates: Vec::new(),
+            unresolved_predicate_sites: Vec::new(),
             matched_test_assignments: Vec::new(),
             test_config_opacity: Vec::new(),
             verdicts: t
@@ -2622,7 +2659,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         module_root.syntax(),
         &t.cfg_ident,
     );
-    let resolved_predicates = scan_resolved_predicates(
+    let (resolved_predicates, unresolved_predicate_sites) = scan_resolved_predicates(
         &module_file,
         &module_src,
         module_root.syntax(),
@@ -2649,82 +2686,129 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             continue;
         };
 
-        // Gate 2: a direct branch predicate referencing it. H1's own
-        // unary scan (a single `cfg.<path>` check) is tried first,
-        // unconditionally and unchanged -- every H1-era target's verdict
-        // is byte-for-byte identical to before this fallback existed,
-        // since a unary predicate always matches here and the H2 path
-        // below is never even reached for it. Only when H1's scan finds
-        // nothing does H2's compound counterfactual model (alias
-        // resolution + per-instance evaluation, see
-        // `h2_counterfactual_verdict`) get a chance -- this is exactly
-        // how `mysqlLocal`-style aliased/compound predicates (davis's
-        // real case) get a verdict without touching how any existing
-        // unary target is evaluated.
-        let Some(pred) = predicates.iter().find(|p| p.path == watched_path) else {
-            match h2_counterfactual_verdict(
-                watched,
-                &watched_path,
-                &options,
-                &resolved_predicates,
-                &assignments,
-                &opacity,
-                t,
-            ) {
-                Some(verdict) => verdicts.push(verdict),
-                None => verdicts.push(Verdict::PredicateNotFound {
-                    option: watched.clone(),
-                }),
-            }
-            continue;
-        };
+        // Gates 2-4, unified: H1's own unary predicate (if any, using its
+        // already-established gate-3 semantics for THAT predicate
+        // specifically) AND every H2 resolved predicate referencing this
+        // option are evaluated as candidates in the SAME aggregation --
+        // not "H1 first, H2 only as a fallback when H1 finds nothing".
+        // Reviewed and fixed: the previous fallback structure meant a
+        // watched option with BOTH a real but non-transitioning direct H1
+        // predicate AND a real, transitioning H2 compound predicate would
+        // report the H1 predicate's `OBA001` and never even look at the
+        // H2 one -- a genuine false `OBA001`, not merely an incomplete
+        // `PASS`. H1's own gate 3 (`DefaultUnresolved`) stays an
+        // immediate, unchanged short-circuit specifically for H1's own
+        // predicate -- narrow, deliberate scope: this preserves
+        // byte-identical behavior for the existing `DefaultUnresolved`
+        // goldens without also having to unify gate 3 itself into the
+        // aggregator, which no finding actually asked for.
+        let mut attempts: Vec<PredicateAttempt> = Vec::new();
+        let mut winner: Option<(PredicateRef, bool, Vec<TestAssignment>)> = None;
+        let mut has_unresolved = false;
 
-        // Gate 3: the default's outcome under this predicate must be
-        // statically classifiable, or there's no baseline to prove a
-        // transition away from. Classified from the actual default AST
-        // node (ValueClass), not a textual comparison -- see H1.1: a
-        // `!= null` default that's an `if` expression, an alias select, or
-        // `lib.mkDefault null` has no text equal to "null" even when its
-        // runtime value definitely is, so a text check would wrongly call
-        // it "definitely non-null" instead of honestly Unknown.
-        let Some(default_outcome) = decl
-            .default_class
-            .and_then(|c| predicate_outcome(&pred.kind, c))
-        else {
-            verdicts.push(Verdict::DefaultUnresolved {
-                option: watched.clone(),
+        if let Some(pred) = predicates.iter().find(|p| p.path == watched_path) {
+            // Gate 3 for H1's own predicate specifically -- unchanged.
+            let Some(default_outcome) = decl
+                .default_class
+                .and_then(|c| predicate_outcome(&pred.kind, c))
+            else {
+                verdicts.push(Verdict::DefaultUnresolved {
+                    option: watched.clone(),
+                    predicate: PredicateRef::Unary(pred.clone()),
+                });
+                continue;
+            };
+
+            // H1's own gate 4, unchanged, expressed as one candidate's
+            // attempt instead of an immediate verdict.
+            let matches: Vec<TestAssignment> = assignments
+                .iter()
+                .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
+                .cloned()
+                .collect();
+            matched_assignments.extend(matches.clone());
+
+            let mut opposite = Vec::new();
+            let mut h1_has_unresolved = false;
+            for a in &matches {
+                match predicate_outcome(&pred.kind, a.value_class) {
+                    Some(o) if o == !default_outcome => opposite.push(a.clone()),
+                    Some(_) => {} // known, same outcome as the default -- no evidence, not ambiguous either
+                    None => h1_has_unresolved = true,
+                }
+            }
+
+            attempts.push(PredicateAttempt {
                 predicate: PredicateRef::Unary(pred.clone()),
+                witnessed: if !opposite.is_empty() {
+                    Some(true)
+                } else if h1_has_unresolved {
+                    None
+                } else {
+                    Some(false)
+                },
+            });
+            if h1_has_unresolved {
+                has_unresolved = true;
+            }
+            if !opposite.is_empty() {
+                winner = Some((PredicateRef::Unary(pred.clone()), default_outcome, opposite));
+            }
+        }
+
+        // Every H2 resolved predicate referencing this option -- always
+        // evaluated now, regardless of whether H1 already found one.
+        for pred in resolved_predicates
+            .iter()
+            .filter(|p| p.refs.iter().any(|r| r == &watched_path))
+        {
+            let outcome =
+                evaluate_predicate_witness(pred, &watched_path, &options, &assignments, t);
+            let witnessed = match &outcome {
+                PredicateWitnessOutcome::Witness { .. } => Some(true),
+                PredicateWitnessOutcome::EvidenceNoTransition => Some(false),
+                PredicateWitnessOutcome::Unresolved => None,
+            };
+            attempts.push(PredicateAttempt {
+                predicate: PredicateRef::Resolved(pred.clone()),
+                witnessed,
+            });
+            match outcome {
+                PredicateWitnessOutcome::Witness {
+                    default_outcome,
+                    evidence,
+                } => {
+                    if winner.is_none() {
+                        winner = Some((
+                            PredicateRef::Resolved(pred.clone()),
+                            default_outcome,
+                            evidence,
+                        ));
+                    }
+                }
+                PredicateWitnessOutcome::Unresolved => {
+                    has_unresolved = true;
+                }
+                PredicateWitnessOutcome::EvidenceNoTransition => {}
+            }
+        }
+
+        if attempts.is_empty() {
+            verdicts.push(Verdict::PredicateNotFound {
+                option: watched.clone(),
             });
             continue;
-        };
+        }
 
-        // Gate 4: a structurally-bound test assignment whose value's
-        // outcome under this predicate is the *opposite* of the default's.
-        // Three-way split, not a binary filter: a matching assignment
-        // whose own outcome is Unknown (e.g. `builtins.elem "x" [ "x" "y"
-        // ]` -- statically opaque, but genuinely `true` at runtime) must
-        // NOT be silently treated as "no evidence" just because it fails
-        // an `== Some(opposite)` filter. That's the same fail-closed
-        // principle this tool applies to the default (gate 3) not being
-        // applied to the test side -- caught by the H1.1 review. A known
-        // opposite-outcome assignment takes precedence over an unresolved
-        // one if both are present: real evidence beats an unrelated
-        // ambiguity elsewhere in the same test file.
-        let matches: Vec<TestAssignment> = assignments
-            .iter()
-            .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
-            .cloned()
-            .collect();
-        matched_assignments.extend(matches.clone());
-
-        let mut opposite = Vec::new();
-        let mut has_unresolved = false;
-        for a in &matches {
-            match predicate_outcome(&pred.kind, a.value_class) {
-                Some(o) if o == !default_outcome => opposite.push(a.clone()),
-                Some(_) => {} // known, but same outcome as the default -- no evidence, but not ambiguous either
-                None => has_unresolved = true,
-            }
+        if let Some((predicate, default_outcome, evidence)) = winner {
+            verdicts.push(Verdict::Pass {
+                option: watched.clone(),
+                predicate,
+                default_outcome,
+                evidence,
+                predicate_attempts: attempts,
+            });
+            continue;
         }
 
         // Does any part of the test config that could structurally contain
@@ -2732,41 +2816,85 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         // (imports, an alias, a function call)? Checked AFTER opposite
         // evidence, never before: an explicit, provable transition found
         // elsewhere in the file is a stronger claim than "some unrelated
-        // opacity also exists" (c17). Checked before TestValueUnresolved:
-        // "an entire region of config was invisible" is a more fundamental
-        // gap than "one specific value we did see was ambiguous".
+        // opacity also exists" (c17).
         let target_path_opaque = opacity
             .iter()
-            .any(|o| path_is_prefix_of_target(&o.path, &t.option_prefix, &pred.path));
+            .any(|o| path_is_prefix_of_target(&o.path, &t.option_prefix, &watched_path));
 
-        if !opposite.is_empty() {
-            verdicts.push(Verdict::Pass {
-                option: watched.clone(),
-                predicate: PredicateRef::Unary(pred.clone()),
-                default_outcome,
-                evidence: opposite,
-                predicate_attempts: Vec::new(),
+        // Reviewed: a branch-condition site this resolver found but
+        // couldn't lower at all (`UnresolvedPredicateSite`) means part of
+        // this target's own branch logic was never actually looked at --
+        // an unrelated helper's `if isInt v then ...` is syntactically
+        // indistinguishable, without deeper analysis, from a genuine
+        // option-branch predicate this tool simply doesn't understand
+        // yet. A target with such a site can't honestly claim `OBA001`
+        // ("no evidence anywhere") for a watched option that site's
+        // `refs` (collected even from the failed lowering, see
+        // `collect_reachable_refs`) actually reaches -- matched
+        // per-option, not target-wide: an earlier version gated on "any
+        // unresolved site exists anywhere in the target", which was
+        // itself found unsound in both directions -- too coarse against
+        // real corpus (kimai's unrelated `eachSite != {}` blocked every
+        // watched option in the target) AND, separately, too narrow
+        // against a purely syntactic relevance test that missed
+        // alias-hidden references (`suspicious = someUnsupportedHelper
+        // cfg.database.driver;`, condition site is just `suspicious`,
+        // whose own text never mentions `cfg` even though its binding
+        // does). Per-option `refs` matching is what actually resolves
+        // both: kimai's `eachSite != {}` resolves to `refs =
+        // [["sites"]]`, which never matches an unrelated watched option,
+        // while `suspicious`'s hidden `cfg.database.driver` resolves to
+        // `refs = [["database","driver"]]`, which correctly matches when
+        // THAT option is being watched. Only weakens a would-be
+        // `OBA001`; a real witness (checked above, already returned)
+        // always wins regardless of how many unresolved sites exist
+        // elsewhere in the same module.
+        let relevant_predicate_site_unresolved = unresolved_predicate_sites
+            .iter()
+            .any(|s| s.refs.iter().any(|r| r == &watched_path));
+
+        // Best-effort diagnostic `default_outcome` for the non-witness
+        // verdicts below: H1's own (if it computed one) takes priority,
+        // matching its exact previous reporting; otherwise every
+        // referenced option of the first H2 candidate at its own declared
+        // default. Reporting only -- which `Verdict` variant gets chosen
+        // is driven entirely by `attempts`/`target_path_opaque`/
+        // `relevant_predicate_site_unresolved` above, never by this value.
+        let diagnostic_default_outcome = predicates
+            .iter()
+            .find(|p| p.path == watched_path)
+            .and_then(|p| {
+                decl.default_class
+                    .and_then(|c| predicate_outcome(&p.kind, c))
+            })
+            .or_else(|| {
+                resolved_predicates
+                    .iter()
+                    .find(|p| p.refs.iter().any(|r| r == &watched_path))
+                    .and_then(|p| eval_pred(&p.ir, &declared_defaults_for(p, &options)))
             });
-        } else if target_path_opaque {
+        let primary_predicate = attempts[0].predicate.clone();
+
+        if target_path_opaque {
             verdicts.push(Verdict::TestConfigUnresolved {
                 option: watched.clone(),
-                predicate: PredicateRef::Unary(pred.clone()),
-                default_outcome: Some(default_outcome),
-                predicate_attempts: Vec::new(),
+                predicate: primary_predicate,
+                default_outcome: diagnostic_default_outcome,
+                predicate_attempts: attempts,
             });
-        } else if has_unresolved {
+        } else if has_unresolved || relevant_predicate_site_unresolved {
             verdicts.push(Verdict::TestValueUnresolved {
                 option: watched.clone(),
-                predicate: PredicateRef::Unary(pred.clone()),
-                default_outcome: Some(default_outcome),
-                predicate_attempts: Vec::new(),
+                predicate: primary_predicate,
+                default_outcome: diagnostic_default_outcome,
+                predicate_attempts: attempts,
             });
         } else {
             verdicts.push(Verdict::Oba001 {
                 option: watched.clone(),
-                predicate: PredicateRef::Unary(pred.clone()),
-                default_outcome: Some(default_outcome),
-                predicate_attempts: Vec::new(),
+                predicate: primary_predicate,
+                default_outcome: diagnostic_default_outcome,
+                predicate_attempts: attempts,
             });
         }
     }
@@ -2777,6 +2905,7 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         discovered_options: options,
         discovered_predicates: predicates,
         resolved_predicates,
+        unresolved_predicate_sites,
         matched_test_assignments: matched_assignments,
         test_config_opacity: opacity,
         verdicts,

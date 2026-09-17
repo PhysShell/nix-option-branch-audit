@@ -374,6 +374,75 @@ fn h2_case5_unknown_context_is_inconclusive_never_a_guess() {
     );
 }
 
+#[test]
+fn h2_case6_explicit_opaque_co_operand_is_never_treated_as_its_own_default() {
+    // H2.2 Finding 1: `createLocally` is explicitly assigned at this
+    // instance, but to a non-literal (opaque) expression -- not left
+    // unassigned. An earlier version of `evaluate_predicate_witness`
+    // collapsed "explicitly assigned but unclassifiable" and "never
+    // assigned at all" into the same lookup miss, silently falling back
+    // to createLocally's OWN declared default (`true`) -- which would
+    // fabricate `p = true && driver == "mysql"` and let driver's
+    // sqlite->mysql transition wrongly PASS. The fix requires this to
+    // weaken to TestValueUnresolved instead.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case6-opaque-other-operand");
+    assert_eq!(
+        verdict_kind(r, "database.driver"),
+        "TestValueUnresolved",
+        "an explicit-but-opaque co-operand assignment must never be silently substituted \
+         with that option's own declared default"
+    );
+}
+
+#[test]
+fn h2_case7_relevant_unresolved_site_blocks_a_false_oba001() {
+    // H2.2 Finding 3: `watched`'s own predicate never flips in test.nix
+    // (held at its own default) -- with no other consideration, this
+    // resolves cleanly to OBA001. But the module also has a SEPARATE,
+    // unrelated-looking `mkIf (cfg.items != [ ]) true` guard that is
+    // both cfg-rooted and statically unlowerable (a list literal isn't a
+    // supported ValueExpr). An earlier version of `scan_resolved_predicates`
+    // silently dropped whatever `lower_pred` couldn't handle -- the same
+    // "not found reads as genuinely absent" shape H1's own walker closed.
+    // This must weaken to TestValueUnresolved, proving the
+    // `unresolved_predicate_sites` gate actually engages for a real
+    // cfg-mentioning site, not just exist as dead plumbing.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case7-unresolved-relevant-site");
+    assert_eq!(
+        verdict_kind(r, "watched"),
+        "TestValueUnresolved",
+        "an unrelated but cfg-mentioning unresolvable predicate site must still weaken \
+         the verdict, not be silently dropped into a false OBA001"
+    );
+}
+
+#[test]
+fn h2_case8_alias_hidden_unresolved_relevance_blocks_a_false_oba001() {
+    // H2.2 Finding 3, round 2: `direct`'s own predicate (driver != null)
+    // never transitions (true both at default "sqlite" and test "mysql"),
+    // so on its own this looks like honest evidence-no-transition. But a
+    // SECOND branch, `hidden = someUnsupportedHelper cfg.database.driver;`,
+    // used bare as a condition site (`hidden`, whose own syntax never
+    // mentions `cfg` at all), genuinely depends on database.driver
+    // through its alias binding and fails to lower. The first version of
+    // Finding 3's fix (a purely syntactic "does the condition's own text
+    // contain `cfg_ident`" check) would have missed this entirely --
+    // `hidden`'s condition site literally never mentions "cfg" in its
+    // own text, only in what it resolves to. `collect_reachable_refs`
+    // must find `database.driver` reachable through the alias anyway.
+    // Must be TestValueUnresolved, never a false OBA001.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case8-alias-hidden-unresolved-relevance");
+    assert_eq!(
+        verdict_kind(r, "database.driver"),
+        "TestValueUnresolved",
+        "an unresolved predicate site reachable ONLY through alias resolution must still \
+         block a false OBA001 for the option it actually references"
+    );
+}
+
 // Positive assertion for the H2 gate-1 fix itself: without this, the test
 // above would trivially pass for the wrong reason if `scan_options`
 // regressed back to finding nothing at all (also `PredicateNotFound`... no,
