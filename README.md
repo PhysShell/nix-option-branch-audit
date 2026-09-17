@@ -1285,24 +1285,14 @@ invocation itself reduces but doesn't eliminate the risk.
 
 Mutation testing (`0afe187`) left a small, clean semantic core — the
 condition the user set for deciding this determination was finally
-meaningful rather than decorative. Scope agreed explicitly, in two
-layers, seven harnesses total (13 counting K0.2's per-operator split):
+meaningful rather than decorative. Final scope, after a real attempt at
+a third layer was tried and dropped (below): **K0.1 + K1, 6 harnesses
+total.**
 
-- **K0 — the abstract boolean evaluator never fabricates knowledge.**
-  `eval_known_eq`/`eval_pred` return `Option<bool>`; the entire `PASS`/
-  `OBA001` distinction rests on `Some(b)` meaning "we actually know
-  this", not "this looks plausible". K0.1 proves `eval_known_eq`
-  soundness directly. K0.2 (one harness per `Pred` constructor —
-  `Eq`/`Not`/`And`/`Or`, plus a two-refs-to-the-same-path case) proves
-  `eval_pred` soundness: whenever it returns `Some(x)` against an
-  abstract environment, `x` agrees with the fully concrete ground truth
-  the abstraction represents. K0.3 proves information monotonicity
-  (refining an environment — `Unknown → DefinitelyNonNull → Exact` —
-  never flips or loses an already-known result, the bounded-model-
-  checking version of the existing `removing_a_known_value_never_flips_a_known_result`
-  proptest). K0.4 is a cheap sanity/positive control (`Not(Not(p)) = p`),
-  proving the harness machinery actually explores the tree, not a reason
-  on its own to run Kani.
+- **K0.1 — `eval_known_eq` never fabricates knowledge.** It returns
+  `Option<bool>`; the entire `PASS`/`OBA001` distinction rests on
+  `Some(b)` meaning "we actually know this", not "this looks plausible".
+  Proven directly against a small finite `Scalar`/`KnownValue` domain.
 - **K1 — `aggregate`'s priority ordering is exhaustively correct.**
   Already pinned by brute-force enumeration
   (`aggregate_priority_is_exhaustively_correct_over_all_32_cases`, plain
@@ -1314,40 +1304,62 @@ layers, seven harnesses total (13 counting K0.2's per-operator split):
   itself: if `aggregate` ever returns `Oba001`, none of the other four
   uncertainty facts held.
 
-**Deliberately not attempted**: `rnix`/`rowan`, `resolve_ident_binding`,
-`lower_pred_chained`, the test-file walker, or `run_target` as a whole.
-A small self-contained function with an existing test base is exactly
-what Kani's own guidance recommends starting from; a deep call graph
-over untyped syntax trees is exactly what it warns against. That surface
-already has goldens, adversarial fixtures, proptest, mutation testing,
-and hostile review — formalizing it now would be negative ROI.
+Both are cheap: all 6 harnesses verify in a few seconds combined, on
+this project's own resource-constrained dev VPS (1 core, 1.9GB RAM) as
+well as in CI.
 
-**Runs in CI, not locally — a resource finding, not a preference.**
-K0.1 and all five K1 harnesses run in seconds on this project's own dev
-VPS (1 core, 1.9GB RAM). K0.2/K0.3 do not: five escalating scope
-reductions were tried locally (free recursive `Pred` generator over 3
-paths/depth 2, then 2 paths/depth 1, then 1 path/depth 1; finally
-replaced the generator entirely with one FIXED tree shape per `Pred`
-constructor, cutting the real driver — `kani::any()` branching over
-"which Pred variant" and "Ref vs Literal" at every position,
-multiplying into dozens of structurally distinct trees before CBMC even
-reaches SAT solving). The fixed-shape redesign is a genuine improvement
-and stayed even after the decision to move to CI — but it did NOT fully
-solve the cost: even the single cheapest shape (`k0_2_eq_sound`, exactly
-one `Ref` lookup against one real environment entry) pushed the VPS to
-under 100MB free and 2.4GB of swap before finishing, confirming the
-dominant cost is CBMC symbolically modeling Rust `HashMap`'s SipHash
-hasher — present in any use of the real `HashMap<Vec<String>,
-KnownValue>` environment type at all, not something a smaller harness
-shape can fully dodge. `.github/workflows/kani.yml` runs the whole
-module (`model-checking/kani-github-action`, the official, maintained
-action — reuse-first per AGENTS.md) on GitHub-hosted runners, which have
-the headroom this class of proof actually needs.
+**`eval_pred` soundness/monotonicity (originally-planned K0.2/K0.3, plus
+a K0.4 sanity check) was attempted and DROPPED, not deferred — the
+central finding of this whole KANI-0 round.** The harnesses were
+well-formed and compiled correctly; what killed them was CBMC's cost for
+symbolically modeling Rust `HashMap`'s SipHash hasher, present in any
+use of the real `HashMap<Vec<String>, KnownValue>` environment type
+`eval_pred` actually takes — essentially independent of harness size.
+Five escalating scope reductions tried locally (free recursive `Pred`
+generator over 3 paths/depth 2, then 2/1, then 1/1, then one FIXED tree
+shape per `Pred` constructor with a single `Ref` lookup — a genuine
+harness-design improvement, kept in spirit even after the layer itself
+was dropped) each still pushed the VPS to the edge of OOM before
+finishing. Moved to GitHub Actions next, on the theory that more RAM/CPU
+would fix it — **it didn't**: on a real CI run, the single cheapest
+harness (`k0_4_double_not_is_identity`, same fixed-shape design)
+still hadn't finished after ~29 minutes of a 30-minute job timeout, and
+had to be force-killed as an orphan `cbmc` process. That confirmed the
+cost is fundamental to the (real `HashMap`, real `String` keys)
+approach, not a resource ceiling any one machine happened to hit — the
+risk a small finite-domain *mirror* type (proving an isomorphic copy of
+`eval_pred`, not the production function itself) was originally raised
+to avoid. Offered again after the CI failure and explicitly declined, in
+favor of stopping at K0.1 + K1. `eval_pred`'s own Kleene-logic soundness
+stays covered by the existing proptest properties
+(`eval_pred_and_short_circuits_on_a_known_false_operand_either_side` and
+siblings) and mutation testing, not by a bounded proof.
+
+**Deliberately not attempted for the same "small self-contained
+function" reason**: `rnix`/`rowan`, `resolve_ident_binding`,
+`lower_pred_chained`, the test-file walker, or `run_target` as a whole.
+A deep call graph over untyped syntax trees is exactly what Kani's own
+guidance warns against. That surface already has goldens, adversarial
+fixtures, proptest, mutation testing, and hostile review — formalizing
+it now would be negative ROI.
+
+`.github/workflows/kani.yml` runs `cargo kani` in CI on every push/PR to
+`main` (`timeout-minutes: 10`, generous headroom for 6 harnesses that
+take seconds). Reuse survey (AGENTS.md step 3/5): tried the official
+`model-checking/kani-github-action` first — both published tags (`v1`,
+`v1.1`) have a confirmed bug in their shared `install-kani.sh` (extracts
+the installed version via `kani --version | awk '{print $2}'`, but the
+real output is two lines and field 2 of line 1 is "Rust", not the
+version number — reproduced locally, not guessed), so every real run
+failed in ~25-30s before ever reaching Kani. The workflow composes
+around it instead: same `kani-verifier` crate, same
+`dtolnay/rust-toolchain@stable` the action itself uses internally, same
+`cargo kani setup`/`cargo kani` commands — only the action's own broken
+self-verification wrapper is skipped.
 
 ```
 cargo kani list              # enumerate harnesses without running any (fast, local, safe)
-cargo kani --harness NAME    # run one harness locally -- fine for K0.1/K1, NOT recommended
-                              # for K0.2/K0.3 on a resource-constrained machine
+cargo kani                   # run all 6 -- a few seconds, safe on any machine
 ```
 
 ## Running

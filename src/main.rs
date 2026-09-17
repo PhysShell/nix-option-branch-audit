@@ -3514,12 +3514,12 @@ fn print_human(r: &TargetReport) {
 // left a small, clean semantic core -- NOT an attempt to formally verify
 // the analyzer as a whole. Two layers:
 //
-// K0: the abstract boolean evaluator (`eval_known_eq`/`eval_pred`) never
-// fabricates knowledge -- whenever it returns `Some(b)`, `b` is correct
-// for EVERY concrete valuation consistent with its abstract input, not
-// just plausible. This is the theorem the entire `PASS`/`OBA001`
-// distinction rests on: a `Some` the evaluator didn't actually earn
-// would silently corrupt every verdict built on top of it.
+// K0: `eval_known_eq` never fabricates knowledge -- whenever it returns
+// `Some(b)`, `b` is correct for EVERY concrete valuation consistent with
+// its abstract input, not just plausible. This is the theorem the
+// entire `PASS`/`OBA001` distinction rests on: a `Some` the evaluator
+// didn't actually earn would silently corrupt every verdict built on
+// top of it.
 //
 // K1: `aggregate`'s priority ordering is exhaustively correct -- already
 // pinned by `aggregate_priority_is_exhaustively_correct_over_all_32_cases`
@@ -3539,20 +3539,34 @@ fn print_human(r: &TargetReport) {
 // testing, and hostile review; formalizing the syntax layer now would be
 // negative ROI, not a next step.
 //
-// Runs in CI (`.github/workflows/kani.yml`), not on a local dev
-// machine, and that's a deliberate resource decision, not a style
-// preference: even the CHEAPEST non-trivial `eval_pred` harness (a
-// single `Ref` lookup against one real environment entry) pushed a
-// 1-core/1.9GB VPS to under 100MB free and 2.4GB of swap before
-// finishing, because CBMC has to symbolically model Rust's SipHash-based
-// `HashMap` hasher regardless of how small the surrounding harness is --
-// confirmed empirically across five escalating scope reductions (a free
-// recursive `Pred` generator over 3 paths/depth 2 never finished; over
-// 1 path/depth 1 it still climbed for 20+ minutes; only replacing the
-// generator with one FIXED tree shape per `Pred` constructor, see K0.2's
-// own comment, got individual harnesses down to a size any real Rust
-// program's tests would consider normal). GitHub-hosted runners have
-// the RAM/CPU headroom this class of proof actually needs.
+// **`eval_pred` soundness/monotonicity (originally planned K0.2/K0.3,
+// plus a K0.4 sanity check) was ATTEMPTED and DROPPED, not merely
+// deferred.** The property itself was well-formed and the harnesses
+// compiled and were logically sound (recorded here for anyone tempted
+// to retry with more resources) -- what killed it was CBMC's cost for
+// symbolically modeling Rust `HashMap`'s SipHash hasher, present in any
+// use of the real `HashMap<Vec<String>, KnownValue>` environment type
+// eval_pred actually takes, essentially independent of harness size.
+// Five escalating scope reductions on a local 1-core/1.9GB dev VPS (free
+// recursive `Pred` generator over 3 paths/depth 2, then 2/1, then 1/1,
+// then one FIXED tree shape per `Pred` constructor with a single `Ref`
+// lookup) each still pushed the machine to the edge of OOM before
+// finishing or finished only after several minutes. Moved to GitHub
+// Actions on the theory that more RAM/CPU would fix it -- it didn't: on
+// a real CI run, the single cheapest harness (`k0_4_double_not_is_identity`,
+// same fixed-shape design) still hadn't finished after the remaining
+// ~29 minutes of a 30-minute job timeout, and had to be force-killed as
+// an orphan `cbmc` process. This confirmed the cost is fundamental to
+// the (real HashMap, real String keys) approach, not a resource ceiling
+// any one machine happened to hit -- exactly the risk the original K0
+// design discussion flagged as the reason to consider a small
+// finite-domain MIRROR type instead of the real environment type, which
+// was offered again after the CI failure and explicitly declined in
+// favor of stopping at K0.1 (`eval_known_eq`) + K1 (`aggregate`) as the
+// final KANI-0 scope. `eval_pred`'s own Kleene-logic soundness stays
+// covered by the existing proptest properties
+// (`eval_pred_and_short_circuits_on_a_known_false_operand_either_side`
+// and siblings) and mutation testing, not by a bounded proof.
 //
 // Verification-only code, invisible to every normal build (`cfg(kani)`
 // gates it out of `cargo build`/`cargo test`/`cargo clippy` entirely --
@@ -3562,32 +3576,15 @@ mod kani_proofs {
     use super::*;
 
     // -------------------------------------------------------------
-    // Shared generators: a small, closed universe -- real `HashMap`/
-    // `String` types (proving the actual production functions, not a
-    // mirror), but only ever holding values drawn from a tiny alphabet.
-    // `kani_any_scalar` (3-valued: Null/False/True) is the DEFAULT, used
-    // everywhere except K0.1 itself, which needs `kani_any_scalar5`
-    // (adds two DISTINCT non-null strings "s0"/"s1") to tell "the same
-    // non-null scalar" apart from "some other non-null scalar" -- the
-    // one place that distinction actually matters for `eval_known_eq`'s
-    // own soundness, checked in isolation from any `Pred`/environment
-    // machinery (and so cheap regardless).
+    // Shared generators: a small, closed universe -- real `KnownValue`/
+    // `Scalar` types (proving the actual production `eval_known_eq`, not
+    // a mirror), but only ever holding values drawn from a tiny
+    // alphabet: Null, Bool(false), Bool(true), and two DISTINCT non-null
+    // strings "s0"/"s1" -- enough to tell "the same non-null scalar"
+    // apart from "some other non-null scalar", the one distinction
+    // `DefinitelyNonNull`'s own soundness actually needs.
     // -------------------------------------------------------------
 
-    fn kani_any_scalar() -> Scalar {
-        let tag: u8 = kani::any();
-        kani::assume(tag < 3);
-        match tag {
-            0 => Scalar::Null,
-            1 => Scalar::Bool(false),
-            _ => Scalar::Bool(true),
-        }
-    }
-
-    // Wider scalar generator (5-valued: adds two DISTINCT non-null
-    // strings "s0"/"s1"), used only by K0.1 -- see the module doc
-    // comment above for why the other K0 proofs stick to the cheaper
-    // 3-valued `kani_any_scalar`.
     fn kani_any_scalar5() -> Scalar {
         let tag: u8 = kani::any();
         kani::assume(tag < 5);
@@ -3598,22 +3595,6 @@ mod kani_proofs {
             3 => Scalar::Str("s0".to_string()),
             _ => Scalar::Str("s1".to_string()),
         }
-    }
-
-    // A single fixed path, not a symbolic choice over several -- see
-    // K0.2's doc comment for why a free generator (over Pred shape,
-    // Ref-vs-Literal choice, AND path count) is what actually blew up
-    // CBMC's GOTO-program construction, not path count on its own. A
-    // `Pred` can still reference this one path from multiple
-    // `ValueExpr::Ref` positions within a compound
-    // (`And(Eq(Ref(a),lit1), Eq(Ref(a),lit2))`, see
-    // `k0_2_and_two_refs_to_same_path_sound`), which is enough to
-    // exercise real `And`/`Or`/`Not` combination soundness -- testing
-    // "two DIFFERENT options in one predicate" is what K0.3 (information
-    // monotonicity, which independently varies per-path knowledge) is
-    // for, not K0.2's job.
-    fn kani_path(_tag: u8) -> OptionPath {
-        vec!["a".to_string()]
     }
 
     /// γ (verification-only, never used by production code): is
@@ -3653,284 +3634,6 @@ mod kani_proofs {
         if let Some(x) = eval_known_eq(&a, &b) {
             assert_eq!(ca == cb, x, "eval_known_eq({a:?}, {b:?}) = Some({x}) but concretizations {ca:?}/{cb:?} disagree");
         }
-    }
-
-    // -------------------------------------------------------------
-    // K0.2 -- the main proof: `eval_pred` never fabricates a boolean
-    // outcome, checked against an ABSTRACT environment and against the
-    // FULLY CONCRETE environment it abstracts (`eval_pred` itself is the
-    // ground truth for the concrete case too, see the doc comment above
-    // `kani_env_pair` -- a totally known environment has no abstraction
-    // left to reason about).
-    //
-    // One harness per `Pred` constructor, each with a FIXED tree shape
-    // rather than a free recursive generator -- reviewed and rebuilt
-    // after three escalating attempts at a single generic generator
-    // (depth<=2/3 paths, then depth<=1/2 paths, then depth<=1/1 path)
-    // each still took several minutes of CPU and kept climbing, never
-    // finishing. The fixed shape here cuts the BRANCHING FACTOR a free
-    // generator has (`kani::any()` deciding "which of 4 Pred variants"
-    // at every level, and separately "Ref or Literal" at every
-    // `ValueExpr` position, multiplying into dozens of structurally
-    // distinct trees before CBMC even reaches SAT solving) down to just
-    // the leaf VALUES staying symbolic -- a real improvement, and the
-    // right shape for a harness regardless of hardware. It did NOT,
-    // however, fully solve the underlying cost: even the single
-    // cheapest fixed shape here (`k0_2_eq_sound`, exactly one `Ref`
-    // lookup) still pushed a 1-core/1.9GB VPS to under 100MB free before
-    // finishing -- confirming the dominant cost is `HashMap`'s own
-    // SipHash machinery, present in ANY use of the real environment type
-    // at all, not something a smaller harness shape can fully dodge.
-    // That's why this whole module runs in CI (see the module-level
-    // comment above), not locally.
-    // -------------------------------------------------------------
-
-    fn kani_any_literal_expr() -> ValueExpr {
-        ValueExpr::Literal(kani_any_scalar())
-    }
-
-    /// Builds a matched (abstract, concrete) pair of environments for
-    /// the one fixed path: `concrete` always maps it to a fully known
-    /// `Exact` scalar (so `eval_pred(pred, &concrete)` is always
-    /// `Some(_)` and IS the ground truth by construction -- no
-    /// abstraction, nothing left to get wrong); `abstract_env` maps it
-    /// to either the SAME `Exact` value (no information lost), a
-    /// `DefinitelyNonNull` abstraction of it (only when the concrete
-    /// value is actually non-null), or omits it entirely (fully
-    /// unknown) -- every one of these is a valid abstraction of
-    /// `concrete` by `kani_concretizes`'s own definition.
-    fn kani_env_pair() -> (
-        std::collections::HashMap<OptionPath, KnownValue>,
-        std::collections::HashMap<OptionPath, KnownValue>,
-    ) {
-        let mut concrete = std::collections::HashMap::new();
-        let mut abstract_env = std::collections::HashMap::new();
-        let path = kani_path(0);
-        let c = kani_any_scalar();
-        concrete.insert(path.clone(), KnownValue::Exact(c.clone()));
-
-        let mode: u8 = kani::any();
-        kani::assume(mode < 3);
-        match mode {
-            0 => {
-                abstract_env.insert(path, KnownValue::Exact(c));
-            }
-            1 => {
-                kani::assume(!matches!(c, Scalar::Null));
-                abstract_env.insert(path, KnownValue::DefinitelyNonNull);
-            }
-            _ => {
-                // omitted entirely -- fully unknown at this path
-            }
-        }
-        (abstract_env, concrete)
-    }
-
-    /// Shared assertion body for every K0.2 shape: if the abstract
-    /// evaluation resolves at all, it must agree with the concrete
-    /// ground truth.
-    fn k0_2_check(
-        pred: &Pred,
-        abstract_env: &std::collections::HashMap<OptionPath, KnownValue>,
-        concrete_env: &std::collections::HashMap<OptionPath, KnownValue>,
-    ) {
-        if let Some(x) = eval_pred(pred, abstract_env) {
-            let ground_truth = eval_pred(pred, concrete_env)
-                .expect("a fully Exact environment must always resolve eval_pred");
-            assert_eq!(
-                x, ground_truth,
-                "eval_pred returned Some({x}) against an abstraction that doesn't match the \
-                 concrete ground truth {ground_truth}"
-            );
-        }
-    }
-
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_2_eq_sound() {
-        let (abstract_env, concrete_env) = kani_env_pair();
-        let pred = Pred::Eq(ValueExpr::Ref(kani_path(0)), kani_any_literal_expr());
-        k0_2_check(&pred, &abstract_env, &concrete_env);
-    }
-
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_2_not_sound() {
-        let (abstract_env, concrete_env) = kani_env_pair();
-        let pred = Pred::Not(Box::new(Pred::Eq(
-            ValueExpr::Ref(kani_path(0)),
-            kani_any_literal_expr(),
-        )));
-        k0_2_check(&pred, &abstract_env, &concrete_env);
-    }
-
-    // `And`/`Or` each pair one env-derived (`Ref`) operand with one
-    // fully literal operand (no lookup at all) -- enough to prove the
-    // Kleene combination logic honors an abstract operand correctly,
-    // without doubling the lookup count for no additional coverage
-    // (K0.2's "two refs to the same path" case, below, covers the
-    // genuinely different question of two abstract facts combining).
-
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_2_and_sound() {
-        let (abstract_env, concrete_env) = kani_env_pair();
-        let pred = Pred::And(
-            Box::new(Pred::Eq(
-                ValueExpr::Ref(kani_path(0)),
-                kani_any_literal_expr(),
-            )),
-            Box::new(Pred::Eq(kani_any_literal_expr(), kani_any_literal_expr())),
-        );
-        k0_2_check(&pred, &abstract_env, &concrete_env);
-    }
-
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_2_or_sound() {
-        let (abstract_env, concrete_env) = kani_env_pair();
-        let pred = Pred::Or(
-            Box::new(Pred::Eq(
-                ValueExpr::Ref(kani_path(0)),
-                kani_any_literal_expr(),
-            )),
-            Box::new(Pred::Eq(kani_any_literal_expr(), kani_any_literal_expr())),
-        );
-        k0_2_check(&pred, &abstract_env, &concrete_env);
-    }
-
-    /// The same abstract fact used twice (both `And` operands reference
-    /// the SAME path) -- proves soundness still holds when a single
-    /// abstract environment entry gets looked up more than once within
-    /// one evaluation, not just when each `Ref` is independent.
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_2_and_two_refs_to_same_path_sound() {
-        let (abstract_env, concrete_env) = kani_env_pair();
-        let pred = Pred::And(
-            Box::new(Pred::Eq(
-                ValueExpr::Ref(kani_path(0)),
-                kani_any_literal_expr(),
-            )),
-            Box::new(Pred::Eq(
-                ValueExpr::Ref(kani_path(0)),
-                kani_any_literal_expr(),
-            )),
-        );
-        k0_2_check(&pred, &abstract_env, &concrete_env);
-    }
-
-    // -------------------------------------------------------------
-    // K0.3 -- information monotonicity: refining an abstract
-    // environment (replacing "fully unknown" with `DefinitelyNonNull`
-    // or `Exact`, or `DefinitelyNonNull` with the matching `Exact`)
-    // never flips an already-known result -- it may only turn a `None`
-    // into a `Some`, never a `Some(b)` into `Some(!b)` or `None`. This
-    // is the bounded-model-checking version of the same property
-    // `removing_a_known_value_never_flips_a_known_result` already
-    // covers via proptest -- restated here so it's exhaustive over the
-    // same bounded domain the other K0 proofs use, not sampled.
-    // -------------------------------------------------------------
-
-    /// True if `more` is a valid refinement of `less` at a single path:
-    /// equal, or `less` is absent (anything refines "unknown"), or
-    /// `less` is `DefinitelyNonNull` and `more` is the same
-    /// `DefinitelyNonNull` or any non-null `Exact`.
-    fn kani_refines(less: &Option<KnownValue>, more: &Option<KnownValue>) -> bool {
-        match (less, more) {
-            (None, _) => true,
-            (Some(_), None) => false,
-            (Some(KnownValue::Exact(s1)), Some(KnownValue::Exact(s2))) => s1 == s2,
-            (Some(KnownValue::Exact(_)), Some(KnownValue::DefinitelyNonNull)) => false,
-            (Some(KnownValue::DefinitelyNonNull), Some(KnownValue::DefinitelyNonNull)) => true,
-            (Some(KnownValue::DefinitelyNonNull), Some(KnownValue::Exact(s2))) => {
-                !matches!(s2, Scalar::Null)
-            }
-        }
-    }
-
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_3_eval_pred_information_monotone() {
-        // Fixed shape (see K0.2's doc comment for why -- a free
-        // recursive generator made this harness's earlier version
-        // similarly expensive): `And`/`Not`/`Eq` combined, with the
-        // single fixed path looked up twice.
-        let pred = Pred::And(
-            Box::new(Pred::Eq(
-                ValueExpr::Ref(kani_path(0)),
-                kani_any_literal_expr(),
-            )),
-            Box::new(Pred::Not(Box::new(Pred::Eq(
-                ValueExpr::Ref(kani_path(0)),
-                kani_any_literal_expr(),
-            )))),
-        );
-
-        let mut env_less = std::collections::HashMap::new();
-        let mut env_more = std::collections::HashMap::new();
-        for tag in 0u8..1 {
-            let path = kani_path(tag);
-
-            let less_present = kani::any();
-            let less_val = if less_present {
-                Some(if kani::any() {
-                    KnownValue::DefinitelyNonNull
-                } else {
-                    KnownValue::Exact(kani_any_scalar())
-                })
-            } else {
-                None
-            };
-
-            let more_present = kani::any();
-            let more_val = if more_present {
-                Some(if kani::any() {
-                    KnownValue::DefinitelyNonNull
-                } else {
-                    KnownValue::Exact(kani_any_scalar())
-                })
-            } else {
-                None
-            };
-
-            kani::assume(kani_refines(&less_val, &more_val));
-
-            if let Some(v) = less_val {
-                env_less.insert(path.clone(), v);
-            }
-            if let Some(v) = more_val {
-                env_more.insert(path, v);
-            }
-        }
-
-        if let Some(b) = eval_pred(&pred, &env_less) {
-            assert_eq!(
-                eval_pred(&pred, &env_more),
-                Some(b),
-                "refining the environment flipped or lost an already-known result"
-            );
-        }
-    }
-
-    // -------------------------------------------------------------
-    // K0.4 -- cheap sanity/positive control: proves the harness
-    // machinery actually explores the predicate tree and the toolchain
-    // works end-to-end, not a reason on its own to run Kani.
-    // -------------------------------------------------------------
-
-    #[kani::proof]
-    #[kani::unwind(4)]
-    fn k0_4_double_not_is_identity() {
-        let pred = Pred::Eq(ValueExpr::Ref(kani_path(0)), kani_any_literal_expr());
-        let (env, _) = kani_env_pair();
-        assert_eq!(
-            eval_pred(
-                &Pred::Not(Box::new(Pred::Not(Box::new(pred.clone())))),
-                &env
-            ),
-            eval_pred(&pred, &env)
-        );
     }
 
     // -------------------------------------------------------------

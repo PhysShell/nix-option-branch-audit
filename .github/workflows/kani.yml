@@ -2,15 +2,19 @@ name: Kani proofs
 
 # KANI-0: bounded formal proofs of the semantic core (src/main.rs's
 # `kani_proofs` module, `#[cfg(kani)]`-gated, invisible to every normal
-# build). Runs here rather than locally on principle, not convenience:
-# even the cheapest non-trivial `eval_pred` harness (a single `Ref`
-# lookup against a real `HashMap<Vec<String>, KnownValue>`) pushed a
-# 1-core/1.9GB dev VPS to under 100MB free and 2.4GB of swap before
-# finishing, because CBMC has to symbolically model Rust's SipHash-based
-# `HashMap` hasher regardless of how small the surrounding harness is --
-# confirmed empirically across five escalating scope reductions, not
-# guessed. GitHub-hosted runners have meaningfully more RAM/CPU
-# headroom for exactly this kind of proof.
+# build) -- final scope is K0.1 (`eval_known_eq` soundness) + K1
+# (`aggregate`'s 5-fact priority ordering), 6 harnesses total, all fast
+# (a few seconds combined). `eval_pred` soundness/monotonicity (the
+# originally-planned K0.2/K0.3) was attempted and DROPPED, not deferred
+# -- see the `kani_proofs` module's own top doc comment in src/main.rs
+# for the full account: CBMC has to symbolically model Rust `HashMap`'s
+# SipHash hasher for any use of the real environment type at all, and
+# that cost didn't go away on GitHub-hosted runners either -- a single
+# fixed-shape `eval_pred` harness still hadn't finished after ~29
+# minutes of a 30-minute job here before being force-killed. This
+# workflow still runs in CI rather than only locally (cheap enough that
+# either would work now, but CI catches a regression on every push
+# without relying on a contributor to run `cargo kani` themselves).
 #
 # Reuse survey (AGENTS.md step 3/5): tried the official
 # `model-checking/kani-github-action` first (both published tags, `v1`
@@ -39,7 +43,7 @@ on:
 jobs:
   kani:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
