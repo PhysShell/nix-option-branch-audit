@@ -1102,11 +1102,80 @@ through the golden suite, no dedicated unit test — its real fixtures
 (kimai, the two synthetic alias cases) are the test vectors, not
 synthesized inputs.
 
+H2.2 landed as commit `cef12d7`, pushed. Before moving to mutation
+testing, this commit was itself put through one hostile review checking
+four invariants (the three findings above plus the alias-hidden
+correction folded into Finding 3) against a fresh, independent read of
+the actual committed code, not the commit message. Three held outright;
+one didn't.
+
+## H2.2 hostile review of `cef12d7` — a fourth real gap, found in the fix itself
+
+Invariants 1 (explicit opaque override), 3 (unresolved-relevant-site
+gating), and 4 (alias-surviving, per-option relevance) all held up against
+independent code reading. Invariant 2 — "H1's own predicate must never
+suppress evaluation of H2 candidates for the same option" — did not.
+
+`run_target`'s gate 3 for H1's own predicate specifically still `continue`d
+immediately whenever `decl.default_class.and_then(|c|
+predicate_outcome(&pred.kind, c))` was `None`, before the H2 loop below it
+ever ran — the exact same "H1's own gate short-circuits the whole option"
+shape Finding 2 had just fixed for gate 4, reopened one gate earlier. The
+code's own comment at the time called this "narrow, deliberate scope...
+which no finding actually asked for" — true when written, but the reasoning
+didn't survive contact with the fact that H1's `ValueClass` classifies a
+default's outcome strictly more coarsely than H2's `KnownValue` does for
+the *identical* AST node: a plain string-literal default is
+`ValueClass::DefinitelyNonNull` (enough for a null-check predicate, not
+enough for `Truthy`/`NegTruthy`, which need an actual `Bool`) but
+`KnownValue::Exact(Scalar::Str(..))` under `classify_known_value` — fully
+sufficient for a separate `Eq`-based H2 predicate on the same option. The
+old `continue` meant that gap silently downgraded a resolvable `PASS` to a
+false `DefaultUnresolved`.
+
+Fixed by no longer treating H1's own gate-3 failure as an early exit: it
+now just means H1 contributes no `PredicateAttempt` at all (there's no
+default outcome to compare a test value against), tracked in a
+`h1_default_unresolved` flag, and the H2 loop always runs regardless.
+`h1_default_unresolved` is checked once every candidate (H1's own and every
+H2 one) has had a chance — right after a real `winner`, at the same
+near-top priority `DefaultUnresolved` always had (the original code
+returned it before opacity or assignments were even looked at, so it
+implicitly outranked everything else whenever it applied). Getting this
+priority right took a live regression: an earlier version of the fix folded
+`h1_default_unresolved` into the generic `has_unresolved` bucket alongside
+`TestValueUnresolved`, which flipped the pre-existing
+`h1_unresolvable_default_is_inconclusive_not_guessed` golden
+(`c7-unresolved-default`) from `DefaultUnresolved` to `TestValueUnresolved`
+— caught because that fixture's `bar` option turns out to *always* get a
+redundant H2 attempt too (a bare `cfg.bar` select H1 recognizes as a direct
+predicate is independently picked up by `scan_resolved_predicates`, so
+`attempts` is essentially never empty whenever H1 found something — the
+original fix's `attempts.is_empty()`-gated special case for
+`DefaultUnresolved` was therefore dead code for the case it was written
+for). Restructured as an explicit priority check instead of an
+emptiness check.
+
+New regression: `h2_case9_h2_candidate_rescues_a_false_default_unresolved`
+(`fixtures/synthetic/h2-default-unresolved-rescue/`) — an option `flag`
+defaulting to the plain string `"sqlite"`, with H1 finding a `Truthy`
+predicate on it directly (`mkIf cfg.flag {...}`, unable to classify a
+string default as a boolean outcome) *and* a separate `flag == "mysql"`
+predicate elsewhere in the same module that H2 resolves cleanly. Asserts
+`PASS`, not the false `DefaultUnresolved` the bug would have produced.
+`h1_unresolvable_default_is_inconclusive_not_guessed` (`c7-unresolved-default`,
+no competing H2 candidate exists there) is the negative control proving
+the fix didn't just relocate the bug into weakening every `DefaultUnresolved`
+case indiscriminately.
+
+66 tests total (65 → 66; `tests/golden.rs` 42 → 43).
+
 Deliberately not done in this pass, per explicit scope: mutation testing
 against the new IR/evaluator/resolver/counterfactual-gate (next, now that
-H2.2's correctness pass is closed); Kani/bounded model checking (only
-after mutation testing, only if small and useful); no Z3/SMT (`Eq`/`Not`/
-`And`/`Or` over concrete finite values evaluates directly).
+H2.2's correctness pass — including the hostile-review round on the H2.2
+commit itself — is closed); Kani/bounded model checking (only after
+mutation testing, only if small and useful); no Z3/SMT (`Eq`/`Not`/`And`/
+`Or` over concrete finite values evaluates directly).
 
 ## Running
 

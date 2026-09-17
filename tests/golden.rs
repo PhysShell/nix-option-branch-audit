@@ -419,6 +419,35 @@ fn h2_case7_relevant_unresolved_site_blocks_a_false_oba001() {
 }
 
 #[test]
+fn h2_case9_h2_candidate_rescues_a_false_default_unresolved() {
+    // Hostile-review finding on H2.2 itself (invariant 2, post-commit):
+    // H1's own gate 3 used to `continue` immediately whenever it
+    // couldn't classify its OWN predicate's default outcome
+    // (`DefaultUnresolved`), skipping the H2 loop entirely for that
+    // option -- even when a SEPARATE H2 candidate on the exact same
+    // option is fully resolvable. `flag`'s default is a plain string
+    // ("sqlite"): H1's coarser ValueClass classifies it as
+    // DefinitelyNonNull, which a `Truthy` predicate (H1's own, found
+    // here) can't turn into a boolean outcome -- but H2's finer
+    // KnownValue classifies the identical node as
+    // Exact(Str("sqlite")), which the module's SEPARATE `flag ==
+    // "mysql"` predicate resolves cleanly. Must be PASS, not a false
+    // DefaultUnresolved that silently hides a real, evaluable H2
+    // witness. The pre-existing `h1_unresolvable_default_is_inconclusive_not_guessed`
+    // (target c7-unresolved-default) is the negative control: no H2
+    // candidate exists there, so DefaultUnresolved is still exactly
+    // correct and must remain unchanged.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case9-default-unresolved-rescue");
+    assert_eq!(
+        verdict_kind(r, "flag"),
+        "PASS",
+        "an H1 predicate whose default can't classify must not block a separate, \
+         fully H2-resolvable predicate on the same option from witnessing a real transition"
+    );
+}
+
+#[test]
 fn h2_case8_alias_hidden_unresolved_relevance_blocks_a_false_oba001() {
     // H2.2 Finding 3, round 2: `direct`'s own predicate (driver != null)
     // never transitions (true both at default "sqlite" and test "mysql"),

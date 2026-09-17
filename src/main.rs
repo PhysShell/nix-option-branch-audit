@@ -2696,63 +2696,89 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         // predicate AND a real, transitioning H2 compound predicate would
         // report the H1 predicate's `OBA001` and never even look at the
         // H2 one -- a genuine false `OBA001`, not merely an incomplete
-        // `PASS`. H1's own gate 3 (`DefaultUnresolved`) stays an
-        // immediate, unchanged short-circuit specifically for H1's own
-        // predicate -- narrow, deliberate scope: this preserves
-        // byte-identical behavior for the existing `DefaultUnresolved`
-        // goldens without also having to unify gate 3 itself into the
-        // aggregator, which no finding actually asked for.
+        // `PASS`.
+        //
+        // Reviewed a second time (hostile review of this very commit,
+        // before it was even accepted as a checkpoint): H1's own gate 3
+        // (`DefaultUnresolved`) used to stay an immediate `continue`
+        // here, on the reasoning that it "preserves byte-identical
+        // behavior for the existing `DefaultUnresolved` goldens without
+        // unifying gate 3 into the aggregator too". That reasoning was
+        // exactly the same shape of bug this whole corrective pass
+        // exists to close: H1's `ValueClass` classifies a default's
+        // outcome more coarsely than H2's `KnownValue` does for the
+        // identical AST node (a plain string-literal default is
+        // `ValueClass::DefinitelyNonNull` -- enough for a null-check
+        // predicate, not enough for `Truthy`/`NegTruthy` -- but
+        // `KnownValue::Exact(Scalar::Str(..))` under `classify_known_value`,
+        // which a compound `Eq`-based H2 predicate on the very same
+        // option CAN resolve). The old immediate `continue` meant H1
+        // failing to classify its own predicate's default silently
+        // skipped the H2 loop entirely for that option, even when an H2
+        // candidate on the same option would have witnessed a real
+        // transition -- a false `DefaultUnresolved` standing in for what
+        // should have been `PASS`. `h1_default_unresolved` now only
+        // decides the *fallback* verdict when nothing else (H2 included)
+        // produces a witness or even an attempt; a witnessing H2
+        // candidate always wins, matching the priority Pass already has
+        // over everything else in this aggregation.
         let mut attempts: Vec<PredicateAttempt> = Vec::new();
         let mut winner: Option<(PredicateRef, bool, Vec<TestAssignment>)> = None;
         let mut has_unresolved = false;
+        let mut h1_default_unresolved = false;
 
         if let Some(pred) = predicates.iter().find(|p| p.path == watched_path) {
-            // Gate 3 for H1's own predicate specifically -- unchanged.
-            let Some(default_outcome) = decl
+            // Gate 3 for H1's own predicate specifically. A `None` here
+            // no longer short-circuits the whole option -- it just means
+            // H1's own predicate contributes no attempt at all (there is
+            // no default outcome to compare a test value against), and
+            // `h1_default_unresolved` is what the final fallback verdict
+            // below checks once every H2 candidate has also been tried.
+            match decl
                 .default_class
                 .and_then(|c| predicate_outcome(&pred.kind, c))
-            else {
-                verdicts.push(Verdict::DefaultUnresolved {
-                    option: watched.clone(),
-                    predicate: PredicateRef::Unary(pred.clone()),
-                });
-                continue;
-            };
-
-            // H1's own gate 4, unchanged, expressed as one candidate's
-            // attempt instead of an immediate verdict.
-            let matches: Vec<TestAssignment> = assignments
-                .iter()
-                .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
-                .cloned()
-                .collect();
-            matched_assignments.extend(matches.clone());
-
-            let mut opposite = Vec::new();
-            let mut h1_has_unresolved = false;
-            for a in &matches {
-                match predicate_outcome(&pred.kind, a.value_class) {
-                    Some(o) if o == !default_outcome => opposite.push(a.clone()),
-                    Some(_) => {} // known, same outcome as the default -- no evidence, not ambiguous either
-                    None => h1_has_unresolved = true,
+            {
+                None => {
+                    h1_default_unresolved = true;
                 }
-            }
+                Some(default_outcome) => {
+                    // H1's own gate 4, unchanged, expressed as one
+                    // candidate's attempt instead of an immediate verdict.
+                    let matches: Vec<TestAssignment> = assignments
+                        .iter()
+                        .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
+                        .cloned()
+                        .collect();
+                    matched_assignments.extend(matches.clone());
 
-            attempts.push(PredicateAttempt {
-                predicate: PredicateRef::Unary(pred.clone()),
-                witnessed: if !opposite.is_empty() {
-                    Some(true)
-                } else if h1_has_unresolved {
-                    None
-                } else {
-                    Some(false)
-                },
-            });
-            if h1_has_unresolved {
-                has_unresolved = true;
-            }
-            if !opposite.is_empty() {
-                winner = Some((PredicateRef::Unary(pred.clone()), default_outcome, opposite));
+                    let mut opposite = Vec::new();
+                    let mut h1_has_unresolved = false;
+                    for a in &matches {
+                        match predicate_outcome(&pred.kind, a.value_class) {
+                            Some(o) if o == !default_outcome => opposite.push(a.clone()),
+                            Some(_) => {} // known, same outcome as the default -- no evidence, not ambiguous either
+                            None => h1_has_unresolved = true,
+                        }
+                    }
+
+                    attempts.push(PredicateAttempt {
+                        predicate: PredicateRef::Unary(pred.clone()),
+                        witnessed: if !opposite.is_empty() {
+                            Some(true)
+                        } else if h1_has_unresolved {
+                            None
+                        } else {
+                            Some(false)
+                        },
+                    });
+                    if h1_has_unresolved {
+                        has_unresolved = true;
+                    }
+                    if !opposite.is_empty() {
+                        winner =
+                            Some((PredicateRef::Unary(pred.clone()), default_outcome, opposite));
+                    }
+                }
             }
         }
 
@@ -2794,6 +2820,16 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
         }
 
         if attempts.is_empty() {
+            // Neither H1 found its own predicate for this option, nor
+            // did H2's scanner find any resolved predicate referencing
+            // it -- genuinely nothing to report on. (In practice
+            // `h1_default_unresolved` is essentially never true here: a
+            // bare `cfg.foo` select H1 recognizes as a direct predicate
+            // is independently picked up by `scan_resolved_predicates`
+            // too, so H1 finding a predicate almost always means
+            // `attempts` already has at least one H2-sourced entry --
+            // see the `h1_default_unresolved` check below, which is what
+            // actually handles that case now.)
             verdicts.push(Verdict::PredicateNotFound {
                 option: watched.clone(),
             });
@@ -2807,6 +2843,32 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
                 default_outcome,
                 evidence,
                 predicate_attempts: attempts,
+            });
+            continue;
+        }
+
+        // H1's own predicate exists but its default outcome couldn't be
+        // classified, and nothing (H1's own gate 4 included, and no H2
+        // candidate either) produced a witness above. Reviewed:
+        // `DefaultUnresolved` used to be reported via an immediate
+        // `continue` before opacity/assignments were even looked at, so
+        // it effectively outranked every other verdict whenever it
+        // applied -- preserved here at the same near-top priority
+        // (right after a real witness) rather than folding it into the
+        // generic `has_unresolved` bucket below, which would have
+        // reported a real `c7-unresolved-default`-shaped target as
+        // `TestValueUnresolved` instead of the intended
+        // `DefaultUnresolved` (caught by the existing
+        // `h1_unresolvable_default_is_inconclusive_not_guessed` golden
+        // regressing during this exact fix).
+        if h1_default_unresolved {
+            let pred = predicates
+                .iter()
+                .find(|p| p.path == watched_path)
+                .expect("h1_default_unresolved is only set when this find() succeeded above");
+            verdicts.push(Verdict::DefaultUnresolved {
+                option: watched.clone(),
+                predicate: PredicateRef::Unary(pred.clone()),
             });
             continue;
         }

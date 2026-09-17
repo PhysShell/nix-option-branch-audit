@@ -321,3 +321,11 @@ test = "fixtures/synthetic/h2-alias-hidden-unresolved/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synthHidden"]
 watch = ["database.driver"]
+
+[[target]]
+name = "h2-case9-default-unresolved-rescue"
+module = "fixtures/synthetic/h2-default-unresolved-rescue/module.nix"
+test = "fixtures/synthetic/h2-default-unresolved-rescue/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthDefaultRescue"]
+watch = ["flag"]
