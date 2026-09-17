@@ -8,6 +8,13 @@ description = "Layer-1 spike: option branch activation evidence for NixOS module
 name = "oba"
 path = "src/main.rs"
 
+# `cfg(kani)` is only ever set by the `cargo kani` toolchain (see the
+# KANI-0 proofs module in src/main.rs, entirely gated behind it and
+# invisible to every normal build); declared here so a plain
+# `cargo build`/`cargo clippy` doesn't warn about an "unknown" cfg.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }
+
 [dependencies]
 rnix = "0.11"
 rowan = "0.15"

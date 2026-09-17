@@ -1,0 +1,33 @@
+name: Kani proofs
+
+# KANI-0: bounded formal proofs of the semantic core (src/main.rs's
+# `kani_proofs` module, `#[cfg(kani)]`-gated, invisible to every normal
+# build). Runs here rather than locally on principle, not convenience:
+# even the cheapest non-trivial `eval_pred` harness (a single `Ref`
+# lookup against a real `HashMap<Vec<String>, KnownValue>`) pushed a
+# 1-core/1.9GB dev VPS to under 100MB free and 2.4GB of swap before
+# finishing, because CBMC has to symbolically model Rust's SipHash-based
+# `HashMap` hasher regardless of how small the surrounding harness is --
+# confirmed empirically across five escalating scope reductions, not
+# guessed. GitHub-hosted runners have meaningfully more RAM/CPU
+# headroom for exactly this kind of proof.
+#
+# Reuse survey (AGENTS.md step 3/5): the official, actively-maintained
+# `model-checking/kani-github-action` (published by the same org that
+# maintains Kani itself) handles toolchain install + `cargo kani`
+# invocation -- no reason to hand-roll that setup.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  kani:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Kani proofs
+        uses: model-checking/kani-github-action@v1

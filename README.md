@@ -1281,6 +1281,75 @@ trusting any `cargo test` run immediately after a `cargo-mutants`
 invocation resolves it; `env -u CARGO_TARGET_DIR` on the `cargo mutants`
 invocation itself reduces but doesn't eliminate the risk.
 
+## KANI-0: bounded formal proofs of the semantic core
+
+Mutation testing (`0afe187`) left a small, clean semantic core — the
+condition the user set for deciding this determination was finally
+meaningful rather than decorative. Scope agreed explicitly, in two
+layers, seven harnesses total (13 counting K0.2's per-operator split):
+
+- **K0 — the abstract boolean evaluator never fabricates knowledge.**
+  `eval_known_eq`/`eval_pred` return `Option<bool>`; the entire `PASS`/
+  `OBA001` distinction rests on `Some(b)` meaning "we actually know
+  this", not "this looks plausible". K0.1 proves `eval_known_eq`
+  soundness directly. K0.2 (one harness per `Pred` constructor —
+  `Eq`/`Not`/`And`/`Or`, plus a two-refs-to-the-same-path case) proves
+  `eval_pred` soundness: whenever it returns `Some(x)` against an
+  abstract environment, `x` agrees with the fully concrete ground truth
+  the abstraction represents. K0.3 proves information monotonicity
+  (refining an environment — `Unknown → DefinitelyNonNull → Exact` —
+  never flips or loses an already-known result, the bounded-model-
+  checking version of the existing `removing_a_known_value_never_flips_a_known_result`
+  proptest). K0.4 is a cheap sanity/positive control (`Not(Not(p)) = p`),
+  proving the harness machinery actually explores the tree, not a reason
+  on its own to run Kani.
+- **K1 — `aggregate`'s priority ordering is exhaustively correct.**
+  Already pinned by brute-force enumeration
+  (`aggregate_priority_is_exhaustively_correct_over_all_32_cases`, plain
+  `cargo test`, 32 cases is cheap) — restated as 5 `#[kani::proof]`
+  harnesses (K1.1–K1.5) because this exact priority ordering has broken
+  twice for real (H2.2 Finding 2; the post-`cef12d7` hostile-review
+  fixup), so it earns a formal artifact of its own. K1.5 in particular
+  states the fail-closed guarantee as a postcondition on the verdict
+  itself: if `aggregate` ever returns `Oba001`, none of the other four
+  uncertainty facts held.
+
+**Deliberately not attempted**: `rnix`/`rowan`, `resolve_ident_binding`,
+`lower_pred_chained`, the test-file walker, or `run_target` as a whole.
+A small self-contained function with an existing test base is exactly
+what Kani's own guidance recommends starting from; a deep call graph
+over untyped syntax trees is exactly what it warns against. That surface
+already has goldens, adversarial fixtures, proptest, mutation testing,
+and hostile review — formalizing it now would be negative ROI.
+
+**Runs in CI, not locally — a resource finding, not a preference.**
+K0.1 and all five K1 harnesses run in seconds on this project's own dev
+VPS (1 core, 1.9GB RAM). K0.2/K0.3 do not: five escalating scope
+reductions were tried locally (free recursive `Pred` generator over 3
+paths/depth 2, then 2 paths/depth 1, then 1 path/depth 1; finally
+replaced the generator entirely with one FIXED tree shape per `Pred`
+constructor, cutting the real driver — `kani::any()` branching over
+"which Pred variant" and "Ref vs Literal" at every position,
+multiplying into dozens of structurally distinct trees before CBMC even
+reaches SAT solving). The fixed-shape redesign is a genuine improvement
+and stayed even after the decision to move to CI — but it did NOT fully
+solve the cost: even the single cheapest shape (`k0_2_eq_sound`, exactly
+one `Ref` lookup against one real environment entry) pushed the VPS to
+under 100MB free and 2.4GB of swap before finishing, confirming the
+dominant cost is CBMC symbolically modeling Rust `HashMap`'s SipHash
+hasher — present in any use of the real `HashMap<Vec<String>,
+KnownValue>` environment type at all, not something a smaller harness
+shape can fully dodge. `.github/workflows/kani.yml` runs the whole
+module (`model-checking/kani-github-action`, the official, maintained
+action — reuse-first per AGENTS.md) on GitHub-hosted runners, which have
+the headroom this class of proof actually needs.
+
+```
+cargo kani list              # enumerate harnesses without running any (fast, local, safe)
+cargo kani --harness NAME    # run one harness locally -- fine for K0.1/K1, NOT recommended
+                              # for K0.2/K0.3 on a resource-constrained machine
+```
+
 ## Running
 
 ```

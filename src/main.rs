@@ -2609,6 +2609,86 @@ fn evaluate_predicate_witness(
     }
 }
 
+/// The kind of verdict a watched option resolves to, once every
+/// candidate predicate (H1's own and every H2 `ResolvedPredicate`) has
+/// been tried -- carries no payload (no spans, evidence, or predicate
+/// references) on purpose. `run_target` still builds the full `Verdict`
+/// afterward, attaching whichever data belongs to the chosen kind; this
+/// type exists solely so the PRIORITY DECISION itself is a small, pure,
+/// exhaustively-checkable function, separated from the much larger
+/// surrounding orchestration (scanning, evaluating candidates,
+/// collecting evidence) that decides these facts in the first place.
+///
+/// Extracted specifically because hostile review has now twice found a
+/// real bug in exactly this priority ordering, living inline inside
+/// `run_target` both times (H2.2 Finding 2: H1's own predicate wrongly
+/// short-circuited past H2 candidates; the post-`cef12d7` hostile-review
+/// fixup: H1's own `DefaultUnresolved` wrongly short-circuited past H2
+/// candidates too, one gate earlier) -- both were ordering/short-circuit
+/// mistakes in code that mixed the DECISION with the LOOKUP that
+/// produces its inputs. Pulling the decision out into `aggregate`, over
+/// only 5 booleans (32 total input combinations, fully enumerable), is
+/// what makes that class of bug amenable to exhaustive verification
+/// (see KANI-0's K1 harnesses) instead of only spot-checked by whichever
+/// golden fixtures happen to exist.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum AggregateVerdict {
+    Pass,
+    DefaultUnresolved,
+    TestConfigUnresolved,
+    TestValueUnresolved,
+    Oba001,
+}
+
+/// Every fact `aggregate` needs, computed by `run_target` from the real
+/// predicate/opacity/unresolved-site data -- the decision itself never
+/// touches that data directly, only these five booleans.
+#[derive(Debug, Clone, Copy)]
+struct AggregateFacts {
+    /// A candidate (H1's own unary predicate, or any H2 `ResolvedPredicate`
+    /// referencing the watched option) produced a real opposite-outcome
+    /// transition -- `winner.is_some()` at the call site.
+    has_witness: bool,
+    /// H1 found its own direct predicate for the watched option, but its
+    /// declared default's outcome under that predicate couldn't be
+    /// statically classified.
+    h1_default_unresolved: bool,
+    /// Some part of the test config that could structurally contain the
+    /// watched option lives in a region the walker couldn't see into.
+    target_path_opaque: bool,
+    /// At least one candidate's own evaluation (an H1 test-value
+    /// classification, or an H2 counterfactual environment) was itself
+    /// unresolvable.
+    has_unresolved_attempt: bool,
+    /// A branch-condition site the resolver found but couldn't lower
+    /// reachably references the watched option (see
+    /// `collect_reachable_refs`), even though it contributed no witness.
+    relevant_unresolved_predicate: bool,
+}
+
+/// The pure priority decision: a real witness always wins (`Pass`);
+/// otherwise `DefaultUnresolved` (H1's own predicate exists but its
+/// default is unknown) stays at the same near-top priority it always
+/// had, since a target this can apply to has nothing more specific to
+/// fall back on; otherwise config-region opacity outranks a merely
+/// unresolved value or predicate site, which in turn outranks a clean
+/// `Oba001` -- `Oba001` is reachable only when NONE of the other four
+/// facts hold, i.e. only when every known source of uncertainty this
+/// tool tracks has been checked and found clear.
+fn aggregate(f: AggregateFacts) -> AggregateVerdict {
+    if f.has_witness {
+        AggregateVerdict::Pass
+    } else if f.h1_default_unresolved {
+        AggregateVerdict::DefaultUnresolved
+    } else if f.target_path_opaque {
+        AggregateVerdict::TestConfigUnresolved
+    } else if f.has_unresolved_attempt || f.relevant_unresolved_predicate {
+        AggregateVerdict::TestValueUnresolved
+    } else {
+        AggregateVerdict::Oba001
+    }
+}
+
 fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
     let module_src = fs::read_to_string(&t.module).map_err(|e| {
         anyhow::anyhow!(
@@ -2847,43 +2927,6 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             continue;
         }
 
-        if let Some((predicate, default_outcome, evidence)) = winner {
-            verdicts.push(Verdict::Pass {
-                option: watched.clone(),
-                predicate,
-                default_outcome,
-                evidence,
-                predicate_attempts: attempts,
-            });
-            continue;
-        }
-
-        // H1's own predicate exists but its default outcome couldn't be
-        // classified, and nothing (H1's own gate 4 included, and no H2
-        // candidate either) produced a witness above. Reviewed:
-        // `DefaultUnresolved` used to be reported via an immediate
-        // `continue` before opacity/assignments were even looked at, so
-        // it effectively outranked every other verdict whenever it
-        // applied -- preserved here at the same near-top priority
-        // (right after a real witness) rather than folding it into the
-        // generic `has_unresolved` bucket below, which would have
-        // reported a real `c7-unresolved-default`-shaped target as
-        // `TestValueUnresolved` instead of the intended
-        // `DefaultUnresolved` (caught by the existing
-        // `h1_unresolvable_default_is_inconclusive_not_guessed` golden
-        // regressing during this exact fix).
-        if h1_default_unresolved {
-            let pred = predicates
-                .iter()
-                .find(|p| p.path == watched_path)
-                .expect("h1_default_unresolved is only set when this find() succeeded above");
-            verdicts.push(Verdict::DefaultUnresolved {
-                option: watched.clone(),
-                predicate: PredicateRef::Unary(pred.clone()),
-            });
-            continue;
-        }
-
         // Does any part of the test config that could structurally contain
         // this option live in a region the walker couldn't see into
         // (imports, an alias, a function call)? Checked AFTER opposite
@@ -2948,27 +2991,66 @@ fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
             });
         let primary_predicate = attempts[0].predicate.clone();
 
-        if target_path_opaque {
-            verdicts.push(Verdict::TestConfigUnresolved {
-                option: watched.clone(),
-                predicate: primary_predicate,
-                default_outcome: diagnostic_default_outcome,
-                predicate_attempts: attempts,
-            });
-        } else if has_unresolved || relevant_predicate_site_unresolved {
-            verdicts.push(Verdict::TestValueUnresolved {
-                option: watched.clone(),
-                predicate: primary_predicate,
-                default_outcome: diagnostic_default_outcome,
-                predicate_attempts: attempts,
-            });
-        } else {
-            verdicts.push(Verdict::Oba001 {
-                option: watched.clone(),
-                predicate: primary_predicate,
-                default_outcome: diagnostic_default_outcome,
-                predicate_attempts: attempts,
-            });
+        // The priority decision itself lives in `aggregate` -- a small,
+        // pure function over these five facts, kept separate from the
+        // lookups above precisely because both real bugs in this
+        // priority ordering so far were short-circuit mistakes tangled
+        // up with the code that computes its inputs. See `aggregate`'s
+        // own doc comment.
+        let facts = AggregateFacts {
+            has_witness: winner.is_some(),
+            h1_default_unresolved,
+            target_path_opaque,
+            has_unresolved_attempt: has_unresolved,
+            relevant_unresolved_predicate: relevant_predicate_site_unresolved,
+        };
+
+        match aggregate(facts) {
+            AggregateVerdict::Pass => {
+                let (predicate, default_outcome, evidence) = winner
+                    .expect("aggregate only returns Pass when facts.has_witness == winner.is_some() == true");
+                verdicts.push(Verdict::Pass {
+                    option: watched.clone(),
+                    predicate,
+                    default_outcome,
+                    evidence,
+                    predicate_attempts: attempts,
+                });
+            }
+            AggregateVerdict::DefaultUnresolved => {
+                let pred = predicates
+                    .iter()
+                    .find(|p| p.path == watched_path)
+                    .expect("h1_default_unresolved is only set when this find() succeeded above");
+                verdicts.push(Verdict::DefaultUnresolved {
+                    option: watched.clone(),
+                    predicate: PredicateRef::Unary(pred.clone()),
+                });
+            }
+            AggregateVerdict::TestConfigUnresolved => {
+                verdicts.push(Verdict::TestConfigUnresolved {
+                    option: watched.clone(),
+                    predicate: primary_predicate,
+                    default_outcome: diagnostic_default_outcome,
+                    predicate_attempts: attempts,
+                });
+            }
+            AggregateVerdict::TestValueUnresolved => {
+                verdicts.push(Verdict::TestValueUnresolved {
+                    option: watched.clone(),
+                    predicate: primary_predicate,
+                    default_outcome: diagnostic_default_outcome,
+                    predicate_attempts: attempts,
+                });
+            }
+            AggregateVerdict::Oba001 => {
+                verdicts.push(Verdict::Oba001 {
+                    option: watched.clone(),
+                    predicate: primary_predicate,
+                    default_outcome: diagnostic_default_outcome,
+                    predicate_attempts: attempts,
+                });
+            }
         }
     }
 
@@ -3425,12 +3507,579 @@ fn print_human(r: &TargetReport) {
     }
 }
 
+// ---------------------------------------------------------------------
+// KANI-0: bounded formal proofs of semantic-core soundness.
+//
+// Explicit scope, agreed after the mutation-testing pass (`0afe187`)
+// left a small, clean semantic core -- NOT an attempt to formally verify
+// the analyzer as a whole. Two layers:
+//
+// K0: the abstract boolean evaluator (`eval_known_eq`/`eval_pred`) never
+// fabricates knowledge -- whenever it returns `Some(b)`, `b` is correct
+// for EVERY concrete valuation consistent with its abstract input, not
+// just plausible. This is the theorem the entire `PASS`/`OBA001`
+// distinction rests on: a `Some` the evaluator didn't actually earn
+// would silently corrupt every verdict built on top of it.
+//
+// K1: `aggregate`'s priority ordering is exhaustively correct -- already
+// pinned by `aggregate_priority_is_exhaustively_correct_over_all_32_cases`
+// via brute-force enumeration (cheap enough not to need Kani at all,
+// 32 cases), restated here as `#[kani::proof]` harnesses per the
+// explicit ask: two real regressions (H2.2 Finding 2, and the
+// post-`cef12d7` hostile-review fixup) both lived in exactly this
+// priority ordering, so it earns a proof artifact of its own, not just
+// an enumeration.
+//
+// Deliberately NOT attempted here: `rnix`/`rowan`, `resolve_ident_binding`,
+// `lower_pred_chained`, the test-file walker, or `run_target` as a
+// whole -- a small self-contained function with an existing test base is
+// exactly what Kani's own guidance recommends starting from; a deep call
+// graph over untyped syntax trees is exactly what it warns against. That
+// surface already has goldens, adversarial fixtures, proptest, mutation
+// testing, and hostile review; formalizing the syntax layer now would be
+// negative ROI, not a next step.
+//
+// Runs in CI (`.github/workflows/kani.yml`), not on a local dev
+// machine, and that's a deliberate resource decision, not a style
+// preference: even the CHEAPEST non-trivial `eval_pred` harness (a
+// single `Ref` lookup against one real environment entry) pushed a
+// 1-core/1.9GB VPS to under 100MB free and 2.4GB of swap before
+// finishing, because CBMC has to symbolically model Rust's SipHash-based
+// `HashMap` hasher regardless of how small the surrounding harness is --
+// confirmed empirically across five escalating scope reductions (a free
+// recursive `Pred` generator over 3 paths/depth 2 never finished; over
+// 1 path/depth 1 it still climbed for 20+ minutes; only replacing the
+// generator with one FIXED tree shape per `Pred` constructor, see K0.2's
+// own comment, got individual harnesses down to a size any real Rust
+// program's tests would consider normal). GitHub-hosted runners have
+// the RAM/CPU headroom this class of proof actually needs.
+//
+// Verification-only code, invisible to every normal build (`cfg(kani)`
+// gates it out of `cargo build`/`cargo test`/`cargo clippy` entirely --
+// `cargo kani` is the only thing that ever compiles this module).
+#[cfg(kani)]
+mod kani_proofs {
+    use super::*;
+
+    // -------------------------------------------------------------
+    // Shared generators: a small, closed universe -- real `HashMap`/
+    // `String` types (proving the actual production functions, not a
+    // mirror), but only ever holding values drawn from a tiny alphabet.
+    // `kani_any_scalar` (3-valued: Null/False/True) is the DEFAULT, used
+    // everywhere except K0.1 itself, which needs `kani_any_scalar5`
+    // (adds two DISTINCT non-null strings "s0"/"s1") to tell "the same
+    // non-null scalar" apart from "some other non-null scalar" -- the
+    // one place that distinction actually matters for `eval_known_eq`'s
+    // own soundness, checked in isolation from any `Pred`/environment
+    // machinery (and so cheap regardless).
+    // -------------------------------------------------------------
+
+    fn kani_any_scalar() -> Scalar {
+        let tag: u8 = kani::any();
+        kani::assume(tag < 3);
+        match tag {
+            0 => Scalar::Null,
+            1 => Scalar::Bool(false),
+            _ => Scalar::Bool(true),
+        }
+    }
+
+    // Wider scalar generator (5-valued: adds two DISTINCT non-null
+    // strings "s0"/"s1"), used only by K0.1 -- see the module doc
+    // comment above for why the other K0 proofs stick to the cheaper
+    // 3-valued `kani_any_scalar`.
+    fn kani_any_scalar5() -> Scalar {
+        let tag: u8 = kani::any();
+        kani::assume(tag < 5);
+        match tag {
+            0 => Scalar::Null,
+            1 => Scalar::Bool(false),
+            2 => Scalar::Bool(true),
+            3 => Scalar::Str("s0".to_string()),
+            _ => Scalar::Str("s1".to_string()),
+        }
+    }
+
+    // A single fixed path, not a symbolic choice over several -- see
+    // K0.2's doc comment for why a free generator (over Pred shape,
+    // Ref-vs-Literal choice, AND path count) is what actually blew up
+    // CBMC's GOTO-program construction, not path count on its own. A
+    // `Pred` can still reference this one path from multiple
+    // `ValueExpr::Ref` positions within a compound
+    // (`And(Eq(Ref(a),lit1), Eq(Ref(a),lit2))`, see
+    // `k0_2_and_two_refs_to_same_path_sound`), which is enough to
+    // exercise real `And`/`Or`/`Not` combination soundness -- testing
+    // "two DIFFERENT options in one predicate" is what K0.3 (information
+    // monotonicity, which independently varies per-path knowledge) is
+    // for, not K0.2's job.
+    fn kani_path(_tag: u8) -> OptionPath {
+        vec!["a".to_string()]
+    }
+
+    /// γ (verification-only, never used by production code): is
+    /// `concrete` one of the real values `abstract_kv` could denote?
+    /// `Exact(s)` denotes exactly `s`; `DefinitelyNonNull` denotes any
+    /// non-null scalar -- the same semantics `eval_known_eq`'s own doc
+    /// comment describes.
+    fn kani_concretizes(abstract_kv: &KnownValue, concrete: &Scalar) -> bool {
+        match abstract_kv {
+            KnownValue::Exact(s) => s == concrete,
+            KnownValue::DefinitelyNonNull => !matches!(concrete, Scalar::Null),
+        }
+    }
+
+    // -------------------------------------------------------------
+    // K0.1 -- abstract equality never fabricates knowledge.
+    // -------------------------------------------------------------
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_1_eval_known_eq_sound() {
+        let a = if kani::any() {
+            KnownValue::DefinitelyNonNull
+        } else {
+            KnownValue::Exact(kani_any_scalar5())
+        };
+        let b = if kani::any() {
+            KnownValue::DefinitelyNonNull
+        } else {
+            KnownValue::Exact(kani_any_scalar5())
+        };
+        let ca = kani_any_scalar5();
+        let cb = kani_any_scalar5();
+        kani::assume(kani_concretizes(&a, &ca));
+        kani::assume(kani_concretizes(&b, &cb));
+
+        if let Some(x) = eval_known_eq(&a, &b) {
+            assert_eq!(ca == cb, x, "eval_known_eq({a:?}, {b:?}) = Some({x}) but concretizations {ca:?}/{cb:?} disagree");
+        }
+    }
+
+    // -------------------------------------------------------------
+    // K0.2 -- the main proof: `eval_pred` never fabricates a boolean
+    // outcome, checked against an ABSTRACT environment and against the
+    // FULLY CONCRETE environment it abstracts (`eval_pred` itself is the
+    // ground truth for the concrete case too, see the doc comment above
+    // `kani_env_pair` -- a totally known environment has no abstraction
+    // left to reason about).
+    //
+    // One harness per `Pred` constructor, each with a FIXED tree shape
+    // rather than a free recursive generator -- reviewed and rebuilt
+    // after three escalating attempts at a single generic generator
+    // (depth<=2/3 paths, then depth<=1/2 paths, then depth<=1/1 path)
+    // each still took several minutes of CPU and kept climbing, never
+    // finishing. The fixed shape here cuts the BRANCHING FACTOR a free
+    // generator has (`kani::any()` deciding "which of 4 Pred variants"
+    // at every level, and separately "Ref or Literal" at every
+    // `ValueExpr` position, multiplying into dozens of structurally
+    // distinct trees before CBMC even reaches SAT solving) down to just
+    // the leaf VALUES staying symbolic -- a real improvement, and the
+    // right shape for a harness regardless of hardware. It did NOT,
+    // however, fully solve the underlying cost: even the single
+    // cheapest fixed shape here (`k0_2_eq_sound`, exactly one `Ref`
+    // lookup) still pushed a 1-core/1.9GB VPS to under 100MB free before
+    // finishing -- confirming the dominant cost is `HashMap`'s own
+    // SipHash machinery, present in ANY use of the real environment type
+    // at all, not something a smaller harness shape can fully dodge.
+    // That's why this whole module runs in CI (see the module-level
+    // comment above), not locally.
+    // -------------------------------------------------------------
+
+    fn kani_any_literal_expr() -> ValueExpr {
+        ValueExpr::Literal(kani_any_scalar())
+    }
+
+    /// Builds a matched (abstract, concrete) pair of environments for
+    /// the one fixed path: `concrete` always maps it to a fully known
+    /// `Exact` scalar (so `eval_pred(pred, &concrete)` is always
+    /// `Some(_)` and IS the ground truth by construction -- no
+    /// abstraction, nothing left to get wrong); `abstract_env` maps it
+    /// to either the SAME `Exact` value (no information lost), a
+    /// `DefinitelyNonNull` abstraction of it (only when the concrete
+    /// value is actually non-null), or omits it entirely (fully
+    /// unknown) -- every one of these is a valid abstraction of
+    /// `concrete` by `kani_concretizes`'s own definition.
+    fn kani_env_pair() -> (
+        std::collections::HashMap<OptionPath, KnownValue>,
+        std::collections::HashMap<OptionPath, KnownValue>,
+    ) {
+        let mut concrete = std::collections::HashMap::new();
+        let mut abstract_env = std::collections::HashMap::new();
+        let path = kani_path(0);
+        let c = kani_any_scalar();
+        concrete.insert(path.clone(), KnownValue::Exact(c.clone()));
+
+        let mode: u8 = kani::any();
+        kani::assume(mode < 3);
+        match mode {
+            0 => {
+                abstract_env.insert(path, KnownValue::Exact(c));
+            }
+            1 => {
+                kani::assume(!matches!(c, Scalar::Null));
+                abstract_env.insert(path, KnownValue::DefinitelyNonNull);
+            }
+            _ => {
+                // omitted entirely -- fully unknown at this path
+            }
+        }
+        (abstract_env, concrete)
+    }
+
+    /// Shared assertion body for every K0.2 shape: if the abstract
+    /// evaluation resolves at all, it must agree with the concrete
+    /// ground truth.
+    fn k0_2_check(
+        pred: &Pred,
+        abstract_env: &std::collections::HashMap<OptionPath, KnownValue>,
+        concrete_env: &std::collections::HashMap<OptionPath, KnownValue>,
+    ) {
+        if let Some(x) = eval_pred(pred, abstract_env) {
+            let ground_truth = eval_pred(pred, concrete_env)
+                .expect("a fully Exact environment must always resolve eval_pred");
+            assert_eq!(
+                x, ground_truth,
+                "eval_pred returned Some({x}) against an abstraction that doesn't match the \
+                 concrete ground truth {ground_truth}"
+            );
+        }
+    }
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_2_eq_sound() {
+        let (abstract_env, concrete_env) = kani_env_pair();
+        let pred = Pred::Eq(ValueExpr::Ref(kani_path(0)), kani_any_literal_expr());
+        k0_2_check(&pred, &abstract_env, &concrete_env);
+    }
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_2_not_sound() {
+        let (abstract_env, concrete_env) = kani_env_pair();
+        let pred = Pred::Not(Box::new(Pred::Eq(
+            ValueExpr::Ref(kani_path(0)),
+            kani_any_literal_expr(),
+        )));
+        k0_2_check(&pred, &abstract_env, &concrete_env);
+    }
+
+    // `And`/`Or` each pair one env-derived (`Ref`) operand with one
+    // fully literal operand (no lookup at all) -- enough to prove the
+    // Kleene combination logic honors an abstract operand correctly,
+    // without doubling the lookup count for no additional coverage
+    // (K0.2's "two refs to the same path" case, below, covers the
+    // genuinely different question of two abstract facts combining).
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_2_and_sound() {
+        let (abstract_env, concrete_env) = kani_env_pair();
+        let pred = Pred::And(
+            Box::new(Pred::Eq(
+                ValueExpr::Ref(kani_path(0)),
+                kani_any_literal_expr(),
+            )),
+            Box::new(Pred::Eq(kani_any_literal_expr(), kani_any_literal_expr())),
+        );
+        k0_2_check(&pred, &abstract_env, &concrete_env);
+    }
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_2_or_sound() {
+        let (abstract_env, concrete_env) = kani_env_pair();
+        let pred = Pred::Or(
+            Box::new(Pred::Eq(
+                ValueExpr::Ref(kani_path(0)),
+                kani_any_literal_expr(),
+            )),
+            Box::new(Pred::Eq(kani_any_literal_expr(), kani_any_literal_expr())),
+        );
+        k0_2_check(&pred, &abstract_env, &concrete_env);
+    }
+
+    /// The same abstract fact used twice (both `And` operands reference
+    /// the SAME path) -- proves soundness still holds when a single
+    /// abstract environment entry gets looked up more than once within
+    /// one evaluation, not just when each `Ref` is independent.
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_2_and_two_refs_to_same_path_sound() {
+        let (abstract_env, concrete_env) = kani_env_pair();
+        let pred = Pred::And(
+            Box::new(Pred::Eq(
+                ValueExpr::Ref(kani_path(0)),
+                kani_any_literal_expr(),
+            )),
+            Box::new(Pred::Eq(
+                ValueExpr::Ref(kani_path(0)),
+                kani_any_literal_expr(),
+            )),
+        );
+        k0_2_check(&pred, &abstract_env, &concrete_env);
+    }
+
+    // -------------------------------------------------------------
+    // K0.3 -- information monotonicity: refining an abstract
+    // environment (replacing "fully unknown" with `DefinitelyNonNull`
+    // or `Exact`, or `DefinitelyNonNull` with the matching `Exact`)
+    // never flips an already-known result -- it may only turn a `None`
+    // into a `Some`, never a `Some(b)` into `Some(!b)` or `None`. This
+    // is the bounded-model-checking version of the same property
+    // `removing_a_known_value_never_flips_a_known_result` already
+    // covers via proptest -- restated here so it's exhaustive over the
+    // same bounded domain the other K0 proofs use, not sampled.
+    // -------------------------------------------------------------
+
+    /// True if `more` is a valid refinement of `less` at a single path:
+    /// equal, or `less` is absent (anything refines "unknown"), or
+    /// `less` is `DefinitelyNonNull` and `more` is the same
+    /// `DefinitelyNonNull` or any non-null `Exact`.
+    fn kani_refines(less: &Option<KnownValue>, more: &Option<KnownValue>) -> bool {
+        match (less, more) {
+            (None, _) => true,
+            (Some(_), None) => false,
+            (Some(KnownValue::Exact(s1)), Some(KnownValue::Exact(s2))) => s1 == s2,
+            (Some(KnownValue::Exact(_)), Some(KnownValue::DefinitelyNonNull)) => false,
+            (Some(KnownValue::DefinitelyNonNull), Some(KnownValue::DefinitelyNonNull)) => true,
+            (Some(KnownValue::DefinitelyNonNull), Some(KnownValue::Exact(s2))) => {
+                !matches!(s2, Scalar::Null)
+            }
+        }
+    }
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_3_eval_pred_information_monotone() {
+        // Fixed shape (see K0.2's doc comment for why -- a free
+        // recursive generator made this harness's earlier version
+        // similarly expensive): `And`/`Not`/`Eq` combined, with the
+        // single fixed path looked up twice.
+        let pred = Pred::And(
+            Box::new(Pred::Eq(
+                ValueExpr::Ref(kani_path(0)),
+                kani_any_literal_expr(),
+            )),
+            Box::new(Pred::Not(Box::new(Pred::Eq(
+                ValueExpr::Ref(kani_path(0)),
+                kani_any_literal_expr(),
+            )))),
+        );
+
+        let mut env_less = std::collections::HashMap::new();
+        let mut env_more = std::collections::HashMap::new();
+        for tag in 0u8..1 {
+            let path = kani_path(tag);
+
+            let less_present = kani::any();
+            let less_val = if less_present {
+                Some(if kani::any() {
+                    KnownValue::DefinitelyNonNull
+                } else {
+                    KnownValue::Exact(kani_any_scalar())
+                })
+            } else {
+                None
+            };
+
+            let more_present = kani::any();
+            let more_val = if more_present {
+                Some(if kani::any() {
+                    KnownValue::DefinitelyNonNull
+                } else {
+                    KnownValue::Exact(kani_any_scalar())
+                })
+            } else {
+                None
+            };
+
+            kani::assume(kani_refines(&less_val, &more_val));
+
+            if let Some(v) = less_val {
+                env_less.insert(path.clone(), v);
+            }
+            if let Some(v) = more_val {
+                env_more.insert(path, v);
+            }
+        }
+
+        if let Some(b) = eval_pred(&pred, &env_less) {
+            assert_eq!(
+                eval_pred(&pred, &env_more),
+                Some(b),
+                "refining the environment flipped or lost an already-known result"
+            );
+        }
+    }
+
+    // -------------------------------------------------------------
+    // K0.4 -- cheap sanity/positive control: proves the harness
+    // machinery actually explores the predicate tree and the toolchain
+    // works end-to-end, not a reason on its own to run Kani.
+    // -------------------------------------------------------------
+
+    #[kani::proof]
+    #[kani::unwind(4)]
+    fn k0_4_double_not_is_identity() {
+        let pred = Pred::Eq(ValueExpr::Ref(kani_path(0)), kani_any_literal_expr());
+        let (env, _) = kani_env_pair();
+        assert_eq!(
+            eval_pred(
+                &Pred::Not(Box::new(Pred::Not(Box::new(pred.clone())))),
+                &env
+            ),
+            eval_pred(&pred, &env)
+        );
+    }
+
+    // -------------------------------------------------------------
+    // K1 -- `aggregate`'s priority ordering, exhaustively correct.
+    // Already pinned by brute-force enumeration in the plain test
+    // suite (32 cases is cheap); restated as Kani proofs because this
+    // exact ordering has broken twice for real (H2.2 Finding 2, and the
+    // post-`cef12d7` hostile-review fixup), so it earns its own formal
+    // artifact.
+    // -------------------------------------------------------------
+
+    fn kani_any_facts() -> AggregateFacts {
+        AggregateFacts {
+            has_witness: kani::any(),
+            h1_default_unresolved: kani::any(),
+            target_path_opaque: kani::any(),
+            has_unresolved_attempt: kani::any(),
+            relevant_unresolved_predicate: kani::any(),
+        }
+    }
+
+    #[kani::proof]
+    fn k1_1_witness_always_wins() {
+        let mut f = kani_any_facts();
+        f.has_witness = true;
+        assert_eq!(aggregate(f), AggregateVerdict::Pass);
+    }
+
+    #[kani::proof]
+    fn k1_2_default_unresolved_priority() {
+        let mut f = kani_any_facts();
+        f.has_witness = false;
+        f.h1_default_unresolved = true;
+        assert_eq!(aggregate(f), AggregateVerdict::DefaultUnresolved);
+    }
+
+    #[kani::proof]
+    fn k1_3_test_config_unresolved_priority() {
+        let mut f = kani_any_facts();
+        f.has_witness = false;
+        f.h1_default_unresolved = false;
+        f.target_path_opaque = true;
+        assert_eq!(aggregate(f), AggregateVerdict::TestConfigUnresolved);
+    }
+
+    #[kani::proof]
+    fn k1_4_test_value_unresolved_priority() {
+        let mut f = kani_any_facts();
+        f.has_witness = false;
+        f.h1_default_unresolved = false;
+        f.target_path_opaque = false;
+        kani::assume(f.has_unresolved_attempt || f.relevant_unresolved_predicate);
+        assert_eq!(aggregate(f), AggregateVerdict::TestValueUnresolved);
+    }
+
+    /// K1.5 -- the fail-closed guarantee stated as a postcondition on
+    /// the verdict, not merely an absence of special-casing in the
+    /// code: if `aggregate` ever returns `Oba001`, NONE of the other
+    /// four uncertainty facts held. A system that prints `OBA001` never
+    /// did so while ignoring a source of doubt it already knew about.
+    #[kani::proof]
+    fn k1_5_oba001_requires_complete_knowledge() {
+        let f = kani_any_facts();
+        if aggregate(f) == AggregateVerdict::Oba001 {
+            assert!(!f.has_witness);
+            assert!(!f.h1_default_unresolved);
+            assert!(!f.target_path_opaque);
+            assert!(!f.has_unresolved_attempt);
+            assert!(!f.relevant_unresolved_predicate);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     fn path_eq(a: &[String], b: &[&str]) -> bool {
         a.len() == b.len() && a.iter().zip(b.iter()).all(|(x, y)| x == y)
+    }
+
+    /// Exhaustive check over `aggregate`'s entire 32-case input space
+    /// (5 independent booleans) -- cheap enough to just brute-force at
+    /// the unit-test level, ahead of/independent from the Kani harnesses
+    /// (KANI-0 K1) that will prove the same properties formally rather
+    /// than by enumeration. Pins exactly the priority-ordering
+    /// properties named in the K1 design, each stated as an implication
+    /// so it stays true regardless of which OTHER facts happen to hold:
+    ///
+    /// - K1.1: `has_witness` alone implies `Pass`, unconditionally.
+    /// - K1.2: no witness + `h1_default_unresolved` implies
+    ///   `DefaultUnresolved`, regardless of the other three facts.
+    /// - K1.3: no witness, no `h1_default_unresolved`, `target_path_opaque`
+    ///   implies `TestConfigUnresolved`.
+    /// - K1.4: none of the above three, but `has_unresolved_attempt` or
+    ///   `relevant_unresolved_predicate`, implies `TestValueUnresolved`.
+    /// - K1.5: `Oba001` implies NONE of the other four facts hold -- the
+    ///   fail-closed guarantee stated as a postcondition on the verdict
+    ///   itself, not just as an absence of special-casing in the code.
+    #[test]
+    fn aggregate_priority_is_exhaustively_correct_over_all_32_cases() {
+        for has_witness in [false, true] {
+            for h1_default_unresolved in [false, true] {
+                for target_path_opaque in [false, true] {
+                    for has_unresolved_attempt in [false, true] {
+                        for relevant_unresolved_predicate in [false, true] {
+                            let f = AggregateFacts {
+                                has_witness,
+                                h1_default_unresolved,
+                                target_path_opaque,
+                                has_unresolved_attempt,
+                                relevant_unresolved_predicate,
+                            };
+                            let v = aggregate(f);
+
+                            if has_witness {
+                                assert_eq!(v, AggregateVerdict::Pass, "K1.1 violated by {f:?}");
+                                continue;
+                            }
+                            if h1_default_unresolved {
+                                assert_eq!(
+                                    v,
+                                    AggregateVerdict::DefaultUnresolved,
+                                    "K1.2 violated by {f:?}"
+                                );
+                                continue;
+                            }
+                            if target_path_opaque {
+                                assert_eq!(
+                                    v,
+                                    AggregateVerdict::TestConfigUnresolved,
+                                    "K1.3 violated by {f:?}"
+                                );
+                                continue;
+                            }
+                            if has_unresolved_attempt || relevant_unresolved_predicate {
+                                assert_eq!(
+                                    v,
+                                    AggregateVerdict::TestValueUnresolved,
+                                    "K1.4 violated by {f:?}"
+                                );
+                                continue;
+                            }
+                            assert_eq!(v, AggregateVerdict::Oba001, "K1.5 violated by {f:?}");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// Scanner-level golden against real, unmodified nixpkgs source (not
