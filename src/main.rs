@@ -534,47 +534,21 @@ struct OptionDecl {
 /// (kimai's shape) simply never matches here and falls through to the
 /// nested form instead, unchanged -- this fix doesn't alter kimai's path
 /// at all.
-/// Safety gate for the flat-option-root fix, added on review: does
-/// `cfg_ident`'s own module-level binding (`cfg = config.services.davis;`)
-/// actually point at the same absolute path as the target's
-/// `option_prefix`? Without this check, a flat `options.<option_prefix> =
-/// {...};` root gets silently correlated with predicates matched against
-/// `cfg_ident` purely because the *manifest* says they share a prefix --
-/// a manifest with `cfg_ident = "otherCfg"` and `option_prefix =
-/// ["services","davis"]` could pair declarations from one scope with
-/// predicates from a completely different one, a manifest-induced false
-/// correlation this tool has no business producing. A flat search for
-/// the first `NODE_ATTRPATH_VALUE` binding `cfg_ident` anywhere in the
-/// module -- not a full scope-aware walk from a specific use site, since
-/// this only needs to check the module's own top-level `let cfg = ...;`
-/// idiom, the same flat scan `scan_predicates` already uses for its own
-/// purposes.
-fn cfg_ident_binds_to_prefix(root: &SyntaxNode, cfg_ident: &str, option_prefix: &[String]) -> bool {
-    for node in root.descendants() {
-        if node.kind() != NODE_ATTRPATH_VALUE {
-            continue;
-        }
-        let mut children = node.children();
-        let Some(attrpath) = children.next() else {
-            continue;
-        };
-        let Some(segs) = attrpath_segments(&attrpath) else {
-            continue;
-        };
-        if segs.len() != 1 || segs[0] != cfg_ident {
-            continue;
-        }
-        let Some(value) = children.next() else {
-            continue;
-        };
-        let Some((root_name, path)) = as_select(&value) else {
-            continue;
-        };
-        return root_name == "config" && path == option_prefix;
-    }
-    false
-}
-
+///
+/// Safety gate, scope-aware: for each candidate flat root, `resolve_cfg_root`
+/// (defined below, alongside the rest of the alias resolver) resolves
+/// `cfg_ident` *as seen from that declaration's own tree position* down to
+/// the `config.<path>` it actually denotes, and only walks the root if that
+/// resolved path matches `option_prefix` exactly. This used to be a flat,
+/// scope-blind search for the first `NODE_ATTRPATH_VALUE` named `cfg_ident`
+/// anywhere in the whole module -- reviewed and replaced: a flat search
+/// could find an unrelated helper function's own shadowed `cfg` before the
+/// real top-level one (wrongly rejecting a legitimate flat root), or the
+/// reverse (wrongly accepting one), and either way it was a second,
+/// independent, scope-blind way of answering "what does `cfg_ident` mean
+/// here" sitting right next to the scope-aware resolver H2 had just built
+/// for everything else -- two systems that would inevitably disagree. One
+/// resolver, one answer, used everywhere `cfg_ident`'s meaning matters.
 fn scan_options(
     file: &str,
     src: &str,
@@ -584,9 +558,6 @@ fn scan_options(
 ) -> Vec<OptionDecl> {
     let mut out = Vec::new();
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
-    let flat_root_is_safe = prefix_is_concrete
-        && !option_prefix.is_empty()
-        && cfg_ident_binds_to_prefix(root, cfg_ident, option_prefix);
     for node in root.descendants() {
         if node.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -610,10 +581,14 @@ fn scan_options(
             continue;
         }
 
-        if flat_root_is_safe
+        if prefix_is_concrete
+            && !option_prefix.is_empty()
             && segs.len() == option_prefix.len() + 1
             && segs[0] == "options"
             && segs[1..] == option_prefix[..]
+            && resolve_cfg_root(&node, cfg_ident)
+                .map(|resolved| resolved == option_prefix)
+                .unwrap_or(false)
         {
             walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
         }
@@ -756,11 +731,15 @@ fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
 // `db.createLocally && db.driver == "mysql"` can be represented and
 // evaluated as itself, rather than forcing every predicate down to
 // "truthy/falsy check of exactly one option's value" the way H1's model
-// does. Every lowering function below returns `Option<_>`, not a guess:
-// `None` means "this syntactic shape isn't representable in this pure
-// IR", propagated by `?` rather than silently discarded -- the same
-// fail-closed idiom `ValueClass`/`predicate_outcome` already use
-// throughout H1.
+// does. Every lowering function below returns `Result<_, ResolveFailure>`,
+// not a guess: a typed failure means "this syntactic shape isn't
+// representable in this pure IR, and here's specifically why", propagated
+// by `?` rather than silently discarded or collapsed into an
+// undifferentiated `None` -- the same fail-closed idiom
+// `ValueClass`/`predicate_outcome` already use throughout H1, sharpened
+// once this lowering started feeding the real verdict chain (see
+// `ResolveFailure`'s own doc comment for why a bare `Option` stopped being
+// enough).
 // ---------------------------------------------------------------------
 
 /// A dotted option path, relative to `cfg_ident` -- e.g. `cfg.database.
@@ -961,6 +940,60 @@ fn resolve_alias_recursively<T>(
     let result = lower_bound(&bound_node, chain);
     chain.pop();
     result
+}
+
+/// Resolves `cfg_ident` *as seen from `use_site`'s own tree position* down
+/// to the `OptionPath` it denotes relative to `config` -- e.g. `cfg =
+/// config.services.davis;` resolves to `["services","davis"]`. The single
+/// source of truth for "does this occurrence of `cfg_ident` really mean
+/// this target's `option_prefix`", used by the gate-1 flat-root safety
+/// check (see `scan_options`) so it can never disagree with the same
+/// scope-aware resolution every alias lookup elsewhere in H2 already uses
+/// -- deliberately NOT a separate, independent scope-blind search.
+fn resolve_cfg_root(use_site: &SyntaxNode, cfg_ident: &str) -> Result<OptionPath, ResolveFailure> {
+    resolve_alias_recursively(
+        use_site,
+        cfg_ident,
+        &mut Vec::new(),
+        resolve_config_rooted_path,
+    )
+}
+
+/// Helper for `resolve_cfg_root`: given an expression already resolved to
+/// (an alias of) `cfg_ident`'s binding, keeps chasing through further
+/// aliases (`cfg = innerCfg; innerCfg = config.services.davis;`) until it
+/// either lands on a literal `config`-rooted select or fails. Structurally
+/// the same shape as `lower_value_expr_chained`, but deliberately a
+/// separate function rather than reusing it directly: this one's target
+/// root is always the literal identifier `"config"`, never `cfg_ident`
+/// (calling `lower_value_expr_chained(_, cfg_ident, _)` here would ask
+/// "does this resolve to `cfg_ident`", the wrong question when the whole
+/// point is determining what `cfg_ident` itself means).
+fn resolve_config_rooted_path(
+    node: &SyntaxNode,
+    chain: &mut AliasChain,
+) -> Result<OptionPath, ResolveFailure> {
+    if node.kind() == NODE_SELECT {
+        let (root_name, path) = as_select(node).ok_or(ResolveFailure::UnsupportedExpression)?;
+        if root_name == "config" {
+            return Ok(path);
+        }
+        let root_node = node
+            .children()
+            .next()
+            .ok_or(ResolveFailure::UnsupportedExpression)?;
+        let base =
+            resolve_alias_recursively(&root_node, &root_name, chain, resolve_config_rooted_path)?;
+        let mut full = base;
+        full.extend(path);
+        return Ok(full);
+    }
+    if node.kind() == NODE_IDENT {
+        if let Some(name) = ident_text(node) {
+            return resolve_alias_recursively(node, &name, chain, resolve_config_rooted_path);
+        }
+    }
+    Err(ResolveFailure::UnsupportedExpression)
 }
 
 /// Lowers a value-position expression into the pure IR: a `cfg_ident`-
@@ -2963,6 +2996,118 @@ mod tests {
             opts.is_empty(),
             "cfg binds to a different scope than option_prefix claims -- must not correlate; \
              got {opts:?}"
+        );
+    }
+
+    // --- Scope-aware regression pair for the gate-1 safety gate, added
+    // on review: the ORIGINAL safety-gate implementation did a flat,
+    // scope-blind `root.descendants()` search for the first binding named
+    // `cfg_ident` anywhere in the whole module -- correct for the simple
+    // cases above, but wrong the moment an unrelated helper function has
+    // its own, differently-scoped `cfg`. Both directions below.
+
+    #[test]
+    fn resolve_cfg_root_ignores_an_unrelated_earlier_shadow_in_document_order() {
+        // helper's own `cfg` is a completely different, non-enclosing
+        // scope relative to the real declaration -- and, critically,
+        // appears EARLIER in the source than the real top-level `cfg`, so
+        // a flat first-match search would find the wrong one first. A
+        // scope-aware resolver, walking ancestors from the declaration's
+        // own position, must never even visit helper's inner `cfg` at
+        // all (it isn't an ancestor of the declaration).
+        let src = r#"
+            { config, lib, ... }:
+            let
+              helper = x:
+                let
+                  cfg = config.services.other;
+                in
+                cfg.foo;
+
+              cfg = config.services.davis;
+            in
+            {
+              options.services.davis = {
+                foo = lib.mkOption { default = null; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "davis".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["foo"])),
+            "the declaration's own scope must resolve cfg to config.services.davis, \
+             ignoring an unrelated earlier helper's shadowed cfg; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn resolve_cfg_root_is_scope_aware_not_a_flat_grep() {
+        // Direct proof the resolver itself (not just scan_options's
+        // end-to-end behavior) distinguishes scopes: querying from the
+        // real declaration's position resolves to config.services.davis;
+        // querying from INSIDE the shadowed helper resolves to
+        // config.services.other. A predicate found inside helper must
+        // never be attributed to Davis's option_prefix -- this is the
+        // machinery a future predicate-site check would rely on for that.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              helper = x:
+                let
+                  cfg = config.services.other;
+                in
+                cfg.foo;
+
+              cfg = config.services.davis;
+            in
+            {
+              options.services.davis = {
+                foo = lib.mkOption { default = null; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let tree = root.tree();
+
+        let declaration = tree
+            .syntax()
+            .descendants()
+            .find(|n| {
+                n.kind() == NODE_ATTRPATH_VALUE
+                    && n.children()
+                        .next()
+                        .and_then(|ap| attrpath_segments(&ap))
+                        .as_deref()
+                        == Some(
+                            &[
+                                "options".to_string(),
+                                "services".to_string(),
+                                "davis".to_string(),
+                            ][..],
+                        )
+            })
+            .expect("the flat declaration node must be found");
+        assert_eq!(
+            resolve_cfg_root(&declaration, "cfg"),
+            Ok(vec!["services".to_string(), "davis".to_string()])
+        );
+
+        let inner_cfg_use = tree
+            .syntax()
+            .descendants()
+            .find(|n| {
+                n.kind() == NODE_SELECT && as_select(n).map(|(r, _)| r).as_deref() == Some("cfg")
+            })
+            .expect("the inner cfg.foo select inside helper must be found");
+        assert_eq!(
+            resolve_cfg_root(&inner_cfg_use, "cfg"),
+            Ok(vec!["services".to_string(), "other".to_string()]),
+            "a use site inside the inner shadowed scope must resolve to the INNER cfg, \
+             never the outer one"
         );
     }
 

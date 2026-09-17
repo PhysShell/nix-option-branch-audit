@@ -834,6 +834,63 @@ gate. Still not wired into `run_target` -- the dead_code warnings on the
 IR/resolver are expected until the counterfactual gate-4 rewrite (next)
 actually calls into this.
 
+## H2 — safety gate made scope-aware (own review round)
+
+One more correction before the counterfactual gate-4 wiring, this time
+against the safety gate itself: `cfg_ident_binds_to_prefix` (the gate-1
+flat-root check above) did a flat, scope-blind `root.descendants()`
+search for the first `NODE_ATTRPATH_VALUE` named `cfg_ident` anywhere in
+the whole module — correct for the simple cases, wrong the moment an
+unrelated helper function has its own, differently-named-the-same `cfg`
+in a completely different scope:
+
+```nix
+let
+  helper = x:
+    let cfg = config.services.other;
+    in cfg.foo;
+
+  cfg = config.services.davis;   # the REAL top-level one
+in
+{ options.services.davis = { ... }; }
+```
+
+`helper`'s own `cfg` appears *earlier* in the source than the real one, so
+a flat first-match search finds the wrong binding first and wrongly
+rejects a legitimate flat root. Pointed out directly: this was ironic — a
+scope-aware lexical resolver had just been built for exactly this problem
+one section above, and the safety gate right next to it was still doing
+the scope-blind thing it was supposed to replace. Two independent,
+disagreeing ways of answering "what does `cfg_ident` mean here" is exactly
+the failure mode "one semantics, one implementation" exists to prevent.
+
+Fixed by building `resolve_cfg_root(use_site, cfg_ident) ->
+Result<OptionPath, ResolveFailure>`: resolves `cfg_ident` *as seen from a
+specific tree position*, reusing the same `resolve_ident_binding`/
+`resolve_alias_recursively` machinery every other alias lookup in H2 already
+uses (chasing through further aliases via `resolve_config_rooted_path` if
+`cfg_ident` isn't directly `config`-rooted), rather than a second,
+independent search. `scan_options` now calls it once per candidate flat
+root, from that declaration's own position — so an unrelated helper's
+shadowed `cfg` is never even visited (it isn't an ancestor of the real
+declaration), regardless of document order. `cfg_ident_binds_to_prefix`
+deleted outright, not kept alongside as a fallback.
+
+Two new regression tests, not just re-asserting the original happy/sad
+pair: `resolve_cfg_root_ignores_an_unrelated_earlier_shadow_in_document_order`
+(the exact shape above, end-to-end through `scan_options`) and
+`resolve_cfg_root_is_scope_aware_not_a_flat_grep` (unit-level proof that
+querying from the real declaration resolves to `config.services.davis`
+while querying from *inside* the shadowed `helper` resolves to
+`config.services.other` — the foundation a future predicate-site check
+would need, even though predicate-site wiring itself is still gate-4's
+job, not this pass's). Also fixed in the same pass: the H2 IR's top doc
+comment still said lowering returns `Option<_>` with `None` meaning
+unsupported, stale since the `Result<_, ResolveFailure>` switch two
+sections above — corrected.
+
+56 tests total (was 54).
+
 ## Running
 
 ```
@@ -876,11 +933,12 @@ scripts/verify-upstream.sh /path/to/nixpkgs-checkout
 - [x] E. does not invoke VM tests
 - [x] F. does not know anything about Doctrine
 
-`cargo test` — 54 tests, all passing (34 at the H1.3b/H1-freeze point
-below, +1 golden and +19 unit tests from H2's gate-1 fix, pure Predicate
-IR, `eval_pred` refinement, and lexical alias resolver — see "H2" above;
-H2 hasn't added new `cN`-numbered fixtures yet, so criterion C's case
-list stays as of the freeze): 5 from the original spike, 5 from H1
+`cargo test` — 56 tests, all passing (34 at the H1.3b/H1-freeze point
+below, +1 golden and +21 unit tests from H2's gate-1 fix, pure Predicate
+IR, `eval_pred` refinement, lexical alias resolver, and the scope-aware
+safety-gate fix — see "H2" above; H2 hasn't added new `cN`-numbered
+fixtures yet, so criterion C's case list stays as of the freeze): 5 from
+the original spike, 5 from H1
 (exit codes, parse-errors-fail-closed, outcome-transition +
 positive-control, unresolvable-default, mandatory-declaration-gate), 4
 from H1.1 (unresolved-test-value, AST-classified null-predicate default,
