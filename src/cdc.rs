@@ -30,9 +30,27 @@
 //! checks the result against the vendored fixture's own recorded
 //! provenance (`fixtures/integrity-lock.toml`) rather than a second,
 //! redundant constant duplicating the same fact.
+//!
+//! K2b (done): [`ProducerEvidence`] generalizes HOW producer evidence was
+//! acquired (`SentinelFlow`/`EvaluatedLiteral`) without touching consumer
+//! provenance or [`compare_contract`].
+//!
+//! K2c (done, `fixtures/cdc/k2c-census/`): a real-corpus census measuring
+//! how far `SentinelFlow`/`EvaluatedLiteral` reach across 14 real PHP web
+//! apps -- found the flat-`DB_*`-env-var shape recurring 3 times
+//! (agorakit, movim, snipe-it), the corpus-backed signal K2d acts on.
+//!
+//! K2d (done): [`ProducerEvidence::FlatEnvVars`] -- a third variant for
+//! that flat-env shape, proven for real against agorakit/movim/snipe-it.
+//! Deliberately does not attempt the `DB_HOST` -> Doctrine `host`
+//! mapping for any of the three (that crosses a framework layer --
+//! Laravel's own DB connector -- this module doesn't model); consumer
+//! comparison for these apps stays honestly unsupported.
 
 use std::path::Path;
 use std::process::Command;
+
+use serde_json::Value as JsonValue;
 
 /// Tree state immediately before the fix -- a real, but otherwise
 /// unrelated, upstream nixpkgs commit (the bug itself predates it; see
@@ -221,6 +239,29 @@ fn eval_nix_raw(expr: &str) -> Result<String, CdcError> {
         .map_err(|e| CdcError::ToolError(format!("nix eval produced non-UTF8 output: {e}")))
 }
 
+/// K2d: same semantic oracle as [`eval_nix_raw`], but for a Nix value
+/// that isn't a plain string -- `FlatEnvVars` evidence is a whole
+/// attrset (`services.<app>.config`/`.settings`), not one query-string
+/// scalar, so `--json` (structured) replaces `--raw` (string-only) for
+/// this call shape. A parse failure here is `ToolError` (the tool ran
+/// but its own JSON decoding broke), distinct from `Inconclusive`
+/// (the tool ran fine, the *evidence shape* is the problem) -- that
+/// distinction is drawn in [`build_flat_env_vars_evidence`], not here.
+fn eval_nix_json(expr: &str) -> Result<JsonValue, CdcError> {
+    let out = Command::new("nix")
+        .args(["eval", "--impure", "--json", "--expr", expr])
+        .output()
+        .map_err(|e| CdcError::ToolError(format!("spawning `nix`: {e}")))?;
+    if !out.status.success() {
+        return Err(CdcError::ToolError(format!(
+            "nix eval failed:\n{}",
+            String::from_utf8_lossy(&out.stderr)
+        )));
+    }
+    serde_json::from_slice(&out.stdout)
+        .map_err(|e| CdcError::ToolError(format!("nix eval produced invalid JSON: {e}")))
+}
+
 /// Builds the shared `nixosSystem` prelude for one nixpkgs revision.
 /// `module_override`, when given, disables the real nixpkgs module at
 /// `upstream_path` and substitutes a local file instead -- the mechanism
@@ -263,6 +304,15 @@ fn nixos_eval_expr(
 
 const KIMAI_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/kimai.nix";
 const DAVIS_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/davis.nix";
+/// K2d: no mutation testing is done against these three modules
+/// (`module_override` is always `None` for them -- K2d proves evidence
+/// *acquisition*, not a historical fix/before-after pair the way K1 did
+/// for Kimai/Davis), but [`nixos_eval_expr`] still takes an
+/// `upstream_path` argument, so these are recorded for documentation
+/// parity with [`KIMAI_UPSTREAM_PATH`]/[`DAVIS_UPSTREAM_PATH`].
+const AGORAKIT_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/agorakit.nix";
+const SNIPEIT_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/snipe-it.nix";
+const MOVIM_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/movim.nix";
 
 /// Phase B for Kimai: `services.kimai.sites.<name>.database.socket` is a
 /// real option, so a unique sentinel is injected and the rendered
@@ -353,6 +403,21 @@ pub fn extract_key_for_value(rendered: &str, needle: &str) -> Result<String, Cdc
 /// still know their own concrete, hand-picked sink (Kimai's
 /// `kimai-init-<name>` script, Davis's `services.davis.config`); K2b
 /// generalizes the SHAPE of the proof, not how sinks get found.
+/// K2d adds `FlatEnvVars`: the shape the K2c census found recurring 3
+/// times in the corpus (agorakit, movim, snipe-it) -- discrete `DB_HOST`/
+/// `DB_PORT`/`DB_SOCKET`/etc. environment-variable keys rendered directly
+/// as a Nix attrset, not one value embedded in a DSN query string. There
+/// is no single `emitted_key` to compare here (that's the whole point --
+/// a DSN's `unix_socket=...` query parameter and a bare `DB_SOCKET` env
+/// var are not the same kind of fact), so this variant carries the full
+/// set of rendered keys instead. Deliberately does NOT attempt to map
+/// `DB_HOST` (or any other key) onto Doctrine's `host`/`unix_socket`
+/// parameter names -- for every app this variant covers, that mapping
+/// crosses a framework layer (Laravel's `Illuminate\Database` connector)
+/// this module doesn't model at all; see the K2c census's own
+/// "presence isn't wiring" finding. Acquiring producer evidence is the
+/// only job this variant does -- consumer comparison for these apps is
+/// allowed to stay honestly `unsupported`, not guessed.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ProducerEvidence {
     SentinelFlow {
@@ -367,13 +432,22 @@ pub enum ProducerEvidence {
         rendered_value: String,
         emitted_key: String,
     },
+    FlatEnvVars {
+        sink: String,
+        emitted: Vec<String>,
+    },
 }
 
 impl ProducerEvidence {
-    pub fn emitted_key(&self) -> &str {
+    /// `None` for `FlatEnvVars` -- there is no single comparable key for
+    /// that shape (see the variant's own doc comment). Existing callers
+    /// (`SentinelFlow`/`EvaluatedLiteral` via [`compare_contract`]) still
+    /// get `Some`, unchanged.
+    pub fn emitted_key(&self) -> Option<&str> {
         match self {
             ProducerEvidence::SentinelFlow { emitted_key, .. }
-            | ProducerEvidence::EvaluatedLiteral { emitted_key, .. } => emitted_key,
+            | ProducerEvidence::EvaluatedLiteral { emitted_key, .. } => Some(emitted_key),
+            ProducerEvidence::FlatEnvVars { .. } => None,
         }
     }
 }
@@ -431,6 +505,89 @@ pub fn acquire_kimai_evidence(
 pub fn acquire_davis_evidence(rev: &str) -> Result<ProducerEvidence, CdcError> {
     let rendered = eval_davis_database_url(rev)?;
     build_evaluated_literal_evidence(DAVIS_SINK, rendered, DAVIS_KNOWN_SOCKET_LITERAL)
+}
+
+/// K2d, pure (no Nix/network) -- fail-closed on every shape that isn't a
+/// non-empty JSON object: `rendered` not an object at all (`Inconclusive`,
+/// evidence isn't even the right kind of value), or an object with zero
+/// keys (`Inconclusive`, nothing to compare against later). A duplicate
+/// key is not a failure mode modeled here -- unlike a raw DSN query
+/// string (Phase C's problem), a Nix attrset and the JSON object it
+/// evaluates to structurally cannot contain the same key twice, so there
+/// is nothing to guard against at this layer.
+pub fn build_flat_env_vars_evidence(
+    sink: &str,
+    rendered: JsonValue,
+) -> Result<ProducerEvidence, CdcError> {
+    let JsonValue::Object(map) = rendered else {
+        return Err(CdcError::Inconclusive(format!(
+            "rendered evidence at {sink} is not a JSON object: {rendered}"
+        )));
+    };
+    if map.is_empty() {
+        return Err(CdcError::Inconclusive(format!(
+            "rendered evidence at {sink} is an empty object -- nothing to compare"
+        )));
+    }
+    let mut emitted: Vec<String> = map.into_iter().map(|(k, _)| k).collect();
+    emitted.sort();
+    Ok(ProducerEvidence::FlatEnvVars { sink: sink.to_string(), emitted })
+}
+
+const AGORAKIT_SINK: &str = "services.agorakit.config";
+const SNIPEIT_SINK: &str = "services.snipe-it.config";
+const MOVIM_SINK: &str = "services.movim.settings";
+
+/// Real acquisition for agorakit: `services.agorakit.config` is a plain
+/// Nix attrset rendering discrete `DB_*` keys directly (no sentinel to
+/// inject, no DSN string to parse -- this app never assembles one).
+pub fn acquire_agorakit_evidence(rev: &str) -> Result<ProducerEvidence, CdcError> {
+    let expr = nixos_eval_expr(
+        rev,
+        AGORAKIT_UPSTREAM_PATH,
+        None,
+        r#"services.agorakit = { enable = true; appKeyFile = "/dev/null"; database.createLocally = true; };"#,
+    );
+    let rendered = eval_nix_json(&format!("({expr}).config.services.agorakit.config"))?;
+    build_flat_env_vars_evidence(AGORAKIT_SINK, rendered)
+}
+
+/// Real acquisition for snipe-it: same flat-env shape as agorakit, but
+/// with a dedicated `DB_SOCKET` key alongside `DB_HOST`/`DB_PORT` --
+/// recorded in the K2c census as the one corpus service with a
+/// socket-equivalent field in this shape.
+pub fn acquire_snipeit_evidence(rev: &str) -> Result<ProducerEvidence, CdcError> {
+    let expr = nixos_eval_expr(
+        rev,
+        SNIPEIT_UPSTREAM_PATH,
+        None,
+        r#"services.snipe-it = { enable = true; appKeyFile = "/dev/null"; database.createLocally = true; };"#,
+    );
+    let rendered = eval_nix_json(&format!("({expr}).config.services.snipe-it.config"))?;
+    build_flat_env_vars_evidence(SNIPEIT_SINK, rendered)
+}
+
+/// Real acquisition for movim: same flat-env shape, rendered via
+/// `services.movim.settings` rather than a `.config` attribute. Uses
+/// `database.type = "postgresql"`, not `"mariadb"` -- the `mariadb` path
+/// hits a real, independently confirmed nixpkgs bug at
+/// `movim.nix:628` (`config.services.${cfg.database.type}.settings.port`
+/// interpolates the enum value "mariadb" directly as a `services.<x>`
+/// attribute name, but the actual NixOS service the module registers a
+/// few lines later is `services.mysql`, not `services.mariadb` -- so the
+/// attribute lookup fails outright). Not fixed here (a real nixpkgs bug,
+/// but a different one from this module's own defect class, and out of
+/// scope for K2d); worked around by using `postgresql`, a correctly-wired
+/// sibling path in the same module, to prove the acquisition mechanism.
+pub fn acquire_movim_evidence(rev: &str) -> Result<ProducerEvidence, CdcError> {
+    let expr = nixos_eval_expr(
+        rev,
+        MOVIM_UPSTREAM_PATH,
+        None,
+        r#"services.movim = { enable = true; domain = "movim.example.com"; database.createLocally = true; database.type = "postgresql"; };"#,
+    );
+    let rendered = eval_nix_json(&format!("({expr}).config.services.movim.settings"))?;
+    build_flat_env_vars_evidence(MOVIM_SINK, rendered)
 }
 
 /// Phase D: the accepted-keys extractor. Deliberately a bounded literal
@@ -629,11 +786,13 @@ mod tests {
             build_evaluated_literal_evidence("sink", "unix_socket=/lit".to_string(), "/lit").unwrap();
 
         assert_eq!(sentinel_flow.emitted_key(), evaluated_literal.emitted_key());
+        let sentinel_flow_key = sentinel_flow.emitted_key().unwrap();
+        let evaluated_literal_key = evaluated_literal.emitted_key().unwrap();
         assert_eq!(
-            compare_contract(sentinel_flow.emitted_key(), &accepted),
-            compare_contract(evaluated_literal.emitted_key(), &accepted)
+            compare_contract(sentinel_flow_key, &accepted),
+            compare_contract(evaluated_literal_key, &accepted)
         );
-        assert_eq!(compare_contract(sentinel_flow.emitted_key(), &accepted), CdcVerdict::Pass);
+        assert_eq!(compare_contract(sentinel_flow_key, &accepted), CdcVerdict::Pass);
     }
 
     // --- Phase D: offline, against the real vendored pinned source ---
@@ -807,6 +966,52 @@ mod tests {
         }
     }
 
+    // --- K2d: FlatEnvVars, offline (build_flat_env_vars_evidence is pure
+    // -- only acquire_{agorakit,snipeit,movim}_evidence touch nix/network,
+    // covered separately below) ---
+
+    #[test]
+    fn flat_env_vars_non_object_is_inconclusive() {
+        assert!(matches!(
+            build_flat_env_vars_evidence("sink", serde_json::json!(["not", "an", "object"])),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn flat_env_vars_scalar_is_inconclusive() {
+        assert!(matches!(
+            build_flat_env_vars_evidence("sink", serde_json::json!("just a string")),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn flat_env_vars_empty_object_is_inconclusive() {
+        assert!(matches!(
+            build_flat_env_vars_evidence("sink", serde_json::json!({})),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn flat_env_vars_success_carries_every_key_sorted_and_has_no_emitted_key() {
+        let rendered = serde_json::json!({
+            "DB_HOST": "localhost",
+            "DB_PORT": 3306,
+            "DB_DATABASE": "app",
+        });
+        let evidence = build_flat_env_vars_evidence("services.app.config", rendered).unwrap();
+        match &evidence {
+            ProducerEvidence::FlatEnvVars { sink, emitted } => {
+                assert_eq!(sink, "services.app.config");
+                assert_eq!(emitted, &vec!["DB_DATABASE".to_string(), "DB_HOST".to_string(), "DB_PORT".to_string()]);
+            }
+            other => panic!("expected FlatEnvVars, got {other:?}"),
+        }
+        assert_eq!(evidence.emitted_key(), None);
+    }
+
     // --- K2a real transition tests: opt-in only, same as the K1 golden
     // proof below. Auto-resolves EACH app's consumer identity
     // independently (never sharing one lookup between kimai/davis --
@@ -871,11 +1076,16 @@ mod tests {
     }
 
     /// THE unified downstream step -- identical for both `ProducerEvidence`
-    /// variants. Its signature (`&ProducerEvidence`, not `&SentinelFlow`
-    /// or two separate functions) is what actually proves branching ends
-    /// before comparison, not a doc comment's claim about it.
+    /// variants that carry a comparable key. Its signature (`&ProducerEvidence`,
+    /// not `&SentinelFlow` or two separate functions) is what actually
+    /// proves branching ends before comparison, not a doc comment's claim
+    /// about it. Only ever called with Kimai/Davis evidence (`SentinelFlow`/
+    /// `EvaluatedLiteral`) -- `unwrap()` on `emitted_key()` is deliberate
+    /// here, not a K2d oversight: `FlatEnvVars` has no consumer-side
+    /// verdict path yet (see [`ProducerEvidence::FlatEnvVars`]'s own doc
+    /// comment), so this helper is never asked to compare one.
     fn verdict_for_evidence(evidence: &ProducerEvidence) -> CdcVerdict {
-        compare_contract(evidence.emitted_key(), &accepted_doctrine_keys())
+        compare_contract(evidence.emitted_key().unwrap(), &accepted_doctrine_keys())
     }
 
     #[test]
@@ -958,5 +1168,66 @@ mod tests {
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn mutation_control_unix_socket_to_itself_is_pass() {
         assert_eq!(mutation_verdict("unix_socket"), CdcVerdict::Pass);
+    }
+
+    // --- K2d real acquisition: opt-in only, same as K1/K2a/K2b above.
+    // One unified assertion helper for all three apps -- no app-name
+    // branch in what's checked, only in which acquire_* function and
+    // which expected keys are passed in (the K2d stop condition). ---
+
+    fn assert_flat_env_vars(
+        evidence: &ProducerEvidence,
+        expected_sink: &str,
+        must_contain: &[&str],
+    ) {
+        match evidence {
+            ProducerEvidence::FlatEnvVars { sink, emitted } => {
+                assert_eq!(sink, expected_sink);
+                for key in must_contain {
+                    assert!(emitted.contains(&key.to_string()), "missing {key} in {emitted:?}");
+                }
+            }
+            other => panic!("expected FlatEnvVars, got {other:?}"),
+        }
+        assert_eq!(evidence.emitted_key(), None);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn agorakit_real_evidence_is_flat_env_vars_with_no_socket_key() {
+        let evidence = acquire_agorakit_evidence(AFTER_REV).unwrap();
+        assert_flat_env_vars(
+            &evidence,
+            AGORAKIT_SINK,
+            &["DB_HOST", "DB_PORT", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD"],
+        );
+        if let ProducerEvidence::FlatEnvVars { emitted, .. } = &evidence {
+            assert!(!emitted.contains(&"DB_SOCKET".to_string()));
+        }
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn snipeit_real_evidence_is_flat_env_vars_with_a_dedicated_socket_key() {
+        let evidence = acquire_snipeit_evidence(AFTER_REV).unwrap();
+        assert_flat_env_vars(
+            &evidence,
+            SNIPEIT_SINK,
+            &["DB_HOST", "DB_PORT", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD", "DB_SOCKET"],
+        );
+    }
+
+    /// Uses `database.type = "postgresql"` inside `acquire_movim_evidence`
+    /// (see that function's own doc comment for the real, independently
+    /// confirmed `mariadb`-path nixpkgs bug this works around).
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn movim_real_evidence_is_flat_env_vars() {
+        let evidence = acquire_movim_evidence(AFTER_REV).unwrap();
+        assert_flat_env_vars(
+            &evidence,
+            MOVIM_SINK,
+            &["DB_HOST", "DB_PORT", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD", "DB_DRIVER"],
+        );
     }
 }

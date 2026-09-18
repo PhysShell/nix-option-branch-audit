@@ -58,9 +58,9 @@ instead of appearing to (mis)sum across one merged column.
 | davis | supported (EvaluatedLiteral) | supported (3.10.6 @ `c95589d7`) | fetched_source |
 | strichliste | supported (SentinelFlow, verified for real) | supported* (3.10.5 @ `95d84866`, resolved for real; Phase D for this exact version not vendored) | fetched_source |
 | part-db | supported (SentinelFlow-shaped) | unsupported (Postgres dialect, wrong driver vendored) | fetched_source |
-| agorakit | needs_new_evidence_form (flat `DB_*` env vars; closed by K2d, see below) | unsupported (Laravel; `doctrine/dbal` 3.9.4 present but very likely not the real runtime consumer) | fetched_source |
-| movim | needs_new_evidence_form (flat `DB_*` env vars; closed by K2d) | unsupported (`doctrine/dbal` 4.4.4 present, real consumer not confirmed) | fetched_source |
-| snipe-it | needs_new_evidence_form (flat `DB_*` env vars, **has** a dedicated `DB_SOCKET` key; closed by K2d) | unsupported (Laravel; `doctrine/dbal` 3.10.5 present but very likely not the real runtime consumer) | fetched_source |
+| agorakit | **supported** (`FlatEnvVars`, K2d, verified for real) | unsupported (Laravel; `doctrine/dbal` 3.9.4 present but very likely not the real runtime consumer) | fetched_source |
+| movim | **supported** (`FlatEnvVars`, K2d, verified for real via the `postgresql` path -- see sub-finding below for the `mariadb` path's own real nixpkgs bug) | unsupported (`doctrine/dbal` 4.4.4 present, real consumer not confirmed) | fetched_source |
+| snipe-it | **supported** (`FlatEnvVars`, K2d, verified for real; **has** a dedicated `DB_SOCKET` key) | unsupported (Laravel; `doctrine/dbal` 3.10.5 present but very likely not the real runtime consumer) | fetched_source |
 | flarum | needs_new_evidence_form (generated `config.php` PHP array; one-off in this corpus, NOT addressed by K2d) | unsupported (`doctrine/dbal` 2.13.9 present, real consumer not confirmed; also blocked by provenance location below) | nixpkgs_local |
 | baikal | not_applicable (not surveyed for producer shape -- no consumer to compare against anyway) | unsupported (absent) | nixpkgs_local |
 | bookstack | not_applicable | unsupported (absent) | fetched_source |
@@ -79,11 +79,13 @@ K1's frozen result, not new candidates this round). Counts below are
 over the **14 census candidates only**; kimai/davis are called out
 separately since they were never in question.
 
-**producer support** (14 census candidates)
-- `supported`: 2 -- strichliste, part-db. (+ kimai, davis as frozen K1 baseline.)
-- `needs_new_evidence_form`: 4 -- agorakit, movim, snipe-it, flarum.
+**producer support** (14 census candidates -- updated after K2d closed
+`FlatEnvVars` for agorakit/movim/snipe-it; original K2c-round counts were
+2/4/8, see git history for that version of this file)
+- `supported`: 5 -- strichliste, part-db, agorakit, movim, snipe-it. (+ kimai, davis as frozen K1 baseline.)
+- `needs_new_evidence_form`: 1 -- flarum (deliberately left as a one-off, see the census's own closing note -- one instance hasn't earned its own type).
 - `not_applicable`: 8 -- baikal, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms, postfixadmin.
-- 2 + 4 + 8 = 14. ✓
+- 5 + 1 + 8 = 14. ✓
 
 **consumer support** (14 census candidates)
 - `supported`: 1 -- strichliste (resolved for real this round; full PASS still pending Phase D vendoring of 3.10.5, see below). (+ kimai, davis as frozen K1 baseline.)
@@ -191,7 +193,10 @@ add one more real test), not part of what this round claims.
   design review asked this census to produce: if a new `ProducerEvidence`
   variant ever gets built, "a discrete named env-var key, not embedded in
   a query string" is the one with actual corpus support behind it, not a
-  guess.
+  guess. K2d built that variant (`FlatEnvVars`) and proved it for real
+  against all 3 -- flarum's shape stays `needs_new_evidence_form` and
+  deliberately uncategorized: one instance in a corpus of 14 hasn't
+  earned its own `ProducerEvidence` type yet.
 
 ## Stop condition
 
