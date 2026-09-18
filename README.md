@@ -1509,17 +1509,107 @@ mega-commit:
   real verdict count). Golden suite's own summary assertions updated for
   the renamed/reshaped fields (`findings` → `finding`, `status` string
   dropped — derivable from the counts, wasn't adding a distinct claim).
-- **PR C — Thin GitHub Action.** Composite (not Docker, not Node):
-  download the pinned release binary, verify it, invoke `oba check`,
-  emit `::error`/`::warning` annotations + a `$GITHUB_STEP_SUMMARY` table.
-  HEAD-only at this stage; SARIF deliberately deferred (another
-  spec to carry `file:line` through 300 lines of JSON, not needed unless
-  GitHub Code Scanning integration is actually wanted).
-- **PR D — Native differential/ratchet mode.** `oba diff`, target
-  correlation (same id / new / removed / definition-changed), the
-  trusted-manifest policy above, transition classification, one
-  `DiffReport` — the Action's job shrinks to materializing both roots and
-  invoking `oba` once.
+- **PR C — Thin GitHub Action. Closed.** `action.yml`, a composite action
+  (not Docker, not Node): install a pinned `oba` release, run `oba check
+  --root <root> --targets <targets>`, pass its exit code straight through
+  as the step's own outcome, hand back the raw `schema_version: 1` JSON
+  as both a step output (`report-json`) and an uploaded artifact.
+  **Deliberately narrower than first planned**: no JSON parsing, no
+  `::error`/`::warning` annotations, no `$GITHUB_STEP_SUMMARY` table —
+  that would be this project's own analysis semantics leaking into CI
+  glue, the exact thing the productization decision (single-invocation
+  ratchet living inside `oba`, not the Action) was written to prevent one
+  layer up. Rendering the JSON into annotations is a separate, later
+  concern built *on top of* this output, not inside it. SARIF stays
+  deferred for the same reason it always was.
+
+  Self-dogfood, added in this same PR rather than left for later:
+  `.github/workflows/dogfood.yml` runs this repo's own `action.yml`
+  (`uses: ./`, pinned to a real released tag, not `latest`) against this
+  repo's own `targets/clean.toml` (must exit 0) and `targets/golden.toml`
+  (must exit 2, `continue-on-error: true` + an explicit
+  `steps.*.outcome == 'failure'`/`exit-code == '2'` check — the same
+  pattern `model-checking/kani-github-action`'s own `test-action.yml`
+  uses for its invalid-version case, confirmed real-world precedent, not
+  invented here). Not for coverage — `cargo test` already covers the
+  analysis far more thoroughly — but to prove install/cwd/paths/exit-code
+  passthrough/JSON output actually work together on a real runner, not
+  just individually look correct. Caught one real bug before it ever hit
+  CI: a local bash simulation of the action's own install+run steps
+  (real `curl | sh` against the real `v0.2.0` release, `$GITHUB_OUTPUT`/
+  `$GITHUB_PATH` faked as plain files) showed the JSON report is
+  pretty-printed (`"schema_version": 1`, with a space) — the dogfood
+  workflow's first draft used `grep -q '"schema_version":1'` (no space),
+  which would have silently never matched; fixed to `jq -e
+  '.schema_version == 1'` before ever pushing.
+- **PR D — Native differential/ratchet mode. Design note, not started —
+  written before any diff code, on purpose.** The two-root model is the
+  most dangerous single step left in this roadmap: get it wrong and
+  "diff" quietly becomes "ran twice, compared two JSON blobs", which
+  looks fine right up until a manifest edit or a renamed fixture makes it
+  lie. Questions to answer explicitly before writing `compare()`, not
+  discovered mid-implementation:
+  - **`base_root` / `head_root`**: two independent filesystem roots,
+    each analyzed through the *existing* `analyze()` unchanged — `oba
+    diff`'s only new code is `compare(base: &AnalysisReport, head:
+    &AnalysisReport) -> DiffReport`, a pure function over two already-
+    complete reports, never touching Git/GitHub/filesystems itself (same
+    "can this be tested without CLI/git/GitHub" bar as `analyze()`
+    itself already meets).
+  - **One manifest or two?** One, by construction: `oba diff --base-root
+    --head-root --targets <manifest>` applies the *same* manifest to
+    both roots (this is exactly why `--targets` was made cwd-relative,
+    not root-relative, back in PR B commit 2 — so this question doesn't
+    come up as an ambiguity here). Whether an untrusted PR can smuggle
+    manifest changes past this is the separate trust-policy question
+    below, not a second-manifest design.
+  - **Target identity across revisions — decided, not open**: a
+    positional/array index or the free-text `name` is not a stable key
+    (reordering `targets.toml` must never itself read as "changes").
+    Identity is the canonical tuple `(module, test, cfg_ident,
+    option_prefix, watched_path)` — i.e. per *watched option*, not just
+    per target block, since that's the actual unit a verdict is computed
+    for. An explicit manifest-provided `id` field remains an option if
+    the canonical tuple ever proves too brittle in practice, but isn't
+    added speculatively before a real case demonstrates the need.
+  - **Added / deleted / renamed**: a target/watched-option present in
+    head only is `new`; present in base only is `removed`; a `module`/
+    `test` path edit changes the identity tuple above, so it surfaces as
+    a `removed` + `new` pair rather than a mis-detected "same target,
+    different verdict" — correct per the identity rule, but worth
+    stating explicitly so it isn't mistaken for a bug later.
+  - **What's actually compared**: verdict kind is the minimum (`PASS` vs
+    `OBA001` vs each inconclusive variant) for ratchet classification;
+    whether `evidence`/`predicate_attempts` also need a comparison
+    (e.g. "still PASS, but via a different predicate") is left open
+    until a real case motivates it — not guessed at now.
+  - **Manifest-tampering trust policy** (flagged in the roadmap
+    intro above, restated here since it's really part of this same
+    design question): if `targets.toml` lives in the audited repo, an
+    untrusted head can edit it. Resolution belongs in `compare()`/`oba
+    diff`, not the Action.
+
+  Standing constraints while this gets built, not just for PR D: `oba
+  diff`/`compare()` are built on the CURRENT verdict semantics, not
+  bundled with any H2 predicate-IR change — if differential output ever
+  looks wrong, this keeps "two roots" and "a new evaluator" from being
+  tangled into one unfalsifiable bug hunt. (H2's own IR already matches
+  the normal form this kind of guardrail usually has to ask for up
+  front: `Pred::{Eq,Not,And,Or}` over `ValueExpr::{Ref,Literal}`, with
+  alias resolution as its own pre-lowering step (`resolve_ident_binding`/
+  `resolve_alias_recursively`, `lower_pred`/`lower_value_expr` returning
+  `Result<_, ResolveFailure>`) rather than folded into each `Eq`/`And`
+  case — this was already the H2 round 2 design, not new work triggered
+  by this note.) `schema_version: 1` itself
+  stays untouched through this design phase; only *additive* fields
+  (e.g. a `"diff"` mode payload) get added under it, per the envelope's
+  own reserved `mode` tag from PR B commit 3 — a bump is for an
+  incompatible change, not routine, or it becomes exactly the
+  version-every-commit theater the schema was designed to avoid. Once
+  `compare()` exists: `oba diff`, target correlation, the trusted-manifest
+  policy, transition classification, one `DiffReport` — the Action's job
+  shrinks to materializing both roots and invoking `oba` once, unchanged
+  from the original plan.
 - **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
   needed** — changed-target selection (skip targets whose `module`/`test`
   didn't change), kept deliberately separate from and after D: proving

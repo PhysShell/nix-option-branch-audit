@@ -1,0 +1,54 @@
+name: Dogfood
+
+# Exercises this repo's OWN action.yml (uses: ./, the composite action
+# from PR C) against this repo's OWN fixtures. Not for coverage -- cargo
+# test already covers the analysis itself far more thoroughly. This is
+# here to prove that installation, cwd, paths, exit-code passthrough, and
+# the JSON output/artifact actually work together inside a real GitHub
+# Actions runner, not just look correct read in isolation. Pins
+# oba-version explicitly (not "latest") so this workflow tests a known
+# release deterministically, independent of whatever gets tagged next.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dogfood:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: oba check (clean manifest, must pass)
+        id: clean
+        uses: ./
+        with:
+          root: .
+          targets: targets/clean.toml
+          oba-version: v0.2.0
+          artifact-name: oba-report-clean
+
+      - name: assert clean run actually reported exit-code 0
+        shell: bash
+        run: |
+          test "${{ steps.clean.outputs.exit-code }}" = "0"
+          echo '${{ steps.clean.outputs.report-json }}' | jq -e '.schema_version == 1'
+
+      - name: oba check (mixed manifest, real OBA001 + davis inconclusive)
+        id: mixed
+        uses: ./
+        continue-on-error: true
+        with:
+          root: .
+          targets: targets/golden.toml
+          oba-version: v0.2.0
+          artifact-name: oba-report-mixed
+
+      - name: assert mixed run failed the step with exit-code 2, not silently
+        shell: bash
+        run: |
+          test "${{ steps.mixed.outcome }}" = "failure"
+          test "${{ steps.mixed.outputs.exit-code }}" = "2"
+          echo '${{ steps.mixed.outputs.report-json }}' | jq -e '.mode == "check"'

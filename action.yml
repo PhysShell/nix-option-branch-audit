@@ -1,0 +1,94 @@
+name: 'oba check'
+description: 'Install a pinned oba release and run `oba check` over one root and target manifest.'
+author: 'PhysShell'
+
+# PR C: deliberately the dumbest possible wrapper. No JSON parsing, no
+# annotations, no ratchet/diff logic -- that would be this project's own
+# analysis semantics leaking into CI glue, exactly the "GitHub-specific
+# core" the productization decision (see README) was written to prevent.
+# This action's entire job: install the pinned binary, run `oba check`
+# with the given root/targets, pass its exit code straight through, and
+# hand back the raw JSON report as both a step output and an artifact.
+# Anything smarter than that (annotations, a step summary table, ratchet
+# comparison) is a different PR's job, built ON TOP of this output, not
+# inside it.
+
+inputs:
+  root:
+    description: >-
+      Filesystem root every target's module/test path is resolved
+      against (oba check --root). Usually the checkout you want analyzed.
+    required: true
+  targets:
+    description: >-
+      Path to the TOML target manifest, resolved relative to the
+      workflow's own working directory -- NOT to `root` (same asymmetry
+      `oba check` itself has; see the README's PR B section for why).
+    required: true
+  oba-version:
+    description: >-
+      oba release tag to install, e.g. "v0.2.0", or "latest".
+    required: false
+    default: 'latest'
+  artifact-name:
+    description: >-
+      Name for the uploaded JSON report artifact. Override this if you
+      invoke this action more than once in the same job (GitHub Actions
+      rejects duplicate artifact names within one run).
+    required: false
+    default: 'oba-report'
+
+outputs:
+  exit-code:
+    description: >-
+      oba check's own exit code as a string: "0" clean, "1" a genuine
+      finding, "2" inconclusive, "3" the tool itself didn't run (bad
+      manifest, missing files, a --root escape, ...).
+    value: ${{ steps.run.outputs.exit-code }}
+  report-json:
+    description: 'The full schema_version:1 JSON report, verbatim.'
+    value: ${{ steps.run.outputs.report-json }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install oba
+      shell: bash
+      run: |
+        set -euo pipefail
+        version="${{ inputs.oba-version }}"
+        if [ "$version" = "latest" ]; then
+          url="https://github.com/PhysShell/nix-option-branch-audit/releases/latest/download/oba-installer.sh"
+        else
+          url="https://github.com/PhysShell/nix-option-branch-audit/releases/download/${version}/oba-installer.sh"
+        fi
+        curl --proto '=https' --tlsv1.2 -LsSf "$url" | sh
+        echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+    - name: Run oba check
+      id: run
+      shell: bash
+      run: |
+        set +e
+        oba check --root "${{ inputs.root }}" --targets "${{ inputs.targets }}" --json \
+          > "${{ github.action_path }}/oba-report.json"
+        code=$?
+        set -e
+
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+
+        delimiter="oba_json_$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
+        {
+          echo "report-json<<$delimiter"
+          cat "${{ github.action_path }}/oba-report.json"
+          echo "$delimiter"
+        } >> "$GITHUB_OUTPUT"
+
+        exit "$code"
+
+    - name: Upload report artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ github.action_path }}/oba-report.json
