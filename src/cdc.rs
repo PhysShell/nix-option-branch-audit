@@ -46,6 +46,13 @@
 //! mapping for any of the three (that crosses a framework layer --
 //! Laravel's own DB connector -- this module doesn't model); consumer
 //! comparison for these apps stays honestly unsupported.
+//!
+//! K2a.1 (done): [`resolve_composer_lock`] adds a second, EXPLICIT
+//! consumer-provenance source ([`ComposerLockOrigin::NixpkgsLocal`],
+//! `pkgs.<attr>.composerVendor.composerLock`) alongside the original
+//! source-based one K2a already had ([`fetch_composer_lock`], unchanged)
+//! -- closes the locator gap K2c found recurring 3x
+//! (flarum/baikal/postfixadmin).
 
 use std::path::Path;
 use std::process::Command;
@@ -217,6 +224,159 @@ fn vendored_doctrine_source_reference() -> Result<String, CdcError> {
                 "fixtures/integrity-lock.toml has no entry for {VENDORED_PATH}"
             ))
         })
+}
+
+/// K2a.1: [`fetch_composer_lock`] above (unchanged, still used exactly as
+/// before by every existing Kimai/Davis call site) only ever
+/// looks at the package's OWN fetched source -- `pkgs.<attr>.src +
+/// "/composer.lock"`. The K2c census found this fails outright for
+/// `flarum`/`baikal`/`postfixadmin`: upstream doesn't ship a lock file
+/// for these, so nixpkgs vendors its own, referenced from `package.nix`
+/// via a `composerLock = ./composer.lock;` argument to
+/// `buildComposerProject2`.
+///
+/// A second, EXPLICIT provenance source for that case -- deliberately
+/// NOT "walk the directory next to `package.nix` and grab whatever
+/// `composer.lock` is nearest" (exactly the kind of false-confidence
+/// generator that would silently pick up an unrelated file with the
+/// right name). Instead: `pkgs.<attr>.composerVendor.composerLock` is
+/// the literal Nix path VALUE the package's own `package.nix` passed as
+/// the `composerLock` argument -- confirmed by reading
+/// `pkgs/build-support/php/builders/v2/build-composer-project.nix`
+/// itself, not guessed: `composerVendor = args.composerVendor or
+/// (php.mkComposerVendor { ...; composerLock; ...})`, and
+/// `lib.extendMkDerivation`'s own merge semantics carry the caller's
+/// `composerLock` argument through onto the resulting derivation's own
+/// attribute set even though `mkComposerVendorOverride` never
+/// re-exports it. So `.composerVendor.composerLock` isn't a guess about
+/// where nixpkgs "usually" keeps a local lock -- it's asking Nix to hand
+/// back the exact same path value the package expression itself
+/// declared, resolved through the one relationship that actually
+/// connects them. Real-verified for all three: `flarum` resolves to
+/// `pkgs/by-name/fl/flarum/composer.lock` (contains a real
+/// `doctrine/dbal` 2.13.9 entry -- Phase D for that specific version is
+/// NOT vendored as part of K2a.1, same disclosed-not-silent deferral
+/// K2c already used for `strichliste`'s 3.10.5); `baikal`/`postfixadmin`
+/// resolve too, genuinely containing no `doctrine/dbal` entry at all
+/// (matches K2c's "absent from the dependency closure" finding, now for
+/// the right, confirmed reason rather than a blocked locator).
+///
+/// `kimai`/`davis`/`strichliste`/`agorakit`/`snipe-it` all resolve this
+/// attribute to Nix `null` (the standard `buildComposerProject2` path
+/// always forwards a `composerLock` argument, defaulting to `null` when
+/// the package doesn't set one) -- `movim` is a genuine third case, the
+/// attribute is entirely ABSENT rather than `null` (its `package.nix`
+/// calls `php.mkComposerVendor` directly with its own argument list,
+/// bypassing `buildComposerProject2`'s automatic forwarding, so
+/// `composerLock` was never part of that call at all). The Nix `or null`
+/// guard on the attribute select collapses both into the same "no local
+/// lock via this relationship" outcome -- correct, since both really do
+/// mean the same thing here, and movim isn't in K2a.1's target scope
+/// (its own consumer support stays unsupported for the K2d reason:
+/// Laravel's own DB connector, not a locator problem).
+///
+/// `None` is a real, valid outcome (most apps), not a failure --
+/// [`resolve_composer_lock_origin`] decides what it means.
+fn fetch_nixpkgs_local_composer_lock(rev: &str, package_attr: &str) -> Result<Option<String>, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        pkgs = import nixpkgsSrc {{ system = "x86_64-linux"; }};
+        localLock = pkgs.{package_attr}.composerVendor.composerLock or null;
+        in if localLock == null then null else builtins.readFile localLock"#
+    );
+    match eval_nix_json(&expr)? {
+        JsonValue::Null => Ok(None),
+        JsonValue::String(s) => Ok(Some(s)),
+        other => Err(CdcError::ToolError(format!(
+            "expected a JSON string or null from the nixpkgs-local composerLock probe, got {other}"
+        ))),
+    }
+}
+
+/// K2a.1's other half: the SAME source-based location `fetch_composer_lock`
+/// already uses (`pkgs.<attr>.src + "/composer.lock"`), but existence-
+/// checked via `builtins.pathExists` rather than letting a missing file
+/// surface as a generic `readFile` failure -- the whole point of this
+/// function is to give [`resolve_composer_lock_origin`] a clean `None`
+/// for "genuinely absent" that doesn't require pattern-matching Nix's own
+/// error text to distinguish from a real tool failure (network outage,
+/// bad revision, etc.). Does NOT replace or call `fetch_composer_lock` --
+/// that function and its existing Kimai/Davis callers are untouched by
+/// K2a.1, on purpose.
+fn fetch_source_composer_lock_if_exists(rev: &str, package_attr: &str) -> Result<Option<String>, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        pkgs = import nixpkgsSrc {{ system = "x86_64-linux"; }};
+        lockPath = pkgs.{package_attr}.src + "/composer.lock";
+        in if builtins.pathExists lockPath then builtins.readFile lockPath else null"#
+    );
+    match eval_nix_json(&expr)? {
+        JsonValue::Null => Ok(None),
+        JsonValue::String(s) => Ok(Some(s)),
+        other => Err(CdcError::ToolError(format!(
+            "expected a JSON string or null from the source composer.lock existence probe, got {other}"
+        ))),
+    }
+}
+
+/// Provenance -- not architectural decoration. Once
+/// [`resolve_composer_lock`] returns, a Finding can honestly say which
+/// of the two real sources its consumer contract actually came from,
+/// rather than silently treating both as "the composer.lock". Wiring
+/// this into an actual report/Finding type is future work (this module
+/// still has no CLI/report integration at all, per its own top-level
+/// doc comment) -- not attempted in K2a.1.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ComposerLockOrigin {
+    PackageSource,
+    NixpkgsLocal,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ResolvedComposerLock {
+    pub origin: ComposerLockOrigin,
+    pub content: String,
+}
+
+/// Pure (no Nix/network) -- the actual decision the stop condition asked
+/// to be provable, not a "first candidate wins" convention. `NixpkgsLocal`
+/// wins whenever present, REGARDLESS of whether a source-based candidate
+/// is also present: `build-composer-project.nix`'s own `composerVendor`
+/// construction feeds a non-null `composerLock` straight to
+/// `composer install` as the CommandUsed lock (confirmed by reading that
+/// file, not assumed -- see [`fetch_nixpkgs_local_composer_lock`]'s doc
+/// comment) -- when it's set, the real build never reads whatever
+/// composer.lock might also happen to sit inside `src`, so there is no
+/// actual ambiguity to break a tie on, only a fact to report correctly.
+/// This is not exercised by a "both present" case in the current real
+/// corpus (no surveyed app has both) -- covered by a dedicated offline
+/// test using two deliberately DIFFERENT synthetic contents, so the
+/// priority is checked by construction, not merely documented. Neither
+/// candidate present is `Inconclusive`, never a guessed empty lock.
+pub fn resolve_composer_lock_origin(
+    nixpkgs_local: Option<String>,
+    package_source: Option<String>,
+) -> Result<ResolvedComposerLock, CdcError> {
+    if let Some(content) = nixpkgs_local {
+        return Ok(ResolvedComposerLock { origin: ComposerLockOrigin::NixpkgsLocal, content });
+    }
+    if let Some(content) = package_source {
+        return Ok(ResolvedComposerLock { origin: ComposerLockOrigin::PackageSource, content });
+    }
+    Err(CdcError::Inconclusive(
+        "no composer.lock resolved via either the nixpkgs-local composerLock relationship or the package's own fetched source".to_string(),
+    ))
+}
+
+/// Real orchestration: fetches both candidates for real, then defers the
+/// actual decision to the pure [`resolve_composer_lock_origin`]. The
+/// locator abstraction ends HERE -- [`resolve_consumer_identity`] (K2a,
+/// unchanged) takes `resolved.content` exactly as it always has, with no
+/// idea which of the two sources it came from.
+pub fn resolve_composer_lock(rev: &str, package_attr: &str) -> Result<ResolvedComposerLock, CdcError> {
+    let nixpkgs_local = fetch_nixpkgs_local_composer_lock(rev, package_attr)?;
+    let package_source = fetch_source_composer_lock_if_exists(rev, package_attr)?;
+    resolve_composer_lock_origin(nixpkgs_local, package_source)
 }
 
 /// Real Nix evaluation as the semantic oracle. `--impure` (for
@@ -923,6 +1083,48 @@ mod tests {
         .is_ok());
     }
 
+    // --- K2a.1: composer.lock locator, offline (resolve_composer_lock_origin
+    // is pure -- only fetch_nixpkgs_local_composer_lock/
+    // fetch_source_composer_lock_if_exists touch nix/network, covered
+    // separately below) ---
+
+    #[test]
+    fn composer_lock_locator_neither_candidate_present_is_inconclusive() {
+        assert!(matches!(
+            resolve_composer_lock_origin(None, None),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn composer_lock_locator_only_nixpkgs_local_present() {
+        let resolved = resolve_composer_lock_origin(Some("local content".to_string()), None).unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::NixpkgsLocal);
+        assert_eq!(resolved.content, "local content");
+    }
+
+    #[test]
+    fn composer_lock_locator_only_package_source_present() {
+        let resolved = resolve_composer_lock_origin(None, Some("source content".to_string())).unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::PackageSource);
+        assert_eq!(resolved.content, "source content");
+    }
+
+    /// The actual point of the stop condition: NOT "first candidate
+    /// wins" -- deliberately different content on each side proves the
+    /// result really is `NixpkgsLocal`'s content, not an accident of
+    /// which one happened to be checked first.
+    #[test]
+    fn composer_lock_locator_both_present_nixpkgs_local_wins_by_construction() {
+        let resolved = resolve_composer_lock_origin(
+            Some("local content".to_string()),
+            Some("source content".to_string()),
+        )
+        .unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::NixpkgsLocal);
+        assert_eq!(resolved.content, "local content");
+    }
+
     // --- Phase E: boring comparison, offline ---
 
     #[test]
@@ -1057,6 +1259,79 @@ mod tests {
     #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
     fn davis_auto_resolved_provenance_matches_vendored_fixture_after() {
         assert_auto_resolved_matches_vendored_fixture(AFTER_REV, "davis");
+    }
+
+    // --- K2a.1: composer.lock locator, real (opt-in only, same as every
+    // other real test in this module). Closes the exact gap K2c found:
+    // flarum/baikal/postfixadmin's `pkgs.<attr>.src + "/composer.lock"`
+    // fails outright (no lock file there at all), so the NixpkgsLocal
+    // path is the only one that can resolve them. ---
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn flarum_composer_lock_resolves_via_nixpkgs_local_and_finds_doctrine_dbal() {
+        let resolved = resolve_composer_lock(AFTER_REV, "flarum").unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::NixpkgsLocal);
+        let identity = resolve_consumer_identity(&resolved.content, "doctrine/dbal").unwrap();
+        assert_eq!(identity.version, "2.13.9");
+        assert_eq!(identity.source_reference, "c480849ca3ad6706a39c970cdfe6888fa8a058b8");
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn baikal_composer_lock_resolves_via_nixpkgs_local_with_no_doctrine_dbal() {
+        let resolved = resolve_composer_lock(AFTER_REV, "baikal").unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::NixpkgsLocal);
+        assert!(matches!(
+            resolve_consumer_identity(&resolved.content, "doctrine/dbal"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn postfixadmin_composer_lock_resolves_via_nixpkgs_local_with_no_doctrine_dbal() {
+        let resolved = resolve_composer_lock(AFTER_REV, "postfixadmin").unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::NixpkgsLocal);
+        assert!(matches!(
+            resolve_consumer_identity(&resolved.content, "doctrine/dbal"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    /// Regression, all three previously-supported apps: the NEW unified
+    /// resolver must still land on `PackageSource`, never accidentally
+    /// report `NixpkgsLocal` for an app that never set a local lock.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn kimai_composer_lock_still_resolves_via_package_source() {
+        let resolved = resolve_composer_lock(AFTER_REV, "kimai").unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::PackageSource);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn davis_composer_lock_still_resolves_via_package_source() {
+        let resolved = resolve_composer_lock(AFTER_REV, "davis").unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::PackageSource);
+    }
+
+    /// `strichliste` never became a code-level caller of
+    /// `fetch_composer_lock` before this round (K2c verified it manually
+    /// via a one-off shell transcript, recorded in the census, not as a
+    /// `cdc::` test) -- this is the first automated real test for it,
+    /// proving BOTH that the old function is untouched (called directly)
+    /// AND that the new unified resolver agrees with it.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn strichliste_composer_lock_old_path_and_new_resolver_agree() {
+        let old_path_content = fetch_composer_lock(AFTER_REV, "strichliste").unwrap();
+        let identity = resolve_consumer_identity(&old_path_content, "doctrine/dbal").unwrap();
+        assert_eq!(identity.version, "3.10.5");
+
+        let resolved = resolve_composer_lock(AFTER_REV, "strichliste").unwrap();
+        assert_eq!(resolved.origin, ComposerLockOrigin::PackageSource);
+        assert_eq!(resolved.content, old_path_content);
     }
 
     // --- Real end-to-end: needs a real `nix` binary + network, opt-in
