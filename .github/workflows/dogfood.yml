@@ -32,9 +32,19 @@ jobs:
 
       - name: assert clean run actually reported exit-code 0
         shell: bash
+        # Passed via env, not spliced into the script with ${{ }} -- the
+        # JSON body embeds Nix source text (parens, quotes) and can be
+        # tens of KB; interpolating it as literal script text is exactly
+        # the script-injection shape GitHub's own docs warn against, not
+        # just a style preference. A real run caught this: the "mixed"
+        # report's content broke the single-quoted echo with a bash
+        # syntax error before jq ever ran.
+        env:
+          EXIT_CODE: ${{ steps.clean.outputs.exit-code }}
+          REPORT_JSON: ${{ steps.clean.outputs.report-json }}
         run: |
-          test "${{ steps.clean.outputs.exit-code }}" = "0"
-          echo '${{ steps.clean.outputs.report-json }}' | jq -e '.schema_version == 1'
+          test "$EXIT_CODE" = "0"
+          echo "$REPORT_JSON" | jq -e '.schema_version == 1'
 
       - name: oba check (mixed manifest, real OBA001 + davis inconclusive)
         id: mixed
@@ -48,7 +58,11 @@ jobs:
 
       - name: assert mixed run failed the step with exit-code 2, not silently
         shell: bash
+        env:
+          STEP_OUTCOME: ${{ steps.mixed.outcome }}
+          EXIT_CODE: ${{ steps.mixed.outputs.exit-code }}
+          REPORT_JSON: ${{ steps.mixed.outputs.report-json }}
         run: |
-          test "${{ steps.mixed.outcome }}" = "failure"
-          test "${{ steps.mixed.outputs.exit-code }}" = "2"
-          echo '${{ steps.mixed.outputs.report-json }}' | jq -e '.mode == "check"'
+          test "$STEP_OUTCOME" = "failure"
+          test "$EXIT_CODE" = "2"
+          echo "$REPORT_JSON" | jq -e '.mode == "check"'
