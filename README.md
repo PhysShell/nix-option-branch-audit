@@ -1721,6 +1721,60 @@ mega-commit:
   are validated independently, in that order, specifically so that if
   differential output ever looks wrong, it's diagnosable as "the two-root
   plumbing" or "the evaluator", never both at once.
+
+  **PR D1 — pure `compare()` + the adversarial diff corpus. Closed, still
+  no CLI/Action anywhere near it.** `TargetIdentity` (the canonical
+  `(module, test, cfg_ident, option_prefix, watched_path)` tuple),
+  `TargetOutcome`/`ChangeKind`/`TargetDiff`/`VerdictTransition`/
+  `ComparisonReport`, `index_by_identity`, and `compare(base: &AnalysisReport,
+  head: &AnalysisReport) -> Result<ComparisonReport, CompareError>` itself
+  — all in `src/main.rs`, `#[cfg(test)]`-invisible to the CLI/Action so
+  far (same "dead code until wired up" state H2's IR was in after its own
+  first commit). `TargetReport` gained `module`/`test`/`cfg_ident`/
+  `option_prefix` fields (additive to `schema_version: 1`, populated from
+  the manifest's own `Target` in `run_target`) so `compare()` can compute
+  identity from an `AnalysisReport` alone, without needing the original
+  manifest alongside it. `Verdict::option()`/`::kind()` added as thin
+  accessors (`kind()` returns the new `VerdictKind` bare-discriminant enum
+  — what `ChangeKind::VerdictChanged` actually compares, deliberately
+  ignoring payload so a same-kind-different-evidence pair reads as
+  `Unchanged`, per the type's own documented meaning).
+
+  Every invariant from the design review, proven, not just asserted:
+  `compare(A, A)` is all `Unchanged` (example + `proptest` property);
+  target/verdict order never affects the result (property test reverses
+  a generated report's verdict order and asserts an identical
+  `ComparisonReport`); entries are always sorted by identity (property
+  test, plus a hand-built out-of-order example); `compare(A, B)` and
+  `compare(B, A)` are exact mirrors — `Added`↔`Removed`, `Changed`'s
+  `base`/`head` swap, transitions reverse (property test asserted
+  structurally per entry, not just "same length"); duplicate identity on
+  either side is `Err(CompareError)`, never "pair with the first match"
+  (example test using two *different* target blocks that happen to share
+  one identity tuple — the subtle case, not a literal copy-pasted
+  manifest entry); identity carries zero presentation fields (two
+  dedicated examples: same verdict kind with different `evidence`, and
+  with only a `Span` differing, both `Unchanged`); a `module` rename is
+  `Removed`+`Added`, never a detected move (no heuristic exists to detect
+  one). Plus the full adversarial corpus asked for: reorder-without-change,
+  duplicate identity, bare `Added`, bare `Removed`, all 7×7 `VerdictKind`
+  transition pairs (brute-forced exhaustively, same discipline as
+  `aggregate`'s own 32-case check), same-verdict-different-evidence,
+  same-verdict-different-span, move-as-delete+add, and multiple
+  simultaneous changes with a stable, identity-sorted order. 15 new tests
+  (11 example + 4 `proptest` properties), 96 total (was 81 after PR C).
+
+  Two real clippy findings fixed, not suppressed: `TargetDiff`'s
+  `Added`/`Removed`/`Changed` payloads are now `Box<TargetOutcome>` (an
+  unboxed `Changed` made every `TargetDiff` — including the
+  zero-payload, by-far-most-common `Unchanged` case — pay for the
+  largest variant's ~472 bytes, `clippy::large_enum_variant`, a real
+  signal at real report sizes, not noise); `CompareError`'s `identity`
+  is `Box<TargetIdentity>` for the same reason on the error path
+  (`clippy::result_large_err`, ~128 bytes unboxed). `ChangeKind`'s
+  shared `Changed` postfix triggered `clippy::enum_variant_names` --
+  `#[allow]`ed with a comment, since the naming is the design note's own
+  and nothing here is ever glob-imported (the lint's actual concern).
 - **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
   needed** — changed-target selection (skip targets whose `module`/`test`
   didn't change), kept deliberately separate from and after D: proving

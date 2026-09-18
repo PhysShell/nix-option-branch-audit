@@ -205,7 +205,7 @@ fn is_valid_ident(s: &str) -> bool {
 // Source position
 // ---------------------------------------------------------------------
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct Span {
     file: String,
     line: u32,
@@ -394,7 +394,7 @@ enum PredicateKind {
     NegTruthy,
 }
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct Predicate {
     /// path relative to cfg_ident, e.g. ["database","socket"]
     path: Vec<String>,
@@ -1256,7 +1256,7 @@ fn lower_pred_chained(
 /// -- unlike H1's `Predicate` (which only ever represents a single
 /// `cfg.<path>` unary check), `ir` may be a compound expression over
 /// multiple options, and `refs` lists every one of them.
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct ResolvedPredicate {
     ir: Pred,
     refs: Vec<OptionPath>,
@@ -1566,7 +1566,7 @@ fn refs_in_pred(p: &Pred, out: &mut Vec<OptionPath>) {
 // accumulating full dotted paths, recording every non-attrset leaf.
 // ---------------------------------------------------------------------
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct TestAssignment {
     path: Vec<String>,
     value_source: String,
@@ -2195,7 +2195,7 @@ fn walk_config_entry(
 /// reached through `lower_pred` and possibly alias resolution). `run_target`
 /// always tries the H1 path first; `PredicateRef::Resolved` only ever
 /// appears when H1's own unary scan found nothing for the watched option.
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 enum PredicateRef {
     Unary(Predicate),
@@ -2218,7 +2218,7 @@ impl PredicateRef {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "verdict")]
 enum Verdict {
     /// The module has no `mkOption { ... }` declaration for this watched
@@ -2331,7 +2331,7 @@ enum Verdict {
 /// Always empty for verdicts produced by H1's original unary path -- that
 /// model only ever considers exactly one predicate by construction, so
 /// there is nothing this field would add.
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct PredicateAttempt {
     predicate: PredicateRef,
     /// `Some(true)`: at least one test instance witnessed a provable
@@ -2366,11 +2366,69 @@ impl Verdict {
     fn is_finding(&self) -> bool {
         matches!(self, Verdict::Oba001 { .. })
     }
+
+    /// The watched option's dot-joined path -- every variant carries one,
+    /// but Rust can't project a field shared across enum variants without
+    /// a match. Part of a target identity's `watched_path` component
+    /// (PR D's `compare()`).
+    fn option(&self) -> &str {
+        match self {
+            Verdict::OptionNotFound { option }
+            | Verdict::PredicateNotFound { option }
+            | Verdict::DefaultUnresolved { option, .. }
+            | Verdict::TestValueUnresolved { option, .. }
+            | Verdict::TestConfigUnresolved { option, .. }
+            | Verdict::Oba001 { option, .. }
+            | Verdict::Pass { option, .. } => option,
+        }
+    }
+
+    /// The bare discriminant, ignoring every payload field (predicate,
+    /// evidence, spans, ...) -- what `compare()` considers "the verdict"
+    /// for `ChangeKind::VerdictChanged` purposes. Two verdicts of the
+    /// same kind but different evidence are NOT a verdict change in v1
+    /// (that would be `EvidenceChanged`, reserved but not computed yet).
+    fn kind(&self) -> VerdictKind {
+        match self {
+            Verdict::OptionNotFound { .. } => VerdictKind::OptionNotFound,
+            Verdict::PredicateNotFound { .. } => VerdictKind::PredicateNotFound,
+            Verdict::DefaultUnresolved { .. } => VerdictKind::DefaultUnresolved,
+            Verdict::TestValueUnresolved { .. } => VerdictKind::TestValueUnresolved,
+            Verdict::TestConfigUnresolved { .. } => VerdictKind::TestConfigUnresolved,
+            Verdict::Oba001 { .. } => VerdictKind::Oba001,
+            Verdict::Pass { .. } => VerdictKind::Pass,
+        }
+    }
 }
 
-#[derive(Serialize, Debug)]
+/// `Verdict`'s bare discriminant -- see `Verdict::kind`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum VerdictKind {
+    OptionNotFound,
+    PredicateNotFound,
+    DefaultUnresolved,
+    TestValueUnresolved,
+    TestConfigUnresolved,
+    Oba001,
+    Pass,
+}
+
+#[derive(Serialize, Debug, Clone)]
 struct TargetReport {
     name: String,
+    /// Identity-relevant fields, copied verbatim from the manifest's own
+    /// `Target` -- together with each `Verdict::option()` below, this is
+    /// the `(module, test, cfg_ident, option_prefix, watched_path)` tuple
+    /// PR D's `compare()` uses as a target's identity across two
+    /// `AnalysisReport`s. Deliberately the manifest's own path/ident
+    /// text, not a canonicalized/resolved filesystem path (same
+    /// root-independence reasoning as `Span.file` elsewhere in this
+    /// struct) -- identity must never depend on which `--root` happened
+    /// to be used to produce a given report.
+    module: PathBuf,
+    test: PathBuf,
+    cfg_ident: String,
+    option_prefix: Vec<String>,
     /// Non-empty only when the module or test file failed to parse
     /// cleanly. Fail closed: a target with parse errors gets no per-watch
     /// verdicts at all (they'd be scanning a tree rnix patched together
@@ -2737,6 +2795,7 @@ fn aggregate(f: AggregateFacts) -> AggregateVerdict {
 /// head root, each analyzed independently through this same function
 /// before being compared) both bottom out here; nothing above this layer
 /// should need to know how a `TargetReport` gets produced.
+#[derive(Debug, Clone)]
 struct AnalysisReport {
     targets: Vec<TargetReport>,
 }
@@ -2796,6 +2855,243 @@ fn resolve_within_root(root: &Path, rel: &Path) -> anyhow::Result<PathBuf> {
     Ok(canon)
 }
 
+// ---------------------------------------------------------------------
+// PR D1: pure compare() -- no CLI, no Action, no Git/GitHub anywhere near
+// this. Deliberately built and tested standalone against two in-memory
+// `AnalysisReport`s before `oba diff`/Action wiring exists at all, per
+// the design note's own sequencing (D design freeze -> pure compare() ->
+// adversarial diff corpus -> oba diff CLI -> Action diff integration).
+// ---------------------------------------------------------------------
+
+/// A watched option's identity across two `AnalysisReport`s, independent
+/// of revision. Deliberately syntactic and flat -- no rename/move
+/// tracking, no content-similarity heuristic: a `module`/`test` path
+/// edit changes this tuple, so it surfaces as `Removed` + `Added`, never
+/// a detected "same target, different path" (see the PR D design note).
+/// Nothing presentation-shaped (`Span`, source excerpts, evidence order)
+/// belongs here -- identity must be stable even when only *how* a result
+/// is reported changes, not what it's about.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+struct TargetIdentity {
+    module: PathBuf,
+    test: PathBuf,
+    cfg_ident: String,
+    option_prefix: Vec<String>,
+    watched_path: String,
+}
+
+/// `Verdict`'s bare discriminant, ignoring payload -- see `Verdict::kind`.
+/// What `TargetDiff::Changed`/`Added`/`Removed` actually carry for one
+/// identity. Deliberately just the verdict for now (v1 only computes
+/// `ChangeKind::VerdictChanged`) -- reserved as its own type so a later
+/// `EvidenceChanged`/`PredicateChanged`/`VisibilityChanged` can grow this
+/// struct without renegotiating `TargetDiff` itself.
+#[derive(Debug, Clone, PartialEq)]
+struct TargetOutcome {
+    verdict: Verdict,
+}
+
+/// What kind of change was detected between a base and head outcome for
+/// the same identity. A marker list, not itself a judgment -- `compare()`
+/// states facts, never regression/improvement opinions (see
+/// `TargetDiff::verdict_transition`). Shared `Changed` postfix is
+/// intentional (naming from the PR D design note, not accidental
+/// copy-paste) -- clippy's glob-import-friendliness suggestion doesn't
+/// apply, nothing here is ever glob-imported.
+#[allow(clippy::enum_variant_names)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ChangeKind {
+    VerdictChanged,
+    EvidenceChanged,
+    PredicateChanged,
+    VisibilityChanged,
+}
+
+/// One identity's comparison result. `Unchanged` means "no change under
+/// the `ChangeKind`s this version of `compare()` actually computes" --
+/// v1 only computes `VerdictChanged`, so two outcomes with the same
+/// verdict kind but entirely different evidence are `Unchanged` here, NOT
+/// a claim that the two `TargetOutcome`s are byte-for-byte/structurally
+/// identical. Widening what `Unchanged` notices means adding a
+/// `ChangeKind` and populating it, not redefining this type.
+#[derive(Debug, Clone, PartialEq)]
+enum TargetDiff {
+    Unchanged,
+    // Boxed: `TargetOutcome` wraps a full `Verdict`, whose own payload
+    // (evidence/predicate_attempts/spans) makes it large enough that an
+    // unboxed `Changed` would otherwise force every `TargetDiff` --
+    // including the zero-payload `Unchanged` case, by far the most common
+    // one in a clean run -- to reserve stack space for the biggest
+    // variant (clippy::large_enum_variant, a real signal here, not noise).
+    Added { head: Box<TargetOutcome> },
+    Removed { base: Box<TargetOutcome> },
+    Changed {
+        base: Box<TargetOutcome>,
+        head: Box<TargetOutcome>,
+        changes: Vec<ChangeKind>,
+    },
+}
+
+impl TargetDiff {
+    /// The bare verdict-kind transition, when this diff represents one --
+    /// `None` for `Unchanged`/`Added`/`Removed` (there's no "from" or no
+    /// "to"), and for a hypothetical future `Changed` whose `changes`
+    /// doesn't include `VerdictChanged` (not reachable by v1 alone, which
+    /// only ever populates that one `ChangeKind`). A bare fact --
+    /// `{from, to}`, not "regression"/"improvement": whether e.g.
+    /// `PASS -> INCONCLUSIVE` should block a PR is CI policy, decided
+    /// somewhere above this, same boundary `analyze()` already draws
+    /// around exit codes.
+    fn verdict_transition(&self) -> Option<VerdictTransition> {
+        match self {
+            TargetDiff::Changed { base, head, changes }
+                if changes.contains(&ChangeKind::VerdictChanged) =>
+            {
+                Some(VerdictTransition {
+                    from: base.verdict.kind(),
+                    to: head.verdict.kind(),
+                })
+            }
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct VerdictTransition {
+    from: VerdictKind,
+    to: VerdictKind,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct ComparisonEntry {
+    identity: TargetIdentity,
+    diff: TargetDiff,
+}
+
+/// `compare()`'s full result -- `entries` is always sorted by `identity`
+/// (see `TargetIdentity`'s derived `Ord`), regardless of the order
+/// `AnalysisReport::targets`/each target's `watch` list happened to be
+/// in. Determinism here is load-bearing, not cosmetic: a `oba diff` whose
+/// output order depended on TOML array order would make CI annotations
+/// and any snapshot/golden test of diff output flaky for reasons that
+/// have nothing to do with the actual analysis.
+#[derive(Debug, Clone, PartialEq)]
+struct ComparisonReport {
+    entries: Vec<ComparisonEntry>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CompareSide {
+    Base,
+    Head,
+}
+
+/// `compare()`'s only failure mode: the same identity appearing twice
+/// within a single side. Deliberately an error, not "pair with the first
+/// match" -- a manifest that (accidentally or via a hostile edit)
+/// produces two verdicts for the exact same `(module, test, cfg_ident,
+/// option_prefix, watched_path)` tuple makes pairing genuinely ambiguous,
+/// and guessing would turn into exactly the "why does diff depend on
+/// TOML order" investigation this type exists to prevent.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct CompareError {
+    side: CompareSide,
+    // Boxed: TargetIdentity (2 PathBufs + a String + a Vec<String> + a
+    // String) makes an unboxed CompareError ~128 bytes, which clippy
+    // correctly flags (clippy::result_large_err) -- every `Ok` path
+    // through `Result<_, CompareError>` would otherwise pay for the size
+    // of the rare error case.
+    identity: Box<TargetIdentity>,
+}
+
+impl std::fmt::Display for CompareError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "duplicate target identity on the {:?} side: module={} test={} cfg_ident={} option_prefix={:?} watched_path={}",
+            self.side,
+            self.identity.module.display(),
+            self.identity.test.display(),
+            self.identity.cfg_ident,
+            self.identity.option_prefix,
+            self.identity.watched_path,
+        )
+    }
+}
+
+impl std::error::Error for CompareError {}
+
+/// Every `(identity, &Verdict)` pair in one `AnalysisReport`, keyed by
+/// identity -- `Err` the instant the same identity appears twice on this
+/// side, before any base/head pairing is attempted.
+fn index_by_identity(
+    report: &AnalysisReport,
+    side: CompareSide,
+) -> Result<std::collections::BTreeMap<TargetIdentity, &Verdict>, CompareError> {
+    let mut index = std::collections::BTreeMap::new();
+    for target in &report.targets {
+        for verdict in &target.verdicts {
+            let identity = TargetIdentity {
+                module: target.module.clone(),
+                test: target.test.clone(),
+                cfg_ident: target.cfg_ident.clone(),
+                option_prefix: target.option_prefix.clone(),
+                watched_path: verdict.option().to_string(),
+            };
+            if index.insert(identity.clone(), verdict).is_some() {
+                return Err(CompareError { side, identity: Box::new(identity) });
+            }
+        }
+    }
+    Ok(index)
+}
+
+/// Compare two already-complete `AnalysisReport`s by identity. Pure: no
+/// filesystem, no Git, no GitHub -- everything it needs is already inside
+/// `base`/`head`. Deterministic: `entries` is always sorted by identity,
+/// independent of either report's own target/watch order (`BTreeMap`
+/// keyed by `TargetIdentity`, iterated by its `Ord`).
+fn compare(base: &AnalysisReport, head: &AnalysisReport) -> Result<ComparisonReport, CompareError> {
+    let base_index = index_by_identity(base, CompareSide::Base)?;
+    let head_index = index_by_identity(head, CompareSide::Head)?;
+
+    let mut identities: std::collections::BTreeSet<TargetIdentity> = std::collections::BTreeSet::new();
+    identities.extend(base_index.keys().cloned());
+    identities.extend(head_index.keys().cloned());
+
+    let mut entries = Vec::with_capacity(identities.len());
+    for identity in identities {
+        let diff = match (base_index.get(&identity), head_index.get(&identity)) {
+            (None, None) => unreachable!("identity came from one of the two indexes"),
+            (None, Some(h)) => TargetDiff::Added {
+                head: Box::new(TargetOutcome { verdict: (*h).clone() }),
+            },
+            (Some(b), None) => TargetDiff::Removed {
+                base: Box::new(TargetOutcome { verdict: (*b).clone() }),
+            },
+            (Some(b), Some(h)) => {
+                let mut changes = Vec::new();
+                if b.kind() != h.kind() {
+                    changes.push(ChangeKind::VerdictChanged);
+                }
+                if changes.is_empty() {
+                    TargetDiff::Unchanged
+                } else {
+                    TargetDiff::Changed {
+                        base: Box::new(TargetOutcome { verdict: (*b).clone() }),
+                        head: Box::new(TargetOutcome { verdict: (*h).clone() }),
+                        changes,
+                    }
+                }
+            }
+        };
+        entries.push(ComparisonEntry { identity, diff });
+    }
+
+    Ok(ComparisonReport { entries })
+}
+
 fn run_target(
     t: &Target,
     module_path: &std::path::Path,
@@ -2830,6 +3126,10 @@ fn run_target(
         // damage and pretend the resulting (dis)coveries mean anything.
         return Ok(TargetReport {
             name: t.name.clone(),
+            module: t.module.clone(),
+            test: t.test.clone(),
+            cfg_ident: t.cfg_ident.clone(),
+            option_prefix: t.option_prefix.clone(),
             parse_errors,
             discovered_options: Vec::new(),
             discovered_predicates: Vec::new(),
@@ -3167,6 +3467,10 @@ fn run_target(
 
     Ok(TargetReport {
         name: t.name.clone(),
+        module: t.module.clone(),
+        test: t.test.clone(),
+        cfg_ident: t.cfg_ident.clone(),
+        option_prefix: t.option_prefix.clone(),
         parse_errors,
         discovered_options: options,
         discovered_predicates: predicates,
@@ -4758,6 +5062,460 @@ mod tests {
                     "removing {:?} changed a known result from {:?} to {:?}",
                     path, full_result, weakened_result
                 );
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // PR D1: pure compare() -- invariants + an adversarial corpus, all
+    // standalone (no CLI, no filesystem, no Git/GitHub), per the design
+    // note's own sequencing.
+    // -----------------------------------------------------------------
+
+    fn t_span() -> Span {
+        Span { file: "f.nix".to_string(), line: 1, col: 1 }
+    }
+
+    fn t_predicate_ref() -> PredicateRef {
+        PredicateRef::Unary(Predicate {
+            path: vec!["x".to_string()],
+            kind: PredicateKind::NullNeq,
+            span: t_span(),
+            source: "cfg.x != null".to_string(),
+        })
+    }
+
+    const ALL_VERDICT_KINDS: [VerdictKind; 7] = [
+        VerdictKind::OptionNotFound,
+        VerdictKind::PredicateNotFound,
+        VerdictKind::DefaultUnresolved,
+        VerdictKind::TestValueUnresolved,
+        VerdictKind::TestConfigUnresolved,
+        VerdictKind::Oba001,
+        VerdictKind::Pass,
+    ];
+
+    /// A representative `Verdict` of the given bare kind, for a given
+    /// watched-option path -- payload content is arbitrary/minimal on
+    /// purpose (tests that care about payload independence, e.g.
+    /// `same_verdict_kind_different_evidence_or_span_is_unchanged`, vary
+    /// it explicitly themselves).
+    fn verdict_of_kind(kind: VerdictKind, option: &str) -> Verdict {
+        match kind {
+            VerdictKind::OptionNotFound => Verdict::OptionNotFound { option: option.to_string() },
+            VerdictKind::PredicateNotFound => {
+                Verdict::PredicateNotFound { option: option.to_string() }
+            }
+            VerdictKind::DefaultUnresolved => Verdict::DefaultUnresolved {
+                option: option.to_string(),
+                predicate: t_predicate_ref(),
+            },
+            VerdictKind::TestValueUnresolved => Verdict::TestValueUnresolved {
+                option: option.to_string(),
+                predicate: t_predicate_ref(),
+                default_outcome: Some(false),
+                predicate_attempts: Vec::new(),
+            },
+            VerdictKind::TestConfigUnresolved => Verdict::TestConfigUnresolved {
+                option: option.to_string(),
+                predicate: t_predicate_ref(),
+                default_outcome: Some(false),
+                predicate_attempts: Vec::new(),
+            },
+            VerdictKind::Oba001 => Verdict::Oba001 {
+                option: option.to_string(),
+                predicate: t_predicate_ref(),
+                default_outcome: Some(false),
+                predicate_attempts: Vec::new(),
+            },
+            VerdictKind::Pass => Verdict::Pass {
+                option: option.to_string(),
+                predicate: t_predicate_ref(),
+                default_outcome: false,
+                evidence: Vec::new(),
+                predicate_attempts: Vec::new(),
+            },
+        }
+    }
+
+    fn mk_target_report(
+        name: &str,
+        module: &str,
+        test: &str,
+        cfg_ident: &str,
+        option_prefix: &[&str],
+        verdicts: Vec<Verdict>,
+    ) -> TargetReport {
+        TargetReport {
+            name: name.to_string(),
+            module: PathBuf::from(module),
+            test: PathBuf::from(test),
+            cfg_ident: cfg_ident.to_string(),
+            option_prefix: option_prefix.iter().map(|s| s.to_string()).collect(),
+            parse_errors: Vec::new(),
+            discovered_options: Vec::new(),
+            discovered_predicates: Vec::new(),
+            resolved_predicates: Vec::new(),
+            unresolved_predicate_sites: Vec::new(),
+            matched_test_assignments: Vec::new(),
+            test_config_opacity: Vec::new(),
+            verdicts,
+        }
+    }
+
+    fn mk_report(targets: Vec<TargetReport>) -> AnalysisReport {
+        AnalysisReport { targets }
+    }
+
+    fn one_target_report(verdicts: Vec<Verdict>) -> AnalysisReport {
+        mk_report(vec![mk_target_report(
+            "t",
+            "module.nix",
+            "test.nix",
+            "cfg",
+            &["services", "x"],
+            verdicts,
+        )])
+    }
+
+    // --- adversarial corpus (example-based) ---
+
+    #[test]
+    fn compare_of_identical_report_is_all_unchanged() {
+        let r = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Pass, "a"),
+            verdict_of_kind(VerdictKind::Oba001, "b"),
+            verdict_of_kind(VerdictKind::TestConfigUnresolved, "c"),
+        ]);
+        let diff = compare(&r, &r).unwrap();
+        assert_eq!(diff.entries.len(), 3);
+        assert!(diff.entries.iter().all(|e| e.diff == TargetDiff::Unchanged));
+    }
+
+    #[test]
+    fn reordering_verdicts_does_not_change_the_comparison() {
+        let base = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Pass, "a"),
+            verdict_of_kind(VerdictKind::Oba001, "b"),
+        ]);
+        let base_reordered = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Oba001, "b"),
+            verdict_of_kind(VerdictKind::Pass, "a"),
+        ]);
+        let head = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Pass, "a"),
+            verdict_of_kind(VerdictKind::TestValueUnresolved, "b"),
+        ]);
+        assert_eq!(compare(&base, &head).unwrap(), compare(&base_reordered, &head).unwrap());
+    }
+
+    #[test]
+    fn comparison_entries_are_sorted_by_identity() {
+        // Deliberately inserted out of sorted order.
+        let r = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Pass, "z"),
+            verdict_of_kind(VerdictKind::Pass, "a"),
+            verdict_of_kind(VerdictKind::Pass, "m"),
+        ]);
+        let diff = compare(&r, &r).unwrap();
+        let identities: Vec<_> = diff.entries.iter().map(|e| &e.identity).collect();
+        let mut sorted = identities.clone();
+        sorted.sort();
+        assert_eq!(identities, sorted);
+    }
+
+    #[test]
+    fn added_target_is_reported_as_added_not_changed() {
+        let base = one_target_report(vec![]);
+        let head = one_target_report(vec![verdict_of_kind(VerdictKind::Pass, "a")]);
+        let diff = compare(&base, &head).unwrap();
+        assert_eq!(diff.entries.len(), 1);
+        assert!(matches!(diff.entries[0].diff, TargetDiff::Added { .. }));
+    }
+
+    #[test]
+    fn removed_target_is_reported_as_removed_not_changed() {
+        let base = one_target_report(vec![verdict_of_kind(VerdictKind::Pass, "a")]);
+        let head = one_target_report(vec![]);
+        let diff = compare(&base, &head).unwrap();
+        assert_eq!(diff.entries.len(), 1);
+        assert!(matches!(diff.entries[0].diff, TargetDiff::Removed { .. }));
+    }
+
+    #[test]
+    fn every_verdict_kind_transition_is_reported_correctly() {
+        // Cheap enough to brute-force all 49 pairs at the unit-test level,
+        // same discipline as aggregate's own 32-case exhaustive check.
+        for from in ALL_VERDICT_KINDS {
+            for to in ALL_VERDICT_KINDS {
+                let base = one_target_report(vec![verdict_of_kind(from, "a")]);
+                let head = one_target_report(vec![verdict_of_kind(to, "a")]);
+                let diff = compare(&base, &head).unwrap();
+                assert_eq!(diff.entries.len(), 1);
+                if from == to {
+                    assert_eq!(
+                        diff.entries[0].diff,
+                        TargetDiff::Unchanged,
+                        "same kind {from:?} must be Unchanged"
+                    );
+                } else {
+                    match &diff.entries[0].diff {
+                        TargetDiff::Changed { changes, .. } => {
+                            assert_eq!(changes, &vec![ChangeKind::VerdictChanged]);
+                        }
+                        other => panic!("{from:?} -> {to:?}: expected Changed, got {other:?}"),
+                    }
+                    let transition = diff.entries[0].diff.verdict_transition().unwrap();
+                    assert_eq!(transition.from, from);
+                    assert_eq!(transition.to, to);
+                }
+            }
+        }
+    }
+
+    /// The contract that gives `Unchanged` its precise meaning: "no
+    /// tracked `ChangeKind`", NOT "byte-for-byte/structurally identical
+    /// `TargetOutcome`". Same verdict kind, deliberately different
+    /// evidence -- must still be `Unchanged` in v1, which only computes
+    /// `VerdictChanged`.
+    #[test]
+    fn same_verdict_kind_different_evidence_is_unchanged() {
+        let base = one_target_report(vec![Verdict::Pass {
+            option: "a".to_string(),
+            predicate: t_predicate_ref(),
+            default_outcome: false,
+            evidence: vec![],
+            predicate_attempts: vec![],
+        }]);
+        let head = one_target_report(vec![Verdict::Pass {
+            option: "a".to_string(),
+            predicate: t_predicate_ref(),
+            default_outcome: false,
+            evidence: vec![TestAssignment {
+                path: vec!["a".to_string()],
+                value_source: "true".to_string(),
+                value_class: ValueClass::Bool(true),
+                known_value: Some(KnownValue::Exact(Scalar::Bool(true))),
+                instance: None,
+                span: t_span(),
+            }],
+            predicate_attempts: vec![PredicateAttempt {
+                predicate: t_predicate_ref(),
+                witnessed: Some(true),
+            }],
+        }]);
+        assert_eq!(compare(&base, &head).unwrap().entries[0].diff, TargetDiff::Unchanged);
+    }
+
+    /// Same guarantee, isolated to JUST a span difference (the most
+    /// purely presentational field this codebase has) on an otherwise
+    /// byte-identical verdict.
+    #[test]
+    fn same_verdict_kind_different_span_is_unchanged() {
+        let mut predicate_a = t_predicate_ref();
+        let mut predicate_b = t_predicate_ref();
+        if let PredicateRef::Unary(p) = &mut predicate_a {
+            p.span = Span { file: "a.nix".to_string(), line: 1, col: 1 };
+        }
+        if let PredicateRef::Unary(p) = &mut predicate_b {
+            p.span = Span { file: "a.nix".to_string(), line: 99, col: 7 };
+        }
+        let base = one_target_report(vec![Verdict::Oba001 {
+            option: "a".to_string(),
+            predicate: predicate_a,
+            default_outcome: Some(false),
+            predicate_attempts: vec![],
+        }]);
+        let head = one_target_report(vec![Verdict::Oba001 {
+            option: "a".to_string(),
+            predicate: predicate_b,
+            default_outcome: Some(false),
+            predicate_attempts: vec![],
+        }]);
+        assert_eq!(compare(&base, &head).unwrap().entries[0].diff, TargetDiff::Unchanged);
+    }
+
+    #[test]
+    fn moving_a_module_file_is_removed_plus_added_not_a_rename() {
+        let base = mk_report(vec![mk_target_report(
+            "t",
+            "old.nix",
+            "test.nix",
+            "cfg",
+            &["services", "x"],
+            vec![verdict_of_kind(VerdictKind::Pass, "a")],
+        )]);
+        let head = mk_report(vec![mk_target_report(
+            "t",
+            "new.nix",
+            "test.nix",
+            "cfg",
+            &["services", "x"],
+            vec![verdict_of_kind(VerdictKind::Pass, "a")],
+        )]);
+        let diff = compare(&base, &head).unwrap();
+        assert_eq!(diff.entries.len(), 2);
+        // Order not asserted here on purpose -- entries sort by identity,
+        // whose first field is `module`, so which of "new.nix"/"old.nix"
+        // comes first is just lexicographic accident, not a claim this
+        // test is about (sortedness itself has its own dedicated test).
+        let mut kinds: Vec<_> = diff
+            .entries
+            .iter()
+            .map(|e| match &e.diff {
+                TargetDiff::Added { .. } => "added",
+                TargetDiff::Removed { .. } => "removed",
+                TargetDiff::Changed { .. } => "changed",
+                TargetDiff::Unchanged => "unchanged",
+            })
+            .collect();
+        kinds.sort();
+        assert_eq!(kinds, vec!["added", "removed"]);
+    }
+
+    #[test]
+    fn duplicate_identity_within_one_side_is_an_error() {
+        // Two DIFFERENT target blocks that happen to share the exact same
+        // (module, test, cfg_ident, option_prefix) and both watch "a" --
+        // the identity tuple collides even though nothing about the
+        // manifest looks obviously duplicated at a glance.
+        let base = mk_report(vec![
+            mk_target_report(
+                "t1",
+                "module.nix",
+                "test.nix",
+                "cfg",
+                &["services", "x"],
+                vec![verdict_of_kind(VerdictKind::Pass, "a")],
+            ),
+            mk_target_report(
+                "t2",
+                "module.nix",
+                "test.nix",
+                "cfg",
+                &["services", "x"],
+                vec![verdict_of_kind(VerdictKind::Oba001, "a")],
+            ),
+        ]);
+        let head = one_target_report(vec![verdict_of_kind(VerdictKind::Pass, "a")]);
+        let err = compare(&base, &head).unwrap_err();
+        assert_eq!(err.side, CompareSide::Base);
+        assert_eq!(err.identity.watched_path, "a");
+    }
+
+    #[test]
+    fn multiple_simultaneous_changes_keep_a_stable_sorted_order() {
+        let base = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Pass, "b_unchanged"),
+            verdict_of_kind(VerdictKind::Pass, "c_removed"),
+            verdict_of_kind(VerdictKind::Oba001, "a_changed"),
+        ]);
+        let head = one_target_report(vec![
+            verdict_of_kind(VerdictKind::Pass, "b_unchanged"),
+            verdict_of_kind(VerdictKind::Pass, "a_changed"),
+            verdict_of_kind(VerdictKind::Pass, "d_added"),
+        ]);
+        let diff = compare(&base, &head).unwrap();
+        let paths: Vec<_> = diff.entries.iter().map(|e| e.identity.watched_path.clone()).collect();
+        // Sorted lexicographically by watched_path (this fixture's only
+        // varying identity component), independent of which of
+        // added/removed/changed/unchanged each one is.
+        assert_eq!(
+            paths,
+            vec!["a_changed", "b_unchanged", "c_removed", "d_added"]
+        );
+        assert!(matches!(diff.entries[0].diff, TargetDiff::Changed { .. }));
+        assert_eq!(diff.entries[1].diff, TargetDiff::Unchanged);
+        assert!(matches!(diff.entries[2].diff, TargetDiff::Removed { .. }));
+        assert!(matches!(diff.entries[3].diff, TargetDiff::Added { .. }));
+    }
+
+    // --- property-based invariants (proptest) ---
+
+    fn arb_analysis_report() -> impl proptest::strategy::Strategy<Value = AnalysisReport> {
+        use proptest::prelude::*;
+        prop::collection::hash_set("[a-e]", 1..=5)
+            .prop_flat_map(|names| {
+                let names: Vec<String> = names.into_iter().collect();
+                let n = names.len();
+                (
+                    Just(names),
+                    prop::collection::vec(proptest::sample::select(&ALL_VERDICT_KINDS[..]), n),
+                )
+            })
+            .prop_map(|(names, kinds)| {
+                let verdicts = names
+                    .iter()
+                    .zip(kinds.iter())
+                    .map(|(name, kind)| verdict_of_kind(*kind, name))
+                    .collect();
+                one_target_report(verdicts)
+            })
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn prop_compare_of_identical_report_is_all_unchanged(r in arb_analysis_report()) {
+            let diff = compare(&r, &r).unwrap();
+            proptest::prop_assert!(diff.entries.iter().all(|e| e.diff == TargetDiff::Unchanged));
+        }
+
+        #[test]
+        fn prop_reordering_base_verdicts_does_not_change_the_comparison(
+            base in arb_analysis_report(),
+            head in arb_analysis_report(),
+        ) {
+            let mut base_reordered = base.clone();
+            base_reordered.targets[0].verdicts.reverse();
+            proptest::prop_assert_eq!(
+                compare(&base, &head).unwrap(),
+                compare(&base_reordered, &head).unwrap()
+            );
+        }
+
+        #[test]
+        fn prop_comparison_entries_are_always_sorted(
+            base in arb_analysis_report(),
+            head in arb_analysis_report(),
+        ) {
+            let diff = compare(&base, &head).unwrap();
+            let identities: Vec<_> = diff.entries.iter().map(|e| e.identity.clone()).collect();
+            let mut sorted = identities.clone();
+            sorted.sort();
+            proptest::prop_assert_eq!(identities, sorted);
+        }
+
+        #[test]
+        fn prop_compare_is_mirrored_under_swap(
+            base in arb_analysis_report(),
+            head in arb_analysis_report(),
+        ) {
+            let forward = compare(&base, &head).unwrap();
+            let backward = compare(&head, &base).unwrap();
+            proptest::prop_assert_eq!(forward.entries.len(), backward.entries.len());
+            for (f, b) in forward.entries.iter().zip(backward.entries.iter()) {
+                proptest::prop_assert_eq!(&f.identity, &b.identity);
+                match (&f.diff, &b.diff) {
+                    (TargetDiff::Unchanged, TargetDiff::Unchanged) => {}
+                    (TargetDiff::Added { head: h }, TargetDiff::Removed { base: b2 }) => {
+                        proptest::prop_assert_eq!(h, b2);
+                    }
+                    (TargetDiff::Removed { base: b1 }, TargetDiff::Added { head: h2 }) => {
+                        proptest::prop_assert_eq!(b1, h2);
+                    }
+                    (
+                        TargetDiff::Changed { base: fb, head: fh, changes: fc },
+                        TargetDiff::Changed { base: bb, head: bh, changes: bc },
+                    ) => {
+                        proptest::prop_assert_eq!(fb, bh);
+                        proptest::prop_assert_eq!(fh, bb);
+                        proptest::prop_assert_eq!(fc, bc);
+                    }
+                    (a, b) => proptest::prop_assert!(
+                        false,
+                        "mismatched diff shapes under swap: {:?} vs {:?}", a, b
+                    ),
+                }
             }
         }
     }
