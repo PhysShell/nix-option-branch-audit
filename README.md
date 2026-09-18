@@ -1757,16 +1757,110 @@ surface at once:
    `15 passed; 0 failed; 0 ignored; ... 69 filtered out` in 42.8s on a
    fresh runner.
 
+   **K2d FROZEN at `45d740d`** (the documented-completion commit — `3bc0bfa`
+   is the implementation-point, the commit where the code and real tests
+   actually landed). Same standing rule as every other frozen layer in
+   this project: reopened only by a concrete counterexample, not for
+   architectural cleanup or speculative completeness.
+6. **K2a.1 — a second, explicit `composer.lock` provenance source.
+   Closed, `dce5660`, confirmed green in real CI (`gh run view --log`:
+   21 passed, 0 failed, 45.7s).** The nixpkgs-local locator gap K2c found
+   recurring 3× (`flarum`/`baikal`/`postfixadmin`'s `pkgs.<attr>.src +
+   "/composer.lock"` fails outright — upstream ships no lock file, so
+   nixpkgs vendors its own). Deliberately NOT "learn to find any
+   `composer.lock`" — a second, explicit provenance source alongside the
+   already-working one, held to a tight model: `resolve_composer_lock`
+   tries the package's own fetched source first (K2a's original path,
+   `fetch_composer_lock`, completely UNCHANGED — Kimai/Davis's existing
+   call sites untouched), and a `nixpkgs_local` candidate resolved
+   through ONE explicit package-expression relationship —
+   `pkgs.<attr>.composerVendor.composerLock` — never a directory walk for
+   the nearest file named `composer.lock`, exactly the kind of "convenient
+   false-confidence generator" ruled out up front.
+
+   **The relationship is real, not assumed** — confirmed by reading
+   `pkgs/build-support/php/builders/v2/build-composer-project.nix` itself:
+   `composerVendor = args.composerVendor or (php.mkComposerVendor { ...;
+   composerLock; ...})`, and `lib.extendMkDerivation`'s own merge
+   semantics (documented in `lib/customisation.nix`: the overlay is
+   applied *before* passing to `constructDrv`, on top of the original
+   `args`, not instead of them) carry the caller's `composerLock`
+   argument through onto the resulting derivation's own attribute set
+   even though `mkComposerVendorOverride` never re-exports it explicitly.
+   So `.composerVendor.composerLock` isn't nixpkgs convention being
+   guessed at — it's asking Nix to hand back the exact same path value
+   the package expression itself declared, through the one relationship
+   that actually connects them.
+
+   **Priority when both candidates exist, proven not assumed**: the spec
+   sketch had source-first, local-as-fallback; reading the same builder
+   file turned up a stronger fact — when `composerLock` is non-null, the
+   real build feeds it straight to `composer install`, and never reads
+   whatever `composer.lock` might also happen to sit inside `src`. So
+   `NixpkgsLocal` wins whenever present, not by "first candidate wins"
+   convention but because that is what the actual build does — checked
+   by a dedicated offline test using two deliberately different
+   synthetic contents, so the priority is exercised by construction, not
+   merely asserted in a comment. No real corpus app currently has both
+   candidates present, so this priority is enforced but not yet
+   corpus-exercised — disclosed, not glossed over.
+
+   **All 6 stop-condition items met**: `flarum`/`baikal`/`postfixadmin`
+   each auto-resolve the correct local lock (✓, real `nix eval`, not
+   read from cached source — `flarum` additionally resolves a genuine
+   `doctrine/dbal` 2.13.9 entry via the unchanged `resolve_consumer_identity`;
+   `baikal`/`postfixadmin` genuinely have none, now for the confirmed
+   reason instead of a blocked locator); Kimai/Davis/strichliste's
+   source-based path is completely unchanged (✓ — `fetch_composer_lock`
+   untouched, plus a new regression test proving the unified resolver
+   still lands on `PackageSource` for all three — `strichliste`'s first
+   automated real test in this module, previously only verified manually
+   in K2c's own census transcript); both-present resolves by proven
+   priority, never "first" (✓, see above); the local lock is tied to a
+   real package derivation/expression, never merely adjacent on disk (✓
+   — `.composerVendor.composerLock`, not a path search); missing/
+   ambiguous/mismatched identity is fail-closed (✓ — `Inconclusive` when
+   neither candidate resolves, unchanged fail-closed behavior in
+   `resolve_consumer_identity` downstream); `resolve_consumer_identity`
+   never learns which source its input came from (✓ — it still takes a
+   plain `&str`, unchanged signature; `ComposerLockOrigin` is carried
+   only in the new `ResolvedComposerLock` wrapper, one layer up).
+
+   `ComposerLockOrigin` (`PackageSource | NixpkgsLocal`) added for
+   provenance, not architectural decoration — a Finding can now honestly
+   say which source its consumer contract came from. Not wired into any
+   report/Finding type yet; this module still has no CLI/report
+   integration at all.
+
+   **A real, incidental corpus finding, deliberately NOT fixed in this
+   round**: `movim`'s `package.nix` calls `php.mkComposerVendor` directly
+   with its own argument list (bypassing `buildComposerProject2`'s
+   automatic `composerLock` forwarding entirely), so
+   `pkgs.movim.composerVendor.composerLock` is not `null` but genuinely
+   ABSENT as an attribute — a real, different shape from every other
+   surveyed app (all of which have the attribute present, `null` or a
+   path). Harmless for K2a.1 (`movim` isn't in its target scope — its
+   consumer support stays unsupported for the unrelated K2d reason,
+   Laravel's own DB connector), collapsed correctly by an `or null` guard
+   regardless — recorded here as a corpus finding with its exact
+   reproduction, same discipline as movim's `mariadb`-path bug from K2d.
+   Not folded into "let's also fix movim while we're here" — the user's
+   own explicit instruction this round, to keep the roadmap from
+   re-branching on every incidental discovery.
+
+   4 new offline tests + 6 new real tests. 94 tests total in the `oba`
+   binary's own unit-test target (was 84): 73 offline (was 69, +4) + 21
+   real/ignored (was 15, +6).
+
 Explicitly **not next**, regardless of how tempting: a general PHP
 analyzer, automatic `web-apps/*` scanning, a GitHub Action for CDC/diff
 policy, a package-bump differential checker (a good *later* direction,
-not this one), generic sink discovery, H2 predicates, or D3. The
-user-specified sequence from here: K2a.1 (the nixpkgs-local
-`composerLock` locator gap — recurs 3× now: `flarum`/`baikal`/
-`postfixadmin`), then a new "consumer-framework question" investigation
-(`DB_*` env → Laravel/Symfony config → Doctrine params — likely its own
-consumer-adapter class, not yet scoped), only after that generic sink
-discovery or package-bump drift.
+not this one), generic sink discovery, H2 predicates, D3, or fixing
+movim's `mariadb`-path bug. Per the user's explicit instruction: **look
+at the census again before picking what's next** — only then decide
+whether the actual bottleneck is consumer-framework adapters (`DB_*` env
+→ Laravel/Symfony config → Doctrine params), sink discovery, or
+package-bump drift. Not decided in advance.
 
 ## Productization: from research phase to a usable CI product
 
