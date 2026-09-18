@@ -55,7 +55,17 @@ outputs:
       manifest, missing files, a --root escape, ...).
     value: ${{ steps.run.outputs.exit-code }}
   report-json:
-    description: 'The full schema_version:1 JSON report, verbatim.'
+    description: >-
+      The full schema_version:1 JSON report, verbatim. Fine to consume
+      directly for a small manifest; for a large one, prefer downloading
+      the uploaded artifact instead of piping this output through
+      another step's `env:`/`run:` -- GitHub Actions step outputs are
+      capped at 1MB, and a real run of this repo's own dogfood workflow
+      hit the OS's own process argument/environment size limit
+      ("Argument list too long") passing a ~390KB report through `env:`
+      well before that cap, over a ~28-target manifest. This output
+      exists for convenience on small checks, not as the reliable path
+      for a real nixpkgs-scale one.
     value: ${{ steps.run.outputs.report-json }}
 
 runs:

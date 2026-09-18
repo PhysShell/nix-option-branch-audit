@@ -58,11 +58,19 @@ jobs:
 
       - name: assert mixed run failed the step with exit-code 2, not silently
         shell: bash
+        # No report-json content check here on purpose (unlike the clean
+        # case above) -- golden.toml's real report is ~390KB, and a real
+        # run of this exact workflow showed that's already enough for
+        # "Argument list too long" starting bash once the full JSON is
+        # passed through env: for a downstream step (the OS execve()
+        # argument+environment size limit, not a GitHub Actions-specific
+        # one -- passing it via `env:` avoided the earlier script-
+        # injection failure but not this). See action.yml's own comment
+        # on the report-json output for the resulting size guidance; the
+        # artifact upload two steps up is unaffected by any of this.
         env:
           STEP_OUTCOME: ${{ steps.mixed.outcome }}
           EXIT_CODE: ${{ steps.mixed.outputs.exit-code }}
-          REPORT_JSON: ${{ steps.mixed.outputs.report-json }}
         run: |
           test "$STEP_OUTCOME" = "failure"
           test "$EXIT_CODE" = "2"
-          echo "$REPORT_JSON" | jq -e '.mode == "check"'
