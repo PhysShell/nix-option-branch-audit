@@ -169,13 +169,18 @@ add one more real test), not part of what this round claims.
   fetched app source.** `flarum`, `baikal`, and `postfixadmin` all set
   `composerLock = ./composer.lock;` in their `package.nix` (upstream
   doesn't ship a lock file, so nixpkgs maintains its own). `fetch_composer_lock`'s
-  current `pkgs.<attr>.src + "/composer.lock"` path fails outright for
-  these three -- a real "needs only a new locator" situation for K2a's
+  `pkgs.<attr>.src + "/composer.lock"` path fails outright for these
+  three -- a real "needs only a new locator" situation for K2a's
   *consumer* side specifically, distinct from anything producer-shaped.
-  Doesn't change any bucket count above (baikal/postfixadmin have no
-  `doctrine/dbal` regardless; flarum's blocking reason is still primarily
-  its producer shape), but is exactly the kind of repeated pattern (3
-  instances) worth remembering if K2a's fetch path is ever revisited.
+  **Closed by K2a.1** (`resolve_composer_lock`, `dce5660`): all three now
+  resolve via an explicit `pkgs.<attr>.composerVendor.composerLock`
+  relationship, real-verified. `flarum`'s `provenance location` axis is
+  now unblocked at the identity level (finds a genuine `doctrine/dbal`
+  2.13.9 entry) though its `consumer support` axis stays `unsupported`
+  until that version is separately vendored (deliberately not attempted
+  in K2a.1); `baikal`/`postfixadmin` resolve too, confirmed to genuinely
+  have no `doctrine/dbal` at all -- their `consumer support` stays
+  `unsupported` for that reason, not a locator failure anymore.
 - **`doctrine/dbal` presence in `composer.lock` is necessary, not
   sufficient, evidence that it's the actual runtime DB consumer.**
   `agorakit`/`movim`/`snipe-it` are Laravel-family apps; Laravel's own
