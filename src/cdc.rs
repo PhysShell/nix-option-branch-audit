@@ -339,6 +339,100 @@ pub fn extract_key_for_value(rendered: &str, needle: &str) -> Result<String, Cdc
     Ok(key.to_string())
 }
 
+/// K2b: generalizes HOW producer evidence was acquired without touching
+/// consumer provenance (K2a) or `compare_contract` (Phase E) at all.
+/// Kimai's `database.socket` is a real option, so sentinel-injection
+/// proves the option->sink flow; Davis's socket path is a hardcoded
+/// literal with nothing to inject a sentinel into, so the evidence is a
+/// directly evaluated literal instead. Neither variant is "stronger" in
+/// verdict semantics -- once `emitted_key()` is in hand, both go through
+/// the IDENTICAL downstream pipeline (`ProducerEvidence::emitted_key()` ->
+/// `compare_contract`), proven by a dedicated test using both variants
+/// against the same `accepted_keys`, not just asserted in a doc comment.
+/// Deliberately NOT a generic sink-discovery mechanism -- both variants
+/// still know their own concrete, hand-picked sink (Kimai's
+/// `kimai-init-<name>` script, Davis's `services.davis.config`); K2b
+/// generalizes the SHAPE of the proof, not how sinks get found.
+#[derive(Debug, Clone, PartialEq)]
+pub enum ProducerEvidence {
+    SentinelFlow {
+        option: String,
+        sentinel: String,
+        sink: String,
+        rendered_value: String,
+        emitted_key: String,
+    },
+    EvaluatedLiteral {
+        sink: String,
+        rendered_value: String,
+        emitted_key: String,
+    },
+}
+
+impl ProducerEvidence {
+    pub fn emitted_key(&self) -> &str {
+        match self {
+            ProducerEvidence::SentinelFlow { emitted_key, .. }
+            | ProducerEvidence::EvaluatedLiteral { emitted_key, .. } => emitted_key,
+        }
+    }
+}
+
+/// Pure (no Nix/network) -- the fail-closed producer-evidence mutations
+/// asked for (sentinel absent, sentinel ambiguous) are `extract_key_for_value`
+/// failures propagated here, covered by dedicated tests at THIS level,
+/// not just at Phase C's.
+pub fn build_sentinel_flow_evidence(
+    option: &str,
+    sink: &str,
+    sentinel: &str,
+    rendered_value: String,
+) -> Result<ProducerEvidence, CdcError> {
+    let emitted_key = extract_key_for_value(&rendered_value, sentinel)?;
+    Ok(ProducerEvidence::SentinelFlow {
+        option: option.to_string(),
+        sentinel: sentinel.to_string(),
+        sink: sink.to_string(),
+        rendered_value,
+        emitted_key,
+    })
+}
+
+/// Pure, same fail-closed guarantee as above (a malformed DSN or an
+/// unextractable key is `Inconclusive`, never a guessed literal).
+pub fn build_evaluated_literal_evidence(
+    sink: &str,
+    rendered_value: String,
+    known_literal: &str,
+) -> Result<ProducerEvidence, CdcError> {
+    let emitted_key = extract_key_for_value(&rendered_value, known_literal)?;
+    Ok(ProducerEvidence::EvaluatedLiteral { sink: sink.to_string(), rendered_value, emitted_key })
+}
+
+const KIMAI_OPTION: &str = "services.kimai.sites.\"probe\".database.socket";
+const KIMAI_SINK: &str = "systemd.services.\"kimai-init-probe\".script";
+const DAVIS_SINK: &str = "services.davis.config.DATABASE_URL";
+/// Davis's hardcoded MySQL unix-socket path -- not a sentinel, a known
+/// constant this probe searches for directly (see
+/// [`ProducerEvidence::EvaluatedLiteral`]'s own doc comment).
+const DAVIS_KNOWN_SOCKET_LITERAL: &str = "/run/mysqld/mysqld.sock";
+
+/// Real acquisition for Kimai: eval (Phase B, unchanged) + build (pure).
+pub fn acquire_kimai_evidence(
+    rev: &str,
+    sentinel: &str,
+    module_override: Option<&Path>,
+) -> Result<ProducerEvidence, CdcError> {
+    let rendered = eval_kimai_script(rev, sentinel, module_override)?;
+    build_sentinel_flow_evidence(KIMAI_OPTION, KIMAI_SINK, sentinel, rendered)
+}
+
+/// Real acquisition for Davis: eval (Phase B, unchanged) + build (pure).
+pub fn acquire_davis_evidence(rev: &str) -> Result<ProducerEvidence, CdcError> {
+    let rendered = eval_davis_database_url(rev)?;
+    build_evaluated_literal_evidence(DAVIS_SINK, rendered, DAVIS_KNOWN_SOCKET_LITERAL)
+}
+
 /// Phase D: the accepted-keys extractor. Deliberately a bounded literal
 /// scan over `isset($params['<key>'])`, not a PHP parser -- this is the
 /// exact, narrow shape `constructPdoDsn()` actually uses (verified
@@ -442,6 +536,104 @@ mod tests {
             extract_key_for_value("path/tmp/x.sock/extra", "/tmp/x.sock"),
             Err(CdcError::Inconclusive(_))
         ));
+    }
+
+    // --- K2b: producer evidence generalization, offline (both builder
+    // functions are pure -- only acquire_kimai_evidence/
+    // acquire_davis_evidence touch nix/network, covered separately
+    // below) ---
+
+    #[test]
+    fn sentinel_flow_absent_sentinel_is_inconclusive() {
+        assert!(matches!(
+            build_sentinel_flow_evidence("opt", "sink", "/needle", "no match here".to_string()),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn sentinel_flow_ambiguous_sentinel_is_inconclusive() {
+        let rendered = "a=/needle&b=/needle".to_string();
+        assert!(matches!(
+            build_sentinel_flow_evidence("opt", "sink", "/needle", rendered),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn sentinel_flow_success_carries_the_full_evidence() {
+        let rendered = "mysql://h?charset=utf8&unix_socket=/needle".to_string();
+        let evidence =
+            build_sentinel_flow_evidence("services.kimai...socket", "kimai-init.script", "/needle", rendered)
+                .unwrap();
+        match evidence {
+            ProducerEvidence::SentinelFlow { option, sentinel, sink, emitted_key, .. } => {
+                assert_eq!(option, "services.kimai...socket");
+                assert_eq!(sentinel, "/needle");
+                assert_eq!(sink, "kimai-init.script");
+                assert_eq!(emitted_key, "unix_socket");
+            }
+            other => panic!("expected SentinelFlow, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn evaluated_literal_malformed_dsn_is_inconclusive() {
+        // literal present but not preceded by '=' -- not a DSN key/value pair.
+        let rendered = "not a dsn at all, just contains /run/mysqld/mysqld.sock somewhere".to_string();
+        assert!(matches!(
+            build_evaluated_literal_evidence("sink", rendered, "/run/mysqld/mysqld.sock"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn evaluated_literal_unextractable_key_is_inconclusive() {
+        // literal appears twice -- key cannot be attributed unambiguously.
+        let rendered = "a=/run/mysqld/mysqld.sock&b=/run/mysqld/mysqld.sock".to_string();
+        assert!(matches!(
+            build_evaluated_literal_evidence("sink", rendered, "/run/mysqld/mysqld.sock"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn evaluated_literal_success_carries_the_full_evidence() {
+        let rendered = "mysql://h?unix_socket=/run/mysqld/mysqld.sock".to_string();
+        let evidence =
+            build_evaluated_literal_evidence("davis.config", rendered, "/run/mysqld/mysqld.sock")
+                .unwrap();
+        match evidence {
+            ProducerEvidence::EvaluatedLiteral { sink, emitted_key, .. } => {
+                assert_eq!(sink, "davis.config");
+                assert_eq!(emitted_key, "unix_socket");
+            }
+            other => panic!("expected EvaluatedLiteral, got {other:?}"),
+        }
+    }
+
+    /// The invariant explicitly required: neither `ProducerEvidence`
+    /// variant is "stronger" in verdict semantics. Two DIFFERENT
+    /// variants that both unambiguously resolved the SAME emitted_key
+    /// must produce the IDENTICAL verdict against the same accepted
+    /// keys -- checked by construction (both go through
+    /// `compare_contract(evidence.emitted_key(), ...)`), not by
+    /// convention.
+    #[test]
+    fn sentinel_flow_and_evaluated_literal_are_never_treated_differently_by_comparison() {
+        let accepted = vec!["host".to_string(), "unix_socket".to_string()];
+
+        let sentinel_flow =
+            build_sentinel_flow_evidence("opt", "sink", "/s", "unix_socket=/s".to_string()).unwrap();
+        let evaluated_literal =
+            build_evaluated_literal_evidence("sink", "unix_socket=/lit".to_string(), "/lit").unwrap();
+
+        assert_eq!(sentinel_flow.emitted_key(), evaluated_literal.emitted_key());
+        assert_eq!(
+            compare_contract(sentinel_flow.emitted_key(), &accepted),
+            compare_contract(evaluated_literal.emitted_key(), &accepted)
+        );
+        assert_eq!(compare_contract(sentinel_flow.emitted_key(), &accepted), CdcVerdict::Pass);
     }
 
     // --- Phase D: offline, against the real vendored pinned source ---
@@ -664,72 +856,71 @@ mod tests {
 
     // --- Real end-to-end: needs a real `nix` binary + network, opt-in
     // only (`cargo test --ignored -- cdc::`). These are the K1 golden
-    // proof and mutation proof, run through the exact same
-    // eval_kimai_script/eval_davis_database_url functions the offline
-    // tests above only exercise the pure-Rust half of. ---
+    // proof and mutation proof, now routed through ProducerEvidence
+    // (K2b) -- Kimai's SentinelFlow and Davis's EvaluatedLiteral both
+    // funnel through the SAME verdict_for_evidence below; branching ends
+    // the moment ProducerEvidence exists, not at comparison time. ---
 
-    fn require_verdict(rev: &str, sentinel: &str) -> CdcVerdict {
+    fn accepted_doctrine_keys() -> Vec<String> {
         let doctrine_src = std::fs::read_to_string(
             std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
                 .join("fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php"),
         )
         .unwrap();
-        let accepted = extract_accepted_keys(&doctrine_src).unwrap();
-        let rendered = eval_kimai_script(rev, sentinel, None).unwrap();
-        let emitted = extract_key_for_value(&rendered, sentinel).unwrap();
-        compare_contract(&emitted, &accepted)
+        extract_accepted_keys(&doctrine_src).unwrap()
+    }
+
+    /// THE unified downstream step -- identical for both `ProducerEvidence`
+    /// variants. Its signature (`&ProducerEvidence`, not `&SentinelFlow`
+    /// or two separate functions) is what actually proves branching ends
+    /// before comparison, not a doc comment's claim about it.
+    fn verdict_for_evidence(evidence: &ProducerEvidence) -> CdcVerdict {
+        compare_contract(evidence.emitted_key(), &accepted_doctrine_keys())
     }
 
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn golden_kimai_before_is_finding() {
-        assert!(matches!(
-            require_verdict(BEFORE_REV, "/__OBA_CONTRACT_socket_k1a__/mysql.sock"),
-            CdcVerdict::Finding { .. }
-        ));
+        let evidence =
+            acquire_kimai_evidence(BEFORE_REV, "/__OBA_CONTRACT_socket_k1a__/mysql.sock", None)
+                .unwrap();
+        assert!(matches!(evidence, ProducerEvidence::SentinelFlow { .. }));
+        assert!(matches!(verdict_for_evidence(&evidence), CdcVerdict::Finding { .. }));
     }
 
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn golden_kimai_after_is_pass() {
-        assert_eq!(
-            require_verdict(AFTER_REV, "/__OBA_CONTRACT_socket_k1b__/mysql.sock"),
-            CdcVerdict::Pass
-        );
+        let evidence =
+            acquire_kimai_evidence(AFTER_REV, "/__OBA_CONTRACT_socket_k1b__/mysql.sock", None)
+                .unwrap();
+        assert!(matches!(evidence, ProducerEvidence::SentinelFlow { .. }));
+        assert_eq!(verdict_for_evidence(&evidence), CdcVerdict::Pass);
     }
 
+    /// Davis is no longer a special `if app == davis` case at the
+    /// verdict level -- it acquires `ProducerEvidence::EvaluatedLiteral`
+    /// and goes through the exact same `verdict_for_evidence` Kimai does.
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn golden_davis_before_is_finding() {
-        let doctrine_src = std::fs::read_to_string(
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php"),
-        )
-        .unwrap();
-        let accepted = extract_accepted_keys(&doctrine_src).unwrap();
-        let rendered = eval_davis_database_url(BEFORE_REV).unwrap();
-        let emitted = extract_key_for_value(&rendered, "/run/mysqld/mysqld.sock").unwrap();
-        assert!(matches!(compare_contract(&emitted, &accepted), CdcVerdict::Finding { .. }));
+        let evidence = acquire_davis_evidence(BEFORE_REV).unwrap();
+        assert!(matches!(evidence, ProducerEvidence::EvaluatedLiteral { .. }));
+        assert!(matches!(verdict_for_evidence(&evidence), CdcVerdict::Finding { .. }));
     }
 
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn golden_davis_after_is_pass() {
-        let doctrine_src = std::fs::read_to_string(
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php"),
-        )
-        .unwrap();
-        let accepted = extract_accepted_keys(&doctrine_src).unwrap();
-        let rendered = eval_davis_database_url(AFTER_REV).unwrap();
-        let emitted = extract_key_for_value(&rendered, "/run/mysqld/mysqld.sock").unwrap();
-        assert_eq!(compare_contract(&emitted, &accepted), CdcVerdict::Pass);
+        let evidence = acquire_davis_evidence(AFTER_REV).unwrap();
+        assert!(matches!(evidence, ProducerEvidence::EvaluatedLiteral { .. }));
+        assert_eq!(verdict_for_evidence(&evidence), CdcVerdict::Pass);
     }
 
     /// Mutation proof: takes the REAL fixed module source, patches ONLY
     /// the `unix_socket` literal, and runs it through the EXACT SAME
-    /// `eval_kimai_script` + module-override mechanism the golden proof
-    /// uses -- not a separate mutation-only fixture/parser.
+    /// `acquire_kimai_evidence` + module-override mechanism the golden
+    /// proof uses -- not a separate mutation-only fixture/parser.
     fn mutation_verdict(mutated_key: &str) -> CdcVerdict {
         let fixed_source = std::fs::read_to_string(
             std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -740,16 +931,9 @@ mod tests {
         let tmp = std::env::temp_dir().join(format!("oba-cdc-mutation-{mutated_key}.nix"));
         std::fs::write(&tmp, mutated).unwrap();
 
-        let doctrine_src = std::fs::read_to_string(
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php"),
-        )
-        .unwrap();
-        let accepted = extract_accepted_keys(&doctrine_src).unwrap();
         let sentinel = "/__OBA_CONTRACT_socket_mut__/mysql.sock";
-        let rendered = eval_kimai_script(AFTER_REV, sentinel, Some(&tmp)).unwrap();
-        let emitted = extract_key_for_value(&rendered, sentinel).unwrap();
-        compare_contract(&emitted, &accepted)
+        let evidence = acquire_kimai_evidence(AFTER_REV, sentinel, Some(&tmp)).unwrap();
+        verdict_for_evidence(&evidence)
     }
 
     #[test]

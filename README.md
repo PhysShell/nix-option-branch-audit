@@ -1572,13 +1572,55 @@ surface at once:
    beautifully but still trusts a partially hand-verified pin for what a
    consumer *accepts* is a real, ugly trust boundary — worth
    closing before the surface grows at all.
-3. **K2b — generalize producer evidence.** Davis's own probe already
-   proved sentinel-injection isn't the only valid producer-evidence
-   shape (no option to inject one into; the value is a real, but
-   sentinel-free, evaluated literal). Model this as a real sum type
-   instead of stretching Kimai's sentinel-flow shape to fit every future
-   producer: `ProducerEvidence = SentinelFlow(...) | EvaluatedLiteral(...)`
-   (exact type/variant names TBD when this is actually built).
+3. **K2b — generalize producer evidence. Closed.** `ProducerEvidence`
+   (`SentinelFlow { option, sentinel, sink, rendered_value, emitted_key }`
+   | `EvaluatedLiteral { sink, rendered_value, emitted_key }`), exactly
+   the sum type sketched in the design note. Kept scoped tightly —
+   generalizes the *shape* of the proof only, not sink discovery: both
+   variants still know their own concrete, hand-picked sink (Kimai's
+   `kimai-init-<name>` script, Davis's `services.davis.config`), no
+   generic "find all sinks" mechanism was built.
+
+   Acquisition (`eval_kimai_script`/`eval_davis_database_url`, real
+   Nix+network, unchanged from K1) is kept strictly separate from
+   evidence construction (`build_sentinel_flow_evidence`/
+   `build_evaluated_literal_evidence`, pure, offline-testable) — the
+   same resolution/fetching split K2a already established, applied here
+   to the producer side. **The four requested proofs, each checked
+   against a real run**: (1) Kimai still acquires `SentinelFlow` and the
+   original K1 8/8 stayed unchanged after the refactor (re-ran for real:
+   12/12, unchanged from before K2b); (2) Davis is no longer a special
+   `if app == davis` case at the verdict level — it acquires
+   `EvaluatedLiteral` and goes through the exact same downstream
+   function Kimai does, not a parallel code path (both golden tests now
+   assert the concrete variant *and* call the identical
+   `verdict_for_evidence`); (3) branching ends the moment
+   `ProducerEvidence` exists — `verdict_for_evidence(&ProducerEvidence)
+   -> CdcVerdict` takes the enum, not a variant, and internally only
+   ever calls `compare_contract(evidence.emitted_key(), ...)`, so there
+   is structurally nowhere left for variant-specific verdict logic to
+   hide; (4) fail-closed producer-evidence mutations — 6 new offline
+   tests: `SentinelFlow` with an absent sentinel / an ambiguous
+   (2-occurrence) sentinel, `EvaluatedLiteral` with a malformed DSN
+   (literal present but not `key=`-shaped) / an unextractable key
+   (literal appears twice) — all `Inconclusive`, plus one success case
+   per variant proving the full evidence (option/sentinel/sink for
+   `SentinelFlow`, sink for `EvaluatedLiteral`) actually gets carried,
+   not just the key.
+
+   **The "don't make one variant stronger than the other" rule** is
+   checked by construction, not merely stated: a dedicated test builds
+   one real `SentinelFlow` and one real `EvaluatedLiteral`, both
+   resolving the identical `emitted_key`, and asserts
+   `compare_contract` returns the identical `Pass` verdict for both —
+   there is no `StrongPass`/`WeakPass` anywhere in this codebase and the
+   type system doesn't leave room to add one by accident, since
+   `compare_contract`'s signature only ever sees `&str`, never the
+   `ProducerEvidence` enum itself.
+
+   77 tests total in the `oba` binary's own unit-test target (was 70):
+   65 offline (was 58, +7) + 12 real/ignored (was 12, unchanged in count
+   — all 12 refactored onto the new pipeline, not added to).
 4. **K2c — generalize DSN contract extraction** to a small corpus (more
    than just Kimai/Davis's MySQL DSN), once K2a/K2b exist under it.
 
