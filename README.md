@@ -1362,6 +1362,147 @@ cargo kani list              # enumerate harnesses without running any (fast, lo
 cargo kani                   # run all 6 -- a few seconds, safe on any machine
 ```
 
+## K1 — a spike testing OBA's original premise on a real production defect
+
+Not H2, not D3. A deliberately narrow question, asked directly: **can this
+approach automatically detect a real `unixSocket`/`socket` ↔
+`unix_socket` defect on historical nixpkgs, with provenance and
+fail-closed semantics, using real Nix evaluation and the exact pinned
+Doctrine consumer contract?** OBA answers "did a test exercise this
+option's branch"; K1 asks a genuinely different question — "does the
+*external output contract* match a real consumer" — Contract Drift
+Checking (CDC), not OBA. Kept as a separate module (`src/cdc.rs`), not
+merged into OBA's `Verdict`/report types: two different kinds of
+evidence, not forced into one enum before there's a reason to.
+
+**Answer: yes.** All 8 falsification criteria from the task spec were
+checked against a real run, not assumed:
+
+| case | expected | actual |
+|---|---|---|
+| Kimai before (`5530e24f2`) | FINDING | FINDING |
+| Kimai after (`d81d88f4354b`) | PASS | PASS |
+| Davis before | FINDING | FINDING |
+| Davis after | PASS | PASS |
+| mutation `unix_socket`→`unixSocket` | FINDING | FINDING |
+| mutation `unix_socket`→`socket` | FINDING | FINDING |
+| mutation `unix_socket`→`unix-socket` | FINDING | FINDING |
+| control `unix_socket`→`unix_socket` | PASS | PASS |
+
+**Architecture actually implemented** (real Nix evaluation as semantic
+oracle, `rnix`/source AST plays no role at all here):
+```
+option value (sentinel or, for davis, a fixed hardcoded string)
+    ↓
+real nixosSystem evaluation (nix eval --impure --raw, no build, no VM)
+    ↓
+rendered DATABASE_URL string (a plain Nix string attribute)
+    ↓
+Phase C: extract_key_for_value -- fail-closed DSN-query key extraction
+    ↓
+Phase D: extract_accepted_keys -- bounded isset($params['x']) scan over
+         the exact pinned doctrine/dbal source (vendored fixture)
+    ↓
+Phase E: compare_contract -- boring: emitted_key ∈ accepted_keys ⇒ Pass
+```
+
+**Historical corpus provenance** (Phase A, established before any code,
+per the task's own requirement): before = `PhysShell/nixpkgs`
+`5530e24f2100f4c2ca766050a805a12d7541662f` (a real, but otherwise
+unrelated, pre-existing upstream commit — the bug predates it); after =
+`d81d88f4354b2c9d8a7492c9b72cd3add62a34e0`, current tip of
+`fix/doctrine-unix-socket-param-name`. **Provenance correction made
+during Phase A, not glossed over**: the "after" commit was originally
+recorded as `37f81efa4abf623009e474fa563a094658c25be6` — that SHA still
+resolves via the GitHub API but is no longer reachable from the branch's
+current tip (amended once to add an `Assisted-by` trailer, then a
+test-only follow-up landed on top). Verified before repointing
+`fixtures/integrity-lock.toml`: `kimai.nix`/`davis.nix` are byte-identical
+(same sha256) across the old and new "after" SHAs — only the commit
+message and a later, separate test-file change differ, never the module
+content this spike or the existing OBA golden corpus actually pin.
+Doctrine DBAL: independently confirmed **for each app separately, not
+assumed shared** — Kimai 2.66.0's own `composer.lock` and Davis v5.4.4's
+own `composer.lock` both resolve `doctrine/dbal` to `3.10.6` at the same
+git commit `c95589d775a0b2e543467d40f8c3ecccf586f2b4`. Accepted keys
+(`host`, `port`, `dbname`, `unix_socket`, `charset`) extracted from that
+exact commit's real
+`src/Driver/PDO/MySQL/Driver.php`, vendored as
+`fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php` (sha256-locked,
+same discipline as every other vendored fixture).
+
+**A real mechanism finding, not just a result**: `nixosSystem`'s
+`disabledModules` (used to substitute a locally-mutated `kimai.nix` for
+mutation testing, through the *same* evaluation path as the historical
+corpus, not a separate mutation-only harness) must be given as a Nix
+**path value** built from the same `nixpkgsSrc`, not a string — 
+`disabledModules = [ "nixos/modules/.../kimai.nix" ]` silently fails to
+match nixpkgs's internal module key and the real module loads anyway
+(`option already declared` collision); `disabledModules = [ (nixpkgsSrc +
+"/nixos/modules/.../kimai.nix") ]` matches correctly. Confirmed by
+actually trying the string form first, not assumed from documentation.
+
+**Davis diverges from Kimai's probe, disclosed not hidden**: Kimai's
+`database.socket` is a real option, so a unique sentinel is injected and
+traced to the generated `kimai-init-<host>` systemd script (real evidence
+that the value flows all the way to a production sink). Davis's socket
+path is a hardcoded string literal (`/run/mysqld/mysqld.sock`) regardless
+of configuration — there is no option to inject a sentinel into — so its
+probe evaluates `config.services.davis.config.DATABASE_URL` directly.
+Still real Nix evaluation of the real module through the real option
+system (`mkIf`/`createLocally` branch selection genuinely happens), just
+without a sentinel-driven trace to a further sink, because there's
+nothing sentinel-shaped to trace.
+
+**Fail-closed, exercised by dedicated tests, not just claimed**: every
+extraction failure path returns `Inconclusive`, never a guessed key or a
+silent `Pass` —  sentinel found zero or 2+ times, a value not immediately
+preceded by `=`, a malformed key, `isset($params[...` truncated before
+`'])`, or the `isset($params['<key>'])` pattern not found at all (the
+extractor no longer understands the source shape). `probable_candidate`
+(a similarity hint, e.g. `unixSocket`/`socket` → `unix_socket`) is
+attached to a `Finding` that already exists on its own evidence — it
+never itself decides Pass/Finding.
+
+**Hardcoded corpus assumptions in K1 — the explicit "what K2 would need to
+generalize" list**:
+- The two nixpkgs revisions (`BEFORE_REV`/`AFTER_REV`) and the app names
+  (kimai, davis) are Rust constants, not discovered from anywhere.
+- The Doctrine DBAL version/commit pin (`3.10.6` @ `c95589d7...`) is a
+  Rust constant, independently *confirmed* against each app's real
+  `composer.lock` during Phase A, but not *derived automatically* at
+  runtime from `package.nix` → `composer.lock` — K1 doesn't walk that
+  chain itself.
+- The Doctrine driver source is a vendored, sha256-locked fixture, not
+  fetched live from `doctrine/dbal` at test time (avoids a third live
+  network dependency during tests; `nixpkgs`'s `fetchTarball` is still
+  live).
+- Kimai's sink identity (`systemd.services."kimai-init-<host>".script`)
+  and Davis's (`config.services.davis.config.DATABASE_URL`) are both
+  hand-picked per app, not discovered by walking a generic "sink
+  universe" — exactly per the task's own instruction not to build one
+  without a corpus reason to.
+- The DSN-query key-extraction model (Phase C) and the
+  `isset($params['x'])` scan (Phase D) are narrow, MySQL-DSN- and
+  Doctrine-PDO-shaped on purpose, not a general URI parser or PHP parser.
+
+**Tests**: 11 new offline unit tests (Phase C/D/E logic, no `nix`/network
+— run by every plain `cargo test`) + 8 `#[ignore]`-by-default tests (the
+real golden and mutation proof above, needing a real `nix` binary and
+network access — run explicitly with `cargo test --bin oba -- --ignored
+cdc::`; **not currently run in CI at all**, since this project's existing
+`kani.yml`/`dogfood.yml` workflows don't include a general `cargo test`
+job — a real, disclosed gap, not swept under the rug). 58 tests in the
+`oba` binary's own unit-test target (was 50), 107 total across the whole
+project including `tests/*.rs` black-box suites, all green; `cargo
+clippy --all-targets` clean (same 2 pre-existing warnings, neither
+touched by K1).
+
+**Stop condition honored**: this section, the code, and the hostile
+self-check above are where K1 stops. Not continued into a generic CDC
+architecture, D3, H2, or scanning further services — that's a decision
+for whoever reads this hostile review next, not something to drift into.
+
 ## Productization: from research phase to a usable CI product
 
 The semantic core has now been through H1 freeze, H2.2, hostile review,

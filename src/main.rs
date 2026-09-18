@@ -40,6 +40,17 @@ use std::path::{Path, PathBuf};
 
 use clap::Parser;
 
+/// K1: a separate, experimental Contract Drift Checker (CDC) spike --
+/// answers a genuinely different question from OBA ("does the external
+/// output contract match a real consumer", not "did a test exercise this
+/// option"). Deliberately NOT wired into this binary's CLI/exit-code
+/// contract or the `check`/`diff` report envelope -- see the module's own
+/// doc comment. Exercised only via `cargo test` (offline unit tests) and
+/// `cargo test --ignored -- cdc::` (the real historical/mutation proof,
+/// needs `nix` + network).
+#[allow(dead_code)]
+mod cdc;
+
 #[derive(Parser)]
 struct Cli {
     #[command(subcommand)]
