@@ -39,3 +39,5 @@ Every detector must have at least one positive control proving that the detector
 Before making broad claims, run a real-corpus census and measure unsupported/opaque cases rather than assuming they are rare.
 
 A frozen layer is reopened only by a concrete counterexample, invalidated assumption, or downstream requirement, not for naming cleanup or speculative completeness.
+
+In GitHub Actions YAML (or any CI templating), never splice a tool's own output through `${{ ... }}` directly into a `run:` script body, even when the tool is this project's own and the output is "just JSON" — this project's JSON report embeds raw Nix source text, which is effectively untrusted content from the templating engine's point of view, and GitHub substitutes `${{ ... }}` as literal text before the shell ever parses anything. Pass values through `env:`, a file, or stdin instead. If a later PR renders the report into annotations or a step summary, that rendering must be done by parsing the JSON in real code (the CLI itself, or a script that calls a JSON parser), never by `echo`-ing a templated expression and grepping/string-matching the result.

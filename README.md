@@ -1534,14 +1534,58 @@ mega-commit:
   invented here). Not for coverage — `cargo test` already covers the
   analysis far more thoroughly — but to prove install/cwd/paths/exit-code
   passthrough/JSON output actually work together on a real runner, not
-  just individually look correct. Caught one real bug before it ever hit
-  CI: a local bash simulation of the action's own install+run steps
-  (real `curl | sh` against the real `v0.2.0` release, `$GITHUB_OUTPUT`/
-  `$GITHUB_PATH` faked as plain files) showed the JSON report is
-  pretty-printed (`"schema_version": 1`, with a space) — the dogfood
-  workflow's first draft used `grep -q '"schema_version":1'` (no space),
-  which would have silently never matched; fixed to `jq -e
-  '.schema_version == 1'` before ever pushing.
+  just individually look correct. It earned that: a *local* bash
+  simulation of the install+run steps (real `curl | sh` against the real
+  `v0.2.0` release, `$GITHUB_OUTPUT`/`$GITHUB_PATH` faked as plain files)
+  caught one bug before anything was pushed — the JSON report is
+  pretty-printed (`"schema_version": 1`, with a space), so a first-draft
+  `grep -q '"schema_version":1'` (no space) would have silently never
+  matched; switched to `jq -e`. But three more bugs were only visible on
+  a REAL GitHub-hosted runner, invisible to any local simulation because
+  they're runner/JS-action/OS-level, not bash semantics:
+  1. `github.action_path` for a local `uses: ./` reference resolves to a
+     path ending in `/.` — `actions/upload-artifact@v4`'s glob matcher
+     hard-rejects any `.`/`..` path segment outright, independent of
+     whether the file exists. Fixed: write the report under
+     `$RUNNER_TEMP` instead (a clean absolute path GitHub provides for
+     exactly this, identical whether the action is referenced locally or
+     as `owner/repo@ref`).
+  2. Splicing `${{ steps.X.outputs.report-json }}` straight into a
+     `run:` bash block is a real script-injection shape, not a style
+     nit — the JSON embeds raw Nix source text (parens, quotes),
+     GitHub's own substitution happens as literal text *before* bash
+     parses anything, and it broke a single-quoted `echo` with a genuine
+     syntax error. Fixed: pass values through `env:` instead. Promoted
+     to a standing project rule in `AGENTS.md` — never splice an
+     output through `${{ ... }}` into `run:`, even the tool's own,
+     since its content (Nix source) is effectively untrusted from the
+     templating engine's point of view; a later PR rendering
+     annotations/a summary must do so by parsing the JSON in real code,
+     never by `echo`-and-grep on a templated expression.
+  3. **The architecturally significant one**: `env:` has its own real
+     size ceiling, independent of GitHub's documented 1MB-per-output
+     cap. `golden.toml`'s real report is ~390KB (28 targets) — passing
+     that through `env:` hit the OS's own `execve()` argument+
+     environment limit ("Argument list too long") well before 1MB. Not
+     "fix the test cleverer" — this is a real signal about the
+     `report-json` *output*'s own design, not a dogfood-workflow bug:
+     fighting GitHub's and the OS's size limits further isn't a fight
+     worth having. Contract decided (not yet re-implemented — no need
+     to reopen this PR for it, the documented caveat below is enough for
+     now): the **artifact** is the canonical full report; `report-json`
+     stays a convenience output for genuinely small checks, with its
+     size ceiling stated plainly in `action.yml` itself; a
+     `report-path` output (the artifact's path on the runner's own
+     filesystem, so a downstream step in the *same* job can `jq`/upload
+     elsewhere/keep provenance without threading hundreds of KB through
+     expression/env/output plumbing at all — the filesystem is still a
+     perfectly good IPC mechanism) is the natural next small contract
+     addition, tracked for whenever `action.yml` next changes, not
+     urgent enough to reopen this PR on its own. Only small, genuinely
+     bounded values (`exit-code`, and later `pass`/`finding`/
+     `inconclusive`/`schema-version` mirrored as their own outputs, not
+     just embedded in the JSON) belong as first-class outputs going
+     forward — never another whole report.
 - **PR D — Native differential/ratchet mode. Design note, not started —
   written before any diff code, on purpose.** The two-root model is the
   most dangerous single step left in this roadmap: get it wrong and
@@ -1578,11 +1622,61 @@ mega-commit:
     a `removed` + `new` pair rather than a mis-detected "same target,
     different verdict" — correct per the identity rule, but worth
     stating explicitly so it isn't mistaken for a bug later.
-  - **What's actually compared**: verdict kind is the minimum (`PASS` vs
-    `OBA001` vs each inconclusive variant) for ratchet classification;
-    whether `evidence`/`predicate_attempts` also need a comparison
-    (e.g. "still PASS, but via a different predicate") is left open
-    until a real case motivates it — not guessed at now.
+  - **Does identity survive a rename/move — decided, not open**: no.
+    Identity is *syntactic*, not semantic — `foo.nix` renamed to
+    `bar.nix` (even with byte-identical content) changes the identity
+    tuple, so v1 reports it as `Removed` + `Added`, never a detected
+    "same logical target, different path". No rename tracking, no
+    content-similarity heuristic, no cross-revision identity resolution
+    — that's a fundamentally harder, separate problem (matching against
+    a moving, possibly-edited target is underdetermined without extra
+    signal this tool doesn't have), and not one this checker needs to
+    solve to be useful. If a real corpus ever makes bare delete+add
+    noise genuinely painful, that's a concrete counterexample worth
+    reopening this decision for — not speculative completeness now.
+  - **`compare()`'s result shape — an explicit change algebra, not a
+    verdict pair.** Comparing two full `TargetReport`/`AnalysisReport`
+    serializations field-by-field (or eyeballing "old verdict vs new
+    verdict" as the only case) is how a diff checker quietly turns into
+    an archaeology expedition through `span`/evidence noise. Decided
+    shape instead:
+    ```
+    enum TargetDiff {
+        Unchanged,
+        Added { head: TargetOutcome },
+        Removed { base: TargetOutcome },
+        Changed { base: TargetOutcome, head: TargetOutcome, changes: Vec<ChangeKind> },
+    }
+    enum ChangeKind {
+        VerdictChanged,
+        EvidenceChanged,
+        PredicateChanged,
+        VisibilityChanged,
+    }
+    ```
+    v1 only needs to populate `VerdictChanged` — but reserving the enum
+    now means a later PR adding evidence/predicate/visibility-level
+    diffing extends `ChangeKind`, it doesn't redesign `TargetDiff`
+    itself or fall back to comparing serialized JSON as a stand-in for
+    "did anything change".
+  - **`compare()` reports transitions, never regression/improvement
+    judgments — same boundary as `analyze()`/CLI, one layer further
+    out.** `compare()`'s job stops at a neutral fact: `PASS ->
+    INCONCLUSIVE`, `INCONCLUSIVE -> FINDING`, `FINDING -> PASS`, etc.
+    Whether `PASS -> INCONCLUSIVE` should block a PR, or
+    `INCONCLUSIVE -> PASS` counts as an improvement worth celebrating in
+    a step summary, is CI *policy* — it belongs in the Action or a
+    ratchet-policy layer built on top of `oba diff`'s output, never
+    baked into `compare()` itself. Exactly the same reason `analyze()`
+    doesn't know about exit codes: a pure function that only states what
+    happened stays testable and reusable by a policy it can't predict in
+    advance.
+  - **What's actually compared**: verdict kind is the minimum
+    (`VerdictChanged`) for ratchet classification; whether
+    `evidence`/`predicate_attempts`/opacity also need their own
+    `ChangeKind` variants populated (e.g. "still PASS, but via a
+    different predicate") is left open until a real case motivates it —
+    not guessed at now, just reserved a slot in the enum above.
   - **Manifest-tampering trust policy** (flagged in the roadmap
     intro above, restated here since it's really part of this same
     design question): if `targets.toml` lives in the audited repo, an
@@ -1600,7 +1694,14 @@ mega-commit:
   `resolve_alias_recursively`, `lower_pred`/`lower_value_expr` returning
   `Result<_, ResolveFailure>`) rather than folded into each `Eq`/`And`
   case — this was already the H2 round 2 design, not new work triggered
-  by this note.) `schema_version: 1` itself
+  by this note. No ritual refactor to "match yesterday's plan" is
+  warranted just because it happens to already fit — H2's next
+  meaningful proof, whenever it's picked back up, should be a real,
+  previously-unsupported case going green (davis's actual
+  `mysqlLocal = db.createLocally && db.driver == "mysql"` correctly
+  classified, where it was out of scope before) plus an adversarial
+  mutation flipping one alias/predicate operand and forcing the expected
+  result to change — not "we added `And`".) `schema_version: 1` itself
   stays untouched through this design phase; only *additive* fields
   (e.g. a `"diff"` mode payload) get added under it, per the envelope's
   own reserved `mode` tag from PR B commit 3 — a bump is for an
@@ -1610,6 +1711,16 @@ mega-commit:
   policy, transition classification, one `DiffReport` — the Action's job
   shrinks to materializing both roots and invoking `oba` once, unchanged
   from the original plan.
+
+  **Planned sequencing for this phase**: D design freeze (this note) →
+  pure `compare()` (no CLI/Action yet, tested standalone) → an
+  adversarial diff corpus (added/removed/changed/unchanged/rename-as-
+  delete+add cases, same discipline as every H1.x/H2.x fixture before
+  it) → `oba diff` CLI → Action diff integration → only *then* H2's
+  real-world unlock (davis/`mysqlLocal`). Diff plumbing and H2 semantics
+  are validated independently, in that order, specifically so that if
+  differential output ever looks wrong, it's diagnosable as "the two-root
+  plumbing" or "the evaluator", never both at once.
 - **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
   needed** — changed-target selection (skip targets whose `module`/`test`
   didn't change), kept deliberately separate from and after D: proving
