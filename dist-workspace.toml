@@ -1,0 +1,25 @@
+[workspace]
+members = ["cargo:."]
+
+# Config for 'dist'
+[dist]
+# The preferred dist version to use in CI (Cargo.toml SemVer syntax)
+cargo-dist-version = "0.33.0"
+# CI backends to support
+ci = "github"
+# The installers to generate for each app
+installers = ["shell"]
+# Target platforms to build apps for (Rust target-triple syntax)
+# First release deliberately scoped to just this one target: the real
+# consumer is `ubuntu-latest` GitHub-hosted CI (nixpkgs PR checks), and a
+# static musl binary needs nothing installed on the runner. Broaden once
+# there's an actual non-Linux consumer, not speculatively.
+targets = ["x86_64-unknown-linux-musl"]
+# Path that installers should place binaries in
+install-path = "CARGO_HOME"
+# Whether to install an updater program
+install-updater = false
+# Sign each release artifact with GitHub's Artifact Attestations, so a
+# consumer's Action can verify provenance instead of trusting the
+# download alone.
+github-attestations = true

@@ -1362,6 +1362,151 @@ cargo kani list              # enumerate harnesses without running any (fast, lo
 cargo kani                   # run all 6 -- a few seconds, safe on any machine
 ```
 
+## Productization: from research phase to a usable CI product
+
+The semantic core has now been through H1 freeze, H2.2, hostile review,
+64-mutant mutation testing, and KANI-0 — deliberately declared "battle
+enough" rather than kept growing indefinitely. The next phase is turning
+`oba` from a spike into something a `nixpkgs` fork's CI can actually
+depend on, not adding more analysis smartness.
+
+**CI architecture decision: ratchet / base-vs-head comparison belongs to
+`oba` itself, not to the GitHub Action.** The Action's job is limited to
+acquiring both roots, installing a pinned `oba` binary, invoking it
+*once*, and rendering the report. Reuse survey: `nixpkgs-vet` — the closest
+real precedent, same ratchet philosophy (old violations grandfathered, new
+ones blocked) — was checked directly against its live source rather than
+assumed: `NixOS/nixpkgs`'s own `.github/workflows/lint.yml` invokes it as
+`nix-build ... -A nixpkgs-vet --arg base ./nixpkgs/trusted --arg head
+./nixpkgs/untrusted`, i.e. **one invocation, given both trees**, not two
+independent runs whose output gets diffed by shell glue in the workflow.
+Rationale for following the same shape, beyond precedent: ratchet
+semantics (what counts as a regression / improvement / grandfathered /
+new-target / target-definition-changed) is analysis logic, not CI
+plumbing — it belongs somewhere testable without Git or GitHub in the
+loop. A single invocation also guarantees base and head are analyzed by
+the exact same `oba` version and the exact same comparison rules, and
+keeps the Action from slowly growing a second, slightly-worse analyzer in
+`jq`/bash as ratchet edge cases accumulate. (One correction to the
+precedent as originally cited: `nixpkgs-vet`'s GitHub Releases shipped a
+prebuilt `x86_64-linux.nar.gz` closure through `v0.3.0` but ship no
+release assets at all as of the current `v0.3.4` — not treated as an
+active alternate-delivery pattern to fall back on.)
+
+Planned CLI shape (PR B): `oba check --root <dir> --targets <manifest>`
+(today's single-tree mode, kept) alongside a new `oba diff --base-root
+<dir> --head-root <dir> --targets <manifest>`, backed internally by
+`analyze(root, targets) -> AnalysisReport` and `compare(base: &AnalysisReport,
+head: &AnalysisReport) -> DiffReport` — Git/GitHub stays entirely outside
+this boundary, which is also what makes it testable without either. The
+versioned JSON envelope (`schema_version: 1`) is designed up front to
+carry both modes (`"mode": "check"` vs `"mode": "diff"`, the latter with
+`base`/`head`/`transition` per target) so `schema_version` doesn't have to
+bump the week after v1 ships when the diff mode lands. The exact set of
+`transition` values is deliberately NOT frozen until PR D actually
+implements them.
+
+Open trust question for PR D, deliberately not resolved in PR A/B: if
+`targets.toml` lives in the audited repository itself, an untrusted PR can
+edit the manifest to make an inconvenient target disappear. Needs an
+explicit policy (existing targets keyed off the trusted/base manifest;
+new targets from head allowed in but can't remove/weaken existing ones;
+manifest changes are themselves part of the diff report) before ratchet
+mode is CI-trustworthy — real ratchet-mode nuance, belongs inside `oba
+diff`, not as ad hoc `jq` in the Action.
+
+Planned sequencing, each an independently landable/provable PR, not one
+mega-commit:
+
+- **PR A — Distribution bootstrap. Config landed, real release smoke test
+  still pending.** `dist init -y --ci github -t x86_64-unknown-linux-musl
+  -i shell` (`dist` v0.33.0, installed from its own prebuilt release
+  binary rather than `cargo install`, on the same "don't compile it if a
+  binary exists" principle this PR applies to `oba` itself) generated
+  `dist-workspace.toml` + `.github/workflows/release.yml` + `[profile.dist]`
+  in `Cargo.toml`; targets trimmed by hand from `dist`'s 6-platform
+  default down to just the one actually needed (`ubuntu-latest`-hosted
+  nixpkgs CI), `github-attestations = true` added explicitly (off by
+  default). Validated with `dist plan` (no real build): one
+  `oba-x86_64-unknown-linux-musl.tar.xz` + shell installer + per-artifact
+  and global sha256 checksums, tag `v0.1.0`. Reuse survey: `cargo install`
+  as the Action's install path was rejected outright — a consumer's CI
+  shouldn't compile this project's analyzer on every PR; `dist` exists
+  specifically to generate the release CI and ship prebuilt binaries
+  instead. `taiki-e/install-action` (checksum verification +
+  `cargo-binstall` fallback) is a plausible *additional* install channel
+  later, once the release layout is stable — not a replacement for
+  `oba`'s own composite Action, which also has to do root
+  acquisition/orchestration `install-action` has no opinion on.
+  **Open gap, found while wiring this, not yet resolved: no `LICENSE`
+  file exists in this repository at all** — `cargo package`/`dist`'s
+  `source.tar.gz` artifact don't hard-fail without one, but shipping
+  public binaries with no declared license is a real problem, not a
+  paperwork nit; needs an explicit choice from the repo owner, not a
+  default picked unilaterally here. Actually cutting the `v0.1.0` tag
+  (which triggers a real, public GitHub Release under the owner's
+  account) is deliberately held back until that's resolved and the
+  smoke test itself is explicitly asked for.
+- **PR B — CLI / report foundations.** `--root`-relative analysis,
+  `oba check`, the versioned `check`/`diff` report envelope, the internal
+  `analyze`/`compare` split described above — designed so PR D fills in
+  an already-reserved slot instead of renegotiating the contract PR B
+  just froze.
+- **PR C — Thin GitHub Action.** Composite (not Docker, not Node):
+  download the pinned release binary, verify it, invoke `oba check`,
+  emit `::error`/`::warning` annotations + a `$GITHUB_STEP_SUMMARY` table.
+  HEAD-only at this stage; SARIF deliberately deferred (another
+  spec to carry `file:line` through 300 lines of JSON, not needed unless
+  GitHub Code Scanning integration is actually wanted).
+- **PR D — Native differential/ratchet mode.** `oba diff`, target
+  correlation (same id / new / removed / definition-changed), the
+  trusted-manifest policy above, transition classification, one
+  `DiffReport` — the Action's job shrinks to materializing both roots and
+  invoking `oba` once.
+- **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
+  needed** — changed-target selection (skip targets whose `module`/`test`
+  didn't change), kept deliberately separate from and after D: proving
+  differential semantics are correct on the full small corpus first,
+  *then* optimizing which targets run, not before — otherwise this
+  project acquires yet another way to get a green CI by quietly not
+  running a check, a category of bug it already has a documented history
+  of (see the H1.x/H2.x rounds above).
+
+Nix-native packaging (`flake.nix`, `packages.default`/`apps.default`) is
+planned but explicitly kept separate from the GitHub Action delivery path
+— a static musl binary is cheaper and simpler for the CI consumer than
+adopting `nixpkgs-vet`'s NAR-closure pattern, which isn't even current
+practice upstream anymore (see above).
+
+Kani stays entirely internal to `oba`'s own development CI (`cargo test` /
+clippy / occasional mutation testing / `cargo kani`'s 6 harnesses) and
+never becomes something a consumer's `nixpkgs` PR CI has to install —
+nothing in a changed `davis.nix` should require a CBMC install just to
+learn whether `database.socket` got exercised.
+
+**Proof-audit tooling: deferred, not rejected.** A brief survey (theoremc's
+structured-obligation RFC, os-checker/distributed-verification's proof
+inventory + snapshot diffing, provable-contracts' obligation→Kani→Lean
+ladder, cbmc-starter-kit/Litani for large CBMC proof suites) turned up
+nothing that fits directly, and building a bespoke "does this harness's
+actual GOTO/reachable-function boundary match its stated claim" checker
+now would be infrastructure without an object to watch: K0.1 is bounded to
+`eval_known_eq` over a finite scalar domain, K1.1–K1.5 touch only the
+5-field `AggregateFacts` struct — both proof boundaries are already small
+and structurally obvious by inspection. K0.2–K0.4, the one place where the
+boundary actually ballooned (through the real `HashMap`/SipHash-backed
+`Environment`), were removed for exactly that reason, not audited around.
+Trigger for picking this back up: not a harness count (50 more K1-shaped
+proofs wouldn't need it), but a *new* proof that stops being local and
+starts reaching into the production dependency graph again — K2
+(`counterfactual_once`), `Environment`/`HashMap`, rnix/parsing, the
+filesystem, or any other nontrivial adapter/stub. First step then is still
+not a framework: `kani::cover` for non-vacuity, inspecting reachable
+functions, a small expected/forbidden-dependency check, and a negative
+control that must break the proof. A YAML DSL or a standalone `xtask
+proof-audit` only if that minimal check actually catches drift and the
+need repeats.
+
 ## Running
 
 ```

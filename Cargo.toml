@@ -3,6 +3,7 @@ name = "oba"
 version = "0.1.0"
 edition = "2021"
 description = "Layer-1 spike: option branch activation evidence for NixOS modules"
+repository = "https://github.com/PhysShell/nix-option-branch-audit"
 
 [[bin]]
 name = "oba"
@@ -33,3 +34,8 @@ sha2 = "0.10"
 # itself: hand-rolling a small ad hoc generator loop and calling it
 # "property testing" would just be a differently-shaped unit test).
 proptest = "1"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
