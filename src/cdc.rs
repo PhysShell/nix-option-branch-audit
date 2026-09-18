@@ -20,10 +20,16 @@
 //!
 //! Not built, on purpose (K2 territory if this spike holds up): generic
 //! env-var/CLI-flag/OpenAPI/JSON-Schema contracts, a real PHP parser, a
-//! package-bump differential framework, automatic nixpkgs-wide scanning,
-//! or deriving the `doctrine/dbal` pin automatically from
-//! `package.nix` -> `composer.lock` (hardcoded here -- see
-//! [`DOCTRINE_DBAL_VERSION`]'s own doc comment).
+//! package-bump differential framework, or automatic nixpkgs-wide
+//! scanning.
+//!
+//! K2a (done): the `doctrine/dbal` pin is no longer a hardcoded Rust
+//! constant -- [`fetch_composer_lock`] + [`resolve_consumer_identity`]
+//! derive it automatically, for real, from each app's own
+//! `package.nix` -> `composer.lock`, and [`verify_identity_matches_vendored_fixture`]
+//! checks the result against the vendored fixture's own recorded
+//! provenance (`fixtures/integrity-lock.toml`) rather than a second,
+//! redundant constant duplicating the same fact.
 
 use std::path::Path;
 use std::process::Command;
@@ -41,14 +47,6 @@ pub const BEFORE_REV: &str = "5530e24f2100f4c2ca766050a805a12d7541662f";
 /// note for the verification that the MODULE content never changed
 /// across that rewrite.
 pub const AFTER_REV: &str = "d81d88f4354b2c9d8a7492c9b72cd3add62a34e0";
-/// Independently confirmed (not just trusted from the fix commit's own
-/// message) via each app's own `composer.lock` at its nixpkgs-pinned
-/// version (kimai 2.66.0, davis v5.4.4): both resolve `doctrine/dbal` to
-/// this exact version and git commit. Hardcoded as a K1 corpus fact, not
-/// derived at runtime from `package.nix` -> upstream `composer.lock` --
-/// generalizing that chain is explicitly K2 scope, not K1's.
-pub const DOCTRINE_DBAL_VERSION: &str = "3.10.6";
-pub const DOCTRINE_DBAL_REV: &str = "c95589d775a0b2e543467d40f8c3ecccf586f2b4";
 
 #[derive(Debug)]
 pub enum CdcError {
@@ -68,6 +66,139 @@ impl std::fmt::Display for CdcError {
             CdcError::Inconclusive(m) => write!(f, "INCONCLUSIVE: {m}"),
         }
     }
+}
+
+/// K2a: automatic consumer provenance -- replaces the hand-verified
+/// `DOCTRINE_DBAL_VERSION`/`DOCTRINE_DBAL_REV` constants above with a
+/// real pipeline: nixpkgs revision -> the app's own package derivation's
+/// `src` -> its vendored `composer.lock` -> the exact `doctrine/dbal`
+/// entry. Deliberately narrow -- resolves ONE named package from an
+/// already-fetched `composer.lock`; this does not become a
+/// Composer/Packagist client. Resolution (pure, offline-testable) and
+/// fetching (real Nix + network) are kept as separate functions on
+/// purpose, not one that happens to also do I/O.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConsumerIdentity {
+    pub package: String,
+    pub version: String,
+    pub source_reference: String,
+}
+
+/// Pure: parses an already-fetched `composer.lock`'s JSON text and finds
+/// the entry named EXACTLY `package_name` -- no fuzzy/prefix/similarity
+/// matching anywhere near this trust boundary; a decoy package with a
+/// similar name (`doctrine/dbal-foo`) must never be accepted in its
+/// place (Rust `==` on `&str` already gives this for free -- verified by
+/// a dedicated test with a decoy present, not just assumed). Fail-closed:
+/// a missing `packages` array, zero or 2+ matching entries, or a missing
+/// `version`/`source.reference` field on the match are all
+/// `Inconclusive`, never a guessed identity.
+pub fn resolve_consumer_identity(
+    composer_lock_json: &str,
+    package_name: &str,
+) -> Result<ConsumerIdentity, CdcError> {
+    let value: serde_json::Value = serde_json::from_str(composer_lock_json)
+        .map_err(|e| CdcError::Inconclusive(format!("composer.lock is not valid JSON: {e}")))?;
+    let packages = value.get("packages").and_then(|p| p.as_array()).ok_or_else(|| {
+        CdcError::Inconclusive("composer.lock has no top-level \"packages\" array".to_string())
+    })?;
+    let matches: Vec<_> = packages
+        .iter()
+        .filter(|p| p.get("name").and_then(|n| n.as_str()) == Some(package_name))
+        .collect();
+    if matches.len() != 1 {
+        return Err(CdcError::Inconclusive(format!(
+            "composer.lock has {} entries named {package_name:?}, expected exactly 1",
+            matches.len()
+        )));
+    }
+    let pkg = matches[0];
+    let version = pkg
+        .get("version")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| CdcError::Inconclusive(format!("{package_name} entry has no \"version\" string")))?
+        .to_string();
+    let source_reference = pkg
+        .get("source")
+        .and_then(|s| s.get("reference"))
+        .and_then(|r| r.as_str())
+        .ok_or_else(|| {
+            CdcError::Inconclusive(format!("{package_name} entry has no \"source.reference\" string"))
+        })?
+        .to_string();
+    Ok(ConsumerIdentity { package: package_name.to_string(), version, source_reference })
+}
+
+/// A resolved identity is only useful paired with a REAL source to
+/// extract a contract from -- this refuses to let a vendored fixture
+/// silently stand in for whatever `composer.lock` actually declared, if
+/// the two ever disagree (a tampered/updated lockfile, a stale vendored
+/// fixture, ...).
+pub fn verify_identity_matches_vendored_fixture(
+    identity: &ConsumerIdentity,
+    vendored_source_reference: &str,
+) -> Result<(), CdcError> {
+    if identity.source_reference != vendored_source_reference {
+        return Err(CdcError::Inconclusive(format!(
+            "resolved {} source.reference {} does not match the vendored fixture's {} -- refusing \
+             to extract a contract from a source that doesn't match the resolved identity",
+            identity.package, identity.source_reference, vendored_source_reference
+        )));
+    }
+    Ok(())
+}
+
+/// Fetching, kept separate from resolution on purpose (see this
+/// section's own doc comment) -- real Nix evaluation asked directly for
+/// the package's own vendored `composer.lock`, not a hand-rolled
+/// imports/callPackage resolver walking `package.nix` itself.
+/// `package_attr` is the top-level `pkgs.<attr>` name (`"kimai"`,
+/// `"davis"`); `pkgs.<attr>.src` is that app's own `fetchFromGitHub`
+/// result -- realizing it (a fixed-output derivation, cheap, and in
+/// practice already cached on cache.nixos.org rather than a raw clone,
+/// confirmed by trying it for real: ~2-3s each for kimai/davis) is what
+/// makes `composer.lock`'s real bytes available to `readFile` at all.
+pub fn fetch_composer_lock(rev: &str, package_attr: &str) -> Result<String, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        pkgs = import nixpkgsSrc {{ system = "x86_64-linux"; }};
+        in builtins.readFile (pkgs.{package_attr}.src + "/composer.lock")"#
+    );
+    eval_nix_raw(&expr)
+}
+
+/// Reads the git commit `fixtures/integrity-lock.toml` already records
+/// for the vendored Doctrine driver fixture -- the existing,
+/// hand-verified provenance record from K1's own Phase A, reused here as
+/// K2a's comparison oracle instead of a second Rust constant duplicating
+/// the same fact under a different name (the removed
+/// `DOCTRINE_DBAL_REV`).
+fn vendored_doctrine_source_reference() -> Result<String, CdcError> {
+    #[derive(serde::Deserialize)]
+    struct Lock {
+        fixture: Vec<Entry>,
+    }
+    #[derive(serde::Deserialize)]
+    struct Entry {
+        path: String,
+        commit: String,
+    }
+
+    const VENDORED_PATH: &str = "fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php";
+    let lock_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/integrity-lock.toml");
+    let text = std::fs::read_to_string(&lock_path)
+        .map_err(|e| CdcError::ToolError(format!("reading {}: {e}", lock_path.display())))?;
+    let lock: Lock = toml::from_str(&text)
+        .map_err(|e| CdcError::ToolError(format!("parsing {}: {e}", lock_path.display())))?;
+    lock.fixture
+        .into_iter()
+        .find(|e| e.path == VENDORED_PATH)
+        .map(|e| e.commit)
+        .ok_or_else(|| {
+            CdcError::ToolError(format!(
+                "fixtures/integrity-lock.toml has no entry for {VENDORED_PATH}"
+            ))
+        })
 }
 
 /// Real Nix evaluation as the semantic oracle. `--impure` (for
@@ -342,6 +473,105 @@ mod tests {
         ));
     }
 
+    // --- K2a: automatic consumer provenance, offline (resolution is
+    // pure -- these never touch nix/network, only fetch_composer_lock
+    // does, covered separately below) ---
+
+    fn synthetic_lock(packages_json: &str) -> String {
+        format!(r#"{{"packages": [{packages_json}]}}"#)
+    }
+
+    const REAL_DOCTRINE_ENTRY: &str = r#"{"name": "doctrine/dbal", "version": "3.10.6", "source": {"type": "git", "reference": "c95589d775a0b2e543467d40f8c3ecccf586f2b4"}}"#;
+
+    #[test]
+    fn resolves_the_real_shaped_doctrine_entry() {
+        let lock = synthetic_lock(REAL_DOCTRINE_ENTRY);
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        assert_eq!(
+            identity,
+            ConsumerIdentity {
+                package: "doctrine/dbal".to_string(),
+                version: "3.10.6".to_string(),
+                source_reference: "c95589d775a0b2e543467d40f8c3ecccf586f2b4".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn missing_packages_array_is_inconclusive() {
+        assert!(matches!(
+            resolve_consumer_identity(r#"{"not-packages": []}"#, "doctrine/dbal"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn removed_entry_is_inconclusive_not_a_stale_pass() {
+        let lock = synthetic_lock(r#"{"name": "some/other-package", "version": "1.0.0"}"#);
+        assert!(matches!(
+            resolve_consumer_identity(&lock, "doctrine/dbal"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    /// A decoy package with a similar name sitting right next to the
+    /// real one -- proves exact-string matching, not just the absence of
+    /// a fuzzy matcher.
+    #[test]
+    fn similarly_named_decoy_package_is_never_accepted_in_place_of_the_real_one() {
+        let lock = synthetic_lock(&format!(
+            r#"{{"name": "doctrine/dbal-foo", "version": "9.9.9", "source": {{"reference": "deadbeef"}}}}, {REAL_DOCTRINE_ENTRY}"#
+        ));
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        assert_eq!(identity.version, "3.10.6");
+        assert_eq!(identity.source_reference, "c95589d775a0b2e543467d40f8c3ecccf586f2b4");
+    }
+
+    #[test]
+    fn duplicate_real_entries_is_inconclusive_not_first_match() {
+        let lock = synthetic_lock(&format!("{REAL_DOCTRINE_ENTRY}, {REAL_DOCTRINE_ENTRY}"));
+        assert!(matches!(
+            resolve_consumer_identity(&lock, "doctrine/dbal"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn missing_source_reference_is_inconclusive() {
+        let lock = synthetic_lock(r#"{"name": "doctrine/dbal", "version": "3.10.6"}"#);
+        assert!(matches!(
+            resolve_consumer_identity(&lock, "doctrine/dbal"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    /// The provenance mutation explicitly asked for: a tampered
+    /// `source.reference` must never be silently paired with the
+    /// vendored fixture as if nothing changed.
+    #[test]
+    fn tampered_source_reference_fails_the_vendored_fixture_match() {
+        let lock = synthetic_lock(r#"{"name": "doctrine/dbal", "version": "3.10.6", "source": {"reference": "0000000000000000000000000000000000000000"}}"#);
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        assert!(matches!(
+            verify_identity_matches_vendored_fixture(
+                &identity,
+                "c95589d775a0b2e543467d40f8c3ecccf586f2b4"
+            ),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn matching_source_reference_passes_the_vendored_fixture_match() {
+        let lock = synthetic_lock(REAL_DOCTRINE_ENTRY);
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        assert!(verify_identity_matches_vendored_fixture(
+            &identity,
+            "c95589d775a0b2e543467d40f8c3ecccf586f2b4"
+        )
+        .is_ok());
+    }
+
     // --- Phase E: boring comparison, offline ---
 
     #[test]
@@ -383,6 +613,53 @@ mod tests {
             CdcVerdict::Finding { probable_candidate, .. } => assert_eq!(probable_candidate, None),
             other => panic!("expected Finding, got {other:?}"),
         }
+    }
+
+    // --- K2a real transition tests: opt-in only, same as the K1 golden
+    // proof below. Auto-resolves EACH app's consumer identity
+    // independently (never sharing one lookup between kimai/davis --
+    // invariant #2) via the real fetch_composer_lock -> real
+    // resolve_consumer_identity pipeline, for BOTH the before and after
+    // revision (kimai/davis's own package.nix is unrelated to the
+    // module-level fix, but this is checked, not assumed), and checks
+    // the result against the vendored fixture's own recorded provenance
+    // via verify_identity_matches_vendored_fixture -- the same function
+    // production use would call, exercised here end-to-end rather than
+    // only against synthetic strings. This comparison is what PROVED the
+    // now-removed DOCTRINE_DBAL_VERSION/REV constants were redundant,
+    // before they were deleted -- see git history for the version of
+    // this file where the comparison ran against those constants
+    // directly, kept green through the swap. ---
+
+    fn assert_auto_resolved_matches_vendored_fixture(rev: &str, package_attr: &str) {
+        let lock = fetch_composer_lock(rev, package_attr).unwrap();
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        let vendored = vendored_doctrine_source_reference().unwrap();
+        verify_identity_matches_vendored_fixture(&identity, &vendored).unwrap();
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn kimai_auto_resolved_provenance_matches_vendored_fixture_before() {
+        assert_auto_resolved_matches_vendored_fixture(BEFORE_REV, "kimai");
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn kimai_auto_resolved_provenance_matches_vendored_fixture_after() {
+        assert_auto_resolved_matches_vendored_fixture(AFTER_REV, "kimai");
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn davis_auto_resolved_provenance_matches_vendored_fixture_before() {
+        assert_auto_resolved_matches_vendored_fixture(BEFORE_REV, "davis");
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn davis_auto_resolved_provenance_matches_vendored_fixture_after() {
+        assert_auto_resolved_matches_vendored_fixture(AFTER_REV, "davis");
     }
 
     // --- Real end-to-end: needs a real `nix` binary + network, opt-in

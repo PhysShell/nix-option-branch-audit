@@ -1525,15 +1525,51 @@ surface at once:
    CI job (`cachix/install-nix-action`, the same action
    `PhysShell/nixpkgs`'s own `nixpkgs-vet` CI job already uses) — without
    it, "K1 works" was a claim backed by one specific dev machine, not CI.
-2. **K2a — automatic consumer provenance**, the first real K2
-   generalization, chosen ahead of producer-side/sink-discovery work on
-   purpose: walk `package.nix` → the app's own `composer.lock` →
-   `doctrine/dbal`'s exact version + source commit automatically, instead
-   of the Rust constants `DOCTRINE_DBAL_VERSION`/`DOCTRINE_DBAL_REV`
-   (confirmed correct by hand in K1's own Phase A, never auto-derived).
-   Reasoning: a generic CDC that finds contracts beautifully but still
-   trusts a partially hand-verified pin for what a consumer *accepts* is
-   a real, ugly trust boundary — worth closing before the surface grows.
+2. **K2a — automatic consumer provenance. Closed.** Narrow goal, held to:
+   remove the hand-verified `DOCTRINE_DBAL_VERSION`/`DOCTRINE_DBAL_REV`
+   Rust constants and get the same provenance automatically from the
+   analyzed nixpkgs revision — not arbitrary Composer dependency
+   resolution, not a Rust package manager. `resolve_consumer_identity`
+   (pure: parses an already-fetched `composer.lock`'s JSON, finds the
+   entry named EXACTLY `package_name` — no fuzzy/similarity matching
+   anywhere near this trust boundary, proven by a dedicated test with a
+   `doctrine/dbal-foo` decoy sitting right next to the real entry) is
+   kept strictly separate from `fetch_composer_lock` (real Nix eval:
+   `pkgs.<kimai|davis>.src` is that app's own `fetchFromGitHub` result —
+   asking Nix directly for it, not hand-interpreting `package.nix`'s
+   `imports`/`callPackage`; realizing the fixed-output derivation is
+   cheap and in practice already cache-hit on cache.nixos.org, ~2-3s
+   each, confirmed for real, not assumed). Kimai and Davis resolve via
+   two fully independent calls — never one lookup shared between them,
+   the thing that would have quietly turned this into "a slightly
+   better-disguised global constant." `verify_identity_matches_vendored_fixture`
+   refuses to pair a resolved identity with a vendored source whose
+   `source.reference` doesn't match — a tampered/updated `composer.lock`
+   must never silently keep using the old vendored contract.
+
+   **All 5 stop-condition items met, checked against a real run, not
+   assumed**: Kimai provenance resolves automatically (✓, both
+   revisions); Davis provenance resolves automatically, independently
+   (✓, both revisions); the original K1 8/8 stayed unchanged through the
+   swap (✓, re-ran for real after removing the constants); the
+   `DOCTRINE_DBAL_VERSION`/`DOCTRINE_DBAL_REV` constants are gone from
+   `src/cdc.rs` (✓ — the transition tests now compare the auto-resolved
+   identity against `fixtures/integrity-lock.toml`'s own recorded
+   provenance for the vendored fixture instead, reusing the *existing*
+   hand-verified record rather than duplicating it under a new constant
+   name); missing/ambiguous/mismatched provenance is fail-closed (✓ — 8
+   new offline tests: missing `packages` array, a removed `doctrine/dbal`
+   entry, 2+ matching entries, a missing `version`/`source.reference`
+   field, a tampered `source.reference` failing the vendored-fixture
+   check, plus the decoy-package test above); CI reproduces all of it
+   (✓ — `k1.yml`'s existing `cdc::` filter picks up the 4 new real
+   transition tests automatically, no workflow change needed). 12 real
+   end-to-end tests now (was 8), 8 new offline tests — 70 total in the
+   `oba` binary's own unit-test target counting both (was 58). Reasoning
+   for doing this before K2b/K2c: a generalized CDC that finds contracts
+   beautifully but still trusts a partially hand-verified pin for what a
+   consumer *accepts* is a real, ugly trust boundary — worth
+   closing before the surface grows at all.
 3. **K2b — generalize producer evidence.** Davis's own probe already
    proved sentinel-injection isn't the only valid producer-evidence
    shape (no option to inject one into; the value is a real, but
