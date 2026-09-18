@@ -1,0 +1,12 @@
+# --root security boundary: a `../` escape must be a TOOL_ERROR. Used with
+# --root fixtures/synthetic -- ../../Cargo.toml resolves to the repo's own
+# Cargo.toml, a real file two levels above that root, so canonicalization
+# succeeds and the escape is caught by the starts_with(root) check, not by
+# a missing-file error.
+[[target]]
+name = "dotdot-escape"
+module = "../../Cargo.toml"
+test = "../../Cargo.toml"
+cfg_ident = "cfg"
+option_prefix = ["services", "x"]
+watch = ["foo"]

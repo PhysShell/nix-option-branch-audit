@@ -1,0 +1,9 @@
+# --root security boundary: an absolute module path must be a TOOL_ERROR
+# before any file I/O is even attempted -- the target file need not exist.
+[[target]]
+name = "absolute-escape"
+module = "/this-path-does-not-need-to-exist-rejection-is-syntactic"
+test = "/this-path-does-not-need-to-exist-rejection-is-syntactic"
+cfg_ident = "cfg"
+option_prefix = ["services", "x"]
+watch = ["foo"]

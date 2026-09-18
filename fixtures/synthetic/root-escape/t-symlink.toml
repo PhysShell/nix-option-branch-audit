@@ -1,0 +1,11 @@
+# --root security boundary: a symlink resolving outside --root must be a
+# TOOL_ERROR. Used with --root fixtures/synthetic/root-escape/root, whose
+# checked-in `evil` symlink points at `..` (root-escape/) -- so
+# evil/decoy.nix canonicalizes to root-escape/decoy.nix, outside root.
+[[target]]
+name = "symlink-escape"
+module = "evil/decoy.nix"
+test = "evil/decoy.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "x"]
+watch = ["foo"]

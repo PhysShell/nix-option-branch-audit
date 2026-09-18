@@ -36,14 +36,21 @@ use rnix::{SyntaxNode, SyntaxToken};
 use rowan::ast::AstNode;
 use serde::Serialize;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use clap::Parser;
 
 #[derive(Parser)]
 struct Cli {
+    #[command(subcommand)]
+    command: Option<Command>,
+
+    /// Deprecated legacy invocation, kept working for the real `v0.1.0`
+    /// public release that shipped before `check`/`--root` existed:
+    /// equivalent to `check --root . --targets <TARGETS>`, sharing that
+    /// exact code path (not a separately-maintained approximation of it).
     /// Path to a TOML target manifest (see targets/*.toml). Required
-    /// unless --census is given.
+    /// unless --census or a subcommand is given.
     #[arg(long, conflicts_with = "census")]
     targets: Option<PathBuf>,
     /// Emit machine-readable JSON instead of the human report.
@@ -61,9 +68,44 @@ struct Cli {
     /// expected, across a real corpus rather than a handful of fixtures.
     /// Mutually exclusive with --targets (H1.3a: previously only enforced
     /// by `run()` silently preferring --census and ignoring --targets when
-    /// both were given -- clap now rejects the combination outright).
+    /// both were given -- clap now rejects the combination outright). Not
+    /// folded into the `check` subcommand in this PR -- deliberately not
+    /// touching --census's shape here at all.
     #[arg(long, conflicts_with = "targets")]
     census: Option<PathBuf>,
+}
+
+#[derive(clap::Subcommand)]
+enum Command {
+    /// Run option-branch analysis over one root and target manifest.
+    Check(CheckArgs),
+}
+
+#[derive(clap::Args)]
+struct CheckArgs {
+    /// Filesystem root every target's `module`/`test` path is resolved
+    /// against. A real security boundary, not just a `PathBuf::join`: an
+    /// absolute `module`/`test`, a `../` escape, or a symlink that
+    /// resolves outside `root` after canonicalization all become a
+    /// TOOL_ERROR (exit 3) rather than a read from wherever they happen to
+    /// point. This matters the moment `--targets` can name a manifest that
+    /// lives in the very repository being analyzed (an untrusted PR could
+    /// otherwise point a target at, say, `/etc/shadow`).
+    #[arg(long, default_value = ".")]
+    root: PathBuf,
+    /// Path to a TOML target manifest, resolved relative to the current
+    /// directory (NOT to `--root`) -- deliberately the odd one out, so a
+    /// manifest checked out once can later be pointed at two different
+    /// roots (PR D: a base root and a head root) without "relative to
+    /// which root?" ever being an ambiguous question for the manifest
+    /// path itself. Every `module`/`test` *inside* the manifest, by
+    /// contrast, is always root-relative -- see `root` above.
+    #[arg(long)]
+    targets: PathBuf,
+    /// Emit machine-readable JSON (the versioned `schema_version: 1`
+    /// envelope) instead of the human report.
+    #[arg(long)]
+    json: bool,
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
@@ -2705,13 +2747,53 @@ struct AnalysisReport {
 /// different roots (a base checkout and a head checkout) without the
 /// question of "relative to which root?" ever coming up for the manifest
 /// path itself (only `--targets` stays cwd-relative, at the CLI layer,
-/// same as it always has been).
-fn analyze(root: &std::path::Path, manifest: &TargetFile) -> anyhow::Result<AnalysisReport> {
+/// same as it always has been). Each `module`/`test` is resolved through
+/// `resolve_within_root`, a real filesystem boundary, not a decorative
+/// `PathBuf::join` -- see its own doc comment.
+fn analyze(root: &Path, manifest: &TargetFile) -> anyhow::Result<AnalysisReport> {
     let mut targets = Vec::new();
     for t in &manifest.target {
-        targets.push(run_target(t, &root.join(&t.module), &root.join(&t.test))?);
+        let module_path = resolve_within_root(root, &t.module)
+            .map_err(|e| anyhow::anyhow!("target {}: module: {e}", t.name))?;
+        let test_path = resolve_within_root(root, &t.test)
+            .map_err(|e| anyhow::anyhow!("target {}: test: {e}", t.name))?;
+        targets.push(run_target(t, &module_path, &test_path)?);
     }
     Ok(AnalysisReport { targets })
+}
+
+/// Resolve a target's `module`/`test` path against `root`, refusing to let
+/// it leave `root`'s real (canonicalized, symlinks-resolved) filesystem
+/// subtree. `--root` is meant to be a hard boundary, not a base path
+/// that's merely joined and trusted: `module`/`test` come from a target
+/// manifest, which can itself live inside the very repository under
+/// analysis -- an untrusted PR that can edit `targets.toml` must not be
+/// able to point a target at an absolute path, a `../` escape, or a
+/// symlink resolving outside `root` and have this tool read it anyway.
+/// All three become a TOOL_ERROR (exit 3), same as any other manifest
+/// problem, not a silent read from wherever they happen to point.
+fn resolve_within_root(root: &Path, rel: &Path) -> anyhow::Result<PathBuf> {
+    if rel.is_absolute() {
+        anyhow::bail!(
+            "{} must be relative to --root, not absolute",
+            rel.display()
+        );
+    }
+    let root_canon = root
+        .canonicalize()
+        .map_err(|e| anyhow::anyhow!("--root {}: {e}", root.display()))?;
+    let canon = root_canon.join(rel).canonicalize().map_err(|e| {
+        anyhow::anyhow!("resolving {} under --root {}: {e}", rel.display(), root.display())
+    })?;
+    if !canon.starts_with(&root_canon) {
+        anyhow::bail!(
+            "{} escapes --root {} (resolves to {})",
+            rel.display(),
+            root.display(),
+            canon.display()
+        );
+    }
+    Ok(canon)
 }
 
 fn run_target(
@@ -3352,28 +3434,45 @@ fn main() {
 }
 
 fn run(cli: &Cli) -> anyhow::Result<i32> {
+    if let Some(Command::Check(args)) = &cli.command {
+        if cli.targets.is_some() || cli.census.is_some() {
+            anyhow::bail!(
+                "cannot combine the `check` subcommand with legacy top-level --targets/--census"
+            );
+        }
+        return run_check(&args.root, &args.targets, args.json);
+    }
+
     if let Some(dir) = &cli.census {
         return run_census(dir, cli.json);
     }
 
-    let targets_path = cli
-        .targets
-        .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("either --targets or --census is required"))?;
+    // Legacy invocation (kept working for the real `v0.1.0` public
+    // release that predates `check`/`--root`): exactly `check --root .
+    // --targets <TARGETS>`, through the identical function, not a
+    // separately-maintained approximation of it.
+    let targets_path = cli.targets.as_ref().ok_or_else(|| {
+        anyhow::anyhow!("either the `check` subcommand, or legacy --targets/--census, is required")
+    })?;
+    run_check(Path::new("."), targets_path, cli.json)
+}
 
+/// `root` is a real filesystem boundary (see `resolve_within_root`), never
+/// just a base path to join and trust; `targets_path` is resolved relative
+/// to the current directory, not to `root` -- see `CheckArgs::targets`'s
+/// own doc comment for why those two paths deliberately don't share a base.
+fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32> {
     let manifest_src = fs::read_to_string(targets_path)
         .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", targets_path.display()))?;
     let manifest: TargetFile = toml::from_str(&manifest_src)
         .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
-    // `root` is cwd for now (`.`) -- `analyze`'s own `?`s (missing
-    // module/test file, etc.) bubble up here as a genuine tool error too:
-    // a target naming a file that doesn't exist is a manifest problem, not
-    // an OBA001 finding. A real `--root` (with the path-safety boundary
-    // that implies) lands in a follow-up commit; this one only proves the
-    // extraction itself is behavior-preserving.
-    let reports = analyze(std::path::Path::new("."), &manifest)?.targets;
+    // analyze()'s own `?`s (missing module/test file, a path escaping
+    // --root, etc.) bubble up here as a genuine tool error too: a target
+    // naming a file that doesn't exist -- or reaches outside --root -- is
+    // a manifest problem, not an OBA001 finding.
+    let reports = analyze(root, &manifest)?.targets;
 
     let findings = reports
         .iter()
@@ -3398,7 +3497,7 @@ fn run(cli: &Cli) -> anyhow::Result<i32> {
         (0, "PASS")
     };
 
-    if cli.json {
+    if json {
         let full = FullReport {
             summary: Summary {
                 status,
