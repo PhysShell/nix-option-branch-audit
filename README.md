@@ -1620,7 +1620,9 @@ surface at once:
 
    77 tests total in the `oba` binary's own unit-test target (was 70):
    65 offline (was 58, +7) + 12 real/ignored (was 12, unchanged in count
-   — all 12 refactored onto the new pipeline, not added to).
+   — all 12 refactored onto the new pipeline, not added to). Confirmed
+   green in actual CI, not just locally: `gh run view --log` shows `12
+   passed; ... 65 filtered out` in 40.1s on a fresh runner.
 4. **K2c — generalize DSN contract extraction** to a small corpus (more
    than just Kimai/Davis's MySQL DSN), once K2a/K2b exist under it.
 
