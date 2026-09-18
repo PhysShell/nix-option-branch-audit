@@ -1852,15 +1852,80 @@ surface at once:
    binary's own unit-test target (was 84): 73 offline (was 69, +4) + 21
    real/ignored (was 15, +6).
 
-Explicitly **not next**, regardless of how tempting: a general PHP
-analyzer, automatic `web-apps/*` scanning, a GitHub Action for CDC/diff
-policy, a package-bump differential checker (a good *later* direction,
-not this one), generic sink discovery, H2 predicates, D3, or fixing
-movim's `mariadb`-path bug. Per the user's explicit instruction: **look
-at the census again before picking what's next** — only then decide
-whether the actual bottleneck is consumer-framework adapters (`DB_*` env
-→ Laravel/Symfony config → Doctrine params), sink discovery, or
-package-bump drift. Not decided in advance.
+   **K2a.1 FROZEN at `acce174`** (the last documentation commit — `dce5660`
+   is the implementation-point). The user's own framing for why the
+   local-wins-when-present priority (a real deviation from the original
+   spec sketch's source-first ordering) is the right call to keep, not a
+   liberty taken: "Спецификация обязана проиграть фактам, когда
+   выясняется, что была придумана неправильно" — a specification loses to
+   facts once it turns out to have been designed on a wrong assumption;
+   the alternative is treating the spec as dogma over the actual
+   `buildComposerProject2` semantics that were read and verified for
+   real. Same standing rule as every other frozen layer: reopened only by
+   a concrete counterexample.
+
+7. **K2e — consumer reachability census. Closed, census-only, zero
+   `src/cdc.rs` changes.** Motivated directly by K2c's own unresolved
+   finding: `doctrine/dbal`'s presence in `composer.lock` is necessary,
+   not sufficient, evidence it's the actual runtime consumer of what Nix
+   emits. Before building another `ProducerEvidence` variant or a new
+   consumer adapter on a guess, this round traced the REAL chain — Nix-
+   emitted key → app/framework config layer → actual runtime consumer —
+   for every one of the 8 corpus apps where `doctrine/dbal` is present at
+   all, from real pinned source at an exact tag per app, not framework
+   reputation. New 4th independent axis in `census.md`: `consumer path`
+   = `direct` / `mediated-known` / `mediated-unknown` / `not_applicable`.
+
+   **Result: `direct` 2 (kimai/davis, already proven by K1) + `mediated-known`
+   6 + `mediated-unknown` 0 + `not_applicable` 8** (`doctrine/dbal`
+   absent, the question doesn't arise). Full chains with file:line
+   citations are in `census.md`'s own K2e section; summary:
+   - **`strichliste`/`part-db`**: `mediated-known`, but the terminal
+     contract is unchanged from the direct case — Symfony's
+     `doctrine/doctrine-bundle` eagerly calls Doctrine's OWN
+     `Doctrine\DBAL\Tools\DsnParser` class one stack frame earlier than
+     `DriverManager::getConnection()` would, with zero key renaming.
+     These need no new adapter at all — K1's existing model already
+     covers them once Phase D vendors `doctrine/dbal` 3.10.5 (already
+     identified in K2c, still not done).
+   - **`agorakit`/`movim`/`snipe-it`**: `mediated-known`, terminal
+     library `Illuminate\Database`, `doctrine/dbal` CONFIRMED vestigial
+     — Laravel 11 deleted every DBAL schema-bridge method
+     (`Illuminate\Database\Schema\Grammars\MySqlGrammar` now generates
+     raw `ALTER TABLE` SQL natively), and all three still carry the
+     now-pointless direct `composer.json` requirement. `DB_HOST`/
+     `DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD` (+ `DB_SOCKET`
+     → `unix_socket` for snipe-it, a direct 1:1 rename) map straight
+     into `config/database.php`'s connection array.
+   - **`flarum`**: `mediated-known`, same terminal library
+     (`Illuminate\Database\Capsule\Manager`), but `doctrine/dbal` is
+     real here, not vestigial — narrowly required to unlock Illuminate's
+     optional `renameColumn()`/`dropColumn()`/`change()` schema
+     operations during migrations, never touching the primary
+     connection built from the Nix-generated `config.php` values.
+
+   **The actionable signal, exactly as intended**: 4 of the 6
+   `mediated-known` apps (agorakit, snipe-it, flarum, movim) converge on
+   ONE chain shape — `DB_*`/config-array env keys → a Laravel-family
+   `config/database.php`-equivalent → `Illuminate\Database`. That is
+   real, repeated, corpus-backed support for a future
+   Laravel-config-aware consumer path, not a guess dressed up as one.
+   The other 2 (`strichliste`, `part-db`) need zero new machinery.
+
+   Explicitly **not decided or built this round**: no new
+   `ProducerEvidence` variant, no consumer-adapter class, no framework
+   config parser. K2e's own job was only to make that decision
+   mechanical for whoever picks it up next, per the user's own framing —
+   the choice is now genuinely informed, not a hunch.
+
+Explicitly **not next**, regardless of how tempting: a new
+`ProducerEvidence`/consumer-adapter class, generic sink discovery, a
+package-bump differential checker, H2 predicates, D3, or fixing movim's
+`mariadb`-path bug. The next decision — a Laravel-config-aware consumer
+adapter (corpus-justified: 4 apps, one chain shape) vs. package-bump
+drift vs. Phase D vendoring for strichliste/part-db's already-covered
+shape — is for whoever picks this up, informed by K2e's real evidence,
+not decided in advance in this document.
 
 ## Productization: from research phase to a usable CI product
 

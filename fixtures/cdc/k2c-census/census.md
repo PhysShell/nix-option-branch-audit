@@ -49,27 +49,36 @@ instead of appearing to (mis)sum across one merged column.
   the app's own `fetchFromGitHub` source, K2a's default path) /
   `nixpkgs_local` (`composerLock = ./composer.lock;` -- upstream ships
   none, nixpkgs maintains its own copy sitting next to `package.nix`).
+- **consumer path** (K2e, added below): `direct` (the Nix-emitted value
+  flows into Doctrine's own DSN-parsing/driver code with zero
+  intermediary) / `mediated-known` (a named library sits between the
+  Nix-emitted value and its actual terminal consumer -- the chain is
+  fully traced, and the terminal consumer may or may not be Doctrine at
+  all) / `mediated-unknown` (an intermediary clearly exists but its
+  effect on the value couldn't be pinned down) / `not_applicable`
+  (`doctrine/dbal` isn't even present -- this axis's question doesn't
+  arise).
 
-## Raw table (3 independent axes)
+## Raw table (4 independent axes)
 
-| service | producer support | consumer support | provenance location |
-|---|---|---|---|
-| kimai | supported (SentinelFlow) | supported (3.10.6 @ `c95589d7`) | fetched_source |
-| davis | supported (EvaluatedLiteral) | supported (3.10.6 @ `c95589d7`) | fetched_source |
-| strichliste | supported (SentinelFlow, verified for real) | supported* (3.10.5 @ `95d84866`, resolved for real; Phase D for this exact version not vendored) | fetched_source |
-| part-db | supported (SentinelFlow-shaped) | unsupported (Postgres dialect, wrong driver vendored) | fetched_source |
-| agorakit | **supported** (`FlatEnvVars`, K2d, verified for real) | unsupported (Laravel; `doctrine/dbal` 3.9.4 present but very likely not the real runtime consumer) | fetched_source |
-| movim | **supported** (`FlatEnvVars`, K2d, verified for real via the `postgresql` path -- see sub-finding below for the `mariadb` path's own real nixpkgs bug) | unsupported (`doctrine/dbal` 4.4.4 present, real consumer not confirmed) | fetched_source |
-| snipe-it | **supported** (`FlatEnvVars`, K2d, verified for real; **has** a dedicated `DB_SOCKET` key) | unsupported (Laravel; `doctrine/dbal` 3.10.5 present but very likely not the real runtime consumer) | fetched_source |
-| flarum | needs_new_evidence_form (generated `config.php` PHP array; one-off in this corpus, NOT addressed by K2d) | unsupported (`doctrine/dbal` 2.13.9 present, real consumer not confirmed; also blocked by provenance location below) | nixpkgs_local |
-| baikal | not_applicable (not surveyed for producer shape -- no consumer to compare against anyway) | unsupported (absent) | nixpkgs_local |
-| bookstack | not_applicable | unsupported (absent) | fetched_source |
-| civicrm | not_applicable | unsupported (absent) | fetched_source |
-| engelsystem | not_applicable | unsupported (absent) | fetched_source |
-| grocy | not_applicable | unsupported (absent) | fetched_source |
-| invoiceplane | not_applicable | unsupported (absent) | fetched_source |
-| librenms | not_applicable | unsupported (absent) | fetched_source |
-| postfixadmin | not_applicable | unsupported (absent) | nixpkgs_local |
+| service | producer support | consumer support | provenance location | consumer path |
+|---|---|---|---|---|
+| kimai | supported (SentinelFlow) | supported (3.10.6 @ `c95589d7`) | fetched_source | **direct** |
+| davis | supported (EvaluatedLiteral) | supported (3.10.6 @ `c95589d7`) | fetched_source | **direct** |
+| strichliste | supported (SentinelFlow, verified for real) | supported* (3.10.5 @ `95d84866`, resolved for real; Phase D for this exact version not vendored) | fetched_source | **mediated-known** (Symfony bundle calls Doctrine's own `DsnParser` -- see K2e below) |
+| part-db | supported (SentinelFlow-shaped) | unsupported (Postgres dialect, wrong driver vendored) | fetched_source | **mediated-known** (same bundle mechanism as strichliste) |
+| agorakit | supported (`FlatEnvVars`, K2d, verified for real) | unsupported (Laravel; `doctrine/dbal` 3.9.4 present, confirmed NOT the runtime consumer) | fetched_source | **mediated-known** (Illuminate\Database; doctrine/dbal vestigial) |
+| movim | supported (`FlatEnvVars`, K2d, verified for real via the `postgresql` path -- see sub-finding below for the `mariadb` path's own real nixpkgs bug) | unsupported (`doctrine/dbal` 4.4.4 present, confirmed NOT the runtime consumer) | fetched_source | **mediated-known** (Illuminate\Database/Eloquent; doctrine/dbal vestigial) |
+| snipe-it | supported (`FlatEnvVars`, K2d, verified for real; **has** a dedicated `DB_SOCKET` key) | unsupported (Laravel; `doctrine/dbal` 3.10.5 present, confirmed NOT the runtime consumer) | fetched_source | **mediated-known** (Illuminate\Database; doctrine/dbal vestigial) |
+| flarum | needs_new_evidence_form (generated `config.php` PHP array; one-off in this corpus, NOT addressed by K2d) | unsupported (`doctrine/dbal` 2.13.9 present, confirmed used ONLY for migrations, not the runtime connection; also see provenance location) | nixpkgs_local | **mediated-known** (Illuminate\Database/Capsule; doctrine/dbal real but narrow -- migrations only) |
+| baikal | not_applicable (not surveyed for producer shape -- no consumer to compare against anyway) | unsupported (absent) | nixpkgs_local | not_applicable |
+| bookstack | not_applicable | unsupported (absent) | fetched_source | not_applicable |
+| civicrm | not_applicable | unsupported (absent) | fetched_source | not_applicable |
+| engelsystem | not_applicable | unsupported (absent) | fetched_source | not_applicable |
+| grocy | not_applicable | unsupported (absent) | fetched_source | not_applicable |
+| invoiceplane | not_applicable | unsupported (absent) | fetched_source | not_applicable |
+| librenms | not_applicable | unsupported (absent) | fetched_source | not_applicable |
+| postfixadmin | not_applicable | unsupported (absent) | nixpkgs_local | not_applicable |
 
 ## Distribution (per axis, independently -- the actual point of the correction)
 
@@ -89,13 +98,20 @@ separately since they were never in question.
 
 **consumer support** (14 census candidates)
 - `supported`: 1 -- strichliste (resolved for real this round; full PASS still pending Phase D vendoring of 3.10.5, see below). (+ kimai, davis as frozen K1 baseline.)
-- `unsupported`: 13 -- part-db (wrong DSN dialect); agorakit/movim/snipe-it/flarum (`doctrine/dbal` present but not confirmed as the real runtime consumer -- see sub-finding below); baikal/bookstack/civicrm/engelsystem/grocy/invoiceplane/librenms/postfixadmin (absent from the dependency closure entirely).
+- `unsupported`: 13 -- part-db (wrong DSN dialect); agorakit/movim/snipe-it/flarum (`doctrine/dbal` present, and as of K2e CONFIRMED not the real runtime consumer -- see the K2e section below, no longer just a suspicion); baikal/bookstack/civicrm/engelsystem/grocy/invoiceplane/librenms/postfixadmin (absent from the dependency closure entirely).
 - 1 + 13 = 14. ✓
 
 **provenance location** (14 census candidates)
 - `fetched_source`: 11 -- strichliste, part-db, agorakit, movim, snipe-it, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms. (+ kimai, davis, both `fetched_source`.)
 - `nixpkgs_local`: 3 -- flarum, baikal, postfixadmin.
 - 11 + 3 = 14. ✓
+
+**consumer path** (K2e, 14 census candidates)
+- `direct`: 0 among the 14 (+ kimai, davis, both `direct` -- the K1 baseline).
+- `mediated-known`: 6 -- strichliste, part-db, agorakit, movim, snipe-it, flarum. Full chains in the K2e section below.
+- `mediated-unknown`: 0.
+- `not_applicable`: 8 -- baikal, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms, postfixadmin (`doctrine/dbal` absent, the question doesn't arise).
+- 0 + 6 + 0 + 8 = 14. ✓
 
 `SentinelFlow`/`EvaluatedLiteral` cover the consumer side cleanly for
 **1 of 14** new candidates (strichliste), plus the 2 already-frozen K1
@@ -182,16 +198,19 @@ add one more real test), not part of what this round claims.
   have no `doctrine/dbal` at all -- their `consumer support` stays
   `unsupported` for that reason, not a locator failure anymore.
 - **`doctrine/dbal` presence in `composer.lock` is necessary, not
-  sufficient, evidence that it's the actual runtime DB consumer.**
-  `agorakit`/`movim`/`snipe-it` are Laravel-family apps; Laravel's own
-  `Illuminate\Database` connectors (not Doctrine's DSN parser) are the
-  far more likely real consumer of their `DB_*` env vars, even where
-  `doctrine/dbal` sits somewhere in the dependency graph for an unrelated
-  reason. Not independently confirmed for any of the three in this
-  census (out of scope -- would mean reading Laravel's own connector
-  source, a different consumer entirely) -- flagged here as a real trust-
-  boundary lesson for whenever "just check `composer.lock` for the
-  package name" gets reused again: presence isn't wiring.
+  sufficient, evidence that it's the actual runtime DB consumer --
+  CONFIRMED, not just flagged, by K2e (below).** `agorakit`/`movim`/
+  `snipe-it`/`flarum` are Laravel-family apps; `Illuminate\Database`'s
+  own connectors, not Doctrine's DSN parser, are the real consumer of
+  their `DB_*`/`config.php` values, verified by reading each app's own
+  `config/database.php` (or equivalent) and tracing where `doctrine/dbal`
+  itself is actually required from -- in every one of the four, it turns
+  out to be present for a reason entirely disconnected from the primary
+  database connection (three are outright vestigial pre-Laravel-11
+  leftovers; flarum's is real but narrow, migrations-only). Real
+  trust-boundary lesson for whenever "just check `composer.lock` for the
+  package name" gets reused again: presence isn't wiring, and this round
+  is the proof, not just the suspicion.
 - **The flat-`DB_*`-env-var shape recurs 3 times** (agorakit, movim,
   snipe-it) inside a corpus of only 14 -- a real, repeated pattern, unlike
   flarum's one-off generated-PHP-array shape. Exactly the signal the K2b
@@ -203,7 +222,164 @@ add one more real test), not part of what this round claims.
   deliberately uncategorized: one instance in a corpus of 14 hasn't
   earned its own `ProducerEvidence` type yet.
 
-## Stop condition
+## K2e: consumer reachability census
+
+Motivated directly by the sub-finding above, and done BEFORE any new
+`ProducerEvidence` variant, consumer adapter, or checker code -- the
+question this round answers: for every one of the 8 corpus apps where
+`doctrine/dbal` is present at all (kimai, davis, strichliste, part-db,
+agorakit, movim, snipe-it, flarum), what is the REAL chain from the
+Nix-emitted external key to whatever actually consumes it? Not "is
+`doctrine/dbal` present" (already known from the table above) -- who,
+concretely, reads the value, and does the accepted-keys contract this
+project would need to check even belong to Doctrine at all.
+
+Each app's real, pinned source was read directly (exact GitHub tag +
+commit cited per app below) -- no guessing from framework reputation.
+
+### `direct` (2): kimai, davis
+
+Already proven by K1's own frozen golden proof, not re-verified here --
+the Nix-rendered `DATABASE_URL`/socket value flows straight into
+Doctrine's own `PDO-MySQL-Driver.php` (`isset($params['unix_socket'])`),
+with zero framework or bundle in between at all.
+
+### `mediated-known` (6)
+
+**`strichliste` (tag `v2.1.0`) and `part-db` (tag `v2.13.1`) -- same
+mechanism, terminal library is Doctrine's own, contract unchanged:**
+
+```
+Nix DATABASE_URL (full DSN incl. unix_socket=...)
+  -> config/packages/doctrine.yaml: doctrine.dbal.url: '%env(resolve:DATABASE_URL)%'
+     (Symfony's plain env-var resolver -- no key transformation here)
+  -> doctrine/doctrine-bundle's ConnectionFactory::createConnection()
+     (src/ConnectionFactory.php) EAGERLY calls parseDatabaseUrl()
+     itself, one stack frame before DriverManager::getConnection()
+     would have
+  -> that method instantiates and calls Doctrine\DBAL\Tools\DsnParser
+     -- THE SAME CLASS this project already vendored/verified
+     elsewhere, not a Symfony-authored reimplementation
+  -> merged params array, unix_socket key intact and unrenamed
+  -> Doctrine\DBAL driver code (identical accepted-keys contract as
+     the direct kimai/davis case)
+```
+There genuinely IS an intermediary (`doctrine/doctrine-bundle`), so
+this is honestly `mediated-known`, not `direct` -- but the terminal
+consumer and its accepted-keys contract are Doctrine's own, unchanged.
+Checking against Doctrine's `isset($params[...])` list is still the
+right thing to do for these two apps.
+
+`part-db` additionally has a SECOND, independent consumer of the
+already-parsed params: `src/Command/BackupCommand.php`/
+`src/Services/System/BackupManager.php` call `$connection->getParams()`
+and re-check `isset($params['host'|'port'|'dbname'|'unix_socket'|'user'|'password'])`
+themselves to build `pg_dump`/`mysqldump` shell commands -- same
+key-name assumption asserted a second time, in application code this
+time, downstream of the connection object rather than upstream of it.
+Not a new bucket, just a real detail worth keeping given part-db's
+already-known Postgres/MySQL-driver mismatch.
+
+**`agorakit` (tag `v1.11`), `movim` (tag `v0.35`), `snipe-it` (tag
+`v8.7.2`) -- same Laravel shape, terminal library is `Illuminate\Database`,
+NOT Doctrine, `doctrine/dbal` confirmed vestigial:**
+
+```
+Nix DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD
+  (+ DB_SOCKET for snipe-it; + DB_DRIVER for movim)
+  -> config/database.php's connection array, via env('DB_HOST') etc.
+     (snipe-it: 'unix_socket' => env('DB_SOCKET', '') -- direct 1:1
+     rename, no normalization logic)
+  -> Illuminate\Database\Capsule\Manager / Connectors\{MySql,Postgres}Connector
+     (movim additionally routes through its own Bootstrap.php and a
+     base Eloquent Model class, same terminal library)
+```
+`doctrine/dbal` is a DIRECT dependency in all three `composer.json`s
+(not transitive), but confirmed to have NO real consumer of these
+values: Laravel 11 deleted every DBAL bridge method from
+`Illuminate\Database` (`getDoctrineConnection()`,
+`getDoctrineSchemaManager()`, the `change()`/`renameColumn()` DBAL
+bridge) -- confirmed directly in `Illuminate\Database\Schema\Grammars\MySqlGrammar`
+v11.30.0, which now generates raw `ALTER TABLE` SQL natively. GitHub
+code search of each app's own repo for `Doctrine\DBAL` returned zero
+hits. All three are running post-Laravel-11 (`^11.30`/`^12`) without
+having dropped the now-pointless `doctrine/dbal` requirement from their
+own `composer.json` -- vestigial, not wired to anything.
+
+**`flarum` (tag `v1.8.1`) -- same terminal library, but `doctrine/dbal`
+is real, just narrow:**
+
+```
+Nix-generated config.php's 'database' array
+  -> Foundation/Site.php::loadConfig() -> Config wrapper
+  -> Foundation/Application.php::config() -> Database/DatabaseServiceProvider
+  -> Illuminate\Database\Capsule\Manager::addConnection()
+  -> Illuminate\Database\Connectors\* (reads driver/host/port/database/
+     username/password directly, unchanged key names)
+```
+Unlike agorakit/movim/snipe-it, flarum's `doctrine/dbal` requirement
+(`framework/core/composer.json`: `^2.7`, DIRECT) is real and load-bearing
+-- but only to unlock Illuminate's OPTIONAL schema `renameColumn()`/
+`dropColumn()`/`change()` operations during `php flarum migrate`, which
+internally builds a Doctrine wrapper around the *same* Illuminate PDO
+connection purely for schema introspection. It never touches the
+primary request-time connection built from `config.php`'s values.
+
+### `mediated-unknown` (0), `not_applicable` (8, + kimai/davis excluded from this axis's denominator)
+
+No case in this corpus left the chain genuinely unresolved -- every one
+of the 8 `doctrine/dbal`-present apps traced to a definite terminal
+consumer. The 8 `doctrine/dbal`-absent apps (baikal, bookstack,
+civicrm, engelsystem, grocy, invoiceplane, librenms, postfixadmin) are
+`not_applicable`: this axis's question presupposes `doctrine/dbal`
+being present at all, and wasn't investigated further (a real consumer
+almost certainly exists for THEIR db config too, just not one this
+project has any reason to compare against Doctrine's contract).
+
+### The actionable signal this census exists to produce
+
+**3 of the 6 `mediated-known` apps (agorakit, snipe-it, flarum) share
+the IDENTICAL chain shape**: Nix-emitted `DB_*` keys ->
+`config/database.php`'s Laravel connection array (1:1 `env()` mapping,
+including `DB_SOCKET` -> `unix_socket` for snipe-it) -> `Illuminate\Database`.
+`movim` is a 4th real instance of the same terminal library (Eloquent/
+Capsule), reached via a slightly different bootstrap path but the same
+env-var-to-connection-array shape. That's **4 of 6** `mediated-known`
+cases converging on one framework, one config file shape, one
+normalized-key mapping -- a real, repeated pattern, not a guess dressed
+up as one.
+
+The other 2 (`strichliste`, `part-db`) are a genuinely different shape
+entirely: mediated through a Symfony bundle that ultimately calls
+Doctrine's OWN parser, unchanged contract -- these do NOT need a new
+adapter at all, K1's existing model already covers them once Phase D
+vendors the right `doctrine/dbal` version (3.10.5 for both, already
+identified, not yet vendored).
+
+### K2e stop condition
+
+- [x] Every app with `doctrine/dbal` present got a real chain, not a
+      guess -- all 8 (kimai, davis already known from K1; strichliste,
+      part-db, agorakit, movim, snipe-it, flarum newly traced this
+      round, each from real pinned source at an exact tag, cited above).
+- [x] Classification is 4-valued and honest about mediation existing
+      even when the terminal contract doesn't change -- strichliste/
+      part-db are `mediated-known`, not silently folded into `direct`,
+      even though the practical accepted-keys contract is identical to
+      the direct case.
+- [x] `mediated-unknown` and `no relevant consumer` are real, checked
+      buckets, not omitted for looking empty -- both are 0, stated
+      explicitly, not implied by absence from the table.
+- [x] The actual point (a mechanical next-PR decision) is answered, not
+      deferred further: 4 of 6 `mediated-known` apps converge on ONE
+      chain shape (`DB_*` env -> `config/database.php` -> `Illuminate\Database`)
+      -- a new consumer-adapter class for that shape is now corpus-
+      justified, not a guess. The other 2 need zero new code, only
+      Phase D vendoring already identified in K2c.
+- [x] No `src/cdc.rs` change in this round -- confirmed, this is a
+      census-only round, same discipline as K2c itself.
+
+## K2c stop condition
 
 - [x] Minimum 5 real services -- 14 surveyed, 3 additional real end-to-end
       verifications beyond K1's frozen 2 (kimai, davis, strichliste).
