@@ -1683,14 +1683,90 @@ surface at once:
    absent from most of this particular corpus slice, a fact about the
    sample, not a verdict on the producer model.
 
+   **Methodology correction (post-K2c, before K2d): the counts above
+   don't sum to 14** (3 + 4 + 9 = 16) because "bucket" was overloading
+   three independent questions — producer support, consumer support, and
+   provenance location — into one column. Fixed in
+   [`census.md`](fixtures/cdc/k2c-census/census.md) by splitting into
+   three separate axes, each of which now sums to 14 on its own; no new
+   data was collected, every entry's axis values are re-derived from the
+   same findings recorded above. This is a documentation fix, not a
+   reopening of K2c's substance — nothing about which services fit which
+   producer shape changed.
+5. **K2d — `FlatEnvVars`, a third `ProducerEvidence` variant. Closed.**
+   The corpus-backed signal K2c produced, acted on: `agorakit`/`movim`/
+   `snipe-it` share a flat, discrete `DB_HOST`/`DB_PORT`/`DB_SOCKET`/...
+   env-var shape (rendered directly as a Nix attrset via
+   `services.<app>.config`/`.settings`), not one value embedded in a DSN
+   query string the way Kimai/Davis are. `ProducerEvidence::FlatEnvVars
+   { sink, emitted: Vec<String> }` models it; all 3 apps go through the
+   ONE `build_flat_env_vars_evidence` path, zero app-name branches
+   anywhere in comparison.
+
+   `ProducerEvidence::emitted_key()` changes from `&str` to `Option<&str>`
+   — the minimal change Rust's match-exhaustiveness forces, nothing more:
+   `SentinelFlow`/`EvaluatedLiteral` still return `Some` unchanged,
+   `FlatEnvVars` returns `None` because there genuinely is no single
+   comparable key for this shape (a DSN's `unix_socket=...` parameter and
+   a bare `DB_SOCKET` env var are not the same kind of fact).
+   `compare_contract` itself is untouched.
+
+   **Deliberately does not** attempt to map `DB_HOST`/`DB_SOCKET` onto
+   Doctrine's `host`/`unix_socket` parameter names for any of the three
+   apps — that mapping crosses a framework layer (Laravel's own
+   `Illuminate\Database` connector) this module doesn't model at all, the
+   exact "presence isn't wiring" trust-boundary lesson K2c's census
+   flagged. Consumer support for these three apps stays honestly
+   `unsupported`, not guessed — acquiring producer evidence was the only
+   job this round.
+
+   **Real acquisition, all three verified for real via `nix eval --json`**
+   (new `eval_nix_json`, parallel to `eval_nix_raw` but `--json` instead
+   of `--raw` — the evidence here is a whole attrset, not one string):
+   agorakit's `services.agorakit.config` (`DB_HOST`/`DB_PORT`/
+   `DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`, no socket-equivalent key);
+   snipe-it's `services.snipe-it.config` (same keys, **plus** a dedicated
+   `DB_SOCKET`); movim's `services.movim.settings`, evaluated with
+   `database.type = "postgresql"` rather than `"mariadb"` — the `mariadb`
+   path hits a real, independently confirmed nixpkgs bug at
+   `movim.nix:628` (`config.services.${cfg.database.type}.settings.port`
+   interpolates the enum value `"mariadb"` directly as a `services.<x>`
+   attribute name, but the module's own real service registration a few
+   lines later is `services.mysql`, not `services.mariadb` — the
+   attribute lookup fails outright). Documented in `src/cdc.rs`'s doc
+   comment on `acquire_movim_evidence`, not fixed (a different defect
+   class from this module's own subject matter, out of scope for K2d) and
+   not silently routed around — `postgresql` is a correctly-wired sibling
+   path in the same module, used here only to prove the acquisition
+   mechanism.
+
+   **Stop condition, all 5 items met**: all 3 apps through ONE
+   `FlatEnvVars` path (✓, one `build_flat_env_vars_evidence` function, no
+   per-app branch); zero app-name branches in comparison (✓ —
+   `compare_contract` wasn't touched at all, and nothing calls it with
+   `FlatEnvVars` evidence); real env key/values via `nix eval` (✓, all
+   three re-verified live, not read from cached module source); malformed/
+   empty/non-object evidence is `Inconclusive` (✓ — 4 new offline tests:
+   a JSON array, a JSON scalar, an empty object, plus one success case
+   asserting the full sorted key set and `emitted_key() == None`);
+   existing 12 real K1/K2a/K2b tests unchanged (✓ — re-ran for real,
+   identical pass count and behavior). 84 tests total in the `oba`
+   binary's own unit-test target (was 77): 69 offline (was 65, +4) + 15
+   real/ignored (was 12, +3). Confirmed green in actual CI, not just
+   locally: `gh run view --log` on the pushed commit (`3bc0bfa`) shows
+   `15 passed; 0 failed; 0 ignored; ... 69 filtered out` in 42.8s on a
+   fresh runner.
+
 Explicitly **not next**, regardless of how tempting: a general PHP
 analyzer, automatic `web-apps/*` scanning, a GitHub Action for CDC/diff
 policy, a package-bump differential checker (a good *later* direction,
-not this one), H2 predicates, or D3. Whether the next step is a new
-`ProducerEvidence` variant (the flat-env-var shape now has real corpus
-support), generic sink discovery, or package-bump drift is a decision
-for whoever reads this census next, informed by real distribution data
-instead of the first awkward service encountered.
+not this one), generic sink discovery, H2 predicates, or D3. The
+user-specified sequence from here: K2a.1 (the nixpkgs-local
+`composerLock` locator gap — recurs 3× now: `flarum`/`baikal`/
+`postfixadmin`), then a new "consumer-framework question" investigation
+(`DB_*` env → Laravel/Symfony config → Doctrine params — likely its own
+consumer-adapter class, not yet scoped), only after that generic sink
+discovery or package-bump drift.
 
 ## Productization: from research phase to a usable CI product
 
