@@ -1503,6 +1503,49 @@ self-check above are where K1 stops. Not continued into a generic CDC
 architecture, D3, H2, or scanning further services — that's a decision
 for whoever reads this hostile review next, not something to drift into.
 
+**K1 FROZEN at `4e968a7`.** Reopened only by a concrete counterexample
+(same standing rule as every other frozen layer in this project — see
+`CLAUDE.md`), not for architectural cleanup, renaming, or generalizing
+ahead of a real need. The hostile-review verdict: the proof chain is real
+end-to-end (real `nix eval` → a really-rendered `DATABASE_URL` → an
+extracted producer key → the exact pinned Doctrine 3.10.6 → an extracted
+consumer contract → a boring comparison) — no `grep`-on-`kimai.nix`
+shortcut, no hardcoded "correct answer" anywhere in the pipeline itself.
+
+Reviewed next-step order, deliberately **not** generalizing the whole
+surface at once:
+
+1. **K1.1 — CI qualification for the real proof (this repo's own
+   reproducibility gap, closed before any K2 work).** `.github/workflows/
+   k1.yml` runs K1's 8 `#[ignore]`d historical/mutation tests
+   (`cargo test --bin oba -- --ignored "cdc::"`) in a real Nix-equipped
+   CI job (`cachix/install-nix-action`, the same action
+   `PhysShell/nixpkgs`'s own `nixpkgs-vet` CI job already uses) — without
+   it, "K1 works" was a claim backed by one specific dev machine, not CI.
+2. **K2a — automatic consumer provenance**, the first real K2
+   generalization, chosen ahead of producer-side/sink-discovery work on
+   purpose: walk `package.nix` → the app's own `composer.lock` →
+   `doctrine/dbal`'s exact version + source commit automatically, instead
+   of the Rust constants `DOCTRINE_DBAL_VERSION`/`DOCTRINE_DBAL_REV`
+   (confirmed correct by hand in K1's own Phase A, never auto-derived).
+   Reasoning: a generic CDC that finds contracts beautifully but still
+   trusts a partially hand-verified pin for what a consumer *accepts* is
+   a real, ugly trust boundary — worth closing before the surface grows.
+3. **K2b — generalize producer evidence.** Davis's own probe already
+   proved sentinel-injection isn't the only valid producer-evidence
+   shape (no option to inject one into; the value is a real, but
+   sentinel-free, evaluated literal). Model this as a real sum type
+   instead of stretching Kimai's sentinel-flow shape to fit every future
+   producer: `ProducerEvidence = SentinelFlow(...) | EvaluatedLiteral(...)`
+   (exact type/variant names TBD when this is actually built).
+4. **K2c — generalize DSN contract extraction** to a small corpus (more
+   than just Kimai/Davis's MySQL DSN), once K2a/K2b exist under it.
+
+Explicitly **not next**, regardless of how tempting: a general PHP
+analyzer, automatic `web-apps/*` scanning, a GitHub Action for CDC/diff
+policy, H2 predicates, or D3. Those come after K2 removes K1's hardcoded
+provenance, not before.
+
 ## Productization: from research phase to a usable CI product
 
 The semantic core has now been through H1 freeze, H2.2, hostile review,

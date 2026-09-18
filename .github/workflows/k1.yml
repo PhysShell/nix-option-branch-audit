@@ -1,0 +1,39 @@
+name: K1 (CDC real-eval proof)
+
+# K1.1: the reproducibility gap the user's own hostile review flagged --
+# K1's real historical/mutation proof (src/cdc.rs's `#[ignore]`-by-default
+# tests, 8 total) needs a real `nix` binary and network access, so it
+# doesn't run under kani.yml (Kani-only toolchain) or dogfood.yml (no
+# `nix`). Without this job, "K1 works" was a claim backed only by one
+# specific dev machine, not CI. This job runs ONLY those 8 tests
+# (`--ignored cdc::`) -- the offline half of src/cdc.rs (11 tests) already
+# runs everywhere via a plain `cargo test`, no separate job needed for it.
+#
+# Reuse survey (AGENTS.md step 3/5): cachix/install-nix-action is the same
+# action PhysShell/nixpkgs's own CI (nixpkgs-vet job) already uses for
+# exactly this -- a real Nix on a GitHub-hosted runner, no custom install
+# script.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  k1-real-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: cachix/install-nix-action@v31.11.1
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          # `nix eval` (the new-style CLI src/cdc.rs shells out to) is
+          # gated behind the nix-command experimental feature -- not on
+          # by default on a fresh install.
+          extra_nix_config: |
+            experimental-features = nix-command
+      - name: Run K1's real historical + mutation proof
+        run: cargo test --bin oba -- --ignored "cdc::"
