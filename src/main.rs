@@ -2689,15 +2689,44 @@ fn aggregate(f: AggregateFacts) -> AggregateVerdict {
     }
 }
 
-fn run_target(t: &Target) -> anyhow::Result<TargetReport> {
-    let module_src = fs::read_to_string(&t.module).map_err(|e| {
+/// The result of analyzing one root against one target manifest -- the
+/// pure analysis boundary, with no CLI/exit-code/JSON-envelope concerns
+/// attached. `oba check` (single root) and `oba diff` (PR D: base root +
+/// head root, each analyzed independently through this same function
+/// before being compared) both bottom out here; nothing above this layer
+/// should need to know how a `TargetReport` gets produced.
+struct AnalysisReport {
+    targets: Vec<TargetReport>,
+}
+
+/// Analyze every target in `manifest` against `root`. `module`/`test` in
+/// each `Target` are resolved relative to `root` -- never to the process's
+/// cwd -- specifically so a manifest can later be applied unchanged to two
+/// different roots (a base checkout and a head checkout) without the
+/// question of "relative to which root?" ever coming up for the manifest
+/// path itself (only `--targets` stays cwd-relative, at the CLI layer,
+/// same as it always has been).
+fn analyze(root: &std::path::Path, manifest: &TargetFile) -> anyhow::Result<AnalysisReport> {
+    let mut targets = Vec::new();
+    for t in &manifest.target {
+        targets.push(run_target(t, &root.join(&t.module), &root.join(&t.test))?);
+    }
+    Ok(AnalysisReport { targets })
+}
+
+fn run_target(
+    t: &Target,
+    module_path: &std::path::Path,
+    test_path: &std::path::Path,
+) -> anyhow::Result<TargetReport> {
+    let module_src = fs::read_to_string(module_path).map_err(|e| {
         anyhow::anyhow!(
             "target {}: reading module {}: {e}",
             t.name,
             t.module.display()
         )
     })?;
-    let test_src = fs::read_to_string(&t.test).map_err(|e| {
+    let test_src = fs::read_to_string(test_path).map_err(|e| {
         anyhow::anyhow!("target {}: reading test {}: {e}", t.name, t.test.display())
     })?;
     let module_file = t.module.display().to_string();
@@ -3338,13 +3367,13 @@ fn run(cli: &Cli) -> anyhow::Result<i32> {
         .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
-    let mut reports = Vec::new();
-    for t in &manifest.target {
-        // run_target's own `?`s (missing module/test file, etc.) bubble up
-        // here as a genuine tool error too -- a target naming a file that
-        // doesn't exist is a manifest problem, not an OBA001 finding.
-        reports.push(run_target(t)?);
-    }
+    // `root` is cwd for now (`.`) -- `analyze`'s own `?`s (missing
+    // module/test file, etc.) bubble up here as a genuine tool error too:
+    // a target naming a file that doesn't exist is a manifest problem, not
+    // an OBA001 finding. A real `--root` (with the path-safety boundary
+    // that implies) lands in a follow-up commit; this one only proves the
+    // extraction itself is behavior-preserving.
+    let reports = analyze(std::path::Path::new("."), &manifest)?.targets;
 
     let findings = reports
         .iter()
