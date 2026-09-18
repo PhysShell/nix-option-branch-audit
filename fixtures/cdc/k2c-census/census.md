@@ -27,41 +27,83 @@ apps remained and were fully surveyed (not pre-filtered further --
 "consumer contract unsupported" is a real outcome bucket, not a
 disqualifier applied before counting).
 
-## Raw table
+## Methodology correction (found by hostile review of this same file)
 
-| service | producer mode found | sink | consumer (doctrine/dbal) | bucket |
-|---|---|---|---|---|
-| kimai | SentinelFlow | `kimai-init-<name>.script` | 3.10.6 @ `c95589d7` | supported as-is (K1, frozen) |
-| davis | EvaluatedLiteral | `services.davis.config` | 3.10.6 @ `c95589d7` | supported as-is (K1, frozen) |
-| strichliste | SentinelFlow | `systemd.services.strichliste-migrate.environment.DATABASE_URL` | 3.10.5 @ `95d84866` | **supported as-is** -- verified for real |
-| part-db | DSN-string option (SentinelFlow-*shaped*) | `services.part-db.DATABASE_URL` | present, but Postgres dialect | consumer contract unsupported |
-| agorakit | flat `DB_HOST`/`DB_PORT`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`, no socket key at all | systemd `environment` | 3.9.4 @ `ec16c82f` (likely transitive, not actual runtime consumer) | needs new `ProducerEvidence` variant |
-| movim | same flat-env shape, no socket key | systemd `environment` | 4.4.4 @ `fb9e0ffe` (likely transitive) | needs new `ProducerEvidence` variant |
-| snipe-it | same flat-env shape, but **has** a dedicated `DB_SOCKET` key | systemd `environment` | 3.10.5 @ `95d84866` (Laravel app -- likely its own connector, not Doctrine's) | needs new `ProducerEvidence` variant |
-| flarum | generated `config.php` (PHP array literal via `phpFormat.generate`), no socket-equivalent field seen | `flarum-config.php` | 2.13.9 @ `c480849c` -- **also** needs a different consumer locator (see below) | needs new `ProducerEvidence` variant |
-| baikal | -- | -- | absent | consumer contract unsupported |
-| bookstack | -- | -- | absent | consumer contract unsupported |
-| civicrm | -- | -- | absent | consumer contract unsupported |
-| engelsystem | -- | -- | absent | consumer contract unsupported |
-| grocy | -- | -- | absent | consumer contract unsupported |
-| invoiceplane | -- | -- | absent | consumer contract unsupported |
-| librenms | -- | -- | absent | consumer contract unsupported |
-| postfixadmin | -- | -- | absent | consumer contract unsupported |
+The first cut of this census used ONE "bucket" column per service. The
+counts don't add up against a 14-service corpus (3 supported-as-is + 4
+needs-new-variant + 9 consumer-unsupported = 16), because those aren't
+mutually exclusive outcomes of one classification -- they're three
+genuinely independent questions a service can answer differently on
+each. Replaced with three separate axes below; the numbers in the
+"Distribution" section now sum correctly on each axis independently,
+instead of appearing to (mis)sum across one merged column.
 
-## Distribution (the actual point of this census)
+- **producer support**: `supported` (fits an existing `ProducerEvidence`
+  variant) / `needs_new_evidence_form` (real rendering, but no existing
+  variant's shape) / `not_applicable` (no comparable socket-analogous
+  producer surface exists at all for this defect class).
+- **consumer support**: `supported` (exact pinned `doctrine/dbal` source
+  vendored and usable) / `unsupported` (absent from the dependency
+  closure, or present but the wrong dialect/version not yet vendored).
+- **provenance location**: `fetched_source` (`composer.lock` lives in
+  the app's own `fetchFromGitHub` source, K2a's default path) /
+  `nixpkgs_local` (`composerLock = ./composer.lock;` -- upstream ships
+  none, nixpkgs maintains its own copy sitting next to `package.nix`).
 
-- **supported as-is: 3** -- kimai, davis (frozen K1 baseline), strichliste (new, verified for real this round).
-- **needs new `ProducerEvidence` variant: 4** -- agorakit, movim, snipe-it, flarum.
-- **consumer contract unsupported: 9** -- part-db (wrong DSN dialect) + 8 apps with no `doctrine/dbal` in their dependency closure at all.
-- **needs only a new sink/provenance locator: 0 as a clean standalone bucket**, but a real recurring sub-finding inside two other buckets (see below) -- not invented as its own numbered category since nothing landed there *exclusively*.
-- **ambiguous/inconclusive: 0** -- every one of the 14 candidates resolved to a definite bucket; nothing needed a coin flip.
+## Raw table (3 independent axes)
 
-`SentinelFlow`/`EvaluatedLiteral` cover **3 of 14** new candidates cleanly
-(21%), plus the 2 already-frozen K1 baselines. That is real, useful
-information, not a disappointing number to explain away: it says the
-current model is solid for its proven cases and genuinely narrow beyond
-them -- exactly what a spike-stage architecture should look like before
-its next investment is chosen with evidence instead of guesswork.
+| service | producer support | consumer support | provenance location |
+|---|---|---|---|
+| kimai | supported (SentinelFlow) | supported (3.10.6 @ `c95589d7`) | fetched_source |
+| davis | supported (EvaluatedLiteral) | supported (3.10.6 @ `c95589d7`) | fetched_source |
+| strichliste | supported (SentinelFlow, verified for real) | supported* (3.10.5 @ `95d84866`, resolved for real; Phase D for this exact version not vendored) | fetched_source |
+| part-db | supported (SentinelFlow-shaped) | unsupported (Postgres dialect, wrong driver vendored) | fetched_source |
+| agorakit | needs_new_evidence_form (flat `DB_*` env vars; closed by K2d, see below) | unsupported (Laravel; `doctrine/dbal` 3.9.4 present but very likely not the real runtime consumer) | fetched_source |
+| movim | needs_new_evidence_form (flat `DB_*` env vars; closed by K2d) | unsupported (`doctrine/dbal` 4.4.4 present, real consumer not confirmed) | fetched_source |
+| snipe-it | needs_new_evidence_form (flat `DB_*` env vars, **has** a dedicated `DB_SOCKET` key; closed by K2d) | unsupported (Laravel; `doctrine/dbal` 3.10.5 present but very likely not the real runtime consumer) | fetched_source |
+| flarum | needs_new_evidence_form (generated `config.php` PHP array; one-off in this corpus, NOT addressed by K2d) | unsupported (`doctrine/dbal` 2.13.9 present, real consumer not confirmed; also blocked by provenance location below) | nixpkgs_local |
+| baikal | not_applicable (not surveyed for producer shape -- no consumer to compare against anyway) | unsupported (absent) | nixpkgs_local |
+| bookstack | not_applicable | unsupported (absent) | fetched_source |
+| civicrm | not_applicable | unsupported (absent) | fetched_source |
+| engelsystem | not_applicable | unsupported (absent) | fetched_source |
+| grocy | not_applicable | unsupported (absent) | fetched_source |
+| invoiceplane | not_applicable | unsupported (absent) | fetched_source |
+| librenms | not_applicable | unsupported (absent) | fetched_source |
+| postfixadmin | not_applicable | unsupported (absent) | nixpkgs_local |
+
+## Distribution (per axis, independently -- the actual point of the correction)
+
+The table above has 16 rows: the 14 census candidates from the selection
+funnel, plus `kimai`/`davis` re-listed for baseline continuity (they're
+K1's frozen result, not new candidates this round). Counts below are
+over the **14 census candidates only**; kimai/davis are called out
+separately since they were never in question.
+
+**producer support** (14 census candidates)
+- `supported`: 2 -- strichliste, part-db. (+ kimai, davis as frozen K1 baseline.)
+- `needs_new_evidence_form`: 4 -- agorakit, movim, snipe-it, flarum.
+- `not_applicable`: 8 -- baikal, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms, postfixadmin.
+- 2 + 4 + 8 = 14. ✓
+
+**consumer support** (14 census candidates)
+- `supported`: 1 -- strichliste (resolved for real this round; full PASS still pending Phase D vendoring of 3.10.5, see below). (+ kimai, davis as frozen K1 baseline.)
+- `unsupported`: 13 -- part-db (wrong DSN dialect); agorakit/movim/snipe-it/flarum (`doctrine/dbal` present but not confirmed as the real runtime consumer -- see sub-finding below); baikal/bookstack/civicrm/engelsystem/grocy/invoiceplane/librenms/postfixadmin (absent from the dependency closure entirely).
+- 1 + 13 = 14. ✓
+
+**provenance location** (14 census candidates)
+- `fetched_source`: 11 -- strichliste, part-db, agorakit, movim, snipe-it, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms. (+ kimai, davis, both `fetched_source`.)
+- `nixpkgs_local`: 3 -- flarum, baikal, postfixadmin.
+- 11 + 3 = 14. ✓
+
+`SentinelFlow`/`EvaluatedLiteral` cover the consumer side cleanly for
+**1 of 14** new candidates (strichliste), plus the 2 already-frozen K1
+baselines. That is real, useful information, not a disappointing number
+to explain away: it says the current model is solid for its proven cases
+and genuinely narrow beyond them -- exactly what a spike-stage
+architecture should look like before its next investment is chosen with
+evidence instead of guesswork. On the **producer** side specifically,
+`needs_new_evidence_form` is the largest non-`not_applicable` bucket (4
+of 14) -- the concrete, corpus-backed signal K2d acts on next.
 
 ## `strichliste`: verified for real, not just categorized
 
@@ -112,10 +154,12 @@ Phase D (vendoring `doctrine/dbal` 3.10.5's actual
 vendored 3.10.6. The two versions are almost certainly identical on this
 one function, but "almost certainly" is exactly the kind of hand-wave
 K1's own fail-closed discipline exists to refuse. Strichliste is recorded
-as "supported as-is" for its **producer shape and provenance resolution**
-(both real, both verified) -- a full PASS verdict for strichliste
-specifically is a small, well-scoped K2c follow-up (vendor one more
-pinned file, add one more real test), not part of what this round claims.
+as `producer support: supported` and `provenance location: fetched_source`
+(both real, both verified) -- `consumer support: supported` is recorded
+too, since the pinned version and reference resolved for real, but a full
+PASS *verdict* for strichliste specifically still needs that one vendored
+file; a small, well-scoped K2c follow-up (vendor one more pinned file,
+add one more real test), not part of what this round claims.
 
 ## Real, recurring sub-findings (not new buckets, but worth keeping)
 
@@ -160,12 +204,14 @@ pinned file, add one more real test), not part of what this round claims.
 - [x] No existing K1/K2a/K2b result changed -- zero `src/cdc.rs` changes
       in this round; `strichliste`'s new real checks are additive
       confirmations, not modifications to any prior assertion.
-- [x] All unsupported cases are explicit -- every "consumer contract
-      unsupported"/"needs new variant" entry above states its concrete
-      reason, never a silent skip or a guessed PASS.
+- [x] All unsupported cases are explicit -- every `unsupported`/
+      `needs_new_evidence_form` entry above states its concrete reason,
+      never a silent skip or a guessed PASS.
 - [x] Special cases listed separately -- see "real, recurring
-      sub-findings" above, kept apart from the bucket table itself.
-- [x] Coverage visible -- 3/14 (21%) supported as-is; the dominant
-      finding is "consumer contract unsupported" (9/14), mostly because
-      `doctrine/dbal` simply isn't present -- a fact about this
-      particular corpus slice, not a producer-model failure.
+      sub-findings" above, kept apart from the axis table itself.
+- [x] Coverage visible, per axis -- producer support 2 `supported` / 4
+      `needs_new_evidence_form` / 8 `not_applicable`; consumer support 1
+      `supported` / 13 `unsupported` (dominant reason: `doctrine/dbal`
+      simply absent for 8 of the 13 -- a fact about this particular
+      corpus slice, not a producer-model failure); provenance location
+      11 `fetched_source` / 3 `nixpkgs_local`.
