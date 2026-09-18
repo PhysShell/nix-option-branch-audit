@@ -1623,13 +1623,74 @@ surface at once:
    — all 12 refactored onto the new pipeline, not added to). Confirmed
    green in actual CI, not just locally: `gh run view --log` shows `12
    passed; ... 65 filtered out` in 40.1s on a fresh runner.
-4. **K2c — generalize DSN contract extraction** to a small corpus (more
-   than just Kimai/Davis's MySQL DSN), once K2a/K2b exist under it.
+4. **K2c — corpus qualification census. Closed. Not "support more apps"
+   on purpose** — a measurement of how far `SentinelFlow`/`EvaluatedLiteral`
+   actually reach across a small real corpus, without changing core
+   semantics to make them reach further. Full raw table, methodology, and
+   the real (not just read-from-source) `strichliste` verification are in
+   [`fixtures/cdc/k2c-census/census.md`](fixtures/cdc/k2c-census/census.md)
+   — deliberately kept as an ugly table, not smoothed into prose, because
+   the distribution is the actual deliverable, not a narrative about it.
+
+   **Zero `src/cdc.rs` changes this round** — the one thing this census
+   touches beyond reading source is reusing K2a's `fetch_composer_lock`/
+   `resolve_consumer_identity` *as-is* against a brand-new app
+   (`strichliste`) to confirm they generalize with no code changes at
+   all, which they did. Explicitly resisted the temptation named in the
+   design review — no new `ProducerEvidence` variant was added after the
+   first (or fourth) awkward service; the whole 14-app corpus was
+   surveyed first, reasons for non-fit collected, and only THEN checked
+   for a repeating pattern.
+
+   **Distribution across 14 real candidates** (every non-dev-tool
+   `php.buildComposerProject2` web app in nixpkgs at `AFTER_REV`):
+   supported as-is **3** (kimai, davis — frozen K1 baseline — plus
+   `strichliste`, newly verified for real this round: a live `nix eval`
+   shows a sentinel passed through `services.strichliste.environment.DATABASE_URL`
+   byte-for-byte, `unix_socket=<sentinel>` intact); needs a new
+   `ProducerEvidence` variant **4** (`agorakit`/`movim`/`snipe-it`: a flat,
+   discrete `DB_HOST`/`DB_SOCKET`/... env-var shape, not a DSN query
+   string — a real, *repeated* pattern (3 of 14), the one form of
+   evidence worth actually generalizing to if this gets picked up again;
+   `flarum`: a generated PHP config array, a one-off shape within this
+   corpus, deliberately not promoted to a pattern on a single instance);
+   consumer contract unsupported **9** (`part-db`: right shape, wrong DSN
+   dialect — Postgres, not MySQL, our vendored driver doesn't apply; 8
+   more apps with no `doctrine/dbal` in their dependency closure at all);
+   ambiguous/inconclusive **0** — every candidate resolved to a definite
+   bucket.
+
+   Two real, recurring sub-findings kept in the census file rather than
+   promoted to new buckets or new code: `composer.lock` sometimes lives
+   IN nixpkgs itself (`composerLock = ./composer.lock;`, upstream ships
+   none) rather than in the fetched app source — hits `flarum`/`baikal`/
+   `postfixadmin`, a real "K2a's consumer-side fetch needs an alternate
+   locator" case, not a producer concern; and `doctrine/dbal` merely
+   *appearing* in `composer.lock` is necessary but not sufficient proof
+   it's the actual runtime DB consumer — the three Laravel-family apps
+   almost certainly use Laravel's own connector instead, a trust-boundary
+   lesson worth remembering the next time "grep the lockfile for the
+   package name" gets reused.
+
+   **Stop condition, all 6 items met**: ≥5 real services (14, +3 real
+   verifications beyond K1's frozen 2); each through exact pinned
+   consumer provenance (resolved where `doctrine/dbal` existed, explicitly
+   recorded absent where it didn't — never guessed); zero existing K1/
+   K2a/K2b result changed; every unsupported case explicit, never a
+   silent skip or a fallback `Pass`; special cases (the two sub-findings
+   above) listed separately from the bucket table; coverage visible —
+   3/14 (21%) clean, the dominant reason being `doctrine/dbal` simply
+   absent from most of this particular corpus slice, a fact about the
+   sample, not a verdict on the producer model.
 
 Explicitly **not next**, regardless of how tempting: a general PHP
 analyzer, automatic `web-apps/*` scanning, a GitHub Action for CDC/diff
-policy, H2 predicates, or D3. Those come after K2 removes K1's hardcoded
-provenance, not before.
+policy, a package-bump differential checker (a good *later* direction,
+not this one), H2 predicates, or D3. Whether the next step is a new
+`ProducerEvidence` variant (the flat-env-var shape now has real corpus
+support), generic sink discovery, or package-bump drift is a decision
+for whoever reads this census next, informed by real distribution data
+instead of the first awkward service encountered.
 
 ## Productization: from research phase to a usable CI product
 
