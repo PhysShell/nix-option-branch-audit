@@ -1418,8 +1418,8 @@ diff`, not as ad hoc `jq` in the Action.
 Planned sequencing, each an independently landable/provable PR, not one
 mega-commit:
 
-- **PR A — Distribution bootstrap. Config landed, real release smoke test
-  still pending.** `dist init -y --ci github -t x86_64-unknown-linux-musl
+- **PR A — Distribution bootstrap. Closed: `v0.1.0` tagged, released, and
+  smoke-tested for real.** `dist init -y --ci github -t x86_64-unknown-linux-musl
   -i shell` (`dist` v0.33.0, installed from its own prebuilt release
   binary rather than `cargo install`, on the same "don't compile it if a
   binary exists" principle this PR applies to `oba` itself) generated
@@ -1438,15 +1438,19 @@ mega-commit:
   later, once the release layout is stable — not a replacement for
   `oba`'s own composite Action, which also has to do root
   acquisition/orchestration `install-action` has no opinion on.
-  **Open gap, found while wiring this, not yet resolved: no `LICENSE`
-  file exists in this repository at all** — `cargo package`/`dist`'s
-  `source.tar.gz` artifact don't hard-fail without one, but shipping
-  public binaries with no declared license is a real problem, not a
-  paperwork nit; needs an explicit choice from the repo owner, not a
-  default picked unilaterally here. Actually cutting the `v0.1.0` tag
-  (which triggers a real, public GitHub Release under the owner's
-  account) is deliberately held back until that's resolved and the
-  smoke test itself is explicitly asked for.
+  License gap (no `LICENSE` file existed at all) closed first, dual
+  `MIT OR Apache-2.0` — same choice Kani itself ships under, and this
+  project's closest neighbor besides. Real release:
+  <https://github.com/PhysShell/nix-option-branch-audit/releases/tag/v0.1.0>.
+  Acceptance was deliberately NOT "the workflow went green" — a fresh
+  scratch directory downloaded the actual published asset (never reusing
+  the local build that produced it): `sha256sum -c` against the published
+  checksum, `ldd` confirming a truly static binary, `oba --help` runs,
+  `gh attestation verify --format json` returns a real signed bundle
+  whose certificate SAN names this exact repo/workflow/tag
+  (`.github/workflows/release.yml@refs/tags/v0.1.0`), and the published
+  `oba-installer.sh` piped through `sh` into an isolated `CARGO_HOME`
+  installs a working binary end to end.
 - **PR B — CLI / report foundations.** `--root`-relative analysis,
   `oba check`, the versioned `check`/`diff` report envelope, the internal
   `analyze`/`compare` split described above — designed so PR D fills in
