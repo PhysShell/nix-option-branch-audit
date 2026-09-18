@@ -12,6 +12,15 @@ author: 'PhysShell'
 # Anything smarter than that (annotations, a step summary table, ratchet
 # comparison) is a different PR's job, built ON TOP of this output, not
 # inside it.
+#
+# The report is written under $RUNNER_TEMP, not github.action_path -- a
+# real dogfood run caught that action_path resolves to a path ending in
+# `/.` for a local `uses: ./` reference, and actions/upload-artifact's
+# glob matcher hard-rejects any `.`/`..` path segment ("Relative pathing
+# '.' and '..' is not allowed"), regardless of whether the file itself
+# exists. $RUNNER_TEMP is always a clean absolute path and works
+# identically whether this action is referenced locally or as
+# owner/repo@ref.
 
 inputs:
   root:
@@ -71,7 +80,7 @@ runs:
       run: |
         set +e
         oba check --root "${{ inputs.root }}" --targets "${{ inputs.targets }}" --json \
-          > "${{ github.action_path }}/oba-report.json"
+          > "$RUNNER_TEMP/oba-report.json"
         code=$?
         set -e
 
@@ -80,7 +89,7 @@ runs:
         delimiter="oba_json_$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
         {
           echo "report-json<<$delimiter"
-          cat "${{ github.action_path }}/oba-report.json"
+          cat "$RUNNER_TEMP/oba-report.json"
           echo "$delimiter"
         } >> "$GITHUB_OUTPUT"
 
@@ -91,4 +100,4 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}
-        path: ${{ github.action_path }}/oba-report.json
+        path: ${{ runner.temp }}/oba-report.json
