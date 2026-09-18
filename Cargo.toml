@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "Layer-1 spike: option branch activation evidence for NixOS modules"
 repository = "https://github.com/PhysShell/nix-option-branch-audit"
+license = "MIT OR Apache-2.0"
 
 [[bin]]
 name = "oba"
