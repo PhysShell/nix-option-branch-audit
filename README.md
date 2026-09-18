@@ -1562,8 +1562,10 @@ surface at once:
    entry, 2+ matching entries, a missing `version`/`source.reference`
    field, a tampered `source.reference` failing the vendored-fixture
    check, plus the decoy-package test above); CI reproduces all of it
-   (✓ — `k1.yml`'s existing `cdc::` filter picks up the 4 new real
-   transition tests automatically, no workflow change needed). 12 real
+   (✓ — `k1.yml`'s existing `cdc::` filter picked up the 4 new real
+   transition tests automatically, no workflow change needed, confirmed
+   green on the actual push: `gh run view --log` shows `12 passed; 0
+   failed; ... 58 filtered out` in 44.9s on a fresh runner). 12 real
    end-to-end tests now (was 8), 8 new offline tests — 70 total in the
    `oba` binary's own unit-test target counting both (was 58). Reasoning
    for doing this before K2b/K2c: a generalized CDC that finds contracts
