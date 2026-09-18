@@ -3376,22 +3376,43 @@ fn run_census(dir: &std::path::Path, json: bool) -> anyhow::Result<i32> {
     Ok(if report.parse_errors > 0 { 2 } else { 0 })
 }
 
+/// The versioned, external `--json` machine contract (PR B commit 3).
+/// What's frozen as of `schema_version: 1`: the envelope shape itself
+/// (`schema_version`/`tool`/`mode`/`summary`/`targets`), `tool.name`, and
+/// every existing `TargetReport`/`Verdict` field. NOT frozen yet: the
+/// payload `mode: "diff"` will carry (PR D) -- `mode` is reserved as a
+/// sum-type tag specifically so adding it doesn't need `schema_version:
+/// 2`, but no `transition`/`base`/`head` shape is speculated here before
+/// PR D actually needs one. Deliberately excluded from this envelope:
+/// absolute `--root`, wall-clock timestamps, hostname, PID -- anything
+/// that would make the identical checkout produce a different payload
+/// depending on where or when it happened to run (a GitHub Actions
+/// runner's `/home/runner/work/...` vs a contributor's own `/home/...`
+/// must diff as identical once source paths are normalized the same way,
+/// which they already are: `TargetReport`'s `Span.file`/module/test
+/// strings are always the manifest's own root-relative text, never a
+/// canonicalized/joined filesystem path -- see `analyze`/`run_target`).
 #[derive(Serialize, Debug)]
-struct Summary {
-    /// "PASS" only if every target resolved cleanly with no findings.
-    /// "FINDING" if at least one OBA001 and nothing inconclusive.
-    /// "INCONCLUSIVE" takes precedence over FINDING: a run that couldn't
-    /// fully evaluate some watched option has no business claiming to have
-    /// swept the rest cleanly, regardless of what else it found.
-    status: &'static str,
-    findings: usize,
-    inconclusive: usize,
+struct ReportEnvelope {
+    schema_version: u32,
+    tool: ToolInfo,
+    /// Only `"check"` exists today; `"diff"` is PR D's, not this one's.
+    mode: &'static str,
+    summary: CheckSummary,
+    targets: Vec<TargetReport>,
 }
 
 #[derive(Serialize, Debug)]
-struct FullReport {
-    summary: Summary,
-    targets: Vec<TargetReport>,
+struct ToolInfo {
+    name: &'static str,
+    version: &'static str,
+}
+
+#[derive(Serialize, Debug)]
+struct CheckSummary {
+    pass: usize,
+    finding: usize,
+    inconclusive: usize,
 }
 
 /// Exit codes are a 4-state scheme, not 3: `0` clean analysis / `1` a
@@ -3484,6 +3505,11 @@ fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32
         .flat_map(|r| &r.verdicts)
         .filter(|v| v.is_inconclusive())
         .count();
+    let pass = reports
+        .iter()
+        .flat_map(|r| &r.verdicts)
+        .filter(|v| matches!(v, Verdict::Pass { .. }))
+        .count();
     let parse_failed_targets = reports
         .iter()
         .filter(|r| !r.parse_errors.is_empty())
@@ -3498,15 +3524,21 @@ fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32
     };
 
     if json {
-        let full = FullReport {
-            summary: Summary {
-                status,
-                findings,
+        let envelope = ReportEnvelope {
+            schema_version: 1,
+            tool: ToolInfo {
+                name: "oba",
+                version: env!("CARGO_PKG_VERSION"),
+            },
+            mode: "check",
+            summary: CheckSummary {
+                pass,
+                finding: findings,
                 inconclusive,
             },
             targets: reports,
         };
-        println!("{}", serde_json::to_string_pretty(&full)?);
+        println!("{}", serde_json::to_string_pretty(&envelope)?);
     } else {
         println!("=== summary: {status}  findings={findings}  inconclusive={inconclusive} ===");
         for r in &reports {

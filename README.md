@@ -1451,11 +1451,64 @@ mega-commit:
   (`.github/workflows/release.yml@refs/tags/v0.1.0`), and the published
   `oba-installer.sh` piped through `sh` into an isolated `CARGO_HOME`
   installs a working binary end to end.
-- **PR B — CLI / report foundations.** `--root`-relative analysis,
-  `oba check`, the versioned `check`/`diff` report envelope, the internal
-  `analyze`/`compare` split described above — designed so PR D fills in
-  an already-reserved slot instead of renegotiating the contract PR B
-  just froze.
+- **PR B — CLI / report foundations. Closed.** `2b4b19c` / `a3de569` /
+  (this commit). Deliberately does NOT include a working `oba diff` or
+  `compare()` — a command that exists implies it guarantees something;
+  shipping a decorative one would have quietly become half of PR D two
+  PRs early. The actual split:
+  ```
+  PR B: analyze(root, manifest) -> AnalysisReport
+        oba check
+        versioned, extensible report envelope (schema_version: 1)
+  PR D: compare(base, head) -> DiffReport
+        oba diff
+        ratchet semantics
+  ```
+  Three commits, each independently provable:
+  1. `analyze(root: &Path, manifest: &TargetFile) -> AnalysisReport`
+     extracted out of `run()`'s inline loop, called with `root = "."` —
+     behavior-preserving by construction (proved by the full 72-test
+     suite staying green unchanged, not just claimed).
+  2. `oba check --root <dir> --targets <manifest>`, with `--root` as a
+     real filesystem boundary: `module`/`test` paths are resolved through
+     `resolve_within_root`, which canonicalizes and hard-rejects an
+     absolute path, a `../` escape, or a symlink resolving outside
+     `root` — TOOL_ERROR (exit 3), not a read from wherever it points.
+     Matters because `--targets` can name a manifest living inside the
+     very repository under analysis, editable by the same untrusted PR
+     being audited. `--targets` itself stays resolved relative to cwd,
+     not `--root` — deliberately the odd one out, so PR D can apply one
+     manifest to two different roots without "relative to which root?"
+     ever being ambiguous for the manifest path itself. Legacy flat `oba
+     --targets <manifest>` still works, routed through the exact same
+     `run_check()` as `check --root . --targets <manifest>` — proved
+     equivalent (byte-identical JSON on the real golden manifest), not
+     just similar. `--census` untouched.
+  3. The versioned envelope: `{schema_version, tool: {name, version},
+     mode, summary: {pass, finding, inconclusive}, targets}`. `mode` is
+     reserved as a sum-type tag (`"check"` today) specifically so `"diff"`
+     lands in PR D without a `schema_version: 2` bump — but no
+     `transition`/`base`/`head` shape is guessed at before PR D actually
+     needs one. No absolute `--root`, timestamps, hostname, or PID in the
+     payload — `Span.file`/module/test strings were already the
+     manifest's own root-relative text, never a canonicalized path, so
+     this fell out of commit 2 rather than needing new work. Crate bumped
+     to `0.2.0` (a real machine-contract change, not a patch release).
+
+  New `tests/check_root.rs` (9 black-box subprocess tests): all three
+  escape vectors → exit 3 (two needing no new fixtures at all — rejection
+  is syntactic for an absolute path, and `../../Cargo.toml` already
+  exists two levels above `fixtures/synthetic`; the symlink case uses one
+  new checked-in relative symlink, `fixtures/synthetic/root-escape/root/
+  evil -> ..`); missing `--root` → exit 3; legacy vs `check --root .`
+  byte-identical JSON; running from a totally different cwd with an
+  explicit `--root` reproduces the same report; two runs of the same
+  invocation are byte-stable; `--census` unaffected; the envelope's own
+  shape (`schema_version`/`mode`/`tool.name`/`tool.version`, no stray
+  top-level keys, `pass + finding + inconclusive` actually sums to the
+  real verdict count). Golden suite's own summary assertions updated for
+  the renamed/reshaped fields (`findings` → `finding`, `status` string
+  dropped — derivable from the counts, wasn't adding a distinct claim).
 - **PR C — Thin GitHub Action.** Composite (not Docker, not Node):
   download the pinned release binary, verify it, invoke `oba check`,
   emit `::error`/`::warning` annotations + a `$GITHUB_STEP_SUMMARY` table.
@@ -1516,7 +1569,9 @@ need repeats.
 ```
 cargo test    # the full acceptance suite (tests/golden.rs, tests/fixture_integrity.rs,
               # plus a real-world unit test against fixtures/real/ifm-test.nix)
-cargo run -- --targets targets/golden.toml [--json]
+cargo run -- --targets targets/golden.toml [--json]              # legacy, still works
+cargo run -- check --root . --targets targets/golden.toml [--json]   # equivalent, preferred
+cargo run -- check --root /path/to/nixpkgs --targets targets.toml    # a manifest applied to a checkout elsewhere
 
 # syntax-visibility census against a real corpus, not option-branch
 # analysis -- no manifest, no module/option matching:

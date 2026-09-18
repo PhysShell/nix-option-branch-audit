@@ -1,13 +1,15 @@
-//! PR B commit 2: `oba check --root` acceptance tests.
+//! PR B commits 2-3: `oba check --root` and the versioned JSON envelope.
 //!
-//! Two things this file exists to prove, black-box (real subprocess, real
-//! filesystem -- no unit-level shortcuts): (1) `--root` is a real security
-//! boundary, not a decorative `PathBuf::join`, so a `module`/`test` path
-//! that's absolute, escapes via `../`, or escapes via a symlink all become
-//! a TOOL_ERROR (exit 3) rather than a read from wherever they resolve to;
-//! (2) the legacy flat `--targets` invocation and the new `check --root .
-//! --targets` invocation are the exact same analysis, not two
-//! independently-maintained paths that happen to agree today.
+//! Three things this file exists to prove, black-box (real subprocess,
+//! real filesystem -- no unit-level shortcuts): (1) `--root` is a real
+//! security boundary, not a decorative `PathBuf::join`, so a
+//! `module`/`test` path that's absolute, escapes via `../`, or escapes
+//! via a symlink all become a TOOL_ERROR (exit 3) rather than a read from
+//! wherever they resolve to; (2) the legacy flat `--targets` invocation
+//! and the new `check --root . --targets` invocation are the exact same
+//! analysis, not two independently-maintained paths that happen to agree
+//! today; (3) `schema_version: 1`'s envelope shape is what it claims to
+//! be.
 
 use serde_json::Value;
 use std::path::PathBuf;
@@ -167,4 +169,42 @@ fn repeated_runs_are_byte_stable() {
 fn census_is_unaffected_by_the_check_subcommand() {
     let out = oba(&["--census", "fixtures/real"], &manifest_dir());
     assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+}
+
+/// The frozen part of `schema_version: 1`, pinned explicitly rather than
+/// left to be implied by the other tests only diffing whole-document
+/// equality: envelope keys, `mode: "check"`, `tool.name`, and that
+/// `tool.version` actually matches the binary's own crate version (not
+/// hand-copied/stale). `summary.pass` + `summary.finding` +
+/// `summary.inconclusive` must also add up to the total verdict count --
+/// the envelope's own internal consistency, not just "the fields exist".
+#[test]
+fn schema_v1_envelope_shape_is_what_it_claims() {
+    let out = oba(
+        &["check", "--root", ".", "--targets", "targets/golden.toml", "--json"],
+        &manifest_dir(),
+    );
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+
+    assert_eq!(v["schema_version"], 1);
+    assert_eq!(v["mode"], "check");
+    assert_eq!(v["tool"]["name"], "oba");
+    assert_eq!(v["tool"]["version"], env!("CARGO_PKG_VERSION"));
+
+    let pass = v["summary"]["pass"].as_u64().unwrap();
+    let finding = v["summary"]["finding"].as_u64().unwrap();
+    let inconclusive = v["summary"]["inconclusive"].as_u64().unwrap();
+    let total_verdicts: u64 = v["targets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|t| t["verdicts"].as_array().unwrap().len() as u64)
+        .sum();
+    assert_eq!(pass + finding + inconclusive, total_verdicts);
+
+    // No stray top-level keys -- CI cruft (timestamp/hostname/pid/absolute
+    // root) sneaking into the envelope would show up here.
+    let mut keys: Vec<_> = v.as_object().unwrap().keys().cloned().collect();
+    keys.sort();
+    assert_eq!(keys, ["mode", "schema_version", "summary", "targets", "tool"]);
 }

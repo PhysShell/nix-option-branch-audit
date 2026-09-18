@@ -724,23 +724,22 @@ fn golden_c_mutations_all_stay_oba001() {
 fn h1_exit_codes_distinguish_clean_finding_and_inconclusive() {
     let clean = run_manifest("targets/clean.toml");
     assert_eq!(clean.exit_code, 0);
-    assert_eq!(clean.full["summary"]["status"], "PASS");
+    assert_eq!(clean.full["summary"]["finding"], 0);
+    assert_eq!(clean.full["summary"]["inconclusive"], 0);
 
     let findings = run_manifest("targets/findings-only.toml");
     assert_eq!(findings.exit_code, 1);
-    assert_eq!(findings.full["summary"]["status"], "FINDING");
-    assert_eq!(findings.full["summary"]["findings"], 1);
+    assert_eq!(findings.full["summary"]["finding"], 1);
     assert_eq!(findings.full["summary"]["inconclusive"], 0);
 
     // golden.toml mixes real OBA001 findings with davis's honest
     // OptionNotFound -- inconclusive must take precedence over finding in
-    // both the exit code and the summary status, per the explicit ask:
-    // a run that couldn't fully evaluate everything has no business
-    // reporting itself as merely "found some bugs, otherwise clean".
+    // the exit code, per the explicit ask: a run that couldn't fully
+    // evaluate everything has no business reporting itself as merely
+    // "found some bugs, otherwise clean".
     let mixed = run_manifest("targets/golden.toml");
     assert_eq!(mixed.exit_code, 2);
-    assert_eq!(mixed.full["summary"]["status"], "INCONCLUSIVE");
-    assert!(mixed.full["summary"]["findings"].as_u64().unwrap() > 0);
+    assert!(mixed.full["summary"]["finding"].as_u64().unwrap() > 0);
     assert!(mixed.full["summary"]["inconclusive"].as_u64().unwrap() > 0);
 }
 
@@ -752,7 +751,7 @@ fn h1_exit_codes_distinguish_clean_finding_and_inconclusive() {
 fn h1_parse_errors_fail_closed() {
     let run = run_manifest("targets/parse-error.toml");
     assert_eq!(run.exit_code, 2);
-    assert_eq!(run.full["summary"]["status"], "INCONCLUSIVE");
+    assert!(run.full["summary"]["inconclusive"].as_u64().unwrap() > 0);
     let targets = run.full["targets"].as_array().unwrap();
     assert_eq!(targets.len(), 1);
     let parse_errors = targets[0]["parse_errors"].as_array().unwrap();
