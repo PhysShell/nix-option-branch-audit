@@ -79,6 +79,9 @@ struct Cli {
 enum Command {
     /// Run option-branch analysis over one root and target manifest.
     Check(CheckArgs),
+    /// Compare option-branch analysis between two roots under one
+    /// manifest.
+    Diff(DiffArgs),
 }
 
 #[derive(clap::Args)]
@@ -104,6 +107,33 @@ struct CheckArgs {
     targets: PathBuf,
     /// Emit machine-readable JSON (the versioned `schema_version: 1`
     /// envelope) instead of the human report.
+    #[arg(long)]
+    json: bool,
+}
+
+#[derive(clap::Args)]
+struct DiffArgs {
+    /// Filesystem root analyzed as "base" -- same security boundary as
+    /// `check --root` (see its own doc comment): an escaping
+    /// `module`/`test` is a TOOL_ERROR, not a read from wherever it
+    /// points. This is plumbing reuse, not a second implementation --
+    /// both roots go through the exact same `analyze()`.
+    #[arg(long)]
+    base_root: PathBuf,
+    /// Filesystem root analyzed as "head". Same boundary as `base_root`.
+    #[arg(long)]
+    head_root: PathBuf,
+    /// Path to a TOML target manifest, resolved relative to the current
+    /// directory. Deliberately ONE manifest applied to both roots, not
+    /// `--base-targets`/`--head-targets` -- comparing two different
+    /// *specifications* of what to watch is a different, messier
+    /// question (did the target change, or did what we're even looking
+    /// at change) that this tool isn't trying to answer. `module`/`test`
+    /// inside the manifest are root-relative, same as `check`.
+    #[arg(long)]
+    targets: PathBuf,
+    /// Emit machine-readable JSON (`mode: "diff"` under the same
+    /// `schema_version: 1` envelope family) instead of the human report.
     #[arg(long)]
     json: bool,
 }
@@ -2413,6 +2443,26 @@ enum VerdictKind {
     Pass,
 }
 
+impl VerdictKind {
+    /// `oba diff`'s JSON `verdict_transitions` summary key component --
+    /// e.g. `"pass"`/`"oba001"`, joined as `"pass->oba001"`. Deliberately
+    /// the same fine-grained 7-way kind `compare()` itself already uses
+    /// (`VerdictTransition`, from D1), not a coarser PASS/FINDING/
+    /// INCONCLUSIVE bucketing -- D2 doesn't get to invent a new
+    /// classification on top of what D1 already decided.
+    fn as_str(&self) -> &'static str {
+        match self {
+            VerdictKind::OptionNotFound => "option_not_found",
+            VerdictKind::PredicateNotFound => "predicate_not_found",
+            VerdictKind::DefaultUnresolved => "default_unresolved",
+            VerdictKind::TestValueUnresolved => "test_value_unresolved",
+            VerdictKind::TestConfigUnresolved => "test_config_unresolved",
+            VerdictKind::Oba001 => "oba001",
+            VerdictKind::Pass => "pass",
+        }
+    }
+}
+
 #[derive(Serialize, Debug, Clone)]
 struct TargetReport {
     name: String,
@@ -2871,7 +2921,7 @@ fn resolve_within_root(root: &Path, rel: &Path) -> anyhow::Result<PathBuf> {
 /// Nothing presentation-shaped (`Span`, source excerpts, evidence order)
 /// belongs here -- identity must be stable even when only *how* a result
 /// is reported changes, not what it's about.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
 struct TargetIdentity {
     module: PathBuf,
     test: PathBuf,
@@ -2886,7 +2936,7 @@ struct TargetIdentity {
 /// `ChangeKind::VerdictChanged`) -- reserved as its own type so a later
 /// `EvidenceChanged`/`PredicateChanged`/`VisibilityChanged` can grow this
 /// struct without renegotiating `TargetDiff` itself.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct TargetOutcome {
     verdict: Verdict,
 }
@@ -2899,7 +2949,8 @@ struct TargetOutcome {
 /// copy-paste) -- clippy's glob-import-friendliness suggestion doesn't
 /// apply, nothing here is ever glob-imported.
 #[allow(clippy::enum_variant_names)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
 enum ChangeKind {
     VerdictChanged,
     EvidenceChanged,
@@ -2914,7 +2965,8 @@ enum ChangeKind {
 /// a claim that the two `TargetOutcome`s are byte-for-byte/structurally
 /// identical. Widening what `Unchanged` notices means adding a
 /// `ChangeKind` and populating it, not redefining this type.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
 enum TargetDiff {
     Unchanged,
     // Boxed: `TargetOutcome` wraps a full `Verdict`, whose own payload
@@ -2963,7 +3015,7 @@ struct VerdictTransition {
     to: VerdictKind,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 struct ComparisonEntry {
     identity: TargetIdentity,
     diff: TargetDiff,
@@ -3768,6 +3820,15 @@ fn run(cli: &Cli) -> anyhow::Result<i32> {
         return run_check(&args.root, &args.targets, args.json);
     }
 
+    if let Some(Command::Diff(args)) = &cli.command {
+        if cli.targets.is_some() || cli.census.is_some() {
+            anyhow::bail!(
+                "cannot combine the `diff` subcommand with legacy top-level --targets/--census"
+            );
+        }
+        return run_diff(&args.base_root, &args.head_root, &args.targets, args.json);
+    }
+
     if let Some(dir) = &cli.census {
         return run_census(dir, cli.json);
     }
@@ -3851,6 +3912,155 @@ fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32
     }
 
     Ok(exit_code)
+}
+
+/// `oba diff`'s own versioned JSON payload -- deliberately a SEPARATE
+/// Rust type from `ReportEnvelope`/`CheckSummary`, not one shared struct
+/// forced to cover both `check` and `diff` shapes (they share the
+/// `schema_version`/`tool`/`mode` field *names* by convention, not a
+/// common Rust type -- a consumer branches on `mode` before parsing
+/// `targets`, same as any tagged JSON union). `targets` here is
+/// `Vec<ComparisonEntry>` (identity + diff), not `Vec<TargetReport>` --
+/// forcing those into one enum would only be worse Rust for a JSON
+/// convenience that doesn't actually exist on the wire.
+#[derive(Serialize, Debug)]
+struct DiffEnvelope {
+    schema_version: u32,
+    tool: ToolInfo,
+    mode: &'static str,
+    summary: DiffSummary,
+    targets: Vec<ComparisonEntry>,
+}
+
+#[derive(Serialize, Debug)]
+struct DiffSummary {
+    unchanged: usize,
+    added: usize,
+    removed: usize,
+    changed: usize,
+    /// Bare counts of `VerdictTransition{from,to}` pairs (e.g.
+    /// `"pass->oba001": 2`), nothing more -- explicitly NOT a
+    /// regression/improvement classification. That judgment is CI
+    /// policy, built on top of this count, never baked in here (same
+    /// boundary `compare()` itself already draws around
+    /// `VerdictTransition`).
+    verdict_transitions: std::collections::BTreeMap<String, usize>,
+}
+
+/// D2: pure orchestration around D1's `compare()` -- two `analyze()`
+/// calls (each already a full, independent, fail-closed analysis
+/// through the exact same code `check` uses) and one `compare()` call.
+/// No new comparison semantics get introduced here; if that temptation
+/// shows up, it means D1's model was incomplete, not that D2 gets to
+/// patch around it.
+///
+/// Exit codes are DELIBERATELY not `check`'s 0/1/2/3 with the same
+/// meanings -- `check` answers "what's HEAD's state", `diff` answers
+/// "what changed", and `compare()` is intentionally transition-neutral
+/// (no `Changed` is inherently bad). So: `0` = the comparison was
+/// produced (regardless of what it found -- a real `Changed` entry is
+/// not a failure); `2` = the comparison was produced, but at least one
+/// side's own analysis of at least one target was inconclusive (parse
+/// error or an inconclusive-shaped verdict) -- inspected directly on
+/// `base`/`head`'s `AnalysisReport`s themselves (mirroring `check`'s own
+/// `is_inconclusive()` test, applied to both sides), NOT reconstructed
+/// from `ComparisonReport` -- `TargetDiff::Unchanged` deliberately
+/// carries no payload (see its own doc comment), so an inconclusive
+/// verdict that's identical on both sides wouldn't even be visible from
+/// the diff alone; `3` = a tool/input error (bad manifest, a missing or
+/// `--*-root`-escaping file on either side, or `CompareError` -- a
+/// duplicate identity is a manifest problem, same class as any other
+/// `check` TOOL_ERROR, not a special diff-only failure mode).
+fn run_diff(
+    base_root: &Path,
+    head_root: &Path,
+    targets_path: &Path,
+    json: bool,
+) -> anyhow::Result<i32> {
+    let manifest_src = fs::read_to_string(targets_path)
+        .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", targets_path.display()))?;
+    let manifest: TargetFile = toml::from_str(&manifest_src)
+        .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
+    validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
+
+    let base_analysis = analyze(base_root, &manifest)?;
+    let head_analysis = analyze(head_root, &manifest)?;
+
+    let comparison =
+        compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
+
+    let inconclusive_side = |report: &AnalysisReport| {
+        report
+            .targets
+            .iter()
+            .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
+    };
+    let exit_code = if inconclusive_side(&base_analysis) || inconclusive_side(&head_analysis) {
+        2
+    } else {
+        0
+    };
+
+    let mut unchanged = 0;
+    let mut added = 0;
+    let mut removed = 0;
+    let mut changed = 0;
+    let mut verdict_transitions: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
+    for entry in &comparison.entries {
+        match &entry.diff {
+            TargetDiff::Unchanged => unchanged += 1,
+            TargetDiff::Added { .. } => added += 1,
+            TargetDiff::Removed { .. } => removed += 1,
+            TargetDiff::Changed { .. } => changed += 1,
+        }
+        if let Some(t) = entry.diff.verdict_transition() {
+            *verdict_transitions
+                .entry(format!("{}->{}", t.from.as_str(), t.to.as_str()))
+                .or_insert(0) += 1;
+        }
+    }
+
+    if json {
+        let envelope = DiffEnvelope {
+            schema_version: 1,
+            tool: ToolInfo {
+                name: "oba",
+                version: env!("CARGO_PKG_VERSION"),
+            },
+            mode: "diff",
+            summary: DiffSummary { unchanged, added, removed, changed, verdict_transitions },
+            targets: comparison.entries,
+        };
+        println!("{}", serde_json::to_string_pretty(&envelope)?);
+    } else {
+        println!(
+            "=== diff summary: unchanged={unchanged}  added={added}  removed={removed}  changed={changed} ==="
+        );
+        print_diff_human(&comparison);
+    }
+
+    Ok(exit_code)
+}
+
+fn print_diff_human(comparison: &ComparisonReport) {
+    for entry in &comparison.entries {
+        let path = &entry.identity.watched_path;
+        match &entry.diff {
+            TargetDiff::Unchanged => {}
+            TargetDiff::Added { head } => {
+                println!("  ADDED    {path}  ({})", head.verdict.kind().as_str())
+            }
+            TargetDiff::Removed { base } => {
+                println!("  REMOVED  {path}  ({})", base.verdict.kind().as_str())
+            }
+            TargetDiff::Changed { base, head, .. } => println!(
+                "  CHANGED  {path}  {} -> {}",
+                base.verdict.kind().as_str(),
+                head.verdict.kind().as_str()
+            ),
+        }
+    }
 }
 
 fn print_human(r: &TargetReport) {

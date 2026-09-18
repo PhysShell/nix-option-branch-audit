@@ -1,0 +1,21 @@
+# oba diff duplicate-identity corpus: two DIFFERENT target blocks that
+# happen to share the exact same (module, test, cfg_ident, option_prefix)
+# and both watch the same option -- the identity tuple collides even
+# though nothing about this manifest looks obviously duplicated at a
+# glance. Used with --base-root/--head-root both pointing at
+# fixtures/kimai/before; compare() must refuse to guess a pairing.
+[[target]]
+name = "dup-a"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "dup-b"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]

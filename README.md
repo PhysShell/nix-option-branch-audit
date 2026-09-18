@@ -1775,6 +1775,89 @@ mega-commit:
   shared `Changed` postfix triggered `clippy::enum_variant_names` --
   `#[allow]`ed with a comment, since the naming is the design note's own
   and nothing here is ever glob-imported (the lint's actual concern).
+
+  **PR D2 — `oba diff` CLI. Closed. Zero new comparison semantics, on
+  purpose** — pure orchestration around D1's `analyze()`/`compare()`:
+  ```
+  oba diff --base-root <dir> --head-root <dir> --targets <manifest> [--json]
+  ```
+  Two independent `analyze()` calls (each the exact same fail-closed,
+  `resolve_within_root`-guarded analysis `check` already has — the
+  security boundary is reused, not re-implemented) feeding one
+  `compare()`. `--targets` stays cwd-relative, deliberately not
+  `--base-targets`/`--head-targets` — one manifest is the whole point:
+  comparing two different *specifications* of what to watch is a
+  different, messier question (did the target change, or did what's
+  being looked at change) this tool isn't answering. D1 was already
+  treated as the frozen spec: no identity/verdict/change definition was
+  touched to make the CLI more convenient.
+
+  **Exit codes are deliberately NOT `check`'s 0/1/2/3 with the same
+  meanings** — `check` answers "what's HEAD's state", `diff` answers
+  "what changed", and `compare()` is intentionally transition-neutral (no
+  `Changed` is inherently bad, since `FINDING -> PASS` and `PASS ->
+  FINDING` are both `Changed` and D1 explicitly refused to rank them).
+  So: `0` = the comparison was produced, regardless of what it found — a
+  real `Changed` entry is not a CLI failure; `2` = the comparison was
+  produced, but at least one side's own analysis had an inconclusive
+  verdict or a parse error — checked directly against `base`/`head`'s
+  `AnalysisReport`s (mirroring `check`'s own `is_inconclusive()` check,
+  applied to both sides), NOT reconstructed from the `ComparisonReport`,
+  because `TargetDiff::Unchanged` deliberately carries no payload (see
+  its own doc comment) — an inconclusive verdict identical on both sides
+  wouldn't even be visible from the diff alone; `3` = a tool/input error
+  (bad manifest, a missing or escaping file under either root,
+  `CompareError` — duplicate identity is a manifest problem, same class
+  as any other `check` TOOL_ERROR, not special diff handling). **Exit `1`
+  never appears for `diff` at all** — treating "anything changed" as
+  failure would be exactly the hidden policy judgment `compare()` itself
+  refuses to make; that belongs to a future CI-policy layer (e.g. "block
+  on `PASS -> FINDING`"), built on top of this, not baked in here.
+
+  JSON is a **separate** envelope type (`DiffEnvelope`/`DiffSummary`),
+  not `ReportEnvelope` stretched to cover both modes — `check`'s
+  `targets: Vec<TargetReport>` and `diff`'s `targets: Vec<ComparisonEntry>`
+  are structurally different, and forcing one shared Rust enum over both
+  would be worse types for a JSON convenience that doesn't exist on the
+  wire (`mode` is a field value both share by convention, not a common
+  parent type): `{schema_version, tool, mode: "diff", summary:
+  {unchanged, added, removed, changed, verdict_transitions}, targets:
+  [{identity, diff}]}`. `verdict_transitions` (e.g. `"oba001->pass": 1`)
+  uses D1's own fine-grained `VerdictKind` naming, not a new
+  PASS/FINDING/INCONCLUSIVE bucketing invented for this summary — bare
+  counts, explicitly not a regression/improvement classification.
+
+  New `tests/diff_cli.rs`, 11 tests, deliberately NOT re-covering D1's
+  own exhaustive corpus (the 7×7 `VerdictKind` matrix, mirror-under-swap,
+  etc. stay in `#[cfg(test)]` only) — only the genuinely new CLI surface:
+  a **real** end-to-end proof against the actual historical
+  `fixtures/kimai/before` → `fixtures/kimai/after` OBA001 → PASS
+  transition, reached this time through two independent `--*-root`
+  analyses of one manifest instead of two static `[[target]]` entries;
+  `--base-root` escape reuses the exact fixtures PR B/D1 already proved
+  `check --root` against; a **dedicated new fixture pair**
+  (`fixtures/synthetic/diff-root-escape/{base,head}`) isolates
+  `--head-root`'s own boundary specifically — `base/` is real, valid
+  files (so `--base-root` analysis succeeds cleanly first), `head/
+  module.nix` is a checked-in relative symlink escaping `head/`'s own
+  subtree, proving the guarantee isn't just "whichever root happens to
+  be checked first"; missing file under either root is the same
+  TOOL_ERROR class `check` already has; duplicate identity
+  (`fixtures/synthetic/diff-duplicate/`, two different target blocks
+  sharing one identity tuple) reaches the CLI as exit 3; `--targets`
+  stays cwd-relative even with both `--*-root`s absolute and elsewhere;
+  repeated runs are byte-stable; human and JSON output are cross-checked
+  against the SAME invocation's counts (not independently recomputed);
+  `diff` of identical roots is all `Unchanged`, exit 0; comparing
+  `golden.toml` against itself (real OBA001 + davis's inconclusive
+  `OptionNotFound` on both sides) is exit 2, never 1.
+
+  107 tests total (was 96 after D1). No Git anywhere in `oba` itself —
+  deliberately only two directories in, a comparison out. A future
+  Action (PR D3) does whatever checkout/worktree dance it needs and
+  hands `oba diff` two paths; `oba` stays usable identically from GitHub
+  Actions, a local shell, a Nix derivation, another CI, or two unpacked
+  tarballs — never a second, worse frontend to `git`.
 - **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
   needed** — changed-target selection (skip targets whose `module`/`test`
   didn't change), kept deliberately separate from and after D: proving
@@ -1827,6 +1910,12 @@ cargo test    # the full acceptance suite (tests/golden.rs, tests/fixture_integr
 cargo run -- --targets targets/golden.toml [--json]              # legacy, still works
 cargo run -- check --root . --targets targets/golden.toml [--json]   # equivalent, preferred
 cargo run -- check --root /path/to/nixpkgs --targets targets.toml    # a manifest applied to a checkout elsewhere
+
+# compare one manifest against two independent checkouts -- exit 0 means
+# "the comparison was produced" (a real Changed is not a failure), 2 means
+# either side's own analysis was inconclusive, 3 is a tool/input error;
+# there is no exit 1 for diff at all -- see the PR D2 README section:
+cargo run -- diff --base-root ./base --head-root ./head --targets targets.toml [--json]
 
 # syntax-visibility census against a real corpus, not option-branch
 # analysis -- no manifest, no module/option matching:

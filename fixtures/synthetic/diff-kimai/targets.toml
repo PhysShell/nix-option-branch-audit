@@ -1,0 +1,13 @@
+# oba diff smoke corpus: ONE manifest applied to two different roots
+# (fixtures/kimai/before, fixtures/kimai/after), each of which has its
+# own module.nix/test.nix at its own root -- the real historical
+# OBA001 -> PASS transition (PhysShell/nixpkgs 5530e24f2 -> 37f81efa4),
+# now exercised through --base-root/--head-root instead of two separate
+# [[target]] entries in one static manifest.
+[[target]]
+name = "kimai"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]

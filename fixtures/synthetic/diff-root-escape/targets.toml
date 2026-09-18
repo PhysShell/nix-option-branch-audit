@@ -1,0 +1,14 @@
+# oba diff --head-root escape test. base/module.nix and base/test.nix are
+# real, valid files -- analyzing --base-root must succeed cleanly, so this
+# specifically proves --head-root's own boundary is enforced independently
+# (not just "whichever root happens to be checked first"). head/module.nix
+# is a checked-in relative symlink to ../base/module.nix -- resolves to a
+# real, existing file, so it's not a missing-file error, but the resolved
+# path is outside --head-root's own subtree.
+[[target]]
+name = "escape-probe"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synth"]
+watch = ["foo"]
