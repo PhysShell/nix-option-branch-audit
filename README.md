@@ -1515,9 +1515,12 @@ shortcut, no hardcoded "correct answer" anywhere in the pipeline itself.
 Reviewed next-step order, deliberately **not** generalizing the whole
 surface at once:
 
-1. **K1.1 — CI qualification for the real proof (this repo's own
-   reproducibility gap, closed before any K2 work).** `.github/workflows/
-   k1.yml` runs K1's 8 `#[ignore]`d historical/mutation tests
+1. **K1.1 — CI qualification for the real proof. Closed, `2a9032a`, real
+   CI confirmed green** (`gh run view` on the actual run, not just "the
+   job succeeded": the log shows all 8 `cdc::` tests genuinely executed
+   — `50 filtered out` confirms it wasn't an empty/no-op filter match —
+   and passed in 39.6s on a fresh GitHub-hosted runner). `.github/
+   workflows/k1.yml` runs K1's 8 `#[ignore]`d historical/mutation tests
    (`cargo test --bin oba -- --ignored "cdc::"`) in a real Nix-equipped
    CI job (`cachix/install-nix-action`, the same action
    `PhysShell/nixpkgs`'s own `nixpkgs-vet` CI job already uses) — without
