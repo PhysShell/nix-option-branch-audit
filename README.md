@@ -2101,22 +2101,53 @@ before any more intelligence gets added to the checker):
     tests total (was 25, +2); zero offline tests added (no new pure
     logic); `fixture_integrity` passes with the new sha256 lock.
 
-Explicitly **not next yet**, deliberately, not from lack of interest:
-`flarum`'s multi-consumer shape (kept as a future *adversarial* corpus
-case on purpose — one instance shouldn't force multi-consumer semantics
-into the type system before a second one shows the shape actually
-repeats) and package-bump differential drift (explicitly sequenced
-AFTER strichliste/part-db close, so drift gets checked against a real,
-multi-path consumer-reachability model — direct Doctrine, Symfony-
-mediated-but-same-contract, Laravel/Illuminate MySQL, Laravel/Illuminate
-PostgreSQL — instead of naive "dependency is present," which is exactly
-the kind of fast false-alarm generator this whole project exists to
-avoid). Also explicitly not touched: `ConsumerRoute`'s own types, even
-though movim's Postgres `Inconclusive` result already hints at a future
-distinction worth having (`Inconclusive` = "couldn't prove it" vs. a
-possible future "provably no such contract exists for this
-consumer/driver") — deliberately deferred until a second real corpus
-case shows the same shape, not designed speculatively off one instance.
+    **K2g FROZEN at `86c83e4`.** The design review's own reading of why
+    `part-db` in particular makes this worth freezing, not just closing:
+    a real anti-overfitting test. The system encountered a genuinely
+    different, CORRECT Postgres semantics (`host=` doubling as a
+    socket path, no `unix_socket` key at all) instead of the expected
+    shape, and the existing pipeline survived it without a special-case
+    patch — stronger evidence than one more green MySQL case would have
+    been. Same standing rule as every other frozen layer: reopened only
+    by a concrete counterexample.
+
+K1–K2g (current-contract validation: does the Nix-emitted producer key
+match one specific pinned consumer revision's accepted contract) is
+DONE. **K3 — Differential Consumer Contracts is next, started as a
+separate experiment, not an extension of `compare_contract`.** The
+question is structurally different: current-contract asks "producer
+↔ consumer at revision X"; package-bump drift asks "consumer contract
+at BASE ↔ consumer contract at HEAD, and does Nix still emit a name the
+consumer no longer accepts." K3a doesn't need `ProducerEvidence` at
+all — its first phase is pure: `ContractDiff { removed, added, retained }`
+over two already-extracted accepted-key sets, with boring, checkable
+invariants (`diff(A, A)` is empty; `diff(A, B).removed ==
+diff(B, A).added`; ordering irrelevant; duplicate/malformed input is
+fail-closed, never silently deduped) — no "breaking"/"regression"/
+"safe rename" semantics, only facts. K3b is a REQUIRED census before
+any more K3 code: search the small set of already-qualified consumer
+families (Doctrine MySQL, Doctrine PostgreSQL, Illuminate MySQL,
+Illuminate PostgreSQL) for at least one REAL historical nixpkgs package
+bump where the extractable contract actually changed — explicitly not
+started with a synthetic rename standing in for evidence; if the corpus
+shows no real drift, that is itself a real, reportable result, not a
+reason to fabricate one. K3c (producer correlation — does Nix still
+emit a name the consumer just dropped) only happens once K3b finds a
+real case to correlate against. **`part-db`'s own finding sets the
+constraint for all of this**: a consumer contract's identity must
+include its library AND its dialect/driver, not just be a bare set of
+strings, or a differential checker comparing across dialects would
+manufacture "drift" that's actually just Doctrine MySQL vs. Doctrine
+PostgreSQL being different libraries wearing the same package name.
+
+Parked, deliberately, not from lack of interest: `flarum`'s multi-
+consumer shape (one instance shouldn't force multi-consumer semantics
+into the type system before a second one shows the shape repeats), H2,
+D3. Also still not touched: `ConsumerRoute`'s own types, even though
+movim's Postgres `Inconclusive` result already hints at a future
+`Inconclusive`-vs-"provably no such contract exists" distinction —
+deliberately deferred until a second real corpus case shows the same
+shape.
 
 ## Productization: from research phase to a usable CI product
 
