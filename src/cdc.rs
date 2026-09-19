@@ -85,9 +85,25 @@
 //! [`ConsumerContract`]s (library+dialect+version+accepted_keys), no
 //! `ProducerEvidence` involved at all yet. Fail-closed across mismatched
 //! consumer families (the `part-db` dialect lesson) and duplicate keys.
-//! K3b (real-drift census) and K3c (producer correlation) are not
-//! started -- this module has no opinion yet on whether real upstream
-//! contract drift is common enough in this corpus to be worth more code.
+//!
+//! K3b (done, `fixtures/cdc/k3b-drift-census/`): a real historical
+//! contract-drift census across the 4 qualified PHP/Doctrine/Illuminate
+//! families -- found real drift exists (`doctrine/dbal`'s Postgres
+//! `default_dbname` removal, an added `use_db_after_connecting` on
+//! Illuminate MySQL) but no removed/renamed token inside any
+//! currently-qualified consumer's own observable window. K3b.1 (done,
+//! same directory) then did a bounded ~20-candidate search for a real
+//! nixpkgs consumer straddling that Postgres removal -- not found.
+//! FROZEN as "bounded search exhausted": the PHP/Doctrine/Illuminate
+//! differential corpus is closed for now, not abandoned.
+//!
+//! K4a (done): [`CliContract`]/[`CliFlagDiff`]/[`diff_cli_contracts`] --
+//! CLI-flag contracts, the next interface family, picked over further
+//! Doctrine excavation and over env vars (argv is typically a more
+//! direct producer<->consumer boundary than a framework-mediated env
+//! var). Pure model only, deliberately not reusing
+//! `ConsumerContract`/`ContractDiff`. K4b (real historical CLI-drift
+//! census) and K4c (producer correlation) are not started.
 
 use std::path::Path;
 use std::process::Command;
@@ -1325,6 +1341,105 @@ fn require_no_duplicate_keys(keys: &[String], side: &str) -> Result<Vec<String>,
     Ok(keys.to_vec())
 }
 
+/// K4: CLI-flag contracts -- a new interface family for differential
+/// consumer-contract validation, picked over expanding the PHP/Doctrine
+/// corpus further (K3b.1: closed for now, not abandoned) and over env
+/// vars (ranked second). Reasoning: argv is typically a direct
+/// producer<->consumer boundary --
+/// `ExecStart = "${pkg}/bin/foo --socket ...";` on the Nix side, the
+/// upstream program's own argument parser on the consumer side -- with
+/// less framework mediation than K2e/K2f/K2g repeatedly found sitting
+/// between a Nix-emitted env var and its actual consumer.
+///
+/// K4a (this section): the pure model ONLY, mirroring K3a's own scope
+/// exactly -- no extraction, no real nixpkgs research (that's K4b's
+/// job, not started). Deliberately does NOT reuse
+/// `ConsumerContract`/`ContractDiff` even though the shape rhymes --
+/// forcing a shared abstraction here would blur what's actually being
+/// compared (a CLI program's flag surface is not a PHP library's DSN
+/// parameter contract) for no real current benefit; a shared
+/// abstraction is worth building once/if it falls out naturally from a
+/// second real use, not speculatively now because two `enum`s look
+/// similar.
+///
+/// K4a deliberately only diffs FLAG NAMES, nothing else. K3b's own
+/// `movim` finding (a same-named key can change consuming MECHANISM
+/// without changing its name) applies here in principle too, but is
+/// explicitly out of scope until K4 has caught at least one real
+/// name-level drift case first -- the same "scope has to end somewhere"
+/// discipline K3a itself was built under.
+///
+/// **Extraction-source ranking, recorded here as a design principle for
+/// K4b -- NOT implemented as code this round**: (1) structured parser
+/// metadata/source (e.g. a Rust `clap` derive's `#[arg(long = "...")]`,
+/// a Go `cobra`/`flag` definition, a Python `argparse`/`click` call) --
+/// the closest analogue to Phase D's own bounded literal scan over
+/// vendored source, same trust level; (2) `--help` output, only if
+/// demonstrably stable across the versions being compared; (3) other
+/// source literals/definitions not cleanly "structured metadata" but
+/// still the real vendored source; (4) documentation, fallback/
+/// provenance-hint only, never the primary oracle -- docs drift from
+/// implementation more easily than any of the above. Good first
+/// families for K4b's own census, per this ranking: Rust `clap`, Go
+/// `cobra`/`flag`, Python `argparse`/`click`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CliContract {
+    pub program: String,
+    pub version: String,
+    pub flags: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CliFlagDiff {
+    pub removed: Vec<String>,
+    pub added: Vec<String>,
+    pub retained: Vec<String>,
+}
+
+/// Pure. Fail-closed on a `program` mismatch (comparing `foo --socket`
+/// against `bar --socket` is exactly as meaningless as K3a's own
+/// library/dialect mismatch -- same principle, independently enforced
+/// here rather than shared, per this section's own doc comment) and on
+/// a duplicate flag in either input contract (never silently deduped).
+/// Results are sorted, so input ordering never affects the outcome.
+pub fn diff_cli_contracts(
+    base: &CliContract,
+    head: &CliContract,
+) -> Result<CliFlagDiff, CdcError> {
+    if base.program != head.program {
+        return Err(CdcError::Inconclusive(format!(
+            "cannot diff different CLI programs: {:?} (base) vs {:?} (head)",
+            base.program, head.program
+        )));
+    }
+    let base_flags = require_no_duplicate_flags(&base.flags, "base")?;
+    let head_flags = require_no_duplicate_flags(&head.flags, "head")?;
+
+    let mut removed: Vec<String> =
+        base_flags.iter().filter(|f| !head_flags.contains(f)).cloned().collect();
+    let mut added: Vec<String> =
+        head_flags.iter().filter(|f| !base_flags.contains(f)).cloned().collect();
+    let mut retained: Vec<String> =
+        base_flags.iter().filter(|f| head_flags.contains(f)).cloned().collect();
+    removed.sort();
+    added.sort();
+    retained.sort();
+    Ok(CliFlagDiff { removed, added, retained })
+}
+
+fn require_no_duplicate_flags(flags: &[String], side: &str) -> Result<Vec<String>, CdcError> {
+    let mut seen = std::collections::HashSet::new();
+    for f in flags {
+        if !seen.insert(f.as_str()) {
+            return Err(CdcError::Inconclusive(format!(
+                "{side} CLI contract has a duplicate flag {f:?} -- refusing to diff an \
+                 ambiguous contract"
+            )));
+        }
+    }
+    Ok(flags.to_vec())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2436,6 +2551,104 @@ mod k3a_tests {
             let head = doctrine_mysql("2.0.0", &head_keys.iter().map(String::as_str).collect::<Vec<_>>());
             let forward = diff_contracts(&base, &head).unwrap();
             let backward = diff_contracts(&head, &base).unwrap();
+            proptest::prop_assert_eq!(forward.removed, backward.added);
+            proptest::prop_assert_eq!(forward.added, backward.removed);
+            proptest::prop_assert_eq!(forward.retained, backward.retained);
+        }
+    }
+}
+
+#[cfg(test)]
+mod k4a_tests {
+    use super::*;
+
+    fn contract(program: &str, version: &str, flags: &[&str]) -> CliContract {
+        CliContract {
+            program: program.to_string(),
+            version: version.to_string(),
+            flags: flags.iter().map(|f| f.to_string()).collect(),
+        }
+    }
+
+    #[test]
+    fn diff_of_a_contract_with_itself_is_empty() {
+        let c = contract("foo", "1.4", &["--host", "--port", "--socket"]);
+        let diff = diff_cli_contracts(&c, &c).unwrap();
+        assert!(diff.removed.is_empty());
+        assert!(diff.added.is_empty());
+        let mut expected = vec!["--host", "--port", "--socket"];
+        expected.sort();
+        assert_eq!(diff.retained, expected);
+    }
+
+    /// The exact motivating scenario named going into K4: a real
+    /// removed/renamed flag, with a producer/consumer-relevant name.
+    #[test]
+    fn diff_detects_a_real_removed_and_added_flag() {
+        let base = contract("foo", "1.4", &["--host", "--socket"]);
+        let head = contract("foo", "1.5", &["--host", "--unix-socket"]);
+        let diff = diff_cli_contracts(&base, &head).unwrap();
+        assert_eq!(diff.removed, vec!["--socket".to_string()]);
+        assert_eq!(diff.added, vec!["--unix-socket".to_string()]);
+        assert_eq!(diff.retained, vec!["--host".to_string()]);
+    }
+
+    #[test]
+    fn diff_mismatched_program_is_inconclusive() {
+        let base = contract("foo", "1.4", &["--socket"]);
+        let head = contract("bar", "1.0", &["--socket"]);
+        assert!(matches!(diff_cli_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_duplicate_flag_in_base_is_inconclusive_not_deduped() {
+        let base = contract("foo", "1.4", &["--socket", "--socket"]);
+        let head = contract("foo", "1.5", &["--socket"]);
+        assert!(matches!(diff_cli_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_duplicate_flag_in_head_is_inconclusive_not_deduped() {
+        let base = contract("foo", "1.4", &["--socket"]);
+        let head = contract("foo", "1.5", &["--socket", "--socket"]);
+        assert!(matches!(diff_cli_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_result_does_not_depend_on_input_flag_ordering() {
+        let base_a = contract("foo", "1.4", &["--host", "--port", "--socket"]);
+        let base_b = contract("foo", "1.4", &["--socket", "--host", "--port"]);
+        let head = contract("foo", "1.5", &["--port", "--host"]);
+        assert_eq!(
+            diff_cli_contracts(&base_a, &head).unwrap(),
+            diff_cli_contracts(&base_b, &head).unwrap()
+        );
+    }
+
+    // --- Property-based tests (proptest), same crate/tier K3a's own
+    // tests already use -- not a new precedent.
+
+    proptest::proptest! {
+        #[test]
+        fn prop_diff_of_a_contract_with_itself_is_always_empty(flags in proptest::prelude::prop::collection::btree_set("--[a-c]{1,4}", 0..6)) {
+            let flags: Vec<String> = flags.into_iter().collect();
+            let c = contract("foo", "1.0", &flags.iter().map(String::as_str).collect::<Vec<_>>());
+            let diff = diff_cli_contracts(&c, &c).unwrap();
+            proptest::prop_assert!(diff.removed.is_empty());
+            proptest::prop_assert!(diff.added.is_empty());
+        }
+
+        #[test]
+        fn prop_removed_and_added_are_symmetric_under_swap(
+            base_flags in proptest::prelude::prop::collection::btree_set("--[a-c]{1,4}", 0..6),
+            head_flags in proptest::prelude::prop::collection::btree_set("--[a-c]{1,4}", 0..6),
+        ) {
+            let base_flags: Vec<String> = base_flags.into_iter().collect();
+            let head_flags: Vec<String> = head_flags.into_iter().collect();
+            let base = contract("foo", "1.0", &base_flags.iter().map(String::as_str).collect::<Vec<_>>());
+            let head = contract("foo", "2.0", &head_flags.iter().map(String::as_str).collect::<Vec<_>>());
+            let forward = diff_cli_contracts(&base, &head).unwrap();
+            let backward = diff_cli_contracts(&head, &base).unwrap();
             proptest::prop_assert_eq!(forward.removed, backward.added);
             proptest::prop_assert_eq!(forward.added, backward.removed);
             proptest::prop_assert_eq!(forward.retained, backward.retained);
