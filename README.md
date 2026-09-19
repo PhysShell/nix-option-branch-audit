@@ -2200,6 +2200,42 @@ no longer accepts."
     flags, env-var naming) where rename/removal is plausibly more
     common than in these two comparatively conservative database-driver
     libraries.
+13. **K3b.1 — bounded search for a real straddling consumer. Closed,
+    `fixtures/cdc/k3b-drift-census/k3b1-corpus-expansion.md`, zero
+    `src/cdc.rs` changes.** One specific, falsifiable hunt: a real
+    nixpkgs PHP consumer whose own real package bump crosses
+    `doctrine/dbal`'s Postgres `default_dbname` removal — confirmed
+    present through the ENTIRE 3.x line (including the current
+    `3.10.6`, published 2026-07-21 — 3.x and 4.x are parallel,
+    long-lived release lines, not a superseded branch) and absent from
+    every 4.x release since `4.0.0-beta1` (2022-10-22). Two real,
+    bounded search strategies: re-checked every doctrine/dbal-having app
+    already known from K2c/K2e/K2f/K2g (no new candidate — `part-db`
+    itself entered nixpkgs Dec 2024, after 4.0.0 had already shipped
+    Feb 2024, so it never pinned a pre-4.0 version); searched NixOS
+    modules combining `phpfpm`+`postgresql` for 11 new candidates
+    outside that corpus (`firefly-iii`/`moodle`/`limesurvey`/
+    `speedtest-tracker`/`zabbix`/`freescout`/`pixelfed`/`dolibarr`/
+    `mediawiki`/`tt-rss`/`freshrss`) — 5 confirmed to not use
+    `buildComposerProject2`'s Composer-vendoring mechanism at all
+    (`composerVendor` genuinely `null`, not an eval failure glossed
+    over), 5 confirmed genuinely absent of `doctrine/dbal`, 1
+    (`freescout`) has it but on the old major-2 line, Laravel-family,
+    irrelevant to the 3.x/4.x boundary regardless. A third, narrower
+    `symfony`+`postgresql` module search returned only already-known
+    MySQL-dialect apps (`davis`/`strichliste`).
+
+    **Result: NOT FOUND**, within the bounded ~20-candidate search.
+    **Decision, per the rule fixed before this round: the
+    PHP/Doctrine/Illuminate differential corpus is closed for now, not
+    abandoned** — reopens if a new pre-2024 Postgres-dialect Doctrine
+    consumer is ever packaged in nixpkgs, or `part-db` is ever
+    repackaged from an older fork. **Recommended next direction, NOT
+    started**: pivot to CLI-flag contracts — argv is typically a direct
+    producer↔consumer boundary (`ExecStart = "${pkg}/bin/foo --socket
+    ..."` on the Nix side, `--help`/argument-parser source on the
+    consumer side), unlike the framework mediation K2e/K2f/K2g found
+    repeatedly sitting between an env var and its actual consumer.
 
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
