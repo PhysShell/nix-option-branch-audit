@@ -4424,3 +4424,73 @@ any maintainer contact. Per the user's own closing observation: the
 next real unknown is no longer technical (`cdc.rs` can't answer it) —
 whether the signal is actually useful to a maintainer on a live stream
 of real changes, and how often the tool gets in the way.
+
+## S1: live nixpkgs PR shadow evaluation
+
+The user's own framing for this round: continuing to refine our own
+fixtures at this point would be "slightly suspicious" — the tool has
+learned to ace an exam we write ourselves. S1 is a different exam,
+one this project didn't write: 30 real `NixOS/nixpkgs` PRs, drawn
+mechanically (not cherry-picked), shadow-audited against the frozen,
+already-released `v0.4.0` binary. No source changes, no new CDC
+candidates, no GitHub writes anywhere in the round — a local-only
+worker (fetch PR base/head → `oba audit-diff` → adjudicate) exactly
+per the pre-registered protocol.
+
+**Mechanical population, protocol-first as always**
+(`fixtures/s1-live-pr-shadow/`): real commits touching
+`nixos/modules/services/**`/`nixos/tests/**` in a real ~29-day window,
+pulled via GitHub's own path-filtered commits API (no local nixpkgs
+clone — disk stays untouched) → 196 candidate PRs → 162 survivors
+after excluding docs-only/mass-mechanical/already-used-app-name (a
+113-name list compiled from every prior K1–K5/E1/C-E1.* round, not
+memory) → a deterministic seeded draw (`seed=int("67bb2e1",16)`, same
+mechanism E1's own holdout used) of 30, frozen before any of them was
+individually inspected.
+
+**The headline result, stated plainly**: across all 30 PRs,
+`new_findings=0`, `new_inconclusives=0`, `evidence_only_changes=0` —
+the bounded `notable` list P3c's own advisory Action would show a
+maintainer was empty on every single run. Correctness/actionable
+precision are therefore *undefined* on this sample, not "good" —
+this specific mechanically-fair slice of live nixpkgs history simply
+never gave the tool anything new to say.
+
+**One concrete, disqualifying bug found**: 2 of 30 PRs (both literally
+titled "init module") produced a real `TOOL_ERROR` (CLI exit 3), not a
+graceful inapplicability, confirmed independently by two separate
+investigators against two separate PRs. Per `audit-diff/action.yml`'s
+own advisory semantics, exit 3 *fails* the CI step — a live install
+would hard-fail on one of the most ordinary, legitimate PR shapes
+nixpkgs sees (a brand-new service module), reading as "this tool is
+broken" rather than "nothing to compare yet." Root cause: `analyze()`
+requires its named module file to exist at all under `--base-root`;
+CDC's own half already degrades a missing-on-one-side candidate to a
+real `AddedSubject`, OBA's half does not. **Not fixed in this round**
+— a concrete, scoped, named follow-up, per S1's own freeze.
+
+**Two smaller, real product-scoping observations**, also found in the
+wild rather than theorized: a `resolved_finding` (PR #492803) that
+technically classified correctly but means something different than
+it sounds — the option was *deleted* (`mkRemovedOptionModule`), not
+newly test-covered; and two real `Inconclusive → Pass` improvements
+(#559627, #561557) that `classify_transition_bucket`'s own
+pre-registered design deliberately never surfaces in the bounded
+summary — real, working as specified, but now observed actually
+costing a maintainer-visible "this got better" signal for the first
+time.
+
+**Verdict, per the pre-registered decision rule**: not ready to ship
+the advisory beta — the `TOOL_ERROR` bug is a concrete "fix before
+beta" trigger. Separately and just as honestly: this sample was too
+quiet to answer S1's own second question (how actionable are the
+findings) at all — that remains genuinely open. What IS now known
+with real evidence: real applicability (60% of an unbiased population
+produced a genuine comparison), trivial runtime (single-to-double-
+digit milliseconds per PR), and zero false positives anywhere,
+including on PRs picked with zero prior tuning.
+
+**Not started, per the user's own explicit staging, awaiting explicit
+go**: fixing the `TOOL_ERROR`-on-module-birth bug, and a follow-up S1
+-style re-run afterward to get a real, non-degenerate read on
+actionability — the question this round could not yet answer.
