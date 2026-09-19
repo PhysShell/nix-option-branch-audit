@@ -139,11 +139,11 @@ Applied, in order, to every ELIGIBLE candidate:
 ## Sample draw
 
 From the eligible, non-excluded pool: a deterministic seeded shuffle,
-seed = `int(v0.4.0's own commit SHA "67bb2e1...", 16) mod 2**32` --
-the exact same mechanism E1's own holdout draw already used
-(`seed=int(freeze SHA,16)`), applied here to keep the draw
-reproducible and auditable rather than "whichever 30 looked
-interesting." The first **30** of the shuffled pool are the S1 sample,
+`random.Random(seed).shuffle(...)` (Python's stdlib Mersenne Twister),
+`seed = int("67bb2e1", 16)` -- the exact same mechanism E1's own
+holdout draw already used (`seed=int(freeze SHA,16)`, the short-form
+abbreviated SHA), applied here to keep the draw reproducible and
+auditable rather than "whichever 30 looked interesting." The first **30** of the shuffled pool are the S1 sample,
 frozen before any of them is individually inspected -- committed as
 its own separate commit (`fixtures/s1-live-pr-shadow/sample.md`), with
 the full funnel disclosed (population size -> eligible count ->
