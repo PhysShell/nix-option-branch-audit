@@ -3213,6 +3213,53 @@ fn resolve_within_root(root: &Path, rel: &Path) -> anyhow::Result<PathBuf> {
     Ok(canon)
 }
 
+/// S1-F1: like `resolve_within_root`, but distinguishes "the file
+/// genuinely does not exist" (`Ok(None)`) from every other real
+/// problem (`Err`, exactly the same cases `resolve_within_root` itself
+/// already rejects: an absolute path, a root escape, a permission
+/// error, ...). Exists ONLY for `audit-diff`'s own per-target
+/// orchestration (`run_audit_diff`): a target whose module/test is
+/// absent on one side of a real base/head comparison is real PR-diff
+/// algebra (a brand-new or since-deleted module), not a tool
+/// malfunction -- see `run_audit_diff`'s own `AddedSubject`/
+/// `RemovedSubject` handling below. `check`/`diff`/`audit` keep calling
+/// `resolve_within_root` directly, completely unchanged: asking to
+/// analyze a single root whose named module is simply missing is, and
+/// stays, a real error there -- there is no "other side" for it to be
+/// diff algebra relative to.
+fn resolve_within_root_if_exists(root: &Path, rel: &Path) -> anyhow::Result<Option<PathBuf>> {
+    if rel.is_absolute() {
+        anyhow::bail!(
+            "{} must be relative to --root, not absolute",
+            rel.display()
+        );
+    }
+    let root_canon = root
+        .canonicalize()
+        .map_err(|e| anyhow::anyhow!("--root {}: {e}", root.display()))?;
+    let joined = root_canon.join(rel);
+    let canon = match joined.canonicalize() {
+        Ok(c) => c,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(e) => {
+            return Err(anyhow::anyhow!(
+                "resolving {} under --root {}: {e}",
+                rel.display(),
+                root.display()
+            ));
+        }
+    };
+    if !canon.starts_with(&root_canon) {
+        anyhow::bail!(
+            "{} escapes --root {} (resolves to {})",
+            rel.display(),
+            root.display(),
+            canon.display()
+        );
+    }
+    Ok(Some(canon))
+}
+
 // ---------------------------------------------------------------------
 // PR D1: pure compare() -- no CLI, no Action, no Git/GitHub anywhere near
 // this. Deliberately built and tested standalone against two in-memory
@@ -5070,23 +5117,76 @@ struct NotableChange {
 /// print "+N more in the full artifact" without recomputing anything.
 const NOTABLE_LIMIT: usize = 10;
 
-/// The one real judgment call in P3c's bounded summary, made exactly
-/// ONCE here in tested Rust -- never re-derived by a consuming Action's
-/// own jq/shell logic. `from`/`to` are already-computed `ResultVerdict`s
+/// The one real judgment call in the bounded summary, made exactly ONCE
+/// here in tested Rust -- never re-derived by a consuming Action's own
+/// jq/shell logic. `from`/`to` are already-computed `ResultVerdict`s
 /// (see `oba_kind_class`/`CdcDiff::verdict_transition`), so this is pure
-/// classification, no analysis. `Inconclusive -> Inconclusive` under a
-/// different underlying kind, and `Inconclusive -> Pass` (good news, but
-/// not one of the four named buckets P3c's own spec asks for), both
-/// deliberately return `None`.
+/// classification, no analysis.
+///
+/// S1-F2/S1-F3 (a real nixpkgs PR shadow audit): the original P3c
+/// taxonomy folded `Finding -> Pass` and `Finding -> Inconclusive` into
+/// one `resolved_finding` bucket, and left `Inconclusive -> Pass`
+/// unbucketed entirely. S1 found both choices cost real signal: a real
+/// PR (#492803) showed `resolved_finding` reading as "the coverage gap
+/// was fixed" when the true event was "the option was removed" (a
+/// DIFFERENT transition shape entirely, `Finding -> RemovedSubject`,
+/// handled separately in `run_audit_diff`'s own per-entry loop, never
+/// here); two other real PRs (#559627, #561557) showed a genuine
+/// `Inconclusive -> Pass` improvement that never reached a maintainer
+/// because nothing surfaced it. Fixed here by SPLITTING, not by
+/// smuggling in a "how happy should I be" score:
+///
+/// - `Finding -> Pass` only: `resolved_finding` -- the branch is now
+///   provably covered, unambiguously good.
+/// - `Finding -> Inconclusive`: `finding_became_inconclusive` -- a
+///   DIFFERENT event (test/predicate visibility was lost, not gained;
+///   see D1/D2's own "mechanism reports facts, never plays moral
+///   philosopher" principle, applied here rather than judging whether
+///   this is good or bad).
+/// - `Pass -> Inconclusive`: `new_inconclusive`, unchanged.
+/// - `Inconclusive -> Pass`: `resolved_inconclusive` -- now surfaced,
+///   the real positive signal S1 found being silently dropped.
+///
+/// `Inconclusive -> Inconclusive` under a different underlying
+/// `VerdictKind` (OBA's own sub-kinds only) still deliberately returns
+/// `None` -- a real `Changed` that never crosses a Pass/Finding/
+/// Inconclusive boundary at all.
 fn classify_transition_bucket(from: ResultVerdict, to: ResultVerdict) -> Option<&'static str> {
-    if to == ResultVerdict::Finding && from != ResultVerdict::Finding {
-        Some("new_finding")
-    } else if from == ResultVerdict::Finding && to != ResultVerdict::Finding {
-        Some("resolved_finding")
-    } else if from == ResultVerdict::Pass && to == ResultVerdict::Inconclusive {
-        Some("new_inconclusive")
-    } else {
-        None
+    match (from, to) {
+        (f, ResultVerdict::Finding) if f != ResultVerdict::Finding => Some("new_finding"),
+        (ResultVerdict::Finding, ResultVerdict::Pass) => Some("resolved_finding"),
+        (ResultVerdict::Finding, ResultVerdict::Inconclusive) => Some("finding_became_inconclusive"),
+        (ResultVerdict::Pass, ResultVerdict::Inconclusive) => Some("new_inconclusive"),
+        (ResultVerdict::Inconclusive, ResultVerdict::Pass) => Some("resolved_inconclusive"),
+        _ => None,
+    }
+}
+
+/// S1-F2: `TargetDiff::Removed`/`CdcDiff::RemovedSubject` whose REMOVED
+/// (base) side was a real `Finding` is its own honest event --
+/// `removed_subject_with_finding` -- never folded into
+/// `resolved_finding` (that name specifically means "the same subject
+/// is now provably Pass", not "the subject, and whatever it found,
+/// both stopped existing"). Core states the fact; whether removing that
+/// option/candidate was the right call for the PR to make is a human
+/// judgment this function does not attempt.
+fn removed_with_finding_bucket(removed_class: ResultVerdict) -> Option<&'static str> {
+    (removed_class == ResultVerdict::Finding).then_some("removed_subject_with_finding")
+}
+
+/// S1-F2/S1-F3 symmetric counterpart for `Added`/`AddedSubject`: a
+/// brand-new subject (module birth, or a CDC candidate that just
+/// became analyzable) whose FIRST-EVER result is already a `Finding`
+/// or `Inconclusive` is real, immediate signal -- folded into the SAME
+/// `new_finding`/`new_inconclusive` buckets a same-subject transition
+/// would use (there is no ambiguity to split here the way removal has:
+/// "a new finding exists" is unambiguous regardless of whether the
+/// subject itself is also new).
+fn added_bucket(added_class: ResultVerdict) -> Option<&'static str> {
+    match added_class {
+        ResultVerdict::Finding => Some("new_finding"),
+        ResultVerdict::Inconclusive => Some("new_inconclusive"),
+        _ => None,
     }
 }
 
@@ -5108,6 +5208,47 @@ fn push_notable(
             message: result.message.clone(),
             detail: result.provenance.last().cloned(),
         });
+    }
+}
+
+/// Applies a `classify_transition_bucket`/`removed_with_finding_bucket`/
+/// `added_bucket` result to `summary`'s own matching counter. A bucket
+/// name that doesn't match any known field is a no-op, not a panic --
+/// defensive against a future bucket being added to the classifiers
+/// without this function being updated in lockstep (would rather silently
+/// undercount than crash a real `audit-diff` run).
+fn bump_summary_bucket(summary: &mut AuditDiffSummary, bucket: &str) {
+    match bucket {
+        "new_finding" => summary.new_findings += 1,
+        "resolved_finding" => summary.resolved_findings += 1,
+        "finding_became_inconclusive" => summary.finding_became_inconclusive += 1,
+        "new_inconclusive" => summary.new_inconclusives += 1,
+        "resolved_inconclusive" => summary.resolved_inconclusives += 1,
+        "removed_subject_with_finding" => summary.removed_subjects_with_finding += 1,
+        _ => {}
+    }
+}
+
+/// Bumps the matching counter AND, for every bucket except
+/// `resolved_finding`, pushes a bounded `notable` entry. `resolved_finding`
+/// is the one deliberate exception (unchanged from P3c's own original
+/// reasoning): "this branch is now provably covered" is unambiguous good
+/// news that needs a count, not a maintainer's attention -- every other
+/// bucket (including `resolved_inconclusive`, S1-F3's own real finding
+/// that a genuine improvement was being silently dropped) is either a
+/// real problem, a real loss of certainty, or positive-but-ambiguous-
+/// enough-to-be-worth-a-glance news, so all of those surface.
+fn record_bucket(
+    summary: &mut AuditDiffSummary,
+    notable_total: &mut usize,
+    bucket: &'static str,
+    engine: &'static str,
+    subject: String,
+    result: &AuditResult,
+) {
+    bump_summary_bucket(summary, bucket);
+    if bucket != "resolved_finding" {
+        push_notable(&mut summary.notable, notable_total, bucket, engine, subject, result);
     }
 }
 
@@ -5145,27 +5286,39 @@ struct AuditDiffSummary {
     cdc_verdict_transitions: std::collections::BTreeMap<String, usize>,
     /// Derived, bounded-summary-friendly counts, computed from the SAME
     /// per-entry transitions above -- never a second source of truth.
-    /// `new_finding`/`resolved_finding` cross the Pass/Finding boundary
-    /// in either direction; `new_inconclusive` is specifically
-    /// Pass -> Inconclusive (a real regression in confidence, not just
-    /// "still don't know" -- Inconclusive -> Inconclusive under a
-    /// different `VerdictKind`, e.g. OBA's own sub-kinds, deliberately
-    /// bumps neither counter). `evidence_changed` is a `Changed` entry
-    /// with NO verdict transition at all (CDC's own `EvidenceChanged`,
-    /// e.g. a `proof_depth` move) -- distinct from `changed` above,
-    /// which already counts every `Changed` entry regardless of kind.
+    /// See `classify_transition_bucket`'s own doc comment (S1-F2/S1-F3)
+    /// for the exact, deliberately narrow meaning of each: `new_finding`
+    /// (crossing INTO Finding, from either a same-subject transition or
+    /// a brand-new subject's first result -- `added_bucket`);
+    /// `resolved_finding` (Finding -> Pass ONLY, never Finding ->
+    /// Inconclusive and never a removed subject); `finding_became_
+    /// inconclusive` (Finding -> Inconclusive, a DIFFERENT event from
+    /// `resolved_finding`, not merged into it); `new_inconclusive`
+    /// (Pass -> Inconclusive, or a brand-new subject's first result);
+    /// `resolved_inconclusive` (Inconclusive -> Pass, S1's own real
+    /// finding that this used to be silently dropped);
+    /// `removed_subjects_with_finding` (a `Removed`/`RemovedSubject`
+    /// whose own removed side was a real Finding -- see
+    /// `removed_with_finding_bucket`, never counted as a
+    /// `resolved_finding`). `evidence_changed` is a `Changed` entry with
+    /// NO verdict transition at all (CDC's own `EvidenceChanged`, e.g. a
+    /// `proof_depth` move) -- distinct from `changed` above, which
+    /// already counts every `Changed` entry regardless of kind.
     new_findings: usize,
     resolved_findings: usize,
+    finding_became_inconclusive: usize,
     new_inconclusives: usize,
+    resolved_inconclusives: usize,
+    removed_subjects_with_finding: usize,
     evidence_changed: usize,
     /// Uncapped count backing `notable` below -- lets a consumer print
     /// "+N more in the full artifact" without recomputing anything.
     notable_total: usize,
-    /// First `NOTABLE_LIMIT` new-finding/new-inconclusive entries, in
-    /// deterministic (per-engine, then identity/candidate-sorted) order
-    /// -- already fully classified and formatted; a consuming Action
-    /// only ever needs to print these fields verbatim, never reclassify
-    /// them.
+    /// First `NOTABLE_LIMIT` entries across every bucket above (all six
+    /// as of S1-F2/S1-F3), in deterministic (per-engine, then identity/
+    /// candidate-sorted) order -- already fully classified and
+    /// formatted; a consuming Action only ever needs to print these
+    /// fields verbatim, never reclassify them.
     notable: Vec<NotableChange>,
 }
 
@@ -5202,7 +5355,10 @@ fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
     out.push_str("| | |\n|---|---:|\n");
     let _ = writeln!(out, "| New findings | {} |", summary.new_findings);
     let _ = writeln!(out, "| Resolved findings | {} |", summary.resolved_findings);
+    let _ = writeln!(out, "| Findings became inconclusive | {} |", summary.finding_became_inconclusive);
     let _ = writeln!(out, "| New inconclusives | {} |", summary.new_inconclusives);
+    let _ = writeln!(out, "| Resolved inconclusives | {} |", summary.resolved_inconclusives);
+    let _ = writeln!(out, "| Removed subjects with a finding | {} |", summary.removed_subjects_with_finding);
     let _ = writeln!(out, "| Evidence-only changes | {} |", summary.evidence_changed);
     let _ = writeln!(out, "| Unchanged | {} |", summary.unchanged);
     out.push('\n');
@@ -5211,10 +5367,14 @@ fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
         let heading = match n.bucket {
             "new_finding" => "NEW FINDING",
             "new_inconclusive" => "NEW INCONCLUSIVE",
-            // Defensive: push_notable is only ever called with these two
-            // bucket labels today, but this function never assumes that
-            // silently -- an unrecognized future bucket still renders,
-            // just without a specially-cased heading.
+            "finding_became_inconclusive" => "FINDING BECAME INCONCLUSIVE",
+            "resolved_inconclusive" => "RESOLVED INCONCLUSIVE",
+            "removed_subject_with_finding" => "REMOVED SUBJECT (HAD A FINDING)",
+            // Defensive: `record_bucket` never calls this with
+            // "resolved_finding" (the one bucket that stays count-only,
+            // see its own doc comment) or an unrecognized label, but this
+            // function never assumes that silently -- either still
+            // renders, just without a specially-cased heading.
             other => other,
         };
         let _ = writeln!(out, "### {heading}");
@@ -5247,27 +5407,97 @@ fn run_audit_diff(
         .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
-    // OBA half: reuse `analyze()`/`compare()` completely unchanged --
+    // OBA half: reuse `analyze()`/`compare()` completely unchanged for
+    // every target whose module+test genuinely exist on BOTH sides --
     // this is the EXACT machinery `oba diff` already ships, tested, and
-    // relies on; P3b adds nothing new to it.
+    // relies on. S1-F1 (a real nixpkgs PR shadow audit): a target whose
+    // module is absent on exactly ONE side is real PR-diff algebra (a
+    // brand-new or since-deleted module -- S1 found this hard-failing
+    // as a real TOOL_ERROR on 2/30 real PRs, all literally titled "init
+    // module"), so it's partitioned out BEFORE calling `analyze()` on
+    // the whole manifest and handled as a real `Added`/`Removed`
+    // (mirroring exactly how CDC's own half already treats a candidate
+    // that's unanalyzable on only one side). A target absent on BOTH
+    // sides is a genuine manifest/input error -- nothing in this
+    // comparison could ever say anything about it.
+    let inconclusive_side = |report: &AnalysisReport| {
+        report
+            .targets
+            .iter()
+            .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
+    };
     let (oba_entries, base_oba_inconclusive, head_oba_inconclusive) = if manifest.target.is_empty() {
         (Vec::new(), false, false)
     } else {
-        let base_analysis = analyze(base_root, &manifest)?;
-        let head_analysis = analyze(head_root, &manifest)?;
-        let comparison =
-            compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
-        let inconclusive_side = |report: &AnalysisReport| {
-            report
-                .targets
-                .iter()
-                .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
-        };
-        (
-            comparison.entries,
-            inconclusive_side(&base_analysis),
-            inconclusive_side(&head_analysis),
-        )
+        let mut both_present = Vec::new();
+        let mut only_on_head = Vec::new();
+        let mut only_on_base = Vec::new();
+        for t in &manifest.target {
+            let base_module = resolve_within_root_if_exists(base_root, &t.module)?;
+            let base_test = resolve_within_root_if_exists(base_root, &t.test)?;
+            let head_module = resolve_within_root_if_exists(head_root, &t.module)?;
+            let head_test = resolve_within_root_if_exists(head_root, &t.test)?;
+            let on_base = base_module.is_some() && base_test.is_some();
+            let on_head = head_module.is_some() && head_test.is_some();
+            match (on_base, on_head) {
+                (true, true) => both_present.push(t.clone()),
+                (false, true) => only_on_head.push(t.clone()),
+                (true, false) => only_on_base.push(t.clone()),
+                (false, false) => anyhow::bail!(
+                    "target {}: module/test present under NEITHER --base-root nor --head-root -- a real manifest/input error, not a PR-introduced module addition or removal",
+                    t.name
+                ),
+            }
+        }
+
+        let mut entries = Vec::new();
+        let mut base_inconclusive = false;
+        let mut head_inconclusive = false;
+
+        if !both_present.is_empty() {
+            let sub = TargetFile { target: both_present, cdc_target: Vec::new() };
+            let base_analysis = analyze(base_root, &sub)?;
+            let head_analysis = analyze(head_root, &sub)?;
+            let comparison =
+                compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
+            base_inconclusive |= inconclusive_side(&base_analysis);
+            head_inconclusive |= inconclusive_side(&head_analysis);
+            entries.extend(comparison.entries);
+        }
+        if !only_on_head.is_empty() {
+            let sub = TargetFile { target: only_on_head, cdc_target: Vec::new() };
+            let head_analysis = analyze(head_root, &sub)?;
+            head_inconclusive |= inconclusive_side(&head_analysis);
+            let head_index = index_by_identity(&head_analysis, CompareSide::Head)
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+            for (identity, verdict) in head_index {
+                entries.push(ComparisonEntry {
+                    identity,
+                    diff: TargetDiff::Added { head: Box::new(TargetOutcome { verdict: verdict.clone() }) },
+                });
+            }
+        }
+        if !only_on_base.is_empty() {
+            let sub = TargetFile { target: only_on_base, cdc_target: Vec::new() };
+            let base_analysis = analyze(base_root, &sub)?;
+            base_inconclusive |= inconclusive_side(&base_analysis);
+            let base_index = index_by_identity(&base_analysis, CompareSide::Base)
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+            for (identity, verdict) in base_index {
+                entries.push(ComparisonEntry {
+                    identity,
+                    diff: TargetDiff::Removed { base: Box::new(TargetOutcome { verdict: verdict.clone() }) },
+                });
+            }
+        }
+        // invariant 2 (order-independence): the three passes above are
+        // each individually sorted by identity, but their concatenation
+        // is not -- one real final sort restores it, regardless of the
+        // manifest's own target order or which partition a target fell
+        // into.
+        entries.sort_by(|a, b| a.identity.cmp(&b.identity));
+
+        (entries, base_inconclusive, head_inconclusive)
     };
 
     // CDC half: real, new for P3b -- run_cdc_candidate for every
@@ -5308,8 +5538,34 @@ fn run_audit_diff(
     for entry in &oba_entries {
         match &entry.diff {
             TargetDiff::Unchanged => summary.unchanged += 1,
-            TargetDiff::Added { .. } => summary.added += 1,
-            TargetDiff::Removed { .. } => summary.removed += 1,
+            TargetDiff::Added { head } => {
+                summary.added += 1;
+                if let Some(bucket) = added_bucket(oba_kind_class(head.verdict.kind())) {
+                    let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
+                    record_bucket(
+                        &mut summary,
+                        &mut notable_total,
+                        bucket,
+                        "oba",
+                        entry.identity.watched_path.clone(),
+                        &result,
+                    );
+                }
+            }
+            TargetDiff::Removed { base } => {
+                summary.removed += 1;
+                if let Some(bucket) = removed_with_finding_bucket(oba_kind_class(base.verdict.kind())) {
+                    let result = oba_verdict_to_result(&entry.identity.watched_path, &base.verdict);
+                    record_bucket(
+                        &mut summary,
+                        &mut notable_total,
+                        bucket,
+                        "oba",
+                        entry.identity.watched_path.clone(),
+                        &result,
+                    );
+                }
+            }
             TargetDiff::Changed { .. } => summary.changed += 1,
         }
         if let Some(t) = entry.diff.verdict_transition() {
@@ -5322,41 +5578,34 @@ fn run_audit_diff(
             let TargetDiff::Changed { head, .. } = &entry.diff else {
                 unreachable!("verdict_transition() is only Some for TargetDiff::Changed")
             };
-            match classify_transition_bucket(from_class, to_class) {
-                Some("new_finding") => {
-                    summary.new_findings += 1;
-                    let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
-                    push_notable(
-                        &mut summary.notable,
-                        &mut notable_total,
-                        "new_finding",
-                        "oba",
-                        entry.identity.watched_path.clone(),
-                        &result,
-                    );
-                }
-                Some("resolved_finding") => summary.resolved_findings += 1,
-                Some("new_inconclusive") => {
-                    summary.new_inconclusives += 1;
-                    let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
-                    push_notable(
-                        &mut summary.notable,
-                        &mut notable_total,
-                        "new_inconclusive",
-                        "oba",
-                        entry.identity.watched_path.clone(),
-                        &result,
-                    );
-                }
-                _ => {}
+            if let Some(bucket) = classify_transition_bucket(from_class, to_class) {
+                let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
+                record_bucket(
+                    &mut summary,
+                    &mut notable_total,
+                    bucket,
+                    "oba",
+                    entry.identity.watched_path.clone(),
+                    &result,
+                );
             }
         }
     }
     for entry in &cdc_entries {
         match &entry.diff {
             CdcDiff::Unchanged => summary.unchanged += 1,
-            CdcDiff::AddedSubject { .. } => summary.cdc_added_subject += 1,
-            CdcDiff::RemovedSubject { .. } => summary.cdc_removed_subject += 1,
+            CdcDiff::AddedSubject { head } => {
+                summary.cdc_added_subject += 1;
+                if let Some(bucket) = added_bucket(head.verdict) {
+                    record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), head);
+                }
+            }
+            CdcDiff::RemovedSubject { base } => {
+                summary.cdc_removed_subject += 1;
+                if let Some(bucket) = removed_with_finding_bucket(base.verdict) {
+                    record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), base);
+                }
+            }
             CdcDiff::Changed { .. } => summary.changed += 1,
         }
         if let Some((from, to)) = entry.diff.verdict_transition() {
@@ -5368,31 +5617,8 @@ fn run_audit_diff(
             let CdcDiff::Changed { head, .. } = &entry.diff else {
                 unreachable!("verdict_transition() is only Some for CdcDiff::Changed")
             };
-            match classify_transition_bucket(from, to) {
-                Some("new_finding") => {
-                    summary.new_findings += 1;
-                    push_notable(
-                        &mut summary.notable,
-                        &mut notable_total,
-                        "new_finding",
-                        "cdc",
-                        entry.candidate.clone(),
-                        head,
-                    );
-                }
-                Some("resolved_finding") => summary.resolved_findings += 1,
-                Some("new_inconclusive") => {
-                    summary.new_inconclusives += 1;
-                    push_notable(
-                        &mut summary.notable,
-                        &mut notable_total,
-                        "new_inconclusive",
-                        "cdc",
-                        entry.candidate.clone(),
-                        head,
-                    );
-                }
-                _ => {}
+            if let Some(bucket) = classify_transition_bucket(from, to) {
+                record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), head);
             }
         } else if matches!(entry.diff, CdcDiff::Changed { .. }) {
             summary.evidence_changed += 1;
@@ -5427,7 +5653,7 @@ fn run_audit_diff(
         }
         AuditFormat::Text => {
             println!(
-                "=== audit-diff summary: unchanged={} added={} removed={} changed={} cdc_added_subject={} cdc_removed_subject={} new_findings={} resolved_findings={} new_inconclusives={} evidence_changed={} ===",
+                "=== audit-diff summary: unchanged={} added={} removed={} changed={} cdc_added_subject={} cdc_removed_subject={} new_findings={} resolved_findings={} finding_became_inconclusive={} new_inconclusives={} resolved_inconclusives={} removed_subjects_with_finding={} evidence_changed={} ===",
                 summary.unchanged,
                 summary.added,
                 summary.removed,
@@ -5436,7 +5662,10 @@ fn run_audit_diff(
                 summary.cdc_removed_subject,
                 summary.new_findings,
                 summary.resolved_findings,
+                summary.finding_became_inconclusive,
                 summary.new_inconclusives,
+                summary.resolved_inconclusives,
+                summary.removed_subjects_with_finding,
                 summary.evidence_changed,
             );
             for entry in &oba_entries {
@@ -7396,13 +7625,19 @@ mod tests {
     }
 
     #[test]
-    fn classify_transition_bucket_crossing_out_of_finding_is_always_resolved_finding() {
-        for to in [ResultVerdict::Pass, ResultVerdict::Inconclusive] {
-            assert_eq!(
-                classify_transition_bucket(ResultVerdict::Finding, to),
-                Some("resolved_finding")
-            );
-        }
+    fn classify_transition_bucket_crossing_out_of_finding_splits_by_destination() {
+        // S1-F2: Finding -> Pass and Finding -> Inconclusive are
+        // DIFFERENT real events (the branch is now provably covered, vs.
+        // visibility into it was lost) -- no longer folded into one
+        // "resolved_finding" bucket.
+        assert_eq!(
+            classify_transition_bucket(ResultVerdict::Finding, ResultVerdict::Pass),
+            Some("resolved_finding")
+        );
+        assert_eq!(
+            classify_transition_bucket(ResultVerdict::Finding, ResultVerdict::Inconclusive),
+            Some("finding_became_inconclusive")
+        );
     }
 
     #[test]
@@ -7414,12 +7649,15 @@ mod tests {
     }
 
     #[test]
-    fn classify_transition_bucket_inconclusive_to_pass_is_unbucketed_good_news() {
-        // Real, deliberate: this is a real improvement, but not one of
-        // the four named buckets P3c's own spec asks for -- the bounded
-        // summary stays focused on what needs attention, not everything
-        // that changed for the better.
-        assert_eq!(classify_transition_bucket(ResultVerdict::Inconclusive, ResultVerdict::Pass), None);
+    fn classify_transition_bucket_inconclusive_to_pass_is_resolved_inconclusive() {
+        // S1-F3: a real nixpkgs PR shadow audit found two genuine
+        // Inconclusive -> Pass improvements that the original P3c design
+        // left silently unbucketed. Now surfaced under its own name,
+        // distinct from `resolved_finding`.
+        assert_eq!(
+            classify_transition_bucket(ResultVerdict::Inconclusive, ResultVerdict::Pass),
+            Some("resolved_inconclusive")
+        );
     }
 
     #[test]
@@ -7567,5 +7805,152 @@ mod tests {
         summary.notable_total = 15;
         let md = render_github_summary(&summary, 0);
         assert!(md.contains("_+14 more in the full artifact._"));
+    }
+
+    // =======================================================================
+    // S1-F1: `resolve_within_root_if_exists` -- the real, purely offline
+    // building block for audit-diff's own module-birth/death handling.
+    // =======================================================================
+
+    #[test]
+    fn resolve_within_root_if_exists_none_for_a_real_missing_file() {
+        let root = Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty");
+        assert_eq!(resolve_within_root_if_exists(root, Path::new("module.nix")).unwrap(), None);
+    }
+
+    #[test]
+    fn resolve_within_root_if_exists_some_for_a_real_present_file() {
+        let root = Path::new("fixtures/synthetic/audit-diff-module-lifecycle/after-with-module");
+        assert!(resolve_within_root_if_exists(root, Path::new("module.nix")).unwrap().is_some());
+    }
+
+    #[test]
+    fn resolve_within_root_if_exists_rejects_an_absolute_path() {
+        let root = Path::new("fixtures/synthetic/audit-diff-module-lifecycle/after-with-module");
+        let err = resolve_within_root_if_exists(root, Path::new("/etc/passwd")).unwrap_err();
+        assert!(format!("{err}").contains("must be relative"));
+    }
+
+    #[test]
+    fn resolve_within_root_if_exists_rejects_a_real_root_escape() {
+        // Same real fixture/relative-path pair `dotdot_escape_is_tool_error`
+        // (tests/check_root.rs) already uses: --root fixtures/synthetic,
+        // ../../Cargo.toml resolves to a real file two levels above it.
+        let root = Path::new("fixtures/synthetic");
+        let err = resolve_within_root_if_exists(root, Path::new("../../Cargo.toml")).unwrap_err();
+        assert!(format!("{err}").contains("escapes --root"));
+    }
+
+    // =======================================================================
+    // S1-F2/S1-F3: `added_bucket`/`removed_with_finding_bucket`/
+    // `record_bucket` -- the honest Added/Removed-with-Finding semantics
+    // and the resolved_finding/notable split.
+    // =======================================================================
+
+    #[test]
+    fn added_bucket_classifies_a_brand_new_subjects_first_result() {
+        assert_eq!(added_bucket(ResultVerdict::Finding), Some("new_finding"));
+        assert_eq!(added_bucket(ResultVerdict::Inconclusive), Some("new_inconclusive"));
+        assert_eq!(added_bucket(ResultVerdict::Pass), None);
+    }
+
+    #[test]
+    fn removed_with_finding_bucket_only_fires_for_a_real_finding() {
+        assert_eq!(
+            removed_with_finding_bucket(ResultVerdict::Finding),
+            Some("removed_subject_with_finding")
+        );
+        assert_eq!(removed_with_finding_bucket(ResultVerdict::Pass), None);
+        assert_eq!(removed_with_finding_bucket(ResultVerdict::Inconclusive), None);
+    }
+
+    #[test]
+    fn record_bucket_resolved_finding_counts_but_never_shows_in_notable() {
+        // The one deliberate exception: resolved_finding is unambiguous
+        // good news, a count is enough -- unlike every other real bucket
+        // (including resolved_inconclusive, S1-F3's own point).
+        let mut summary = AuditDiffSummary::default();
+        let mut total = 0usize;
+        let result = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
+        record_bucket(&mut summary, &mut total, "resolved_finding", "cdc", "unpackerr".to_string(), &result);
+        assert_eq!(summary.resolved_findings, 1);
+        assert_eq!(total, 0);
+        assert!(summary.notable.is_empty());
+    }
+
+    #[test]
+    fn record_bucket_resolved_inconclusive_counts_and_shows_in_notable() {
+        let mut summary = AuditDiffSummary::default();
+        let mut total = 0usize;
+        let result = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
+        record_bucket(&mut summary, &mut total, "resolved_inconclusive", "cdc", "unpackerr".to_string(), &result);
+        assert_eq!(summary.resolved_inconclusives, 1);
+        assert_eq!(total, 1);
+        assert_eq!(summary.notable.len(), 1);
+        assert_eq!(summary.notable[0].bucket, "resolved_inconclusive");
+    }
+
+    #[test]
+    fn record_bucket_removed_subject_with_finding_counts_and_shows_in_notable() {
+        let mut summary = AuditDiffSummary::default();
+        let mut total = 0usize;
+        let result = cdc_result("unpackerr", ResultVerdict::Finding, &["debug", "upload_dir"]);
+        record_bucket(
+            &mut summary,
+            &mut total,
+            "removed_subject_with_finding",
+            "cdc",
+            "unpackerr".to_string(),
+            &result,
+        );
+        assert_eq!(summary.removed_subjects_with_finding, 1);
+        assert_eq!(total, 1);
+        assert_eq!(summary.notable[0].bucket, "removed_subject_with_finding");
+    }
+
+    // =======================================================================
+    // S1-F1: the real end-to-end pipeline, against real fixtures on disk
+    // (fixtures/synthetic/audit-diff-module-lifecycle/), reproducing
+    // exactly the shape S1 found hard-failing as TOOL_ERROR on 2/30 real
+    // nixpkgs PRs.
+    // =======================================================================
+
+    #[test]
+    fn run_audit_diff_module_birth_is_a_real_added_subject_not_a_tool_error() {
+        let code = run_audit_diff(
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/after-with-module"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/targets.toml"),
+            AuditFormat::Json,
+            None,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+        assert_eq!(code.unwrap(), 0);
+    }
+
+    #[test]
+    fn run_audit_diff_module_death_is_a_real_removed_subject_with_finding() {
+        let code = run_audit_diff(
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/after-with-module"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/targets.toml"),
+            AuditFormat::Json,
+            None,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+        assert_eq!(code.unwrap(), 0);
+    }
+
+    #[test]
+    fn run_audit_diff_module_missing_on_both_sides_is_a_real_tool_error() {
+        let err = run_audit_diff(
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/targets.toml"),
+            AuditFormat::Json,
+            None,
+        )
+        .unwrap_err();
+        assert!(format!("{err}").contains("present under NEITHER"));
     }
 }

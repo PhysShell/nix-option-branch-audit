@@ -1,0 +1,14 @@
+# S1-F1: real regression fixtures for audit-diff's own module
+# addition/removal handling. after-with-module/{module.nix,test.nix}
+# is byte-identical to fixtures/kimai/before's own real historical
+# OBA001-producing pair (database.socket never flipped away from
+# null) -- reused rather than re-derived, since the only thing this
+# fixture needs is "a real module+test pair that produces a real
+# Finding", not a second historical narrative.
+[[target]]
+name = "lifecycle"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]

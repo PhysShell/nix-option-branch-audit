@@ -542,3 +542,73 @@ fn audit_diff_summary_path_writes_a_real_bounded_markdown_file() {
     assert!(markdown.contains("**OBA001** `database.socket` (oba)"));
     let _ = std::fs::remove_file(&summary_path);
 }
+
+// =======================================================================
+// S1-F1/S1-F2/S1-F3: a real nixpkgs PR shadow audit (S1) found
+// audit-diff hard-failing with TOOL_ERROR on 2/30 real PRs, all "init
+// module" PRs -- a brand-new module absent on --base-root made the
+// WHOLE comparison error out instead of being modeled as a real
+// AddedSubject. These reproduce that exact real shape at the CLI level
+// (not just via the in-process unit tests in src/main.rs's own
+// mod tests), against fixtures/synthetic/audit-diff-module-lifecycle/.
+// =======================================================================
+
+#[test]
+fn audit_diff_module_birth_is_added_not_tool_error_at_the_cli() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/before-empty",
+        "--head-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/after-with-module",
+        "--targets",
+        "fixtures/synthetic/audit-diff-module-lifecycle/targets.toml",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    assert_eq!(v["summary"]["added"], 1);
+    assert_eq!(v["summary"]["new_findings"], 1);
+    assert_eq!(v["oba"][0]["diff"]["kind"], "added");
+    assert_eq!(v["summary"]["notable"][0]["bucket"], "new_finding");
+}
+
+#[test]
+fn audit_diff_module_death_is_removed_subject_with_finding_at_the_cli() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/after-with-module",
+        "--head-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/before-empty",
+        "--targets",
+        "fixtures/synthetic/audit-diff-module-lifecycle/targets.toml",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    assert_eq!(v["summary"]["removed"], 1);
+    // NOT resolved_findings -- S1-F2's own real point: the option was
+    // deleted along with its module, not proven covered.
+    assert_eq!(v["summary"]["resolved_findings"], 0);
+    assert_eq!(v["summary"]["removed_subjects_with_finding"], 1);
+    assert_eq!(v["oba"][0]["diff"]["kind"], "removed");
+    assert_eq!(v["summary"]["notable"][0]["bucket"], "removed_subject_with_finding");
+}
+
+#[test]
+fn audit_diff_module_missing_on_both_sides_is_a_real_tool_error_at_the_cli() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/before-empty",
+        "--head-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/before-empty",
+        "--targets",
+        "fixtures/synthetic/audit-diff-module-lifecycle/targets.toml",
+    ]);
+    assert_eq!(exit_code(&out), 3, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    assert!(String::from_utf8_lossy(&out.stderr).contains("present under NEITHER"));
+}
