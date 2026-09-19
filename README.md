@@ -2410,12 +2410,15 @@ routed through a framework config layer before reaching its real
 consumer, as K2f found for every Laravel app in this corpus) instead of
 pretending it doesn't exist.
 
-17. **K5a — pure `EnvContract`/`EnvContractDiff` model.** Mirrors
-    K3a/K4a's own scope exactly: pure model only, no extraction, no
-    real nixpkgs research (K5b's job, not started). Deliberately a
-    genuinely separate type from `CliContract`/`ConsumerContract`, not
-    a shared abstraction forced because all three are "a name and a
-    diff" — same discipline the design review required for K4a.
+17. **K5a — pure `EnvContract`/`EnvContractDiff` model. Closed,
+    `0306dc7`, confirmed green in real CI** (`gh run view --log`: 192
+    offline tests across 5 targets; `k1.yml` 28/28 real tests
+    unaffected). Mirrors K3a/K4a's own scope exactly: pure model only,
+    no extraction, no real nixpkgs research (K5b's job, not started).
+    Deliberately a genuinely separate type from
+    `CliContract`/`ConsumerContract`, not a shared abstraction forced
+    because all three are "a name and a diff" — same discipline the
+    design review required for K4a.
     `EnvContract { consumer, version, variables }` +
     `EnvContractDiff { removed, added, retained }` +
     `diff_env_contracts(base, head)`. Same boring, checkable
@@ -2426,7 +2429,11 @@ pretending it doesn't exist.
     variable NAMES only this round — deliberately does not model
     `required?`/`default?`/`parse kind?` yet, even though a real
     variable clearly has more shape than a bare name; K3a's/K4a's own
-    "scope must end somewhere" discipline applies here too.
+    "scope must end somewhere" discipline applies here too. 6 new unit
+    tests + 2 property-based (`proptest`, same crate/tier K3a's/K4a's
+    own tests already use). 192 tests total in the `oba` binary's own
+    unit-test target (was 184): 124 offline (was 116, +8) + 28
+    real/ignored (unchanged). Zero changes to K1–K4c code.
 
 **K5b (real historical env-var rename/removal census) is next,
 required before K5c, not started.** Same discipline as K3b/K4b: real
