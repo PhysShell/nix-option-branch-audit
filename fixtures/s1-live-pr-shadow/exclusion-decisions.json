@@ -1,0 +1,172 @@
+[
+  [
+    345652,
+    "name:omada",
+    "omada-software-controller: init at 6.3.0.45"
+  ],
+  [
+    452014,
+    "mechanical",
+    "nixos/tests: set proper derivation names for various tests"
+  ],
+  [
+    485643,
+    "name:grafana",
+    "nixos/grafana: wait for `network-online.target`"
+  ],
+  [
+    531375,
+    "name:bookorbit",
+    "bookorbit: init at 2.8.1, nixos/bookorbit: init module"
+  ],
+  [
+    540351,
+    "mechanical",
+    "weblate: 2026.6.1 -> 2026.9"
+  ],
+  [
+    547702,
+    "mechanical",
+    "music-assistant: 2.9.13 -> 2.10.3"
+  ],
+  [
+    551448,
+    "name:flame",
+    "flame: init at 2.4.0, add NixOS module"
+  ],
+  [
+    551799,
+    "mechanical",
+    "nixos/tests: support a few more running on darwin + hygiene"
+  ],
+  [
+    553728,
+    "mechanical",
+    "nixosTests: do not depend on nix by default"
+  ],
+  [
+    554625,
+    "name:i2pd",
+    "nixos/i2pd: fix config check for yggdrasil-only setups"
+  ],
+  [
+    555116,
+    "name:warpgate",
+    "warpgate: 0.26.1 -> 0.28.4"
+  ],
+  [
+    555614,
+    "name:grafana",
+    "nixosTests.grafana: migrate to runTest"
+  ],
+  [
+    555646,
+    "name:blocky",
+    "nixosTests.blocky: migrate to systemd-nspawn"
+  ],
+  [
+    555849,
+    "name:kimai",
+    "nixosTests.kimai: migrate to systemd-nspawn"
+  ],
+  [
+    556418,
+    "mechanical",
+    "nixos: pkgs.systemd -> config.systemd.package"
+  ],
+  [
+    556767,
+    "name:snipe-it",
+    "snipe-it: 8.4.1 -> 8.7.2"
+  ],
+  [
+    557289,
+    "name:flarum",
+    "nixos/flarum: don't overwrite `config.php` on installs not managed by this module"
+  ],
+  [
+    557328,
+    "name:tor",
+    "nixos/tests/tor: replace activation script with ExecStartPre"
+  ],
+  [
+    557374,
+    "name:invoiceplane",
+    "invoiceplane: 1.7.1 -> 1.7.2"
+  ],
+  [
+    557383,
+    "name:linkwarden",
+    "linkwarden: 2.14.0 -> 2.16.1"
+  ],
+  [
+    557765,
+    "name:zerobyte",
+    "zerobyte: init at 0.42.0 and add module"
+  ],
+  [
+    557835,
+    "name:grocy",
+    "grocy: 4.6.0 -> 4.7.1"
+  ],
+  [
+    558384,
+    "name:karma",
+    "repath-studio: fix flaky tests in sandbox"
+  ],
+  [
+    558390,
+    "docs",
+    "nixos/forgejo-runner: fix typo in migration instructions"
+  ],
+  [
+    559141,
+    "mechanical",
+    "staging-nixos merge for 2026-09-02"
+  ],
+  [
+    559662,
+    "mechanical",
+    "gcr*: add explicit version suffix to attr, enable structuredAttrs"
+  ],
+  [
+    560097,
+    "mechanical",
+    "treewide: remove `optional cond [...]`"
+  ],
+  [
+    560212,
+    "name:i2pd",
+    "nixos/i2pd: add option for tunnel type"
+  ],
+  [
+    560349,
+    "name:gocron",
+    "gocron: 0.9.14 -> 0.11.0"
+  ],
+  [
+    560469,
+    "mechanical",
+    "staging-next 2026-09-05"
+  ],
+  [
+    561035,
+    "mechanical",
+    "staging-nixos merge for 2026-09-07"
+  ],
+  [
+    561289,
+    "name:spacecookie",
+    "nixos/tests/spacecookie: fix"
+  ],
+  [
+    562003,
+    "mechanical",
+    "COSMIC stable 1.8.0"
+  ],
+  [
+    563194,
+    "name:ifstate",
+    "nixos/ifstate: use structuredAttrs instead of passAsFile"
+  ]
+]
