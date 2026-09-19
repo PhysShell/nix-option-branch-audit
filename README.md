@@ -2025,14 +2025,48 @@ surface at once:
    over, same discipline as every other gap this project has found in
    itself.
 
-Explicitly **not next**, regardless of how tempting: generic sink
-discovery, a package-bump differential checker, H2 predicates, D3,
-fixing movim's `mariadb`-path bug, or the untouched CI-coverage gap just
-found. The next decision — extend the Laravel adapter to `flarum`'s
-multi-consumer case, Phase D vendoring for strichliste/part-db's
-already-covered shape, or package-bump drift — is for whoever picks
-this up next, informed by real evidence, not decided in advance in this
-document.
+   **K2f FROZEN at `9e03eca`.** The design review's own framing for why
+   this round is particularly worth freezing rather than just closing:
+   the new special case (`IlluminateDriver`, mysql vs postgres) landed at
+   the level of a real interface, not an app name — exactly the
+   universality test asked of every prior round. Same standing rule as
+   every other frozen layer: reopened only by a concrete counterexample.
+
+Reviewed next-step order, deliberately narrow (two small, cheap items
+before any more intelligence gets added to the checker):
+9. **CI qualification gap — infrastructure only, not analysis.** Closes
+   the gap K2f's own writeup disclosed: `tests/*.rs` (the integration
+   suites this project treats as part of its own proof chain) had never
+   run in CI, only locally. `.github/workflows/test.yml`: one small job,
+   `dtolnay/rust-toolchain@stable` (reuse, same action `k1.yml`/`kani.yml`
+   already use) + a plain `cargo test` — no `#[ignore]`d real-eval test
+   runs here (that's `k1.yml`'s own job, untouched), no restructuring of
+   any existing workflow.
+10. **Phase D vendoring for `strichliste`/`part-db`.** The user's own
+    pick among the three K2e/K2f-opened options (over `flarum`'s
+    multi-consumer case and package-bump drift) — two real corpus cases,
+    zero new semantic model needed (K2e already qualified their consumer
+    route as Symfony's bundle → Doctrine's own `DsnParser`, contract
+    unchanged), a cheap way to grow real end-to-end coverage and confirm
+    K2a's/K2e's conclusions actually compose into one pipeline rather
+    than staying separately-proven facts.
+
+Explicitly **not next yet**, deliberately, not from lack of interest:
+`flarum`'s multi-consumer shape (kept as a future *adversarial* corpus
+case on purpose — one instance shouldn't force multi-consumer semantics
+into the type system before a second one shows the shape actually
+repeats) and package-bump differential drift (explicitly sequenced
+AFTER strichliste/part-db close, so drift gets checked against a real,
+multi-path consumer-reachability model — direct Doctrine, Symfony-
+mediated-but-same-contract, Laravel/Illuminate MySQL, Laravel/Illuminate
+PostgreSQL — instead of naive "dependency is present," which is exactly
+the kind of fast false-alarm generator this whole project exists to
+avoid). Also explicitly not touched: `ConsumerRoute`'s own types, even
+though movim's Postgres `Inconclusive` result already hints at a future
+distinction worth having (`Inconclusive` = "couldn't prove it" vs. a
+possible future "provably no such contract exists for this
+consumer/driver") — deliberately deferred until a second real corpus
+case shows the same shape, not designed speculatively off one instance.
 
 ## Productization: from research phase to a usable CI product
 
