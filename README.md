@@ -3808,3 +3808,70 @@ Not yet started (separate future rounds, only if this one holds up with
 zero app-specific semantic branching, which it does): **C-E1.2b** (the
 same abstraction applied across the remaining qualified C-E1.1 corpus),
 **C-E1.2c** (a holdout rerun / mutation audit).
+
+## C-E1.2b: `GeneratedConfigArtifact` transfer census
+
+A research-only round (`fixtures/c-e1.2b-transfer-census/`, protocol
+committed `e025f4a` before any candidate was inspected, zero `src/`
+changes anywhere in the round) answering a narrower question than
+C-E1.1's own existence question: does C-E1.2a's already-shipped code
+(frozen at `0fab0af`) *transfer* onto the rest of the qualified real
+corpus without `src/cdc.rs` turning into a zoo of one-off cases?
+Population: the 8 of C-E1.1's 12 `SUPPORTED` candidates not already one
+of C-E1.2a's own 4 anchors — `privoxy`, `misskey`, `kavita`,
+`transmission`, `i2pd`, `akkoma`, `vault`, `spacecookie`.
+
+**Result: 6/8 `PASS`, 1 `FINDING`, 1 `INCONCLUSIVE`. Zero candidates
+required app-specific branching. Zero candidates required a new
+semantic abstraction.** `transmission` and `i2pd` reused A/B/the
+comparison path itself completely unmodified; every other `PASS`
+needed only a new per-consumer D-extractor — the same shape every one
+of C-E1.2a's own four anchors already needed.
+
+The two non-`PASS` results are both real, both concrete, and both
+resolve with existing vocabulary rather than forcing anything new:
+
+- **`akkoma` — `FINDING`**: a real 18-way collision on the bare field
+  `:enabled` alone across its real `config/description.exs` schema —
+  copying `unbound`'s own bare-keyword-stripping shortcut here would be
+  genuinely unsound. Needs zero type changes: just a D-extractor that
+  emits fully-qualified `group.key.field` paths instead of stripping.
+- **`vault` — `INCONCLUSIVE`**: a real gap C-E1.1's own citation missed
+  — the bounded `hcl:"..."` struct fields it cited as D's proof are
+  real but genuinely unexercised by a default-configured module; the
+  fields the real artifact actually emits (`storage`/`listener`) decode
+  through a freeform map and an unfollowed external package instead.
+  Also established `content` here is `RenderedText`, not
+  `StructuredValue` — an implicit assumption C-E1.1 never stated either
+  way.
+
+**The adversarial bare-keyword-normalization check — specifically
+targeting whether `unbound`'s own shipped stripping fix is a safe
+default to reuse — produced the census's second-most important
+result**: `i2pd` is a genuine positive control where the SAME bare key
+(`"enabled"`) really collides across 7 real sections, yet the correct
+fix is the literal *opposite* of `unbound`'s own (keep the dots — i2pd's
+own real `boost::program_options` registrations are already fully
+dotted in the consumer's own source, so `flatten_structured_value`
+needs zero changes at all). `akkoma` independently confirms the same
+lesson from the other side. **The normalization decision is real,
+per-consumer semantic work every time, never a safe default in either
+direction, and never inferable from format alone.** A same-session
+sanity recheck of already-shipped code (fetching `unbound`'s own real
+yacc grammar) confirmed its shipped fix is sound on independent
+grounds: the `server:`/`remote-control:` clauses share zero tokens.
+
+One repeating pattern found independently in two different batches:
+`privoxy` and `spacecookie` both bind via a bare positional CLI
+argument — the existing `DirectArgv` variant assumes a named flag and
+doesn't fit either; one new, general `ArtifactBindingEvidence` variant
+would serve both.
+
+**Decision, against the rule fixed before any candidate was
+inspected**: 6/8 PASS with zero app-specific branching anywhere is a
+clean hit on the rule's first branch — minimal generic additions (2 new
+binding-evidence variants, 2 new rendered-text extractor shapes, 7 new
+per-consumer D-extractors, none app-specific) are the recommended
+follow-up, not a redesign. Building any of that is explicitly **not
+authorized by this round** — the census's job was the fit question,
+not the implementation. Full results: `fixtures/c-e1.2b-transfer-census/census.md`.
