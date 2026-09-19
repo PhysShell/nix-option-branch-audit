@@ -2321,6 +2321,64 @@ no longer accepts."
     emits the old `-querier.prefer-availability-zone` name after the
     bump — that correlation is entirely K4c's job, not K4b's.
 
+16. **K4c — correlate `mimir`'s real CLI-flag rename with its real Nix
+    producer. Closed, `3758d7f`, confirmed green in real CI** (`gh run
+    view --log`: 184 offline tests across all 5 targets; `k1.yml`:
+    28/28 real tests, including the actual finding test run live). The
+    first K3/K4-series round to reuse a frozen comparison function
+    (`diff_cli_contracts`, K4a) against a REAL pair instead of a
+    synthetic fixture, and the first to produce an actual classified
+    result rather than a pure research census. Kept deliberately narrow
+    and Mimir-specific throughout, per the design review — no generic
+    CLI extractor framework, no `krill` work this round.
+
+    `CliDriftRelevance { ProducerStillEmitsRemoved, ProducerAdoptedNew,
+    ProducerIrrelevant }` — the A/B/C distinction the design review
+    required, since only one of the three outcomes is an actual bug.
+    `extract_go_flagset_literal_names`: a bounded literal scan over
+    Go's `flag.FlagSet` convention (`f.<Method>(&cfg.<Field>,
+    "<literal>", ...)`), same discipline as Phase D/K2f's PHP
+    extractors, applied to a third real source shape. Recognizes ONLY
+    the literal form — a flag registered via a named Go constant is NOT
+    captured, a real, disclosed limitation confirmed (by reading the
+    real source, not assumed) to affect exactly two flags in this file
+    (`querier.streaming-chunks-per-{ingester,store-gateway}-buffer-size`,
+    literals in 2.14.0, refactored to named constants resolving to the
+    IDENTICAL strings in 3.2.1 — verified before trusting the
+    extractor's raw output for anything, and locked in by a dedicated
+    real test so an accidental extractor "fix" or a genuine further
+    upstream change would be caught, not silently absorbed).
+    `argv_contains_flag`: deliberately NOT a substring search —
+    unsound here specifically, since `prefer-availability-zone` is a
+    literal PREFIX of `prefer-availability-zones`; boundary-checked,
+    both dash spellings.
+
+    **Real result: Outcome C.** `pkgs.mimir`'s own NixOS module,
+    evaluated with its own default configuration
+    (`services.mimir.extraFlags = []`, its own real default), renders
+    `ExecStart = ".../bin/mimir --config.file=<path>"` — confirmed via
+    actual `nix eval` before any Rust code was written, and again via
+    the real `#[ignore]` test. Neither `-querier.prefer-availability-zone`
+    nor `-querier.prefer-availability-zones` is emitted: real upstream
+    CLI contract drift exists (K4b), but this Nix producer never
+    reached it either way — config goes through a YAML file,
+    `extraFlags` is a real escape hatch but unused by anything in this
+    corpus. Exactly the outcome the design review named as equally
+    valuable to a real bug: proof that producer-relevance filtering
+    works, not just that upstream changed something.
+
+    Two real Go files vendored and integrity-locked
+    (`fixtures/cdc/mimir-{2.14.0,3.2.1}/querier.go`) — commit SHAs
+    resolved from the real annotated tags via the GitHub API (not
+    assumed equal to the tag object's own sha, a real gotcha caught
+    mid-round: an annotated tag's ref resolves to a TAG object, which
+    must be dereferenced once more to reach the actual commit).
+
+    13 new offline tests + 1 new real test. 184 tests total in the
+    `oba` binary's own unit-test target (was 171): 116 offline (was
+    103, +13) + 28 real/ignored (was 27, +1). Zero changes to K1–K4b
+    code; K4a's `diff_cli_contracts` reused completely unchanged.
+
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
 into the type system before a second one shows the shape repeats), H2,
