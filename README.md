@@ -2379,14 +2379,78 @@ no longer accepts."
     103, +13) + 28 real/ignored (was 27, +1). Zero changes to K1–K4b
     code; K4a's `diff_cli_contracts` reused completely unchanged.
 
-Parked, deliberately, not from lack of interest: `flarum`'s multi-
-consumer shape (one instance shouldn't force multi-consumer semantics
-into the type system before a second one shows the shape repeats), H2,
-D3. Also still not touched: `ConsumerRoute`'s own types, even though
-movim's Postgres `Inconclusive` result already hints at a future
-`Inconclusive`-vs-"provably no such contract exists" distinction —
-deliberately deferred until a second real corpus case shows the same
-shape.
+    **K4c FROZEN at `3758d7f`. K4 (the whole CLI-flag vertical: K4a +
+    K4b + K4c) FROZEN as a proven, parked vertical — not "closed
+    forever," proven and shelved.** The design review's own reading of
+    why `mimir`'s Outcome C counts as a full, positive result for the
+    whole vertical, not a stopping point that fell short: the complete
+    chain — real upstream rename → exact pinned source → `CliContract`
+    diff → real Nix argv → producer relevance → Outcome C — was proven
+    end to end. The CLI hypothesis is technically confirmed; the first
+    real drift case simply turned out to be correctly irrelevant to the
+    Nix producer, which is a good result, not a miss. `krill`'s own
+    real drift (K4b, medium confidence) is a genuinely different, less
+    clean class of problem — subcommand removal plus positional-option
+    restructuring — that would stop comparing contract-token NAMES and
+    start needing to model CLI GRAMMAR. Explicitly parked as a future
+    *adversarial* target (`K4d`+, not the next natural PR) for "CLI
+    structural drift beyond flag-name changes," not pursued now.
+
+## K5: environment-variable contracts
+
+The next interface family, chosen over `krill`'s structural-drift
+rabbit hole for a concrete reason: this project's producer-side
+acquisition for env vars already exists and is already proven on three
+real apps (`ProducerEvidence::FlatEnvVars`, K2d, real-verified on
+`agorakit`/`movim`/`snipe-it`) — K5 tests a NEW consumer family against
+an ALREADY-PROVEN producer side, rather than inventing both halves of
+the vertical at once the way K4 had to. `ConsumerRoute` (K4/K2e/K2f)
+also means this round can honestly represent mediation (an env var
+routed through a framework config layer before reaching its real
+consumer, as K2f found for every Laravel app in this corpus) instead of
+pretending it doesn't exist.
+
+17. **K5a — pure `EnvContract`/`EnvContractDiff` model.** Mirrors
+    K3a/K4a's own scope exactly: pure model only, no extraction, no
+    real nixpkgs research (K5b's job, not started). Deliberately a
+    genuinely separate type from `CliContract`/`ConsumerContract`, not
+    a shared abstraction forced because all three are "a name and a
+    diff" — same discipline the design review required for K4a.
+    `EnvContract { consumer, version, variables }` +
+    `EnvContractDiff { removed, added, retained }` +
+    `diff_env_contracts(base, head)`. Same boring, checkable
+    invariants as K3a/K4a: `diff(A, A)` is empty; `removed`/`added`
+    swap under base/head; a duplicate variable name in either input is
+    fail-closed, never silently deduped; a `consumer` mismatch is
+    fail-closed, never compared across different consumers. Diffs
+    variable NAMES only this round — deliberately does not model
+    `required?`/`default?`/`parse kind?` yet, even though a real
+    variable clearly has more shape than a bare name; K3a's/K4a's own
+    "scope must end somewhere" discipline applies here too.
+
+**K5b (real historical env-var rename/removal census) is next,
+required before K5c, not started.** Same discipline as K3b/K4b: real
+nixpkgs-crossed package bumps only, never an upstream changelog entry
+no real consumer ever observed. Starting point deliberately NOT
+Laravel — this project already knows exactly how much human creativity
+a framework can interpose between an env var and its real consumer
+(K2e/K2f); K5b starts with apps whose Nix side renders environment
+directly (`systemd.services.*.environment`/`Environment=`/env files)
+AND whose consumer reads it close to directly (`getenv()` or an
+equivalent declarative registration), so the first differential proof
+stays clean.
+
+**K5c (producer correlation) reuses the exact A/B/C model K4c already
+proved** (`ProducerStillEmitsRemoved` / `ProducerAdoptedNew` /
+`ProducerIrrelevant`) — not reinvented, the same real, checked pattern.
+
+Parked, deliberately, not from lack of interest: `krill`'s own
+structural CLI drift (a future `K4d`+ adversarial target), `flarum`'s
+multi-consumer shape, H2, D3. Also still not touched: `ConsumerRoute`'s
+own types, even though movim's Postgres `Inconclusive` result already
+hints at a future `Inconclusive`-vs-"provably no such contract exists"
+distinction — deliberately deferred until a second real corpus case
+shows the same shape.
 
 ## Productization: from research phase to a usable CI product
 
