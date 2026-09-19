@@ -2237,6 +2237,12 @@ no longer accepts."
     consumer side), unlike the framework mediation K2e/K2f/K2g found
     repeatedly sitting between an env var and its actual consumer.
 
+    **K3b.1 FROZEN as "bounded search exhausted, no qualified real 3→4
+    PostgreSQL consumer found."** Explicit user framing for stopping
+    here rather than digging further for one pretty case: past this
+    point it stops being a contract checker and starts being an
+    archaeological expedition through Composer history.
+
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
 into the type system before a second one shows the shape repeats), H2,
