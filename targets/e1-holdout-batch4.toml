@@ -1,0 +1,83 @@
+# E1 holdout audit, batch 4 (candidates 31-40 of the pre-registered draw
+# order, see fixtures/e1-holdout-audit/protocol.md). Real, unmodified
+# nixpkgs module/test pairs, vendored under fixtures/e1-holdout-audit/.
+
+[[target]]
+name = "akkoma"
+module = "fixtures/e1-holdout-audit/akkoma/module.nix"
+test = "fixtures/e1-holdout-audit/akkoma/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "akkoma"]
+watch = ["enable"]
+
+[[target]]
+name = "vault"
+module = "fixtures/e1-holdout-audit/vault/module.nix"
+test = "fixtures/e1-holdout-audit/vault/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "vault"]
+watch = ["enable", "dev"]
+
+[[target]]
+name = "spacecookie"
+module = "fixtures/e1-holdout-audit/spacecookie/module.nix"
+test = "fixtures/e1-holdout-audit/spacecookie/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "spacecookie"]
+watch = ["enable", "openFirewall"]
+
+[[target]]
+name = "unpackerr"
+module = "fixtures/e1-holdout-audit/unpackerr/module.nix"
+test = "fixtures/e1-holdout-audit/unpackerr/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "unpackerr"]
+watch = ["enable", "group", "user"]
+
+[[target]]
+name = "omada"
+module = "fixtures/e1-holdout-audit/omada/module.nix"
+test = "fixtures/e1-holdout-audit/omada/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "omada"]
+watch = ["enable", "openFirewallWebPorts"]
+
+[[target]]
+name = "retroarch"
+module = "fixtures/e1-holdout-audit/retroarch/module.nix"
+test = "fixtures/e1-holdout-audit/retroarch/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "desktopManager", "retroarch"]
+watch = ["enable"]
+
+[[target]]
+name = "unbound"
+module = "fixtures/e1-holdout-audit/unbound/module.nix"
+test = "fixtures/e1-holdout-audit/unbound/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "unbound"]
+watch = ["enable", "enableRootTrustAnchor"]
+
+[[target]]
+name = "mobilizon"
+module = "fixtures/e1-holdout-audit/mobilizon/module.nix"
+test = "fixtures/e1-holdout-audit/mobilizon/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mobilizon"]
+watch = ["enable"]
+
+[[target]]
+name = "pomerium"
+module = "fixtures/e1-holdout-audit/pomerium/module.nix"
+test = "fixtures/e1-holdout-audit/pomerium/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pomerium"]
+watch = ["enable", "useACMEHost"]
+
+[[target]]
+name = "pufferpanel"
+module = "fixtures/e1-holdout-audit/pufferpanel/module.nix"
+test = "fixtures/e1-holdout-audit/pufferpanel/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pufferpanel"]
+watch = ["enable"]

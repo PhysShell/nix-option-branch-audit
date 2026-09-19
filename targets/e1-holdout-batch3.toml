@@ -1,0 +1,84 @@
+# E1 holdout audit, batch 3 (candidates 21-30 of the pre-registered draw
+# order, see fixtures/e1-holdout-audit/protocol.md). Real, unmodified
+# nixpkgs module.nix/test.nix pairs vendored under
+# fixtures/e1-holdout-audit/<name>/. Zero src/ changes.
+
+[[target]]
+name = "nimdow"
+module = "fixtures/e1-holdout-audit/nimdow/module.nix"
+test = "fixtures/e1-holdout-audit/nimdow/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "windowManager", "nimdow"]
+watch = ["enable"]
+
+[[target]]
+name = "flame"
+module = "fixtures/e1-holdout-audit/flame/module.nix"
+test = "fixtures/e1-holdout-audit/flame/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "flame"]
+watch = ["enable", "openFirewall", "apps"]
+
+[[target]]
+name = "peerflix"
+module = "fixtures/e1-holdout-audit/peerflix/module.nix"
+test = "fixtures/e1-holdout-audit/peerflix/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "peerflix"]
+watch = ["enable"]
+
+[[target]]
+name = "coturn"
+module = "fixtures/e1-holdout-audit/coturn/module.nix"
+test = "fixtures/e1-holdout-audit/coturn/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "coturn"]
+watch = ["enable", "static-auth-secret-file", "no-auth"]
+
+[[target]]
+name = "convos"
+module = "fixtures/e1-holdout-audit/convos/module.nix"
+test = "fixtures/e1-holdout-audit/convos/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "convos"]
+watch = ["enable", "reverseProxy"]
+
+[[target]]
+name = "tor"
+module = "fixtures/e1-holdout-audit/tor/module.nix"
+test = "fixtures/e1-holdout-audit/tor/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "tor"]
+watch = ["enable"]
+
+[[target]]
+name = "bees"
+module = "fixtures/e1-holdout-audit/bees/module.nix"
+test = "fixtures/e1-holdout-audit/bees/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beesd"]
+watch = ["filesystems"]
+
+[[target]]
+name = "kthxbye"
+module = "fixtures/e1-holdout-audit/kthxbye/module.nix"
+test = "fixtures/e1-holdout-audit/kthxbye/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kthxbye"]
+watch = ["enable", "openFirewall", "logJSON", "maxDuration"]
+
+[[target]]
+name = "authelia"
+module = "fixtures/e1-holdout-audit/authelia/module.nix"
+test = "fixtures/e1-holdout-audit/authelia/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "authelia", "instances", "*"]
+watch = ["enable"]
+
+[[target]]
+name = "pocket-id"
+module = "fixtures/e1-holdout-audit/pocket-id/module.nix"
+test = "fixtures/e1-holdout-audit/pocket-id/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pocket-id"]
+watch = ["enable"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "bisect"
+module = "fixtures/e1-holdout-audit/_bisect/module.nix"
+test = "fixtures/e1-holdout-audit/_bisect/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "bisect"]
+watch = ["enable"]

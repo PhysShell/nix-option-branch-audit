@@ -1,0 +1,85 @@
+# E1 holdout audit, batch 2 (candidates 11-20 of the pre-registered draw
+# order, see fixtures/e1-holdout-audit/protocol.md). Real, unmodified
+# NixOS/nixpkgs module.nix/test.nix pairs, vendored verbatim under
+# fixtures/e1-holdout-audit/<name>/. Run against the FROZEN, unmodified
+# `oba` binary -- this manifest is audit mechanism, not production code.
+
+[[target]]
+name = "kavita"
+module = "fixtures/e1-holdout-audit/kavita/module.nix"
+test = "fixtures/e1-holdout-audit/kavita/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kavita"]
+watch = ["enable", "dataDir"]
+
+[[target]]
+name = "nebula-lighthouse-service"
+module = "fixtures/e1-holdout-audit/nebula-lighthouse-service/module.nix"
+test = "fixtures/e1-holdout-audit/nebula-lighthouse-service/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nebula-lighthouse-service"]
+watch = ["enable"]
+
+[[target]]
+name = "nmtrust"
+module = "fixtures/e1-holdout-audit/nmtrust/module.nix"
+test = "fixtures/e1-holdout-audit/nmtrust/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nmtrust"]
+watch = ["enable"]
+
+[[target]]
+name = "transmission"
+module = "fixtures/e1-holdout-audit/transmission/module.nix"
+test = "fixtures/e1-holdout-audit/transmission/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "transmission"]
+watch = ["openRPCPort", "enable"]
+
+[[target]]
+name = "matterjs-server"
+module = "fixtures/e1-holdout-audit/matterjs-server/module.nix"
+test = "fixtures/e1-holdout-audit/matterjs-server/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "matterjs-server"]
+watch = ["openFirewall", "bluetoothSupport"]
+
+[[target]]
+name = "i2pd"
+module = "fixtures/e1-holdout-audit/i2pd/module.nix"
+test = "fixtures/e1-holdout-audit/i2pd/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "i2pd"]
+watch = ["enable"]
+
+[[target]]
+name = "ferretdb"
+module = "fixtures/e1-holdout-audit/ferretdb/module.nix"
+test = "fixtures/e1-holdout-audit/ferretdb/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ferretdb"]
+watch = ["enable"]
+
+[[target]]
+name = "ringboard"
+module = "fixtures/e1-holdout-audit/ringboard/module.nix"
+test = "fixtures/e1-holdout-audit/ringboard/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ringboard"]
+watch = ["x11.enable", "wayland.enable"]
+
+[[target]]
+name = "monado"
+module = "fixtures/e1-holdout-audit/monado/module.nix"
+test = "fixtures/e1-holdout-audit/monado/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "monado"]
+watch = ["enable", "highPriority", "forceDefaultRuntime"]
+
+[[target]]
+name = "endlessh"
+module = "fixtures/e1-holdout-audit/endlessh/module.nix"
+test = "fixtures/e1-holdout-audit/endlessh/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "endlessh"]
+watch = ["enable", "openFirewall"]

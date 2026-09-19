@@ -1,0 +1,87 @@
+# E1 holdout audit, batch 1 (candidates 1-10 of the pre-registered draw
+# order -- see fixtures/e1-holdout-audit/protocol.md). Real NixOS/nixpkgs
+# module.nix + test.nix pairs, vendored unmodified, none used anywhere in
+# K1-K5. Watched option per candidate chosen by a fixed rule: prefer the
+# richest real branch-gated option the test actually exercises over bare
+# `enable` when one exists; fall back to `enable` otherwise. Chosen BEFORE
+# running the tool, recorded in fixtures/e1-holdout-audit/batch1.md.
+
+[[target]]
+name = "libinput"
+module = "fixtures/e1-holdout-audit/libinput/module.nix"
+test = "fixtures/e1-holdout-audit/libinput/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "libinput"]
+watch = ["enable"]
+
+[[target]]
+name = "cadvisor"
+module = "fixtures/e1-holdout-audit/cadvisor/module.nix"
+test = "fixtures/e1-holdout-audit/cadvisor/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cadvisor"]
+watch = ["enable"]
+
+[[target]]
+name = "send"
+module = "fixtures/e1-holdout-audit/send/module.nix"
+test = "fixtures/e1-holdout-audit/send/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "send"]
+watch = ["enable"]
+
+[[target]]
+name = "privoxy"
+module = "fixtures/e1-holdout-audit/privoxy/module.nix"
+test = "fixtures/e1-holdout-audit/privoxy/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "privoxy"]
+watch = ["inspectHttps"]
+
+[[target]]
+name = "esphome"
+module = "fixtures/e1-holdout-audit/esphome/module.nix"
+test = "fixtures/e1-holdout-audit/esphome/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "esphome"]
+watch = ["openFirewall"]
+
+[[target]]
+name = "xandikos"
+module = "fixtures/e1-holdout-audit/xandikos/module.nix"
+test = "fixtures/e1-holdout-audit/xandikos/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xandikos"]
+watch = ["enable"]
+
+[[target]]
+name = "nohang"
+module = "fixtures/e1-holdout-audit/nohang/module.nix"
+test = "fixtures/e1-holdout-audit/nohang/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nohang"]
+watch = ["enable"]
+
+[[target]]
+name = "svnserve"
+module = "fixtures/e1-holdout-audit/svnserve/module.nix"
+test = "fixtures/e1-holdout-audit/svnserve/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "svnserve"]
+watch = ["enable"]
+
+[[target]]
+name = "jitsi-meet"
+module = "fixtures/e1-holdout-audit/jitsi-meet/module.nix"
+test = "fixtures/e1-holdout-audit/jitsi-meet/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "jitsi-meet"]
+watch = ["jigasi.enable"]
+
+[[target]]
+name = "misskey"
+module = "fixtures/e1-holdout-audit/misskey/module.nix"
+test = "fixtures/e1-holdout-audit/misskey/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "misskey"]
+watch = ["database.createLocally"]
