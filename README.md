@@ -2908,7 +2908,9 @@ mega-commit:
   real-world unlock (davis/`mysqlLocal`). Diff plumbing and H2 semantics
   are validated independently, in that order, specifically so that if
   differential output ever looks wrong, it's diagnosable as "the two-root
-  plumbing" or "the evaluator", never both at once.
+  plumbing" or "the evaluator", never both at once. **D1 → D2 → D3 all
+  now closed** (see their own sections below) — H2's real-world unlock is
+  next.
 
   **PR D1 — pure `compare()` + the adversarial diff corpus. Closed, still
   no CLI/Action anywhere near it.** `TargetIdentity` (the canonical
@@ -3128,6 +3130,34 @@ mega-commit:
   `OptionNotFound` on both sides) must fail the step with `exit-code=2`,
   `continue-on-error: true` + an explicit `outcome == 'failure'` check,
   the same pattern PR C's own dogfood already established.
+
+  **It earned that dogfood, same as PR C's did**: two real bugs, neither
+  visible to local YAML validation (`python3 -c "import yaml; ..."`,
+  which only checks YAML syntax, not GitHub's own expression-template
+  scanning or a composite action's output wiring), only visible on a
+  real GitHub-hosted runner.
+  1. A literal empty GitHub Actions expression token (a bare
+     dollar-brace-brace with nothing between) inside a plain comment
+     inside `run: |` made the composite-action manifest loader
+     (`ActionManifestManagerLegacy`) fail outright with "An expression
+     was expected" before any step ever ran — ironically, inside a
+     comment *about* never splicing an expression into a `run:` block.
+     `dogfood.yml`'s own comment has the identical literal token and has
+     always run fine — this specific failure mode is real but scoped to
+     a composite action's own `run:` block text, not an ordinary
+     workflow job's `run:` step (confirmed by that existing, unaffected
+     comment, not assumed); left `dogfood.yml` itself untouched — no
+     live failure there to fix, and it isn't this PR's frozen layer to
+     reopen.
+  2. The `exit-code` output was declared with a full description but no
+     `value:` line at all — every other output correctly pointed at
+     `steps.run.outputs.*`; this one silently always resolved to an
+     empty string. `changed`/`unchanged`/`report-path` all came through
+     correctly in the same dogfood run, which is exactly what made this
+     one legible as a real, narrow bug rather than "the whole plumbing
+     is broken" — both `oba diff --help`'s presence in the published
+     `v0.3.0` binary (checked separately, see above) and every other
+     output ruled out a deeper cause before this fix was even written.
 - **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
   needed** — changed-target selection (skip targets whose `module`/`test`
   didn't change), kept deliberately separate from and after D: proving
