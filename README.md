@@ -3614,3 +3614,24 @@ now," it's discriminating correctly between an exercised and an
 unexercised branch on the exact same module. Formal E1-R (the same
 frozen 40-candidate holdout re-run as an official regression benchmark,
 against this exact commit) follows as its own next step.
+
+## E1-R: regression re-run, same frozen 40-candidate holdout
+
+Full report: `fixtures/e1-holdout-audit/e1-r-report.md`. The exact same
+40-candidate corpus E1 itself drew and vendored — never reshuffled, never
+re-drawn — re-run unchanged against the real binary at the head of the
+P0→P1→P2 fix chain (`3f9e41f`). **6 PASS (5 clean + 1 false-positive) /
+2 FINDING / 32 INCONCLUSIVE → 21 PASS (all clean) / 6 FINDING / 13
+INCONCLUSIVE / 0 TOOL_ERROR.** All four of the user's own pre-committed
+success criteria met: false-positive capability 1 → 0 (two permanent
+regression tests assert it in real CI on every push), `TOOL_ERROR`
+unchanged at 0, `INCONCLUSIVE` down 59%, and both of E1's original
+manually-verified findings preserved unchanged. The four newly-reachable
+findings were each independently re-verified genuine by reading the real
+test file directly, not assumed from the tool's own report — including
+`unpackerr`, whose own `group` option (identical predicate shape,
+identical default) correctly comes back `PASS` in the same run because
+its real test does flip it, live proof the fix discriminates correctly
+rather than flagging everything. 13 remaining inconclusives all trace to
+causes E1's own census already named — no new gap discovered by this
+re-run, only the already-fixed ones confirmed fixed.
