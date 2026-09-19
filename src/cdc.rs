@@ -78,6 +78,16 @@
 //! duplicate fixture. `part-db`'s Postgres driver has no `unix_socket`
 //! key at all (`host=` doubles as socket path there) -- the first
 //! non-MySQL-dialect Doctrine fixture in this project.
+//!
+//! K3a (done): [`ContractDiff`]/[`diff_contracts`] -- a SEPARATE
+//! experiment, package-bump drift, not an extension of K1-K2g's
+//! current-contract validation. Pure set difference between two
+//! [`ConsumerContract`]s (library+dialect+version+accepted_keys), no
+//! `ProducerEvidence` involved at all yet. Fail-closed across mismatched
+//! consumer families (the `part-db` dialect lesson) and duplicate keys.
+//! K3b (real-drift census) and K3c (producer correlation) are not
+//! started -- this module has no opinion yet on whether real upstream
+//! contract drift is common enough in this corpus to be worth more code.
 
 use std::path::Path;
 use std::process::Command;
@@ -1232,6 +1242,89 @@ pub fn compare_contract(emitted_key: &str, accepted_keys: &[String]) -> CdcVerdi
     }
 }
 
+/// K3a: Differential Consumer Contracts -- a SEPARATE experiment from
+/// current-contract validation (K1-K2g), not an extension of
+/// `compare_contract`. Current-contract asks "producer <-> consumer at
+/// revision X"; package-bump drift asks "consumer contract at BASE <->
+/// consumer contract at HEAD, and does Nix still emit a name the
+/// consumer no longer accepts." This phase deliberately does not
+/// reference `ProducerEvidence`/`ConsumerRoute` at all -- it's pure set
+/// difference over two already-extracted accepted-key lists, nothing
+/// more. No "breaking"/"regression"/"safe rename" classification and no
+/// fuzzy matching live here -- K3a reports facts only; anything
+/// diagnostic (a probable old-name/new-name correlation) is explicitly
+/// K3c's job, once a real historical drift case actually exists to
+/// correlate against.
+///
+/// `part-db`'s own K2g finding sets a hard constraint on this type:
+/// a consumer contract's identity must carry its library AND its
+/// dialect/driver, never be compared as a bare set of strings --
+/// diffing Doctrine's MySQL driver against its own Postgres driver
+/// would manufacture "drift" that's really just two different
+/// libraries-in-effect sharing one package name (confirmed for real in
+/// K2g: Doctrine's Postgres driver has no `unix_socket` key at all,
+/// which a dialect-blind diff would have wrongly reported as removed).
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConsumerContract {
+    pub library: String,
+    pub dialect: String,
+    pub version: String,
+    pub accepted_keys: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ContractDiff {
+    pub removed: Vec<String>,
+    pub added: Vec<String>,
+    pub retained: Vec<String>,
+}
+
+/// Pure. Fail-closed on the two ways this could otherwise silently lie:
+/// comparing across different consumer families (library/dialect
+/// mismatch -- see this section's own doc comment), or a malformed
+/// input contract carrying a duplicate accepted key (never silently
+/// deduped -- a real `extract_accepted_keys`-style extractor should
+/// never produce one, so seeing one here means something upstream is
+/// already wrong, not a case to paper over). Results are sorted, so
+/// input ordering never affects the outcome.
+pub fn diff_contracts(
+    base: &ConsumerContract,
+    head: &ConsumerContract,
+) -> Result<ContractDiff, CdcError> {
+    if base.library != head.library || base.dialect != head.dialect {
+        return Err(CdcError::Inconclusive(format!(
+            "cannot diff different consumer families: {}/{} (base) vs {}/{} (head)",
+            base.library, base.dialect, head.library, head.dialect
+        )));
+    }
+    let base_keys = require_no_duplicate_keys(&base.accepted_keys, "base")?;
+    let head_keys = require_no_duplicate_keys(&head.accepted_keys, "head")?;
+
+    let mut removed: Vec<String> =
+        base_keys.iter().filter(|k| !head_keys.contains(k)).cloned().collect();
+    let mut added: Vec<String> =
+        head_keys.iter().filter(|k| !base_keys.contains(k)).cloned().collect();
+    let mut retained: Vec<String> =
+        base_keys.iter().filter(|k| head_keys.contains(k)).cloned().collect();
+    removed.sort();
+    added.sort();
+    retained.sort();
+    Ok(ContractDiff { removed, added, retained })
+}
+
+fn require_no_duplicate_keys(keys: &[String], side: &str) -> Result<Vec<String>, CdcError> {
+    let mut seen = std::collections::HashSet::new();
+    for k in keys {
+        if !seen.insert(k.as_str()) {
+            return Err(CdcError::Inconclusive(format!(
+                "{side} contract has a duplicate accepted key {k:?} -- refusing to diff an \
+                 ambiguous contract"
+            )));
+        }
+    }
+    Ok(keys.to_vec())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2239,5 +2332,113 @@ mod tests {
         let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
         assert_eq!(identity.version, "4.4.3");
         assert_eq!(identity.source_reference, "61e730f1658814821a85f2402c945f3883407dec");
+    }
+}
+
+#[cfg(test)]
+mod k3a_tests {
+    use super::*;
+
+    fn contract(library: &str, dialect: &str, version: &str, keys: &[&str]) -> ConsumerContract {
+        ConsumerContract {
+            library: library.to_string(),
+            dialect: dialect.to_string(),
+            version: version.to_string(),
+            accepted_keys: keys.iter().map(|k| k.to_string()).collect(),
+        }
+    }
+
+    fn doctrine_mysql(version: &str, keys: &[&str]) -> ConsumerContract {
+        contract("doctrine/dbal", "mysql", version, keys)
+    }
+
+    #[test]
+    fn diff_of_a_contract_with_itself_is_empty() {
+        let c = doctrine_mysql("3.10.6", &["host", "port", "dbname", "unix_socket", "charset"]);
+        let diff = diff_contracts(&c, &c).unwrap();
+        assert!(diff.removed.is_empty());
+        assert!(diff.added.is_empty());
+        let mut expected = vec!["charset", "dbname", "host", "port", "unix_socket"];
+        expected.sort();
+        assert_eq!(diff.retained, expected);
+    }
+
+    #[test]
+    fn diff_detects_a_real_removed_and_added_key() {
+        let base = doctrine_mysql("4.2.0", &["host", "port", "socket_path"]);
+        let head = doctrine_mysql("4.3.0", &["host", "port", "socket-path"]);
+        let diff = diff_contracts(&base, &head).unwrap();
+        assert_eq!(diff.removed, vec!["socket_path".to_string()]);
+        assert_eq!(diff.added, vec!["socket-path".to_string()]);
+        assert_eq!(diff.retained, vec!["host".to_string(), "port".to_string()]);
+    }
+
+    #[test]
+    fn diff_mismatched_library_is_inconclusive() {
+        let base = doctrine_mysql("3.10.6", &["host"]);
+        let head = contract("illuminate/database", "mysql", "12.0.0", &["host"]);
+        assert!(matches!(diff_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_mismatched_dialect_is_inconclusive_even_for_the_same_library() {
+        // the exact part-db lesson: Doctrine MySQL vs Doctrine Postgres
+        // are not comparable as bare string sets.
+        let base = doctrine_mysql("3.10.6", &["host", "port", "unix_socket"]);
+        let head = contract("doctrine/dbal", "pgsql", "4.4.3", &["host", "port"]);
+        assert!(matches!(diff_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_duplicate_key_in_base_is_inconclusive_not_deduped() {
+        let base = doctrine_mysql("3.10.6", &["host", "host"]);
+        let head = doctrine_mysql("3.10.7", &["host"]);
+        assert!(matches!(diff_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_duplicate_key_in_head_is_inconclusive_not_deduped() {
+        let base = doctrine_mysql("3.10.6", &["host"]);
+        let head = doctrine_mysql("3.10.7", &["host", "host"]);
+        assert!(matches!(diff_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_result_does_not_depend_on_input_key_ordering() {
+        let base_a = doctrine_mysql("3.10.6", &["host", "port", "unix_socket"]);
+        let base_b = doctrine_mysql("3.10.6", &["unix_socket", "host", "port"]);
+        let head = doctrine_mysql("3.10.7", &["port", "host"]);
+        assert_eq!(diff_contracts(&base_a, &head).unwrap(), diff_contracts(&base_b, &head).unwrap());
+    }
+
+    // --- Property-based tests (proptest), same evidence tier AGENTS.md
+    // asks for and the same crate H2's own pure-IR tests already use --
+    // not a new precedent.
+
+    proptest::proptest! {
+        #[test]
+        fn prop_diff_of_a_contract_with_itself_is_always_empty(keys in proptest::prelude::prop::collection::btree_set("[a-c]{1,4}", 0..6)) {
+            let keys: Vec<String> = keys.into_iter().collect();
+            let c = doctrine_mysql("1.0.0", &keys.iter().map(String::as_str).collect::<Vec<_>>());
+            let diff = diff_contracts(&c, &c).unwrap();
+            proptest::prop_assert!(diff.removed.is_empty());
+            proptest::prop_assert!(diff.added.is_empty());
+        }
+
+        #[test]
+        fn prop_removed_and_added_are_symmetric_under_swap(
+            base_keys in proptest::prelude::prop::collection::btree_set("[a-c]{1,4}", 0..6),
+            head_keys in proptest::prelude::prop::collection::btree_set("[a-c]{1,4}", 0..6),
+        ) {
+            let base_keys: Vec<String> = base_keys.into_iter().collect();
+            let head_keys: Vec<String> = head_keys.into_iter().collect();
+            let base = doctrine_mysql("1.0.0", &base_keys.iter().map(String::as_str).collect::<Vec<_>>());
+            let head = doctrine_mysql("2.0.0", &head_keys.iter().map(String::as_str).collect::<Vec<_>>());
+            let forward = diff_contracts(&base, &head).unwrap();
+            let backward = diff_contracts(&head, &base).unwrap();
+            proptest::prop_assert_eq!(forward.removed, backward.added);
+            proptest::prop_assert_eq!(forward.added, backward.removed);
+            proptest::prop_assert_eq!(forward.retained, backward.retained);
+        }
     }
 }
