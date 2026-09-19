@@ -2147,7 +2147,20 @@ no longer accepts."
     a new precedent): `diff(A, A)` is always empty, and removed/added
     are symmetric under swapping base and head.
 
-**K3b (real-drift census) is next, required before any more K3 code.**
+    **K3a FROZEN at `5eee36a`.** The design review's own reading of why
+    this one is worth freezing cleanly: `library`+`dialect` sit inside
+    the comparison boundary itself, not as side metadata a caller could
+    forget to check — the first real MySQL/Postgres pair would otherwise
+    have produced very convincing garbage. Same standing rule as every
+    other frozen layer: reopened only by a concrete counterexample.
+
+**K3b (real-drift census) is next, required before any more K3 code —
+and deliberately does NOT touch `diff_contracts()` or any other K3a
+code.** The question K3b actually answers is sharper than "can a
+differential checker be built" (already close to obvious): **is there
+enough real historical contract change across the four already-
+qualified consumer families for differential mode to be useful, not
+just intellectually tidy?**
 Search the small set of already-qualified consumer families (Doctrine
 MySQL, Doctrine PostgreSQL, Illuminate MySQL, Illuminate PostgreSQL) for
 at least one REAL historical nixpkgs package bump where the extractable
