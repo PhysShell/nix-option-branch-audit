@@ -692,7 +692,7 @@ fn scan_options(
             if is_nested_inside_mk_option_call(&node) {
                 continue;
             }
-            walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
+            walk_options_block(file, src, &value, &mut Vec::new(), &mut out, option_prefix);
             continue;
         }
 
@@ -705,7 +705,7 @@ fn scan_options(
                 .map(|resolved| resolved == option_prefix)
                 .unwrap_or(false)
         {
-            walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
+            walk_options_block(file, src, &value, &mut Vec::new(), &mut out, option_prefix);
         }
     }
     out
@@ -717,7 +717,9 @@ fn walk_options_block(
     attrset: &SyntaxNode,
     path: &mut Vec<String>,
     out: &mut Vec<OptionDecl>,
+    option_prefix: &[String],
 ) {
+    let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
     for entry in attrset.children() {
         if entry.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -734,6 +736,35 @@ fn walk_options_block(
         };
 
         path.extend(segs.clone());
+
+        // E1/P2/GAP-2 fix. A module using the nested `options = {
+        // services.<name> = { ... }; };` idiom (one bare top-level
+        // `options` attrpath whose value nests `services.<name>` inside
+        // it, e.g. real xandikos/svnserve/cadvisor -- as opposed to the
+        // flat-dotted `options.services.<name> = { ... };` form the
+        // SECOND branch of `scan_options` already strips generically)
+        // has its option_prefix embedded partway INSIDE the walk, not at
+        // its own entry point -- so a real, plain `mkOption`-declared
+        // leaf like `enable` was being recorded at the over-qualified
+        // `["services","<name>","enable"]`, never the `option_prefix`-
+        // relative `["enable"]` `run_target`'s own gate-1 lookup expects
+        // (`watch` is documented as "relative to cfg_ident", the same
+        // contract the flat-dotted branch already honors). The moment
+        // the ACCUMULATED path exactly equals `option_prefix` -- however
+        // many separate attrpath segments it took to get there, whether
+        // one combined `services.svnserve = {...}` or nested `services =
+        // { svnserve = {...}; };` -- everything under this point is
+        // relative to THAT instance, exactly the same "reset to a fresh
+        // path" treatment the flat-dotted branch already gives its own
+        // root. Kimai's own `siteOpts` is unaffected: nothing inside its
+        // `options = {...}` block ever accumulates to
+        // `option_prefix` (`["services","kimai","sites","*"]` is
+        // wildcarded, `prefix_is_concrete`-guarded the same way the
+        // flat-dotted branch already is, and no real attrpath can ever
+        // spell a literal `"*"` segment), so this check simply never
+        // fires for it.
+        let at_prefix_root =
+            prefix_is_concrete && !option_prefix.is_empty() && path.as_slice() == option_prefix;
 
         if let Some(helper) = classify_option_helper_call(&value) {
             let (default_source, default_class, default_known_value) =
@@ -756,10 +787,14 @@ fn walk_options_block(
             // -- so `nginx.enable` is recorded at `["nginx","enable"]`,
             // never at the bare, collision-prone `["enable"]`.
             if let Some(nested) = find_nested_options_block(&value) {
-                walk_options_block(file, src, &nested, path, out);
+                walk_options_block(file, src, &nested, path, out, option_prefix);
             }
         } else if value.kind() == NODE_ATTR_SET {
-            walk_options_block(file, src, &value, path, out);
+            if at_prefix_root {
+                walk_options_block(file, src, &value, &mut Vec::new(), out, option_prefix);
+            } else {
+                walk_options_block(file, src, &value, path, out, option_prefix);
+            }
         }
 
         for _ in 0..segs.len() {

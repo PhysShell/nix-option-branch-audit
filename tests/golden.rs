@@ -1311,65 +1311,67 @@ fn discovered_option_paths(report: &Value) -> Vec<String> {
 }
 
 #[test]
-fn h2_case14_nested_submodule_collision_no_longer_false_positives() {
-    // The exact minimal E1 bisect reproducer. Before this fix: a real,
+fn h2_case14_nested_submodule_collision_is_now_a_genuine_pass() {
+    // The exact minimal E1 bisect reproducer. Before P0: a real,
     // demonstrated false OBA001 -- gate 1 matched the unrelated nested
     // `nested.enable` (default true) instead of the real top-level
-    // `enable` (mkEnableOption, itself still invisible per the separate
-    // GAP-1 -- not this test's concern), so the tool's own fabricated
-    // "default" disagreed with reality and it reported a transition that
-    // never actually happened. After this fix: the collision-only entry
-    // can no longer be matched at the bare, wrong path -- the correct,
-    // honest result is `OptionNotFound` (P0 fixes the false-positive
-    // CAPABILITY, not full coverage -- that's P1's `mkEnableOption`
-    // support, a separate, later fix).
+    // `enable` (mkEnableOption, itself invisible per the separate GAP-1
+    // until P1), so the tool's own fabricated "default" disagreed with
+    // reality and it reported a transition that never actually happened.
+    // After P0 alone: honest `OptionNotFound` (the false positive was
+    // gone, but the real declaration was still invisible). After P0+P1+P2
+    // together: the real top-level `enable` is correctly found at its
+    // real, bare, `option_prefix`-relative path, the collision-source
+    // `nested.enable` is correctly scoped under its own container (never
+    // colliding with it), and the result is a genuine, correctly
+    // witnessed `PASS`.
     let reports = run_golden();
     let r = target(&reports, "h2-case14-nested-submodule-collision");
+    assert_eq!(verdict_kind(r, "enable"), "PASS");
+    let verdict = verdict_obj(r, "enable");
     assert_eq!(
-        verdict_kind(r, "enable"),
-        "OptionNotFound",
-        "must NOT be OBA001 (a false finding) or PASS (right-answer-wrong-mechanism) -- \
-         the wrong, collision-sourced declaration must no longer be matchable at all"
+        verdict["default_outcome"], false,
+        "the real top-level `enable` (mkEnableOption, default false) must be what's \
+         actually witnessed, not the nested collision source (default true); got {verdict:?}"
     );
     let paths = discovered_option_paths(r);
     assert!(
-        !paths.contains(&"enable".to_string()),
-        "no entry should exist at the bare, collision-prone path any more; got {paths:?}"
+        paths.contains(&"enable".to_string()),
+        "the real top-level enable must now be found at its real, bare path; got {paths:?}"
     );
     assert!(
-        paths.contains(&"services.bisect.nested.enable".to_string()),
-        "the nested submodule's own `enable` must be recorded at its real, scoped path \
-         instead; got {paths:?}"
+        paths.contains(&"nested.enable".to_string()),
+        "the nested submodule's own `enable` must be recorded at its real, scoped path, \
+         never colliding with the bare one above; got {paths:?}"
     );
 }
 
 #[test]
-fn h2_case15_xandikos_real_nested_submodule_collision_no_longer_false_positives() {
+fn h2_case15_xandikos_real_nested_submodule_collision_is_now_a_genuine_pass() {
     // The real, in-the-wild case the E1 holdout audit actually found this
     // bug on: xandikos's `nginx = mkOption { type = types.submodule {
     // options = { enable = mkOption { default = false; ... }; ...}; };
-    // };`. Before this fix: a real `PASS` on `enable`, but backed by the
-    // WRONG declaration (`nginx.enable`, not `services.xandikos.enable`
-    // itself) -- numerically harmless only by coincidence (both defaults
-    // happened to be `false`), not because the mechanism was sound. After
-    // this fix: same as the synthetic case above -- `OptionNotFound`,
-    // honest and disclosed, not a right-answer-wrong-mechanism PASS.
+    // };`. Before P0: a real `PASS` on `enable`, but backed by the WRONG
+    // declaration (`nginx.enable`, not `services.xandikos.enable` itself)
+    // -- numerically harmless only by coincidence (both defaults happened
+    // to be `false`), not because the mechanism was sound. After P0+P1+P2
+    // together: a genuine `PASS`, backed by the real declaration, with
+    // `nginx.enable` correctly scoped separately.
     let reports = run_golden();
     let r = target(&reports, "h2-case15-xandikos-real-nested-submodule-collision");
-    assert_eq!(
-        verdict_kind(r, "enable"),
-        "OptionNotFound",
-        "must no longer be a PASS backed by the wrong (nginx.enable) declaration"
-    );
+    assert_eq!(verdict_kind(r, "enable"), "PASS");
+    let verdict = verdict_obj(r, "enable");
+    assert_eq!(verdict["default_outcome"], false);
     let paths = discovered_option_paths(r);
     assert!(
-        !paths.contains(&"enable".to_string()),
-        "no entry should exist at the bare, collision-prone path any more; got {paths:?}"
+        paths.contains(&"enable".to_string()),
+        "the real services.xandikos.enable must now be found at its real, bare path; \
+         got {paths:?}"
     );
     assert!(
-        paths.contains(&"services.xandikos.nginx.enable".to_string()),
-        "nginx's own real `enable` must be recorded at its real, scoped path instead; \
-         got {paths:?}"
+        paths.contains(&"nginx.enable".to_string()),
+        "nginx's own real `enable` must be recorded at its real, scoped path, never \
+         colliding with the bare one above; got {paths:?}"
     );
 }
 
@@ -1429,6 +1431,45 @@ fn h2_case18_nohang_real_mkenableoption_is_a_clean_pass() {
     // correctly witnessed `PASS` on completely unfamiliar code.
     let reports = run_golden();
     let r = target(&reports, "h2-case18-nohang-real-mkenableoption");
+    assert_eq!(verdict_kind(r, "enable"), "PASS");
+    let verdict = verdict_obj(r, "enable");
+    assert_eq!(verdict["default_outcome"], false);
+}
+
+// --- E1/P2 regression: the nested `options = { services.X = {...}; };`
+// declaration idiom no longer loses the `option_prefix` boundary.
+// Before this fix: a real, plain `mkOption`-declared leaf under this
+// idiom was recorded at the over-qualified absolute path
+// (`["services","<name>","enable"]`), never the `option_prefix`-
+// relative path `run_target`'s own gate-1 lookup expects -- a real
+// `OptionNotFound` on a perfectly well-formed, directly declared
+// option, for 10 of E1's 32 original inconclusive holdout results.
+
+#[test]
+fn h2_case19_nested_options_idiom_no_longer_loses_the_prefix() {
+    let reports = run_golden();
+    let r = target(&reports, "h2-case19-nested-options-idiom");
+    assert_eq!(verdict_kind(r, "enable"), "PASS");
+    let verdict = verdict_obj(r, "enable");
+    assert_eq!(verdict["default_outcome"], false);
+    let paths = discovered_option_paths(r);
+    assert!(
+        paths.contains(&"enable".to_string()),
+        "must be recorded at the bare, option_prefix-relative path, not \
+         `services.synthNestedIdiom.enable`; got {paths:?}"
+    );
+}
+
+#[test]
+fn h2_case20_svnserve_real_nested_options_idiom_is_a_clean_pass() {
+    // The real, in-the-wild confirmation: svnserve's real `enable =
+    // lib.mkOption {...};`, declared via the nested `options = {
+    // services.svnserve = {...}; };` idiom -- a plain, correctly-typed
+    // mkOption, no mkEnableOption and no nested-submodule collision
+    // involved at all, pure GAP-2. Before this fix: `OptionNotFound`.
+    // After: a real, correctly witnessed `PASS` on unfamiliar code.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case20-svnserve-real-nested-options-idiom");
     assert_eq!(verdict_kind(r, "enable"), "PASS");
     let verdict = verdict_obj(r, "enable");
     assert_eq!(verdict["default_outcome"], false);

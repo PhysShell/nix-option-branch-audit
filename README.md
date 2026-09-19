@@ -3549,3 +3549,68 @@ losing the `option_prefix` boundary). Re-measured post-P1: all 10
 `unpackerr`, `omada`, `unbound`) remain inconclusive — none resolved
 automatically. P2 is confirmed still fully load-bearing, not obsoleted
 by P1, and is next.
+
+## P2: the nested `options = { services.X = {...}; };` idiom fix
+
+Confirmed still needed before starting, not assumed (per the plan's own
+explicit check): of the 10 E1 candidates independently attributed to
+this cause, all 10 remained inconclusive after P1 alone. Root cause: the
+generic `options = {...}` branch of `scan_options` (the one that also,
+correctly, walks kimai's own `siteOpts` submodule from a fresh empty
+path) had no way to recognize that a module using this OTHER real
+nixpkgs idiom — `options = { services.<name> = { ... }; };`, one bare
+top-level `options` attrpath whose value nests the service name inside
+it, rather than the flat-dotted `options.services.<name> = { ... };`
+form the second branch already strips generically — embeds its own
+`option_prefix` PARTWAY into the walk, not at the block's own entry
+point. A perfectly real, plain `mkOption`-declared leaf (`enable`,
+`no-auth`, `user`, ...) ended up recorded at the over-qualified absolute
+path (`["services","<name>","enable"]`), never the `option_prefix`-
+relative path `run_target`'s gate-1 lookup expects.
+
+Fixed by threading `option_prefix` through `walk_options_block` itself
+and checking, at each recursive step, whether the path accumulated SO
+FAR exactly equals `option_prefix` — however many separate attrpath
+segments it took to get there (one combined `services.svnserve = {...}`
+or nested `services = { svnserve = {...}; };}`, both handled uniformly,
+since the check is on the accumulated PATH state, not on any one node's
+own raw attrpath text). The moment it matches, everything under that
+point is walked with a FRESH path, exactly the same "reset to relative"
+treatment the flat-dotted branch already gives its own root. Kimai's own
+`siteOpts` is unaffected by construction: nothing inside it ever
+accumulates to its own wildcarded `option_prefix` (a literal `"*"`
+segment can never appear in real source text), so the check simply never
+fires for it — confirmed by the full existing test suite staying green,
+not just reasoned about.
+
+**Two new regression tests** (`h2-case19`/`20`): a synthetic, isolated
+case (a plain `mkOption`, no `mkEnableOption`/nested-submodule collision
+involved at all) and the real `svnserve` module/test (vendored from E1,
+pure GAP-2, no other gap) — both now a genuine, correctly witnessed
+`PASS`. The two P0 regression tests (`h2-case14`/`15`) were also
+UPDATED, not left stale: with P0+P1+P2 all applied, the bisect and
+xandikos cases no longer merely avoid a false positive — they now
+produce a genuine, correctly witnessed `PASS`, backed by the REAL
+declaration, with the collision source correctly scoped separately. This
+is the fix chain's own best evidence that P0/P1/P2 compose correctly,
+not three isolated patches.
+
+**Final re-measurement against the full 40-candidate E1 holdout** (same
+frozen corpus throughout, never reshuffled): **21 PASS / 6 FINDING / 13
+INCONCLUSIVE / 0 TOOL_ERROR** — up from the original **6 PASS (5 clean +
+1 false-positive) / 2 FINDING / 32 INCONCLUSIVE**. All 6 findings
+manually verified genuine by direct inspection of the real module/test
+source, not assumed from the tool's own report: the original 2
+(`flame`/`openFirewall`, `convos`/`reverseProxy`, both preserved
+unchanged) plus 4 newly-reachable ones (`coturn`/`no-auth`,
+`vault`/`dev`, `unpackerr`/`user`, `omada`/`openFirewallWebPorts`), each
+confirmed by reading the real test file's every node for any assignment
+to the flagged option — none found, in every case. `unpackerr` is worth
+naming specifically: its OWN `group` option (same real predicate shape,
+same real default `"unpackerr"`) correctly shows a real `PASS` in the
+very same run, because its real test explicitly sets `group = "users";`
+— a live, real demonstration that this isn't "the tool flags everything
+now," it's discriminating correctly between an exercised and an
+unexercised branch on the exact same module. Formal E1-R (the same
+frozen 40-candidate holdout re-run as an official regression benchmark,
+against this exact commit) follows as its own next step.

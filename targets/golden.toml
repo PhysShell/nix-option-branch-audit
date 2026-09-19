@@ -427,3 +427,25 @@ test = "fixtures/e1-holdout-audit/nohang/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "nohang"]
 watch = ["enable"]
+
+# --- E1/P2 regression: the nested `options = { services.X = {...}; };`
+# declaration idiom no longer loses the option_prefix boundary. Case 1
+# is synthetic and isolated (a plain mkOption, no mkEnableOption/
+# nested-submodule collision involved at all). Case 2 is the real
+# svnserve module/test, vendored from E1 -- pure GAP-2, no other gap.
+
+[[target]]
+name = "h2-case19-nested-options-idiom"
+module = "fixtures/synthetic/h2-nested-options-idiom/module.nix"
+test = "fixtures/synthetic/h2-nested-options-idiom/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthNestedIdiom"]
+watch = ["enable"]
+
+[[target]]
+name = "h2-case20-svnserve-real-nested-options-idiom"
+module = "fixtures/e1-holdout-audit/svnserve/module.nix"
+test = "fixtures/e1-holdout-audit/svnserve/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "svnserve"]
+watch = ["enable"]
