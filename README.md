@@ -2034,14 +2034,21 @@ surface at once:
 
 Reviewed next-step order, deliberately narrow (two small, cheap items
 before any more intelligence gets added to the checker):
-9. **CI qualification gap — infrastructure only, not analysis.** Closes
-   the gap K2f's own writeup disclosed: `tests/*.rs` (the integration
-   suites this project treats as part of its own proof chain) had never
-   run in CI, only locally. `.github/workflows/test.yml`: one small job,
-   `dtolnay/rust-toolchain@stable` (reuse, same action `k1.yml`/`kani.yml`
-   already use) + a plain `cargo test` — no `#[ignore]`d real-eval test
-   runs here (that's `k1.yml`'s own job, untouched), no restructuring of
-   any existing workflow.
+9. **CI qualification gap — infrastructure only, not analysis. Closed,
+   `1e39345`, confirmed green in real CI — and confirmed by log, not
+   just a checkmark.** Closes the gap K2f's own writeup disclosed:
+   `tests/*.rs` (the integration suites this project treats as part of
+   its own proof chain) had never run in CI, only locally.
+   `.github/workflows/test.yml`: one small job, `dtolnay/rust-toolchain@stable`
+   (reuse, same action `k1.yml`/`kani.yml` already use) + a plain
+   `cargo test` — no `#[ignore]`d real-eval test runs here (that's
+   `k1.yml`'s own job, untouched), no restructuring of any existing
+   workflow. `gh run view --log` on the real run shows all 5 targets
+   genuinely executing, each with its own `Running`/`test result: ok`
+   pair, not inferred from a green checkmark: `unittests src/main.rs`
+   (86 passed, 25 ignored), `tests/check_root.rs` (9 passed),
+   `tests/diff_cli.rs` (11 passed), `tests/fixture_integrity.rs`
+   (1 passed), `tests/golden.rs` (47 passed) — 154 tests total, 37s.
 10. **Phase D vendoring for `strichliste`/`part-db`.** The user's own
     pick among the three K2e/K2f-opened options (over `flarum`'s
     multi-consumer case and package-bump drift) — two real corpus cases,
