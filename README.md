@@ -2543,7 +2543,8 @@ one.
 
 Parked, deliberately, not from lack of interest: `krill`'s own
 structural CLI drift (a future `K4d`+ adversarial target), `flarum`'s
-multi-consumer shape, H2, D3. Also still not touched: `ConsumerRoute`'s
+multi-consumer shape, H2 (D3 — Action diff integration — closed
+separately, see the Productization section below). Also still not touched: `ConsumerRoute`'s
 own types, even though movim's Postgres `Inconclusive` result already
 hints at a future `Inconclusive`-vs-"provably no such contract exists"
 distinction — deliberately deferred until a second real corpus case
@@ -3045,6 +3046,88 @@ mega-commit:
   hands `oba diff` two paths; `oba` stays usable identically from GitHub
   Actions, a local shell, a Nix derivation, another CI, or two unpacked
   tarballs — never a second, worse frontend to `git`.
+- **PR D3 — Action diff integration. Closed.** `diff/action.yml`, a
+  second composite action (a subdirectory, not the root `action.yml` —
+  GitHub only lets one action live at a repo root; referenced as `uses:
+  owner/repo/diff@ref`, or `uses: ./diff` for this repo's own dogfood).
+  **The exact same "remain stupid" contract PR C already established for
+  `check`**: install the pinned binary, run `oba diff --base-root ...
+  --head-root ... --targets ...`, pass its exit code straight through,
+  hand back the report. Nothing smarter. In particular: **no
+  checkout/worktree/git logic of any kind** — `base-root`/`head-root`
+  are two already-materialized filesystem paths; how the caller gets a
+  base tree and a head tree onto disk is entirely the calling workflow's
+  problem, same as `oba diff` itself never touching Git (PR D2: "No Git
+  anywhere in `oba` itself"). **No regression/improvement judgment** —
+  `compare()` already refuses to rank a `PASS -> FINDING` transition
+  worse than `FINDING -> PASS`; baking a "block the PR if X" policy into
+  this Action would smuggle exactly that judgment back in one layer up,
+  the same boundary PR C's own design note drew. Reuses `oba diff`'s
+  exit-code contract verbatim (0/2/3, never 1).
+
+  **File-based transport made first-class from day one**, instead of
+  rediscovered the hard way like PR C's `report-json` was: `report-path`
+  (the report's real path on the runner's own filesystem, via
+  `$RUNNER_TEMP` — PR C's own bug 1, `github.action_path` resolving to a
+  path ending in `/.` for a local `uses: ./diff` reference, avoided
+  the same way) is the PRIMARY, always-populated output.
+  `unchanged`/`added`/`removed`/`changed` are small, genuinely bounded
+  integers pulled from the file with `jq`, never threaded through `env:`
+  as a blob — exactly the class of output PR C's own postmortem said
+  should exist ("Only small, genuinely bounded values... belong as
+  first-class outputs going forward — never another whole report").
+  `report-json` still exists, but documented up front as a convenience
+  for a small diff only, with the exact size ceiling PR C hit
+  (`env:`'s real, sub-1MB `execve()` limit — a real ~390KB report was
+  already enough) stated in `diff/action.yml` itself rather than left
+  for a future bug report to rediscover. On exit-code 3 (TOOL_ERROR),
+  `oba diff` never printed a report at all — `report-path` still points
+  at a file (the shell redirect creates it unconditionally), but it's
+  empty, not JSON; the script checks the exit code before ever handing
+  that file to `jq`, so a tool error doesn't compound into a second,
+  confusing `jq` failure on top of the real one.
+
+  **Real blocker found and closed before any of this could be
+  dogfooded**: the only published release, `v0.2.0`, predates PR D1/D2
+  entirely — it has no `diff` subcommand at all. Claiming the Action
+  works while installing a binary that can't even run it would have been
+  a real self-deception, not a shortcut. Closed with a dedicated,
+  isolated release-gate commit (`1ba0b6b`, version-only, no other
+  changes) — full local gate green first (159+9+11+1+47 = 227 offline
+  tests, then the real 30-test `cdc::` suite, 439.65s on this VPS's
+  single core), *then* CI green on all 4 workflows for that exact
+  commit, *then* the `v0.3.0` tag pushed at that verified SHA. The real
+  published release was then checked against the same bar PR A used for
+  `v0.1.0`/`v0.2.0` — from a clean scratch directory, never reusing the
+  local build that produced it: `sha256sum -c` against the published
+  checksum, `ldd` confirming a truly static binary, the binary's own
+  real JSON envelope reporting `"version": "0.3.0"` (no `--version` flag
+  exists, so this is checked through a real `oba check` run, not
+  assumed), `oba diff --help` actually printing (confirming the
+  subcommand shipped, not just that installation succeeded), and `gh
+  attestation verify --format json` returning a real signed bundle whose
+  certificate `subjectAlternativeName`/`sourceRepositoryRef` name this
+  exact repo/workflow/tag (`release.yml@refs/tags/v0.3.0`) and whose
+  `sourceRepositoryDigest` matches the exact gated commit
+  (`1ba0b6bc834c676bab5422269cf5f3e83297c2d5`). Only then was
+  `diff/action.yml` written and dogfooded — no clippy check ran anywhere
+  in this gate; no CI workflow in this repo runs clippy, and the local
+  toolchain here has no `cargo-clippy` binary at all, a real, disclosed
+  gap rather than a claimed-but-unrun check.
+
+  Self-dogfood, added in this same PR: `.github/workflows/dogfood-diff.yml`
+  runs this repo's own `diff/action.yml` (`uses: ./diff`, pinned to the
+  real `v0.3.0` release) against two real scenarios, no checkout/worktree
+  dance needed since both roots already live inside one checkout of this
+  repo: `fixtures/kimai/before` → `fixtures/kimai/after` (the actual
+  historical `PhysShell/nixpkgs` OBA001 → PASS transition, reused from
+  `tests/diff_cli.rs`'s own real fixture) must exit 0 with `changed=1`,
+  `unchanged=0`, and `report-path` pointing at a real file whose
+  `verdict_transitions["oba001->pass"]` is 1; `targets/golden.toml`
+  against itself (real OBA001 + davis's honest inconclusive
+  `OptionNotFound` on both sides) must fail the step with `exit-code=2`,
+  `continue-on-error: true` + an explicit `outcome == 'failure'` check,
+  the same pattern PR C's own dogfood already established.
 - **PR E, only if dogfooding on `PhysShell/nixpkgs` shows it's actually
   needed** — changed-target selection (skip targets whose `module`/`test`
   didn't change), kept deliberately separate from and after D: proving

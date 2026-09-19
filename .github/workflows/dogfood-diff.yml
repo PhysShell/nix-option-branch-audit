@@ -1,0 +1,86 @@
+name: Dogfood diff
+
+# PR D3: exercises this repo's OWN diff/action.yml against this repo's
+# OWN fixtures, the same "prove install/cwd/paths/exit-code/output
+# plumbing actually work on a real runner" reason dogfood.yml exists for
+# `check` (cargo test already covers oba diff's own analysis semantics
+# far more thoroughly -- see tests/diff_cli.rs). Pins oba-version
+# explicitly (not "latest"), same determinism reason dogfood.yml gives.
+#
+# No checkout/worktree dance here: diff/action.yml takes two ALREADY-
+# MATERIALIZED roots, and this repo already carries two real, disjoint
+# historical trees on disk as fixtures -- fixtures/kimai/before and
+# fixtures/kimai/after (the real PhysShell/nixpkgs 5530e24f2 ->
+# 37f81efa4 fix) -- so one `actions/checkout` of this repo already gives
+# diff/action.yml everything it needs. Proving the Action can accept two
+# externally-materialized roots from two SEPARATE checkouts is a
+# consumer-workflow concern, not something this dogfood needs to
+# reinvent (diff/action.yml itself has zero opinion on how base/head got
+# onto disk -- see its own doc comment).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dogfood-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: oba diff (real kimai OBA001 -> PASS transition, must exit 0)
+        id: kimai
+        uses: ./diff
+        with:
+          base-root: fixtures/kimai/before
+          head-root: fixtures/kimai/after
+          targets: fixtures/synthetic/diff-kimai/targets.toml
+          oba-version: v0.3.0
+          artifact-name: oba-diff-report-kimai
+
+      - name: assert the real transition was reported correctly
+        shell: bash
+        # Same env:-not-splice discipline as dogfood.yml's own report-json
+        # check -- report-json here is small (one target), well inside
+        # the size ceiling diff/action.yml documents.
+        env:
+          EXIT_CODE: ${{ steps.kimai.outputs.exit-code }}
+          REPORT_PATH: ${{ steps.kimai.outputs.report-path }}
+          CHANGED: ${{ steps.kimai.outputs.changed }}
+          UNCHANGED: ${{ steps.kimai.outputs.unchanged }}
+        run: |
+          test "$EXIT_CODE" = "0"
+          test "$CHANGED" = "1"
+          test "$UNCHANGED" = "0"
+          test -s "$REPORT_PATH"
+          jq -e '.mode == "diff"' "$REPORT_PATH"
+          jq -e '.summary.verdict_transitions["oba001->pass"] == 1' "$REPORT_PATH"
+
+      - name: oba diff (golden.toml against itself, must exit 2)
+        id: mixed
+        uses: ./diff
+        continue-on-error: true
+        with:
+          base-root: .
+          head-root: .
+          targets: targets/golden.toml
+          oba-version: v0.3.0
+          artifact-name: oba-diff-report-mixed
+
+      - name: assert the inconclusive run failed the step with exit-code 2, not silently
+        shell: bash
+        # No report-json/report-path content check here -- golden.toml
+        # compared against itself is the same real ~390KB-scale report
+        # PR C's dogfood already found ARG_MAX trouble at (see
+        # dogfood.yml's own comment on this exact manifest); report-path
+        # (a real file this step never reads) is exactly the escape
+        # hatch diff/action.yml exists to offer for that case, not
+        # something this smoke test needs to exercise further.
+        env:
+          STEP_OUTCOME: ${{ steps.mixed.outcome }}
+          EXIT_CODE: ${{ steps.mixed.outputs.exit-code }}
+        run: |
+          test "$STEP_OUTCOME" = "failure"
+          test "$EXIT_CODE" = "2"

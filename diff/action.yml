@@ -1,0 +1,204 @@
+name: 'oba diff'
+description: 'Install a pinned oba release and run `oba diff` between two already-materialized roots.'
+author: 'PhysShell'
+
+# PR D3: the same "remain stupid" contract PR C already established for
+# `check`, applied to `diff`. This action does exactly four things:
+# install the pinned binary, run `oba diff --base-root ... --head-root
+# ... --targets ...`, pass its exit code straight through, and hand back
+# the report. Nothing else. In particular:
+#   - NO checkout/worktree/git logic of any kind. base-root/head-root are
+#     two ALREADY-MATERIALIZED filesystem paths -- how the caller gets a
+#     base tree and a head tree onto disk (two actions/checkout steps
+#     with different `ref`s, a `git worktree add`, two separate jobs with
+#     shared artifacts, ...) is entirely the calling workflow's problem,
+#     the same way `oba diff` itself never touches Git (see the README's
+#     PR D2 section: "No Git anywhere in `oba` itself -- deliberately
+#     only two directories in, a comparison out").
+#   - NO regression/improvement judgment. `oba diff` itself already
+#     refuses to rank a `PASS -> FINDING` transition as worse than
+#     `FINDING -> PASS` (see compare()'s own contract) -- baking a
+#     "block the PR if X" policy into this Action would smuggle exactly
+#     the judgment `compare()` deliberately stays neutral about back in
+#     at the CI-glue layer, one level up. That belongs to whatever
+#     workflow consumes this action's outputs, not to this action.
+#   - Deliberately reuses the exact `oba diff` exit-code contract
+#     unchanged (0 = comparison produced, 2 = inconclusive on either
+#     side, 3 = tool/input error, NEVER 1) -- see run_diff's own doc
+#     comment in src/main.rs. This action's `exit-code` output and the
+#     step's own pass/fail outcome are always that same number, verbatim.
+#
+# File-based transport is first-class from day one here, unlike PR C's
+# `check` action (which shipped `report-json` as the only output and
+# only learned the size lesson the hard way -- see the README's PR C
+# section, bug 3: a real ~390KB report hit the OS's own execve()
+# argument+environment limit the moment a DOWNSTREAM step tried to pass
+# it through `env:`). `report-path` -- the report's real path on the
+# runner's own filesystem -- is the PRIMARY, always-populated output;
+# `unchanged`/`added`/`removed`/`changed` are small, genuinely bounded
+# integers (never another whole report); `report-json` stays a
+# convenience for a small diff, with that same size ceiling stated here
+# up front rather than rediscovered.
+#
+# The report is written under $RUNNER_TEMP, not github.action_path --
+# PR C's own bug 1 (a local `uses: ./diff` reference resolves
+# `action_path` to a path ending in `/.`, which actions/upload-artifact's
+# glob matcher hard-rejects outright, file existence aside). $RUNNER_TEMP
+# is always a clean absolute path, identical whether this action is
+# referenced locally or as `owner/repo/diff@ref`.
+
+inputs:
+  base-root:
+    description: >-
+      Filesystem root analyzed as "base" (oba diff --base-root). Must
+      already exist on disk -- this action does no checkout of its own.
+    required: true
+  head-root:
+    description: >-
+      Filesystem root analyzed as "head" (oba diff --head-root). Must
+      already exist on disk -- this action does no checkout of its own.
+    required: true
+  targets:
+    description: >-
+      Path to the TOML target manifest, resolved relative to the
+      workflow's own working directory -- NOT to either root. One
+      manifest applied to both roots, the same asymmetry `oba diff`
+      itself has (see the README's PR D2 section for why).
+    required: true
+  oba-version:
+    description: >-
+      oba release tag to install, e.g. "v0.3.0", or "latest". Must be a
+      release that actually contains the `diff` subcommand (PR D1/D2) --
+      `v0.2.0` predates it and has no `diff` subcommand at all.
+    required: false
+    default: 'latest'
+  artifact-name:
+    description: >-
+      Name for the uploaded JSON report artifact. Override this if you
+      invoke this action more than once in the same job (GitHub Actions
+      rejects duplicate artifact names within one run).
+    required: false
+    default: 'oba-diff-report'
+
+outputs:
+  exit-code:
+    description: >-
+      oba diff's own exit code as a string: "0" the comparison was
+      produced (regardless of what it found -- a real Changed entry is
+      not a failure), "2" the comparison was produced but at least one
+      side's own analysis was inconclusive, "3" the tool itself didn't
+      run (bad manifest, missing/escaping files under either root,
+      duplicate target identity). Exit "1" never appears for diff.
+  report-path:
+    description: >-
+      Absolute path to the full schema_version:1 diff report (JSON) on
+      the runner's own filesystem -- the PRIMARY way to consume a report
+      of any size in a later step of the SAME job (`jq`/upload
+      elsewhere/keep provenance), without threading hundreds of KB
+      through expression/env/output plumbing. Always populated, even on
+      exit-code 3 -- though on a real tool error the file is empty, not
+      a JSON document (the analysis never produced one); check
+      exit-code first.
+    value: ${{ steps.run.outputs.report-path }}
+  unchanged:
+    description: 'Count of watched options with no detected change. Empty string on exit-code 3.'
+    value: ${{ steps.run.outputs.unchanged }}
+  added:
+    description: 'Count of watched options present only in head. Empty string on exit-code 3.'
+    value: ${{ steps.run.outputs.added }}
+  removed:
+    description: 'Count of watched options present only in base. Empty string on exit-code 3.'
+    value: ${{ steps.run.outputs.removed }}
+  changed:
+    description: >-
+      Count of watched options present on both sides with a detected
+      change (today: a verdict-kind transition). Not itself a
+      regression/improvement classification -- see this file's own doc
+      comment. Empty string on exit-code 3.
+    value: ${{ steps.run.outputs.changed }}
+  report-json:
+    description: >-
+      The full schema_version:1 diff report, verbatim. Fine to consume
+      directly for a small manifest; for a real nixpkgs-scale one,
+      prefer downloading the uploaded artifact or reading `report-path`
+      in a later step of this job instead -- GitHub Actions step outputs
+      are capped at 1MB, and PR C's own `check` action already hit the
+      OS's own argument/environment size limit passing a ~390KB report
+      through a downstream step's `env:`, well before that cap. This
+      output exists for convenience on small diffs, not as the reliable
+      path for a large one. Empty string on exit-code 3.
+    value: ${{ steps.run.outputs.report-json }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install oba
+      shell: bash
+      run: |
+        set -euo pipefail
+        version="${{ inputs.oba-version }}"
+        if [ "$version" = "latest" ]; then
+          url="https://github.com/PhysShell/nix-option-branch-audit/releases/latest/download/oba-installer.sh"
+        else
+          url="https://github.com/PhysShell/nix-option-branch-audit/releases/download/${version}/oba-installer.sh"
+        fi
+        curl --proto '=https' --tlsv1.2 -LsSf "$url" | sh
+        echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+    - name: Run oba diff
+      id: run
+      shell: bash
+      run: |
+        set +e
+        report="$RUNNER_TEMP/oba-diff-report.json"
+        oba diff --base-root "${{ inputs.base-root }}" --head-root "${{ inputs.head-root }}" \
+          --targets "${{ inputs.targets }}" --json \
+          > "$report"
+        code=$?
+        set -e
+
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+        echo "report-path=$report" >> "$GITHUB_OUTPUT"
+
+        # Exit 3 (TOOL_ERROR) means the analysis never ran to completion
+        # at all -- `$report` exists (the shell redirect creates it
+        # unconditionally) but is empty, not a JSON document: `oba`
+        # itself never printed anything to stdout on that path (see
+        # main()'s error branch in src/main.rs). Only exit 0/2 ever
+        # produce the real envelope, so only those two attempt to parse
+        # it -- jq on an empty/missing file would otherwise abort this
+        # step with a confusing second failure on top of the real one.
+        if [ "$code" != "3" ]; then
+          echo "unchanged=$(jq -r '.summary.unchanged' "$report")" >> "$GITHUB_OUTPUT"
+          echo "added=$(jq -r '.summary.added' "$report")" >> "$GITHUB_OUTPUT"
+          echo "removed=$(jq -r '.summary.removed' "$report")" >> "$GITHUB_OUTPUT"
+          echo "changed=$(jq -r '.summary.changed' "$report")" >> "$GITHUB_OUTPUT"
+
+          # Passed through env:/GITHUB_OUTPUT (never spliced with ${{ }}
+          # into this run: block) -- the same script-injection lesson PR
+          # C's own action.yml already paid for (the JSON embeds raw Nix
+          # source text: parens, quotes). Read FROM THE FILE, same as
+          # every other value on this branch, not reconstructed from a
+          # shell variable.
+          delimiter="oba_json_$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
+          {
+            echo "report-json<<$delimiter"
+            cat "$report"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+        else
+          echo "unchanged=" >> "$GITHUB_OUTPUT"
+          echo "added=" >> "$GITHUB_OUTPUT"
+          echo "removed=" >> "$GITHUB_OUTPUT"
+          echo "changed=" >> "$GITHUB_OUTPUT"
+          echo "report-json=" >> "$GITHUB_OUTPUT"
+        fi
+
+        exit "$code"
+
+    - name: Upload report artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ runner.temp }}/oba-diff-report.json
