@@ -1,0 +1,727 @@
+[
+  {
+    "number": 375846,
+    "title": "nixos/rundeck: init",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 438001,
+    "title": "nixos/mealie: add openFirewall option",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 451958,
+    "title": "nixos/neo4j: add ssl.policies.<name>.enable",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 461073,
+    "title": "udp514-journal: new package and module - forwarding remote logs to journal.",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 481112,
+    "title": "grub2: 2.12 -> 2.14",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 495112,
+    "title": "kaidan: 0.14.0 -> 0.16.0 ",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 495731,
+    "title": "nixos/qbit-manage: init module",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 504200,
+    "title": "bulwark: init at 1.9.0, nixos/bulwark: init, nixos/tests/bulwark: add bulwark test",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 512581,
+    "title": "nixos/logrotate: Copy configFile to /etc, remove option",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 517731,
+    "title": "zfs: support zfs-mount-generator",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 532540,
+    "title": "cliproxyapi: init at 7.2.146",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 534088,
+    "title": "lomiri.lomiri-system-settings: 1.3.2 -> 1.4.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 534100,
+    "title": "lomiri.lomiri: 0.5.0 -> 0.6.1",
+    "categories": [
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 534234,
+    "title": "canaille: 0.2.7 -> 0.3.6",
+    "categories": [
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 536538,
+    "title": "nixos/journald: migrate to RFC 42-style settings",
+    "categories": [
+      "option_declaration",
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 537190,
+    "title": "nginx: support dynamic modules",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 537675,
+    "title": "nixos/softether: fix ExecStart failing on read-only /nix/store",
+    "categories": [
+      "execstart_script_cmdline"
+    ]
+  },
+  {
+    "number": 541090,
+    "title": "nixos/linkding: add options to configure process and thread counts",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 545183,
+    "title": "pumpkin: init at 0-unstable-2026-07-25; nixos/pumpkin: init module",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 547038,
+    "title": "nixos/nginx: add missing types from the referenced compression configs",
+    "categories": [
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 548837,
+    "title": "sstorytime: init at 0-unstable-2026-08-12",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 549553,
+    "title": "nixos/nginx: add locations.<name>.useGrpcErrorPages option",
+    "categories": [
+      "option_declaration",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 549618,
+    "title": "nixos/immich: add database.package option",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 550306,
+    "title": "Change networking.firewall.checkReversePath to \"loose\"",
+    "categories": [
+      "environment"
+    ]
+  },
+  {
+    "number": 550647,
+    "title": "nixos/tpm2: register pkcs11 module with p11-kit",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 550650,
+    "title": "nixos/wireless: add pkcs11 option for smartcard/TPM EAP-TLS",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552038,
+    "title": "nixos/prometheus-exporters/snowflake: init",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552640,
+    "title": "nixos/rancher: make preloaded images detect derivation changes",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552704,
+    "title": "perses: 0.53.1 -> 0.54.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552777,
+    "title": "mediawiki: 1.45.4 -> 1.46.0",
+    "categories": [
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552984,
+    "title": "aurral: init at 2.8.0",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 553474,
+    "title": "nixos/tests: filter out nspawn tests on darwin",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 553699,
+    "title": "nixos/nebula: Add user & group settings, and assertions for truncated TUN device names",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 554062,
+    "title": "nixos/adguardhome: preserve HTTP settings",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 554366,
+    "title": "git-pages.services.default: init",
+    "categories": [
+      "option_declaration",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 554425,
+    "title": "systemd: fix some tests",
+    "categories": [
+      "execstart_script_cmdline",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 554495,
+    "title": "hyphanet: rename from freenet",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 554949,
+    "title": "szurubooru: bump ffmpeg_4-full -> ffmpeg-full",
+    "categories": [
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 555067,
+    "title": "matrix-synapse: 1.158.0 -> 1.159.0, fix test",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555078,
+    "title": "nixos/tests/scion: use new json schema and update CLI flags",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555212,
+    "title": "jool: 4.1.14 -> 4.1.15",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555612,
+    "title": "redis, valkey: migrate to runTest, simplify",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555615,
+    "title": "nixosTests.hitch: migrate to runTest",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555616,
+    "title": "nixosTests.hostname: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555620,
+    "title": "nixosTests.kafka: migrate to runTest",
+    "categories": [
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555621,
+    "title": "nixosTests.kerberos: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555628,
+    "title": "nixosTests.lorri: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555630,
+    "title": "nixosTests.mattermost: migrate to runTest",
+    "categories": [
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555632,
+    "title": "nixosTests.wine: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555635,
+    "title": "nixosTests.thelounge: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555643,
+    "title": "nixosTests.actual: migrate to systemd-nspawn",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555650,
+    "title": "nixosTests.cloudlog: migrate to systemd-nspawn",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555707,
+    "title": "cloudcompare: 2.13.2 -> 2.13.2-unstable-2026-08-21",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555801,
+    "title": "nixos/syncthing: escape properly ignorePatterns",
+    "categories": [
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 556069,
+    "title": "ocamlPackages.kapla: init at 0.4.0",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 556119,
+    "title": " nixos/tests/gitea: lots of clean up, reduce resource usage a lot",
+    "categories": [
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 556413,
+    "title": "nixos/test-driver: cleanup junit.xml creation",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 556558,
+    "title": "vxwm: init at 2.3-unstable-2026-08-08",
+    "categories": [
+      "option_declaration",
+      "environment",
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 556683,
+    "title": "nixos/selfoss: Port to RFC42-style settings",
+    "categories": [
+      "option_declaration",
+      "generated_config"
+    ]
+  },
+  {
+    "number": 557131,
+    "title": "gnome-photos: drop",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 557150,
+    "title": "nixos/tests/systemd-{boot,confinement}: fix races",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 557715,
+    "title": "nixosTests.switchTest: split into parts to bound evaluation memory",
+    "categories": [
+      "execstart_script_cmdline",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 558164,
+    "title": "nixos/tests/prometheus-exporters: Fix ping",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 558400,
+    "title": "sing-box: 1.13.21 -> 1.14.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 558973,
+    "title": "openvswitch: 3.7.1 -> 4.0.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 558981,
+    "title": "nixos/printers: collect provisioning into CUPS' `ExecStartPost`",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 559239,
+    "title": "nixos/selfoss: add support for configuring nginx, add nixos test",
+    "categories": [
+      "option_declaration",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 559314,
+    "title": "nixos/udev: include all rules from systemd in /etc",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 559393,
+    "title": "go-neb: drop",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 560031,
+    "title": "nixos/throttled: restart service when configuration changes",
+    "categories": [
+      "environment"
+    ]
+  },
+  {
+    "number": 560155,
+    "title": "nixos.prefect: module fixes",
+    "categories": [
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 560614,
+    "title": "nixos/systemd-confinement: fix with PrivateTmp=disconnected",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 560664,
+    "title": "python3Packages.exllamav3: 1.4.3 -> 1.4.8; tabbyapi: 0-unstable-2026-08-08 -> 0-unstable-2026-09-07",
+    "categories": [
+      "option_declaration",
+      "environment",
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 561130,
+    "title": "jellyfin{,-web}: 10.11.11 -> 12.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 561424,
+    "title": "modules/image/repart: fix Format=empty",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 561987,
+    "title": "nixos/coder: add url to Coder configuration reference",
+    "categories": [
+      "environment"
+    ]
+  },
+  {
+    "number": 562044,
+    "title": "nixos/suricata: add support for --drop-conf rules",
+    "categories": [
+      "option_declaration",
+      "generated_config"
+    ]
+  },
+  {
+    "number": 562066,
+    "title": "nixos/suricata: reload suricata after ruleset update",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 562127,
+    "title": "nixos/tests/duplicity: init",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 562805,
+    "title": "nixosTests.redis: drop version suffix from test name",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 563010,
+    "title": "sickgear: drop",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "generated_config",
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 563084,
+    "title": "nixos/tests/docuum: init",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 563907,
+    "title": "nixos/nordvpn: inherit maintainers from package",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 564742,
+    "title": "harmonia: 3.2.0 -> 3.3.0; nixos/harmonia: add services.harmonia.gc",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 564265,
+    "title": "nextcloud35: init at 35.0.0",
+    "categories": [
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 564936,
+    "title": "nextcloud32: drop, nextcloud32Packages: drop",
+    "categories": [
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  }
+]
