@@ -1,0 +1,153 @@
+name: Dogfood audit-diff
+
+# P3c: exercises this repo's OWN audit-diff/action.yml against a real
+# published binary (v0.4.0, the first release containing `audit-diff`
+# at all) and this repo's own historical fixtures -- the same
+# "prove install/cwd/exit-code-translation/output plumbing actually
+# work on a real runner" reason dogfood.yml/dogfood-diff.yml already
+# exist for `check`/`diff` (cargo test already covers oba audit-diff's
+# own analysis semantics far more thoroughly -- see the offline
+# CdcDiff/compare_cdc tests and tests/audit_cli.rs).
+#
+# This is P3c's own real acceptance gate, exactly as specified:
+#   self diff        -> 0 meaningful changes
+#   buggy -> fixed    -> a real resolved finding
+#   fixed -> buggy    -> a real new (added) finding
+#   inconclusive      -> Action step SUCCEEDS (advisory, not a failure)
+#   tool error        -> Action step FAILS
+#
+# No checkout/worktree dance for the OBA-only steps below, same reason
+# dogfood-diff.yml gives: fixtures/kimai/before and fixtures/kimai/after
+# are two real, disjoint historical trees already on disk after one
+# checkout. The tool-error step needs no real CDC candidate evaluated
+# either (an unknown [[cdc_target]] name is a real TOOL_ERROR at
+# manifest-validation time, before any `nix eval`) -- so this whole
+# workflow needs no `nix` provisioning at all, unlike k1.yml.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dogfood-audit-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: audit-diff (buggy -> fixed, must succeed with a real resolved finding)
+        id: fixed
+        uses: ./audit-diff
+        with:
+          base-root: fixtures/kimai/before
+          head-root: fixtures/kimai/after
+          targets: fixtures/synthetic/diff-kimai/targets.toml
+          oba-version: v0.4.0
+          artifact-name: oba-audit-diff-report-buggy-to-fixed
+
+      - name: assert the real fix was reported as a resolved finding, not a new one
+        shell: bash
+        env:
+          EXIT_CODE: ${{ steps.fixed.outputs.exit-code }}
+          ADDED: ${{ steps.fixed.outputs.added-findings }}
+          RESOLVED: ${{ steps.fixed.outputs.resolved-findings }}
+          REPORT_PATH: ${{ steps.fixed.outputs.report-path }}
+        run: |
+          test "$EXIT_CODE" = "0"
+          test "$ADDED" = "0"
+          test "$RESOLVED" = "1"
+          test -s "$REPORT_PATH"
+          jq -e '.summary.resolved_findings == 1' "$REPORT_PATH"
+
+      - name: audit-diff (fixed -> buggy, must succeed with a real new finding)
+        id: buggy
+        uses: ./audit-diff
+        with:
+          base-root: fixtures/kimai/after
+          head-root: fixtures/kimai/before
+          targets: fixtures/synthetic/diff-kimai/targets.toml
+          oba-version: v0.4.0
+          artifact-name: oba-audit-diff-report-fixed-to-buggy
+
+      - name: assert the real regression was reported as a new finding, not resolved
+        shell: bash
+        env:
+          EXIT_CODE: ${{ steps.buggy.outputs.exit-code }}
+          ADDED: ${{ steps.buggy.outputs.added-findings }}
+          RESOLVED: ${{ steps.buggy.outputs.resolved-findings }}
+          REPORT_PATH: ${{ steps.buggy.outputs.report-path }}
+        run: |
+          test "$EXIT_CODE" = "0"
+          test "$ADDED" = "1"
+          test "$RESOLVED" = "0"
+          jq -e '.summary.notable[0].bucket == "new_finding"' "$REPORT_PATH"
+          jq -e '.summary.notable[0].code == "OBA001"' "$REPORT_PATH"
+
+      - name: audit-diff (self-diff, fixed against itself, must show zero meaningful changes)
+        id: self
+        uses: ./audit-diff
+        with:
+          base-root: fixtures/kimai/after
+          head-root: fixtures/kimai/after
+          targets: fixtures/synthetic/diff-kimai/targets.toml
+          oba-version: v0.4.0
+          artifact-name: oba-audit-diff-report-self
+
+      - name: assert self-diff produced no findings, resolutions, or changes at all
+        shell: bash
+        env:
+          EXIT_CODE: ${{ steps.self.outputs.exit-code }}
+          ADDED: ${{ steps.self.outputs.added-findings }}
+          RESOLVED: ${{ steps.self.outputs.resolved-findings }}
+          CHANGED: ${{ steps.self.outputs.changed }}
+        run: |
+          test "$EXIT_CODE" = "0"
+          test "$ADDED" = "0"
+          test "$RESOLVED" = "0"
+          test "$CHANGED" = "0"
+
+      - name: audit-diff (golden.toml against itself, real inconclusive -- must still SUCCEED)
+        id: inconclusive
+        uses: ./audit-diff
+        with:
+          base-root: .
+          head-root: .
+          targets: targets/golden.toml
+          oba-version: v0.4.0
+          artifact-name: oba-audit-diff-report-inconclusive
+
+      - name: assert the inconclusive run reported exit-code 2 but did NOT fail the step
+        shell: bash
+        # The whole point of P3c's own advisory exit-code translation:
+        # a real, disclosed INCONCLUSIVE must never read as broken CI.
+        # No continue-on-error above -- if the step itself failed, this
+        # workflow run fails before this assertion is even reached.
+        env:
+          STEP_OUTCOME: ${{ steps.inconclusive.outcome }}
+          EXIT_CODE: ${{ steps.inconclusive.outputs.exit-code }}
+          REPORT_PATH: ${{ steps.inconclusive.outputs.report-path }}
+        run: |
+          test "$STEP_OUTCOME" = "success"
+          test "$EXIT_CODE" = "2"
+          test -s "$REPORT_PATH"
+
+      - name: audit-diff (unknown cdc_target name -- a real tool error, must FAIL the step)
+        id: tool_error
+        uses: ./audit-diff
+        continue-on-error: true
+        with:
+          base-root: .
+          head-root: .
+          targets: fixtures/synthetic/audit-cdc/unknown-candidate.toml
+          oba-version: v0.4.0
+          artifact-name: oba-audit-diff-report-tool-error
+
+      - name: assert the tool error failed the step with exit-code 3, not silently
+        shell: bash
+        env:
+          STEP_OUTCOME: ${{ steps.tool_error.outcome }}
+          EXIT_CODE: ${{ steps.tool_error.outputs.exit-code }}
+        run: |
+          test "$STEP_OUTCOME" = "failure"
+          test "$EXIT_CODE" = "3"
