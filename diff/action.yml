@@ -89,6 +89,7 @@ outputs:
       side's own analysis was inconclusive, "3" the tool itself didn't
       run (bad manifest, missing/escaping files under either root,
       duplicate target identity). Exit "1" never appears for diff.
+    value: ${{ steps.run.outputs.exit-code }}
   report-path:
     description: >-
       Absolute path to the full schema_version:1 diff report (JSON) on
