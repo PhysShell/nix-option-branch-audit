@@ -102,8 +102,21 @@
 //! Doctrine excavation and over env vars (argv is typically a more
 //! direct producer<->consumer boundary than a framework-mediated env
 //! var). Pure model only, deliberately not reusing
-//! `ConsumerContract`/`ContractDiff`. K4b (real historical CLI-drift
-//! census) and K4c (producer correlation) are not started.
+//! `ConsumerContract`/`ContractDiff`.
+//!
+//! K4b (done, `fixtures/cdc/k4b-cli-drift-census/`): a real historical
+//! CLI-flag drift census across a bounded ~21-candidate corpus (Rust/
+//! Go/Python) -- found a real, source-verified rename on a real
+//! nixpkgs-crossed pair: `mimir` 2.14.0 -> 3.2.1,
+//! `-querier.prefer-availability-zone` -> `-querier.prefer-availability-zones`.
+//!
+//! K4c (done): [`evaluate_mimir_cli_drift`] correlates that ONE
+//! qualified case with the real Nix producer -- [`CliDriftRelevance`]
+//! distinguishes "producer still emits the removed flag" (an actual
+//! bug) from "producer adopted the new flag" (handled, no finding) from
+//! "producer never emitted either" (drift real, producer irrelevant).
+//! Deliberately Mimir-specific throughout -- no generic CLI extractor
+//! framework, no `krill` work this round.
 
 use std::path::Path;
 use std::process::Command;
@@ -1440,6 +1453,179 @@ fn require_no_duplicate_flags(flags: &[String], side: &str) -> Result<Vec<String
     Ok(flags.to_vec())
 }
 
+/// K4c: correlates the ONE real, K4b-qualified CLI drift case
+/// (`mimir` 2.14.0 -> 3.2.1, `-querier.prefer-availability-zone` ->
+/// `-querier.prefer-availability-zones`) with the real Nix producer.
+/// Deliberately narrow and Mimir-specific throughout -- no generic CLI
+/// extractor framework, no `krill` work, per explicit instruction. This
+/// is the first K3/K4-series round that reuses `diff_cli_contracts`
+/// (K4a) against a REAL pair rather than a synthetic test fixture.
+///
+/// Reuses `eval_nix_raw` (K1) for the producer side, unchanged.
+///
+/// Fail-closed distinction the design review required: three outcomes,
+/// only one of which is an actual bug. `ProducerStillEmitsRemoved` (A)
+/// is the only finding-worthy case; `ProducerAdoptedNew` (B) proves the
+/// checker can tell "drift happened, nixpkgs already adapted" from a
+/// real bug; `ProducerIrrelevant` (C) proves producer-relevance
+/// filtering works at all -- upstream contract drift is real (K4b) but
+/// simply doesn't reach this particular Nix module's own emitted argv.
+#[derive(Debug, Clone, PartialEq)]
+pub enum CliDriftRelevance {
+    ProducerStillEmitsRemoved,
+    ProducerAdoptedNew,
+    ProducerIrrelevant,
+}
+
+/// Pure. Deliberately NOT a substring search -- unsound here
+/// specifically, since `prefer-availability-zone` is a literal PREFIX
+/// of `prefer-availability-zones`; a naive `argv.contains(needle)`
+/// could not tell "old flag present" from "new flag present" apart.
+/// Checks both single- and double-dash spellings (Go's `flag` package
+/// treats them as equivalent) and requires the character immediately
+/// after the matched flag name to be `=`, whitespace, or end-of-string.
+fn argv_contains_flag(argv: &str, flag_name: &str) -> bool {
+    for prefix in ["--", "-"] {
+        let needle = format!("{prefix}{flag_name}");
+        let mut search_from = 0;
+        while let Some(rel) = argv[search_from..].find(&needle) {
+            let pos = search_from + rel;
+            let before_ok = pos == 0
+                || argv.as_bytes().get(pos - 1).is_some_and(|b| b.is_ascii_whitespace());
+            let after = &argv[pos + needle.len()..];
+            let after_ok =
+                after.is_empty() || after.starts_with('=') || after.starts_with(char::is_whitespace);
+            if before_ok && after_ok {
+                return true;
+            }
+            search_from = pos + needle.len();
+        }
+    }
+    false
+}
+
+/// Pure. `removed_flag`/`added_flag` are the specific names
+/// `diff_cli_contracts` (K4a) already confirmed for this pair -- this
+/// function doesn't recompute the diff, only classifies real argv
+/// against it.
+pub fn classify_cli_drift_relevance(
+    removed_flag: &str,
+    added_flag: &str,
+    argv: &str,
+) -> CliDriftRelevance {
+    if argv_contains_flag(argv, removed_flag) {
+        CliDriftRelevance::ProducerStillEmitsRemoved
+    } else if argv_contains_flag(argv, added_flag) {
+        CliDriftRelevance::ProducerAdoptedNew
+    } else {
+        CliDriftRelevance::ProducerIrrelevant
+    }
+}
+
+/// Pure. Reuse survey: same bounded-literal-scan discipline Phase
+/// D/K2f already established, applied to a THIRD real source shape
+/// (Go's `flag.FlagSet` convention) -- not a general Go parser, not a
+/// new precedent. Scoped to this file's own consistent convention:
+/// every directly-named flag registration is
+/// `f.<Method>(&cfg.<Field>, "<literal>", ...)`. Recognizes ONLY the
+/// literal form -- a flag registered via a named Go constant (e.g.
+/// `f.DurationVar(&cfg.X, queryStoreAfterFlag, ...)`) is NOT captured,
+/// a real, disclosed limitation, not a silent gap. Confirmed for real
+/// this affects exactly two flags in this file
+/// (`querier.streaming-chunks-per-{ingester,store-gateway}-buffer-size`,
+/// literals in 2.14.0, refactored to named constants resolving to the
+/// IDENTICAL strings in 3.2.1 -- verified by reading the constant
+/// declarations directly, not assumed) -- confirmed NOT a second real
+/// rename before this extractor's raw output was trusted for the
+/// actual finding below.
+pub fn extract_go_flagset_literal_names(source: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    const NEEDLE: &str = "&cfg.";
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find(NEEDLE) {
+        let pos = search_from + rel;
+        let after_field = &source[pos + NEEDLE.len()..];
+        let ident_end = after_field
+            .find(|c: char| !(c.is_ascii_alphanumeric() || c == '_' || c == '.'))
+            .unwrap_or(after_field.len());
+        let after_ident = after_field[ident_end..].trim_start();
+        if let Some(rest) = after_ident.strip_prefix(',') {
+            let rest = rest.trim_start();
+            if let Some(lit_rest) = rest.strip_prefix('"') {
+                if let Some(end) = lit_rest.find('"') {
+                    names.push(lit_rest[..end].to_string());
+                }
+            }
+        }
+        search_from = pos + NEEDLE.len();
+    }
+    names
+}
+
+/// Real: reads the vendored, integrity-locked `querier.go` fixture (see
+/// `fixtures/integrity-lock.toml`) -- NOT a live fetch, same discipline
+/// as every other vendored consumer fixture in this project.
+fn mimir_querier_go_contract(vendored_path: &str, version: &str) -> Result<CliContract, CdcError> {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(vendored_path);
+    let source = std::fs::read_to_string(&path)
+        .map_err(|e| CdcError::ToolError(format!("reading {}: {e}", path.display())))?;
+    let flags = extract_go_flagset_literal_names(&source);
+    if flags.is_empty() {
+        return Err(CdcError::Inconclusive(format!(
+            "no literal flag names extracted from {vendored_path} -- extractor no longer \
+             understands this source shape"
+        )));
+    }
+    Ok(CliContract { program: "mimir".to_string(), version: version.to_string(), flags })
+}
+
+const MIMIR_2_14_0_FIXTURE: &str = "fixtures/cdc/mimir-2.14.0/querier.go";
+const MIMIR_3_2_1_FIXTURE: &str = "fixtures/cdc/mimir-3.2.1/querier.go";
+const MIMIR_REMOVED_FLAG: &str = "querier.prefer-availability-zone";
+const MIMIR_ADDED_FLAG: &str = "querier.prefer-availability-zones";
+
+/// Real: `pkgs.mimir`'s own NixOS module, evaluated with the module's
+/// OWN default configuration (`extraFlags = []`, its own real default,
+/// not overridden) -- the same "ask Nix, don't hand-interpret the
+/// module" discipline this whole project has used since K1.
+fn eval_mimir_exec_start(rev: &str) -> Result<String, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.mimir = {{ enable = true; configuration = {{ target = "all"; }}; }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in eval.config.systemd.services.mimir.serviceConfig.ExecStart"#
+    );
+    eval_nix_raw(&expr)
+}
+
+/// Real: the full K4c pipeline for the one qualified case -- extract
+/// both vendored contracts, confirm the K4b-identified rename via the
+/// unchanged K4a `diff_cli_contracts`, evaluate the real producer argv,
+/// classify. Fails closed (via the `?` propagation from every real
+/// step above) rather than guessing if extraction or evaluation don't
+/// behave as expected -- this function never falls back to asserting
+/// the rename by name alone.
+pub fn evaluate_mimir_cli_drift(rev: &str) -> Result<CliDriftRelevance, CdcError> {
+    let base = mimir_querier_go_contract(MIMIR_2_14_0_FIXTURE, "2.14.0")?;
+    let head = mimir_querier_go_contract(MIMIR_3_2_1_FIXTURE, "3.2.1")?;
+    let diff = diff_cli_contracts(&base, &head)?;
+    if !diff.removed.iter().any(|f| f == MIMIR_REMOVED_FLAG) {
+        return Err(CdcError::ToolError(format!(
+            "expected the real consumer diff to show {MIMIR_REMOVED_FLAG} as removed -- \
+             extraction or a vendored fixture has drifted from what K4b confirmed"
+        )));
+    }
+    let argv = eval_mimir_exec_start(rev)?;
+    Ok(classify_cli_drift_relevance(MIMIR_REMOVED_FLAG, MIMIR_ADDED_FLAG, &argv))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2653,5 +2839,165 @@ mod k4a_tests {
             proptest::prop_assert_eq!(forward.added, backward.removed);
             proptest::prop_assert_eq!(forward.retained, backward.retained);
         }
+    }
+}
+
+#[cfg(test)]
+mod k4c_tests {
+    use super::*;
+
+    // --- extract_go_flagset_literal_names: offline, pure ---
+
+    #[test]
+    fn extractor_captures_a_direct_literal_flag() {
+        let src = r#"f.StringVar(&cfg.Foo, "my.flag", "", "help text")"#;
+        assert_eq!(extract_go_flagset_literal_names(src), vec!["my.flag".to_string()]);
+    }
+
+    #[test]
+    fn extractor_captures_multiple_flags_in_order_found() {
+        let src = r#"
+            f.StringVar(&cfg.Foo, "foo.flag", "", "help")
+            f.BoolVar(&cfg.Bar, "bar.flag", true, "help")
+        "#;
+        assert_eq!(
+            extract_go_flagset_literal_names(src),
+            vec!["foo.flag".to_string(), "bar.flag".to_string()]
+        );
+    }
+
+    /// The real, confirmed extraction limitation: a flag registered via
+    /// a named Go constant is NOT captured. Deliberate -- not a general
+    /// Go parser, a bounded scan over this one observed shape.
+    #[test]
+    fn extractor_skips_a_constant_referenced_flag_name() {
+        let src = r#"f.DurationVar(&cfg.Foo, someConstantFlagName, 0, "help")"#;
+        assert!(extract_go_flagset_literal_names(src).is_empty());
+    }
+
+    #[test]
+    fn extractor_skips_a_concatenation_expression() {
+        let src = r#"f.DurationVar(&cfg.Foo, someConst+"-suffix", 0, "help")"#;
+        assert!(extract_go_flagset_literal_names(src).is_empty());
+    }
+
+    #[test]
+    fn extractor_ignores_unrelated_ampersand_cfg_usage() {
+        let src = r#"someOtherFunc(&cfg.Foo)"#;
+        assert!(extract_go_flagset_literal_names(src).is_empty());
+    }
+
+    // --- argv_contains_flag: offline, pure -- the exact correctness
+    // trap this section exists to avoid: prefer-availability-zone is a
+    // literal PREFIX of prefer-availability-zones. ---
+
+    #[test]
+    fn argv_contains_flag_matches_single_dash() {
+        assert!(argv_contains_flag("mimir -querier.prefer-availability-zone=eu", "querier.prefer-availability-zone"));
+    }
+
+    #[test]
+    fn argv_contains_flag_matches_double_dash() {
+        assert!(argv_contains_flag("mimir --querier.prefer-availability-zone=eu", "querier.prefer-availability-zone"));
+    }
+
+    #[test]
+    fn argv_contains_flag_does_not_false_match_a_shorter_flag_inside_a_longer_one() {
+        // only the PLURAL flag is present; searching for the SINGULAR
+        // (a strict prefix of the plural) must NOT match.
+        let argv = "mimir --querier.prefer-availability-zones=eu-west,eu-east";
+        assert!(!argv_contains_flag(argv, "querier.prefer-availability-zone"));
+        assert!(argv_contains_flag(argv, "querier.prefer-availability-zones"));
+    }
+
+    #[test]
+    fn argv_contains_flag_absent_entirely() {
+        assert!(!argv_contains_flag(
+            "mimir --config.file=/etc/mimir.yaml",
+            "querier.prefer-availability-zone"
+        ));
+    }
+
+    // --- classify_cli_drift_relevance: offline, pure -- the A/B/C
+    // distinction the design review required. ---
+
+    #[test]
+    fn classify_a_producer_still_emits_removed() {
+        let argv = "mimir --querier.prefer-availability-zone=eu";
+        assert_eq!(
+            classify_cli_drift_relevance("querier.prefer-availability-zone", "querier.prefer-availability-zones", argv),
+            CliDriftRelevance::ProducerStillEmitsRemoved
+        );
+    }
+
+    #[test]
+    fn classify_b_producer_adopted_new() {
+        let argv = "mimir --querier.prefer-availability-zones=eu-west,eu-east";
+        assert_eq!(
+            classify_cli_drift_relevance("querier.prefer-availability-zone", "querier.prefer-availability-zones", argv),
+            CliDriftRelevance::ProducerAdoptedNew
+        );
+    }
+
+    #[test]
+    fn classify_c_producer_irrelevant() {
+        let argv = "mimir --config.file=/etc/mimir.yaml";
+        assert_eq!(
+            classify_cli_drift_relevance("querier.prefer-availability-zone", "querier.prefer-availability-zones", argv),
+            CliDriftRelevance::ProducerIrrelevant
+        );
+    }
+
+    // --- Real: the vendored contracts + diff_cli_contracts (K4a,
+    // unchanged) against the two real vendored files -- offline (no
+    // nix/network needed, these files are already vendored), but
+    // exercising the real extraction end-to-end, locking in the exact
+    // real result this round hand-verified. ---
+
+    #[test]
+    fn real_vendored_mimir_contracts_diff_matches_the_hand_verified_result() {
+        let base = mimir_querier_go_contract(MIMIR_2_14_0_FIXTURE, "2.14.0").unwrap();
+        let head = mimir_querier_go_contract(MIMIR_3_2_1_FIXTURE, "3.2.1").unwrap();
+        let diff = diff_cli_contracts(&base, &head).unwrap();
+
+        assert!(diff.removed.contains(&MIMIR_REMOVED_FLAG.to_string()));
+        assert!(diff.added.contains(&MIMIR_ADDED_FLAG.to_string()));
+
+        // The real, hand-verified extraction blind spot (K4c's own doc
+        // comment on extract_go_flagset_literal_names): these two flags
+        // were literals in 2.14.0 and became named-constant references
+        // in 3.2.1 (constants confirmed, by reading the source, to
+        // resolve to the IDENTICAL strings) -- a real limitation of
+        // this bounded extractor, not a second genuine rename. Asserted
+        // here explicitly so a future accidental fix of the extractor
+        // (or a real further upstream change) is caught by this test,
+        // not silently absorbed.
+        assert!(diff.removed.contains(&"querier.streaming-chunks-per-ingester-buffer-size".to_string()));
+        assert!(diff.removed.contains(&"querier.streaming-chunks-per-store-gateway-buffer-size".to_string()));
+
+        // Real, confirmed retained flags -- present as literals in BOTH
+        // versions.
+        assert!(diff.retained.contains(&"querier.query-engine".to_string()));
+        assert!(diff.retained.contains(&"querier.enable-query-engine-fallback".to_string()));
+    }
+
+    // --- Real end-to-end: needs a real `nix` binary and network access
+    // (fetchTarball), opt-in only, same as every other real test in
+    // this module. ---
+
+    /// The actual K4c finding: mimir's real NixOS module, evaluated
+    /// with its own default configuration, never emits EITHER the
+    /// removed or the added flag -- outcome C. Real, upstream CLI
+    /// contract drift (K4b) exists, but this Nix producer never reached
+    /// it either way (the module renders its config as a YAML file,
+    /// `--config.file=...` is the module's only default CLI flag;
+    /// `services.mimir.extraFlags` exists as a real escape hatch but
+    /// defaults to empty and nothing in this corpus sets it to either
+    /// name).
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn mimir_producer_correlation_is_outcome_c_producer_irrelevant() {
+        let relevance = evaluate_mimir_cli_drift(AFTER_REV).unwrap();
+        assert_eq!(relevance, CliDriftRelevance::ProducerIrrelevant);
     }
 }

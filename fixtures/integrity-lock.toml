@@ -153,3 +153,24 @@ repo = "doctrine/dbal"
 commit = "61e730f1658814821a85f2402c945f3883407dec"
 upstream_path = "src/Driver/PDO/PgSQL/Driver.php"
 sha256 = "3c70c3fb0d848e2154808556e0a5197162647b0a8416fcbca7e1bc9d8d331791"
+
+# K4c: the one real, source-verified CLI-flag rename K4b's census
+# found. `commit` is the real commit each tag (`mimir-2.14.0`/
+# `mimir-3.2.1`) points to (both are annotated tags -- dereferenced via
+# the GitHub API, not assumed identical to the tag's own object sha).
+# Both are real nixpkgs pins for the `mimir` package (oldest real
+# nixpkgs commit for 2.14.0; the project's own AFTER_REV pins 3.2.1
+# exactly).
+[[fixture]]
+path = "fixtures/cdc/mimir-2.14.0/querier.go"
+repo = "grafana/mimir"
+commit = "bc5a6ce2f67de0f5fbade9b000e4bf46d6d59518"
+upstream_path = "pkg/querier/querier.go"
+sha256 = "652e90a5881f34a733cfdfa5d633c32acfc3cc2fd3a360bce4338467a482d768"
+
+[[fixture]]
+path = "fixtures/cdc/mimir-3.2.1/querier.go"
+repo = "grafana/mimir"
+commit = "e49585d43c6e852225e114bd1ddd98da58a4c060"
+upstream_path = "pkg/querier/querier.go"
+sha256 = "9dd9d1ca5a7f19afdd4283103a1d35fa74e89513047a34dfe03694faf02fa9e9"
