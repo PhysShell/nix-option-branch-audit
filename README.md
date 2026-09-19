@@ -2243,6 +2243,48 @@ no longer accepts."
     point it stops being a contract checker and starts being an
     archaeological expedition through Composer history.
 
+14. **K4a — CLI contract model (pure).** The next interface family,
+    picked over further Doctrine excavation ("past this point it stops
+    being a contract checker and starts being an archaeological
+    expedition through Composer history") and over env vars (ranked
+    second): argv is typically a direct producer↔consumer boundary
+    (`ExecStart = "${pkg}/bin/foo --socket ...";` on the Nix side, the
+    upstream program's own argument parser on the consumer side), with
+    less framework mediation than K2e/K2f/K2g repeatedly found sitting
+    between a Nix-emitted env var and its actual consumer. Mirrors
+    K3a's own scope exactly: pure model only, no extraction, no real
+    nixpkgs research — that's K4b's job, not started this round.
+    `CliContract { program, version, flags }` +
+    `CliFlagDiff { removed, added, retained }` +
+    `diff_cli_contracts(base, head)`, deliberately NOT reusing
+    `ConsumerContract`/`ContractDiff` even though the shape rhymes —
+    forcing a shared abstraction now would blur what's actually being
+    compared for no real current benefit; worth building once/if it
+    falls out naturally from a second real use, not speculatively
+    because two `enum`s look similar. Fail-closed on a `program`
+    mismatch (the CLI analogue of K3a's library/dialect fail-close) and
+    on a duplicate flag in either input, never silently deduped.
+    Deliberately only diffs FLAG NAMES — K3b's own `movim`
+    same-name/different-mechanism finding applies here in principle
+    too, but stays explicitly out of scope until K4 has caught at least
+    one real name-level drift case first.
+
+    **Extraction-source ranking recorded as a design principle for
+    K4b, NOT implemented as code this round**: (1) structured parser
+    metadata/source (a Rust `clap` derive's `#[arg(long = "...")]`, a Go
+    `cobra`/`flag` definition, a Python `argparse`/`click` call) — the
+    closest analogue to Phase D's own bounded literal scan, same trust
+    level; (2) `--help` output, only if demonstrably stable across the
+    compared versions; (3) other source literals/definitions, still
+    real vendored source; (4) documentation, fallback/provenance-hint
+    only, never the primary oracle. Good first families for K4b's own
+    census: Rust `clap`, Go `cobra`/`flag`, Python `argparse`/`click`.
+
+    6 new unit tests (self-diff-empty, a real `--socket`→`--unix-socket`
+    add/remove case, program mismatch, duplicate flag in base, duplicate
+    flag in head, ordering-independence) + 2 property-based (`proptest`,
+    same crate/tier K3a's own tests already use).
+
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
 into the type system before a second one shows the shape repeats), H2,
