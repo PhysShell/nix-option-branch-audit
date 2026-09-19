@@ -3672,3 +3672,55 @@ existing CDC abstraction models), not touched by this census. The
 here cleared the frequency bar in the first place, so the question of
 whether a fix would stay general never had to be tested against a real
 temptation to special-case one app.
+
+## C-E1.1: `GeneratedConfigArtifact` qualification audit -- QUALIFIED
+
+Full report: `fixtures/c-e1.1-generated-config-audit/census.md`.
+Protocol (`protocol.md`, committed before any candidate was inspected):
+a candidate qualifies for a future `GeneratedConfigArtifact` CDC
+abstraction only if all four links are separately proven, each with
+its own real evidence -- **A** the Nix producer really generates the
+exact artifact, **B** that same artifact is really bound to the
+consumer process, **C** the consumer's own exact pinned source really
+parses it, **D** the accepted keys are really extractable in a bounded
+way. No partial credit; format (JSON/YAML/TOML/HCL/INI/...) explicitly
+rejected as an abstraction axis before any evidence was looked at --
+it's a locator detail feeding one evidence model, never its own enum
+variant.
+
+All 14 of E1's own already-named "generated multi-key config" holdout
+candidates investigated for real (four parallel research passes, real
+`nix eval` for A/B, freshly-fetched real upstream consumer source at
+each package's exact pinned version for C/D — E1 itself never checked
+C/D at all). **Result: 12/14 (86%) show the full A→B→C→D chain.** The 2
+real failures are both clean, different `NO_PRODUCER_PROOF` cases
+(`libinput`: renders a fragment fed into a *different*, unvendored
+module's own artifact, never its own; `nohang`: zero Nix-rendered
+content exists at all, only package-bundled static files or a raw
+user-supplied path) — the exact "looks like generated config at a
+glance, isn't on real inspection" false-positive risk this audit was
+built to catch.
+
+A blind second review (given only the protocol and candidate names,
+explicitly required to re-derive C/D from real upstream source itself,
+never trust a citation) re-investigated 5 candidates — the 2 failures
+plus 3 successes of varying complexity. **13/14 assessed links agreed
+(93%)**, a sharp jump from E1's own 50% on its first, looser attempt at
+this kind of judgment. The one disagreement (`akkoma`'s D-link) resolved
+in the blind reviewer's favor on independent re-verification — it had
+found a real, ~105KB machine-readable schema file (`config/
+description.exs`) the first pass's own research simply hadn't
+surfaced, not a case of two people reading identical evidence and
+guessing differently. `akkoma` corrected to `SUPPORTED`, transparently.
+
+**Both decision-rule conditions met decisively** (≥5/14 with A∧B∧C∧D,
+and ≥80% inter-rater agreement): **C-E1.2 (the real `GeneratedConfigArtifact`
+CDC vertical) is qualified to be built.** Support held across a genuinely
+wide matrix — 11 different format/language/binding-mechanism
+combinations, including 3 distinct real binding shapes E1 itself never
+checked (a direct `ExecStart` flag, an `environment.etc` activation-time
+symlink, a `makeWrapper`-injected env var, and even one fully implicit
+hardcoded-default-path case with zero CLI arguments at all) — with the
+identical A→B→C→D evidence shape throughout. This is the empirical
+confirmation, not just the design intent, that format/binding are
+locator details under one reusable model.
