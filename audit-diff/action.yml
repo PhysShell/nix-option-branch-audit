@@ -1,0 +1,216 @@
+name: 'oba audit-diff'
+description: 'Install a pinned oba release and run `oba audit-diff` between two already-materialized roots, advisory by default.'
+author: 'PhysShell'
+
+# P3c: the same "remain stupid" contract `diff/action.yml` (PR D3) and
+# `action.yml` (PR C) already established, applied to `audit-diff`.
+# This action does exactly four things: install the pinned binary, run
+# `oba audit-diff --base-root ... --head-root ... --targets ...
+# --summary-path ...`, translate its exit code into an ADVISORY pass/
+# fail (see below -- this is the one real behavioral difference from
+# `diff/action.yml`), and hand back the report + a ready-made step
+# summary. Nothing else. In particular:
+#   - NO checkout/worktree/git logic, same as `diff/action.yml` -- see
+#     that file's own doc comment. base-root/head-root are two
+#     ALREADY-MATERIALIZED filesystem paths.
+#   - NO reclassification of findings/transitions. `oba audit-diff`
+#     itself already computes new_findings/resolved_findings/
+#     new_inconclusives/evidence_changed and a bounded, pre-formatted
+#     `notable` list (see src/main.rs's own `classify_transition_bucket`/
+#     `render_github_summary`) -- this action never re-derives any of
+#     that from the raw JSON with jq/shell. The step summary is written
+#     by `oba audit-diff` itself (`--summary-path`) and `cat`'d
+#     verbatim; the only jq usage here is trivial field extraction
+#     (`.summary.new_findings`) for the small scalar outputs below,
+#     never a boolean/classification expression.
+#
+# ADVISORY EXIT SEMANTICS (the one real design decision this action
+# itself makes, deliberately, per the user's own explicit P3c spec):
+#   CLI exit 0 (comparison produced, no side inconclusive) -> step
+#     succeeds.
+#   CLI exit 2 (comparison produced, but analysis was inconclusive on
+#     at least one side) -> step STILL succeeds. This is NOT the same
+#     translation `diff/action.yml` makes (there, exit 2 fails the
+#     step) -- deliberately different here, because an advisory Action
+#     exists specifically so "I don't know" never reads as "broken".
+#     `oba`'s own fail-closed INCONCLUSIVE is a real, disclosed
+#     analytical result, not a tool failure; failing the CI step on it
+#     would train maintainers to treat every inconclusive the same as
+#     a real bug in this tool, exactly the confusion this project's own
+#     fail-closed design has tried to avoid from K1 onward.
+#   CLI exit 3 (tool/input error -- the analysis never ran to
+#     completion at all) -> step fails. This is the one case that IS a
+#     real problem with the invocation itself (bad manifest, missing/
+#     escaping root, duplicate identity, ...).
+#   CLI exit 1 never occurs (see run_audit_diff's own doc comment).
+# The real `exit-code` output always carries the UNTRANSLATED CLI value
+# ("0"/"2"/"3") so a consuming workflow that wants stricter gating (e.g.
+# fail on ANY inconclusive) can still build that policy on top --
+# CI policy belongs one level above this action, same boundary
+# `diff/action.yml` already draws for regression/improvement judgment.
+#
+# File-based transport, same size lesson `diff/action.yml` already
+# paid for (see that file's own doc comment: a real ~390KB report hit
+# the OS's own execve() argument+environment limit through `env:`).
+# `report-path` is the PRIMARY output; `added-findings`/
+# `resolved-findings`/`new-inconclusives`/`changed` are small, genuinely
+# bounded integers; there is deliberately NO `report-json` output here
+# at all (unlike `diff/action.yml`'s convenience-only one) -- P3c's own
+# spec is explicit that the full report belongs in the artifact, never
+# threaded through Actions' own output/expression plumbing.
+
+inputs:
+  base-root:
+    description: >-
+      Filesystem root analyzed as "base" (oba audit-diff --base-root).
+      Must already exist on disk -- this action does no checkout of its
+      own; use two `actions/checkout` steps (different `ref`s), a `git
+      worktree add`, or two jobs with a shared artifact to materialize
+      it.
+    required: true
+  head-root:
+    description: >-
+      Filesystem root analyzed as "head" (oba audit-diff --head-root).
+      Must already exist on disk, same caveat as base-root.
+    required: true
+  targets:
+    description: >-
+      Path to the TOML target manifest ([[target]]/[[cdc_target]]
+      entries), resolved relative to the workflow's own working
+      directory -- NOT to either root. One manifest applied to both
+      roots.
+    required: true
+  oba-version:
+    description: >-
+      oba release tag to install, e.g. "v0.4.0", or "latest". Must be a
+      release that actually contains the `audit-diff` subcommand and
+      its `--summary-path` flag (P3b/P3c) -- v0.3.0 and earlier predate
+      both entirely.
+    required: false
+    default: 'latest'
+  artifact-name:
+    description: >-
+      Name for the uploaded JSON report artifact. Override this if you
+      invoke this action more than once in the same job.
+    required: false
+    default: 'oba-audit-diff-report'
+
+outputs:
+  exit-code:
+    description: >-
+      oba audit-diff's own, UNTRANSLATED exit code as a string: "0" the
+      comparison was produced with no side inconclusive, "2" the
+      comparison was produced but at least one side's own analysis was
+      inconclusive (this action's own step still SUCCEEDS on "2" -- see
+      this file's own doc comment), "3" the tool itself didn't run
+      (this action's own step FAILS on "3"). "1" never appears.
+    value: ${{ steps.run.outputs.exit-code }}
+  report-path:
+    description: >-
+      Absolute path to the full schema_version:1 audit-diff report
+      (JSON) on the runner's own filesystem. Always populated on
+      exit-code 0/2; on a real exit-code 3 the file exists (the shell
+      redirect creates it) but is empty, not a JSON document -- check
+      exit-code first.
+    value: ${{ steps.run.outputs.report-path }}
+  added-findings:
+    description: >-
+      Count of subjects that newly became a Finding (crossed INTO
+      Finding from Pass or Inconclusive) between base and head --
+      `summary.new_findings`, read verbatim, never recomputed. Empty
+      string on exit-code 3.
+    value: ${{ steps.run.outputs.added-findings }}
+  resolved-findings:
+    description: >-
+      Count of subjects that stopped being a Finding (crossed OUT of
+      Finding) between base and head -- `summary.resolved_findings`,
+      read verbatim. Empty string on exit-code 3.
+    value: ${{ steps.run.outputs.resolved-findings }}
+  new-inconclusives:
+    description: >-
+      Count of subjects that went from a clean Pass to Inconclusive --
+      `summary.new_inconclusives`, read verbatim. Empty string on
+      exit-code 3.
+    value: ${{ steps.run.outputs.new-inconclusives }}
+  changed:
+    description: >-
+      Total count of Changed entries across both engines (D2's own
+      boring change-algebra bucket, NOT itself a finding-transition
+      count) -- `summary.changed`, read verbatim. Empty string on
+      exit-code 3.
+    value: ${{ steps.run.outputs.changed }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install oba
+      shell: bash
+      run: |
+        set -euo pipefail
+        version="${{ inputs.oba-version }}"
+        if [ "$version" = "latest" ]; then
+          url="https://github.com/PhysShell/nix-option-branch-audit/releases/latest/download/oba-installer.sh"
+        else
+          url="https://github.com/PhysShell/nix-option-branch-audit/releases/download/${version}/oba-installer.sh"
+        fi
+        curl --proto '=https' --tlsv1.2 -LsSf "$url" | sh
+        echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+    - name: Run oba audit-diff
+      id: run
+      shell: bash
+      # Inputs enter the shell only via env: (GitHub Actions expressions
+      # NEVER spliced directly into this run: block) -- the same real
+      # script-injection lesson `diff/action.yml`/`action.yml` already
+      # paid for; base-root/head-root/targets are caller-supplied
+      # strings this action has no reason to trust as shell-safe.
+      env:
+        BASE_ROOT: ${{ inputs.base-root }}
+        HEAD_ROOT: ${{ inputs.head-root }}
+        TARGETS: ${{ inputs.targets }}
+      run: |
+        set +e
+        report="$RUNNER_TEMP/oba-audit-diff-report.json"
+        summary="$RUNNER_TEMP/oba-audit-diff-summary.md"
+        oba audit-diff --base-root "$BASE_ROOT" --head-root "$HEAD_ROOT" \
+          --targets "$TARGETS" --format json --summary-path "$summary" \
+          > "$report"
+        cli_code=$?
+        set -e
+
+        echo "exit-code=$cli_code" >> "$GITHUB_OUTPUT"
+        echo "report-path=$report" >> "$GITHUB_OUTPUT"
+
+        # Same reasoning as diff/action.yml's own identical branch: on a
+        # real exit-code 3 the tool never produced a JSON envelope (or a
+        # summary file) at all -- jq-ing an empty/missing file would
+        # otherwise abort this step with a second, confusing failure on
+        # top of the real one.
+        if [ "$cli_code" != "3" ]; then
+          echo "added-findings=$(jq -r '.summary.new_findings' "$report")" >> "$GITHUB_OUTPUT"
+          echo "resolved-findings=$(jq -r '.summary.resolved_findings' "$report")" >> "$GITHUB_OUTPUT"
+          echo "new-inconclusives=$(jq -r '.summary.new_inconclusives' "$report")" >> "$GITHUB_OUTPUT"
+          echo "changed=$(jq -r '.summary.changed' "$report")" >> "$GITHUB_OUTPUT"
+          if [ -s "$summary" ]; then
+            cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+          fi
+        else
+          echo "added-findings=" >> "$GITHUB_OUTPUT"
+          echo "resolved-findings=" >> "$GITHUB_OUTPUT"
+          echo "new-inconclusives=" >> "$GITHUB_OUTPUT"
+          echo "changed=" >> "$GITHUB_OUTPUT"
+        fi
+
+        # Advisory translation (this file's own doc comment, above):
+        # only a real exit-code 3 fails this step.
+        if [ "$cli_code" = "3" ]; then
+          exit 1
+        fi
+        exit 0
+
+    - name: Upload report artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ runner.temp }}/oba-audit-diff-report.json
