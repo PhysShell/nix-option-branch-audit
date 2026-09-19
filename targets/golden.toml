@@ -392,3 +392,38 @@ test = "fixtures/e1-holdout-audit/xandikos/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "xandikos"]
 watch = ["enable"]
+
+# --- E1/P1 regression: mkEnableOption normalized as a declaration of a
+# plain boolean option with a known default (default = false, unless a
+# `// {...}` merge overrides it -- real Nix `//` precedence). Case 1
+# (bare mkEnableOption) and case 2 (the `// {...}` override form, the
+# same real shape libinput's own module uses) are synthetic and
+# isolated from GAP-2's own nested-options-idiom gap (both use the
+# flat-dotted `options.services.X = {...};` form). Case 3 is the real
+# nohang module/test, vendored from E1 -- the cleanest real E1 case
+# this fix unlocks end-to-end (flat form, one watched option, no other
+# gap involved).
+
+[[target]]
+name = "h2-case16-mkenableoption-bare"
+module = "fixtures/synthetic/h2-mkenableoption-bare/module.nix"
+test = "fixtures/synthetic/h2-mkenableoption-bare/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthEnableBare"]
+watch = ["enable"]
+
+[[target]]
+name = "h2-case17-mkenableoption-override-default-wins"
+module = "fixtures/synthetic/h2-mkenableoption-override/module.nix"
+test = "fixtures/synthetic/h2-mkenableoption-override/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthEnableOverride"]
+watch = ["enable"]
+
+[[target]]
+name = "h2-case18-nohang-real-mkenableoption"
+module = "fixtures/e1-holdout-audit/nohang/module.nix"
+test = "fixtures/e1-holdout-audit/nohang/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nohang"]
+watch = ["enable"]

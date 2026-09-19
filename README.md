@@ -3485,3 +3485,67 @@ All 5 existing K1-H2 offline test suites (129+9+11+1 = 150 tests) and
 the full `tests/golden.rs` suite (47 → 49) pass unchanged — zero
 regressions, confirmed by a real run, not assumed from the diff's small
 size.
+
+## P1: `mkEnableOption` normalized as a declaration, not a name match
+
+E1's own single biggest, most concentrated signal (84% of its 32
+inconclusive holdout results traced to this one cause): `mkEnableOption`
+— nixpkgs's own standard, stable, documented helper for a service's
+`enable` toggle (`lib/options.nix`: always `mkOption { type = types.bool;
+default = false; ...};`) — was completely invisible to `scan_options`'s
+declaration scanner. `is_mk_option_call` only recognized a literal
+`mkOption` call by name; a call to a DIFFERENT function entirely was
+silently skipped, `walk_options_block`'s own recursion never matching it.
+
+Fixed deliberately NOT as a second hardcoded string sitting next to
+`"mkOption"` — the user's own explicit concern going in: a narrow,
+name-matched special case just restarts the same regex farm the moment a
+real wrapper/alias/re-export of `mkEnableOption` shows up in some future
+holdout. Instead: a new, small, explicit `OptionHelperCall` enum —
+`Explicit` (an `mkOption {...}` call, unchanged: read its own literal
+`default =` field) and `EnableOption` (a `mkEnableOption <description>`
+call, MODELED with its own known, stable semantic contract: a boolean
+option defaulting to `false`) — dispatched by `classify_option_helper_call`,
+a single, honestly-maintained place a future real helper gets added to,
+not a scattered set of `if call_head_name == "..."` checks. The `//`
+merge-override form real modules actually use (libinput's own `lib.
+mkEnableOption "libinput" // { default = config.services.xserver.enable;
+...};`) is modeled too: the override's own `default` field wins over the
+synthesized `false`, the same precedence real Nix's `//` operator itself
+has — `find_attrset_field` (factored out of the existing `mk_option_field`,
+which now just calls it) does the actual field lookup either way, so the
+`mkOption`/`mkEnableOption` cases share the exact same "read this
+attrset's own field" mechanism rather than two independently-maintained
+copies of it.
+
+**Three new regression tests** (`h2-case16`/`17`/`18`): a bare
+`mkEnableOption` (isolated from GAP-2, flat-dotted declaration form) —
+correctly synthesizes `default = false`, a real witnessed `PASS`; the
+`//`-override form (a literal `default = true;` override, the same real
+shape libinput uses with a cross-module default instead) — correctly
+uses the OVERRIDE's own default, not the synthesized one, proven by
+asserting the exact `default_outcome` the real JSON output carries; and
+the real `nohang` module/test (vendored from E1, flat-dotted form, no
+other gap involved) — a genuinely clean, real, witnessed `PASS` on
+completely unfamiliar code.
+
+**Re-measured against the full 40-candidate E1 holdout** (same frozen
+corpus, not reshuffled — the informal preview of what E1-R will make
+official): candidate-level outcomes moved from **6 PASS (5 clean + 1
+right-answer-wrong-mechanism) / 2 FINDING / 32 INCONCLUSIVE** to **13
+PASS (all clean — xandikos's own false-positive is now gone, correctly
+`OptionNotFound` instead of a wrong `PASS`, still blocked by the
+separate P2 gap) / 2 FINDING (unchanged — `flame`/`convos` both still
+real) / 25 INCONCLUSIVE.** Exactly matching the user's own stated
+success criteria: false-positive capability 1 → 0, `TOOL_ERROR` 0 → 0,
+existing true findings preserved, inconclusive rate substantially down
+(32 → 25; +7 candidates now cleanly analyzable).
+
+**P2 checked, not assumed, before starting it**: of the 32 originally-
+inconclusive candidates, 10 were independently attributed to a SEPARATE
+cause (the nested `options = { services.X = {...}; };` declaration idiom
+losing the `option_prefix` boundary). Re-measured post-P1: all 10
+(`cadvisor`, `send`, `svnserve`, `coturn`, `tor`, `vault`, `spacecookie`,
+`unpackerr`, `omada`, `unbound`) remain inconclusive — none resolved
+automatically. P2 is confirmed still fully load-bearing, not obsoleted
+by P1, and is next.

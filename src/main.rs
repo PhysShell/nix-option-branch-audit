@@ -735,11 +735,9 @@ fn walk_options_block(
 
         path.extend(segs.clone());
 
-        if is_mk_option_call(&value) {
-            let default_node = mk_option_field(&value, "default");
-            let default_source = default_node.as_ref().map(|n| n.text().to_string());
-            let default_class = default_node.as_ref().map(classify_value);
-            let default_known_value = default_node.as_ref().and_then(classify_known_value);
+        if let Some(helper) = classify_option_helper_call(&value) {
+            let (default_source, default_class, default_known_value) =
+                option_helper_default(&helper, &value);
             out.push(OptionDecl {
                 path: path.clone(),
                 default_source,
@@ -771,20 +769,38 @@ fn walk_options_block(
 }
 
 fn is_mk_option_call(node: &SyntaxNode) -> bool {
+    is_call_named(node, "mkOption")
+}
+
+/// Resolves a call-head expression the same way `call_head_name` does,
+/// then checks it against `name` -- e.g. `is_call_named(node,
+/// "mkEnableOption")` matches both `mkEnableOption "x"` and
+/// `lib.mkEnableOption "x"`. Shared by `is_mk_option_call` and P1's own
+/// `classify_option_helper_call` below, instead of each hand-rolling its
+/// own `flatten_apply` + `call_head_name` check.
+fn is_call_named(node: &SyntaxNode, name: &str) -> bool {
     if node.kind() != NODE_APPLY {
         return false;
     }
     let (head, _args) = flatten_apply(node);
-    call_head_name(&head).as_deref() == Some("mkOption")
+    call_head_name(&head).as_deref() == Some(name)
 }
 
 fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
     let (_head, args) = flatten_apply(apply_node);
-    let arg = args.first()?;
-    if arg.kind() != NODE_ATTR_SET {
+    find_attrset_field(args.first()?, field)
+}
+
+/// Shared by `mk_option_field` (an `mkOption {...}` call's own first
+/// argument) and P1's own `classify_option_helper_call` (an
+/// `mkEnableOption ... // {...}` merge's RHS attrset) -- looking a named
+/// field up in an attrset is the same operation either way, not two
+/// independently-maintained copies of the same walk.
+fn find_attrset_field(attrset: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
+    if attrset.kind() != NODE_ATTR_SET {
         return None;
     }
-    for entry in arg.children() {
+    for entry in attrset.children() {
         if entry.kind() != NODE_ATTRPATH_VALUE {
             continue;
         }
@@ -796,6 +812,89 @@ fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
         }
     }
     None
+}
+
+/// E1/P1 fix. A recognized nixpkgs option-declaring HELPER call, with
+/// its own KNOWN, stable semantic contract -- a small, explicit,
+/// honestly maintained table of "known helper -> known synthesized
+/// declaration shape", not a literal-string special case buried in the
+/// walker's control flow (the exact "regular-expression farm" this
+/// design was reviewed to avoid: a future `lib.mkEnableOption`
+/// re-alias/wrapper needs a new entry HERE, in one place, not a new
+/// scattered string match). `mkOption` needs nothing synthesized -- its
+/// own literal `default =` field is read directly, unchanged from
+/// before this fix. `mkEnableOption <description>` is nixpkgs's own
+/// stable, documented helper (`lib/options.nix`): always `mkOption {
+/// type = types.bool; default = false; ...};` -- modeled here as that
+/// exact known default, UNLESS the call is immediately `//`-merged with
+/// its own attrset (e.g. libinput's real `lib.mkEnableOption "libinput"
+/// // { default = config.services.xserver.enable; };`), in which case
+/// the override's own `default` field wins -- the same precedence real
+/// Nix's `//` operator itself has (the override's OTHER keys, and the
+/// synthesized `default = false` if the override doesn't mention
+/// `default` at all, both survive untouched).
+enum OptionHelperCall {
+    Explicit,
+    EnableOption { override_attrs: Option<SyntaxNode> },
+}
+
+fn classify_option_helper_call(node: &SyntaxNode) -> Option<OptionHelperCall> {
+    if let Some(bin) = rnix::ast::BinOp::cast(node.clone()) {
+        if bin.operator() == Some(rnix::ast::BinOpKind::Update) {
+            let lhs = bin.lhs()?.syntax().clone();
+            let rhs = bin.rhs()?.syntax().clone();
+            if is_call_named(&lhs, "mkEnableOption") && rhs.kind() == NODE_ATTR_SET {
+                return Some(OptionHelperCall::EnableOption {
+                    override_attrs: Some(rhs),
+                });
+            }
+        }
+        return None;
+    }
+    if is_call_named(node, "mkOption") {
+        return Some(OptionHelperCall::Explicit);
+    }
+    if is_call_named(node, "mkEnableOption") {
+        return Some(OptionHelperCall::EnableOption {
+            override_attrs: None,
+        });
+    }
+    None
+}
+
+/// The `(default_source, default_class, default_known_value)` triple
+/// for one recognized `OptionHelperCall`, the same three pieces of
+/// evidence `walk_options_block` has always recorded per `OptionDecl` --
+/// factored out so the `mkOption`/`mkEnableOption` cases can't drift
+/// out of sync with each other.
+fn option_helper_default(
+    helper: &OptionHelperCall,
+    value: &SyntaxNode,
+) -> (Option<String>, Option<ValueClass>, Option<KnownValue>) {
+    let default_node = match helper {
+        OptionHelperCall::Explicit => mk_option_field(value, "default"),
+        OptionHelperCall::EnableOption { override_attrs } => override_attrs
+            .as_ref()
+            .and_then(|attrs| find_attrset_field(attrs, "default")),
+    };
+    match default_node {
+        Some(node) => (
+            Some(node.text().to_string()),
+            Some(classify_value(&node)),
+            classify_known_value(&node),
+        ),
+        None => match helper {
+            // mkEnableOption's own known, stable default -- synthesized,
+            // never read from source text, since there IS no source
+            // text for it at a bare `mkEnableOption "..."` call site.
+            OptionHelperCall::EnableOption { .. } => (
+                Some("false".to_string()),
+                Some(ValueClass::Bool(false)),
+                Some(KnownValue::Exact(Scalar::Bool(false))),
+            ),
+            OptionHelperCall::Explicit => (None, None, None),
+        },
+    }
 }
 
 /// E1/GAP-4 fix. True if `node` sits inside (a strict descendant of)

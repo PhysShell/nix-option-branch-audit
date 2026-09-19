@@ -1372,3 +1372,64 @@ fn h2_case15_xandikos_real_nested_submodule_collision_no_longer_false_positives(
          got {paths:?}"
     );
 }
+
+// --- E1/P1 regression: mkEnableOption normalized as a declaration of a
+// plain boolean option with a known default. Before this fix:
+// `mkEnableOption` (nixpkgs's own standard helper for a service's
+// `enable` toggle) was invisible to scan_options's declaration scanner
+// entirely -- is_mk_option_call only recognized a literal `mkOption`
+// call -- so every option declared this way was OptionNotFound
+// regardless of whether a real predicate branched on it. E1 found this
+// was the root cause behind 84% of its 32 real inconclusive holdout
+// results.
+
+#[test]
+fn h2_case16_mkenableoption_bare_is_recognized_with_default_false() {
+    let reports = run_golden();
+    let r = target(&reports, "h2-case16-mkenableoption-bare");
+    assert_eq!(
+        verdict_kind(r, "enable"),
+        "PASS",
+        "a bare `mkEnableOption` declaration must now be found, with its real, known \
+         default (false)"
+    );
+    let verdict = verdict_obj(r, "enable");
+    assert_eq!(
+        verdict["default_outcome"], false,
+        "mkEnableOption's own synthesized default must be `false` -- got {verdict:?}"
+    );
+}
+
+#[test]
+fn h2_case17_mkenableoption_override_default_wins() {
+    // The same real shape libinput's own module uses (`mkEnableOption
+    // "..." // { default = config.services.xserver.enable; };`), here
+    // with a literal override so the exact value can be asserted: the
+    // `// {...}` merge's own `default = true;` must win over the
+    // synthesized `false`, the same precedence real Nix's `//` operator
+    // itself has.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case17-mkenableoption-override-default-wins");
+    assert_eq!(verdict_kind(r, "enable"), "PASS");
+    let verdict = verdict_obj(r, "enable");
+    assert_eq!(
+        verdict["default_outcome"], true,
+        "the `// {{ default = true; }}` override must win over mkEnableOption's own \
+         synthesized `false`; got {verdict:?}"
+    );
+}
+
+#[test]
+fn h2_case18_nohang_real_mkenableoption_is_a_clean_pass() {
+    // The real, in-the-wild confirmation: nohang's `enable =
+    // mkEnableOption "...";`, flat-dotted declaration form (no GAP-2
+    // involved), a single real `mkIf cfg.enable {...}` predicate, and a
+    // real test flipping it to `true`. Before this fix: `OptionNotFound`
+    // -- the option was never even visible to gate 1. After: a real,
+    // correctly witnessed `PASS` on completely unfamiliar code.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case18-nohang-real-mkenableoption");
+    assert_eq!(verdict_kind(r, "enable"), "PASS");
+    let verdict = verdict_obj(r, "enable");
+    assert_eq!(verdict["default_outcome"], false);
+}
