@@ -4569,3 +4569,35 @@ tool is now "beta ready" (the code has now seen these exact 30 PRs),
 only a regression corpus. A fresh, non-overlapping sample (S2, under a
 new frozen release) is what would actually answer the still-open
 actionability question.
+
+## S1-R: regression rerun, all 30 PRs match expectation
+
+Exactly that regression corpus, run immediately after: the SAME 30
+PRs, against a dev build with S1-F1/F2/F3 landed. **30/30 matched
+their predicted result.** Both original `TOOL_ERROR` PRs now produce
+real comparisons; four more PRs S1 itself never even attempted (base
+module absent, previously just skipped) also now run cleanly as real
+`Added` entries — the fix generalizes past the exact two cases that
+found it. `#492803` no longer shows `resolved_findings=1`; turned out
+to be a same-subject `finding_became_inconclusive` (the module file
+itself still exists, only the option's own declaration vanished via
+`mkRemovedOptionModule`) — a more precise result than S1's own
+original writeup speculated. Both real `Inconclusive -> Pass`
+improvements now show `resolved_inconclusive`, confirmed in the actual
+rendered `summary.md`, not just the JSON. The remaining 24 PRs
+reproduced byte-for-byte identical to S1's own original result — zero
+unintended side effects. One honest correction made to S1's own
+`results.md` along the way (an option name/verdict-class label was
+imprecise for `#559055`; the substantive conclusion was already
+correct).
+
+Per the user's own explicit framing, this is confirmation the fixes
+work, not a beta-readiness claim — the code has now literally seen
+these 30 PRs. **Not started, awaiting explicit go**: a new `v0.4.1`
+release freeze, then S2 — a fresh, non-overlapping sample with a split
+design (a random cohort for real-world prevalence, plus a separate
+"stress" cohort of PRs that specifically change option declarations/
+test config/`ExecStart`/environment/generated config/package version,
+counted separately so neither number can be accused of cherry-picking)
+— the only round that can actually answer the still-open actionability
+question.
