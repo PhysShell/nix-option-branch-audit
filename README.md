@@ -2113,32 +2113,49 @@ before any more intelligence gets added to the checker):
 
 K1–K2g (current-contract validation: does the Nix-emitted producer key
 match one specific pinned consumer revision's accepted contract) is
-DONE. **K3 — Differential Consumer Contracts is next, started as a
-separate experiment, not an extension of `compare_contract`.** The
-question is structurally different: current-contract asks "producer
-↔ consumer at revision X"; package-bump drift asks "consumer contract
-at BASE ↔ consumer contract at HEAD, and does Nix still emit a name the
-consumer no longer accepts." K3a doesn't need `ProducerEvidence` at
-all — its first phase is pure: `ContractDiff { removed, added, retained }`
-over two already-extracted accepted-key sets, with boring, checkable
-invariants (`diff(A, A)` is empty; `diff(A, B).removed ==
-diff(B, A).added`; ordering irrelevant; duplicate/malformed input is
-fail-closed, never silently deduped) — no "breaking"/"regression"/
-"safe rename" semantics, only facts. K3b is a REQUIRED census before
-any more K3 code: search the small set of already-qualified consumer
-families (Doctrine MySQL, Doctrine PostgreSQL, Illuminate MySQL,
-Illuminate PostgreSQL) for at least one REAL historical nixpkgs package
-bump where the extractable contract actually changed — explicitly not
-started with a synthetic rename standing in for evidence; if the corpus
-shows no real drift, that is itself a real, reportable result, not a
-reason to fabricate one. K3c (producer correlation — does Nix still
-emit a name the consumer just dropped) only happens once K3b finds a
-real case to correlate against. **`part-db`'s own finding sets the
-constraint for all of this**: a consumer contract's identity must
-include its library AND its dialect/driver, not just be a bare set of
-strings, or a differential checker comparing across dialects would
-manufacture "drift" that's actually just Doctrine MySQL vs. Doctrine
-PostgreSQL being different libraries wearing the same package name.
+DONE. **K3 — Differential Consumer Contracts, started as a separate
+experiment, not an extension of `compare_contract`.** The question is
+structurally different: current-contract asks "producer ↔ consumer at
+revision X"; package-bump drift asks "consumer contract at BASE ↔
+consumer contract at HEAD, and does Nix still emit a name the consumer
+no longer accepts."
+
+11. **K3a — pure `ContractDiff`. Closed, `5eee36a`, confirmed green in
+    real CI (`gh run view --log`: 163 offline tests across all 5
+    targets; `k1.yml`'s own 27 real tests unaffected, confirming zero
+    K1–K2g code was touched).** Deliberately doesn't reference
+    `ProducerEvidence`/`ConsumerRoute` at all — pure set difference
+    between two `ConsumerContract { library, dialect, version,
+    accepted_keys }`s, producing `ContractDiff { removed, added,
+    retained }`. No "breaking"/"regression"/"safe rename"
+    classification and no fuzzy matching — those stay K3c's job, once a
+    real historical drift case exists to correlate against; K3a reports
+    facts only. `part-db`'s own K2g finding sets a hard constraint,
+    enforced at the type/fail-closed level, not just documented:
+    `diff_contracts` REFUSES to compare two contracts with a different
+    `library` or `dialect` — diffing Doctrine's MySQL driver against its
+    own Postgres driver would manufacture "drift" that's really just two
+    different libraries-in-effect sharing one package name (Doctrine's
+    Postgres driver genuinely has no `unix_socket` key at all; a
+    dialect-blind diff would have wrongly reported it as removed).
+    Duplicate accepted keys in either input contract are also
+    fail-closed, never silently deduped. 9 new offline tests: 7 unit
+    (self-diff-empty, a real add/remove case, library mismatch, dialect
+    mismatch — the exact `part-db` lesson —, duplicate key in base,
+    duplicate key in head, ordering-independence) + 2 property-based
+    (`proptest`, same crate/tier H2's own pure-IR tests already use, not
+    a new precedent): `diff(A, A)` is always empty, and removed/added
+    are symmetric under swapping base and head.
+
+**K3b (real-drift census) is next, required before any more K3 code.**
+Search the small set of already-qualified consumer families (Doctrine
+MySQL, Doctrine PostgreSQL, Illuminate MySQL, Illuminate PostgreSQL) for
+at least one REAL historical nixpkgs package bump where the extractable
+contract actually changed — explicitly not started with a synthetic
+rename standing in for evidence; if the corpus shows no real drift, that
+is itself a real, reportable result, not a reason to fabricate one. K3c
+(producer correlation — does Nix still emit a name the consumer just
+dropped) only happens once K3b finds a real case to correlate against.
 
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
