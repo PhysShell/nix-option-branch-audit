@@ -3635,3 +3635,40 @@ its real test does flip it, live proof the fix discriminates correctly
 rather than flagging everything. 13 remaining inconclusives all trace to
 causes E1's own census already named — no new gap discovered by this
 re-run, only the already-fixed ones confirmed fixed.
+
+## E2: residual inconclusive census (research-only, zero code changes)
+
+Full report: `fixtures/e1-holdout-audit/e2-residual-census.md`. After
+E1-R's jump (32 → 13 inconclusive), the user's own instruction: don't
+guess between "more OBA" and "CDC generated-config" — census the
+residual 13 by hand first, against a pre-fixed decision rule (one root
+cause ≥ 4/13 → targeted fix; two together ≥ ~60% → two fixes; diffuse →
+freeze OBA, pivot to CDC), and specifically record the FIRST blocking
+cause only (a target with five oddities counts once, at whichever gate
+the real chain actually stops on first) plus a counterfactual (would
+fixing it actually flip the verdict, or is another blocker immediately
+behind it).
+
+**Result: genuinely diffuse.** Nine distinct concrete causes behind 13
+candidates (one, `monado`, contributes two — a real file-import opacity
+on two of its options, a wholly separate `mkEnableOption ... //
+mkOption {...}` declaration edge case on a third). The largest single-
+mechanism cluster (a `with`/`let...in` wrapper around an options value
+that `scan_options` never unwraps before requiring a literal
+`NODE_ATTR_SET`) is 2/13. The largest *thematic* cluster (test-side
+import/reference/function indirection) is 4/13 but is explicitly NOT
+one fix — three genuinely different mechanisms, one of which (chasing
+an external, unvendored test-helper file) is arguably outside this
+project's own stated scope entirely. Reporting that as "one 31% gap"
+would be exactly the bucket-counting mistake this project's own K2c
+round already got corrected for once.
+
+**Per the pre-fixed rule: OBA frozen at its current level** (P0-P2,
+E1-R's 21 PASS / 6 FINDING / 13 INCONCLUSIVE / 0 TOOL_ERROR) — **next
+is the CDC generated-config-artifact work**, E1's own strongest
+remaining signal (35% of the holdout shares one producer shape no
+existing CDC abstraction models), not touched by this census. The
+"no app-specific special case" gate was never actually invoked — nothing
+here cleared the frequency bar in the first place, so the question of
+whether a fix would stay general never had to be tested against a real
+temptation to special-case one app.
