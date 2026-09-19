@@ -174,12 +174,17 @@ runs:
           echo "removed=$(jq -r '.summary.removed' "$report")" >> "$GITHUB_OUTPUT"
           echo "changed=$(jq -r '.summary.changed' "$report")" >> "$GITHUB_OUTPUT"
 
-          # Passed through env:/GITHUB_OUTPUT (never spliced with ${{ }}
-          # into this run: block) -- the same script-injection lesson PR
-          # C's own action.yml already paid for (the JSON embeds raw Nix
-          # source text: parens, quotes). Read FROM THE FILE, same as
-          # every other value on this branch, not reconstructed from a
-          # shell variable.
+          # Passed through env:/GITHUB_OUTPUT (never spliced with a GitHub
+          # Actions expression into this run: block) -- the same script-
+          # injection lesson PR C's own action.yml already paid for (the
+          # JSON embeds raw Nix source text: parens, quotes). Read FROM
+          # THE FILE, same as every other value on this branch, not
+          # reconstructed from a shell variable. (A literal empty
+          # expression token in a comment here once broke this file's own
+          # YAML/expression parsing -- GitHub's template parser scans a
+          # composite action's run: block text for that token even inside
+          # a comment; this note is deliberately phrased to never contain
+          # it again.)
           delimiter="oba_json_$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
           {
             echo "report-json<<$delimiter"
