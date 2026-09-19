@@ -139,7 +139,118 @@ skip is itself a recorded outcome, not a mulligan.
   below -- recorded as a judgment call, explicitly labeled as such, not
   disguised as a measured result.
 
+## Amendment (after batch 1+2 reported, before batch 3+4 were read) --
+user-requested safeguards against E1 quietly becoming a self-assessment
+
+Batches 1 and 2 (candidates 1-20) had already reported back when this
+amendment was written; batches 3 and 4 had not. Applied retroactively
+to backfill 1+2's classifications against the rubric below during
+final aggregation (the raw evidence they collected doesn't change, only
+the classification scheme applied to it) -- not a re-investigation, and
+not something batch 3/4's already-running agents were interrupted or
+re-briefed for.
+
+1. **Exact nixpkgs revision, already pinned, restated for emphasis**:
+   the population was built from the single pinned tree
+   `68740713a1d5904edf9ba92a998a522b1b6ce080` (see "Population and draw
+   method" above), fetched once before the draw and never re-fetched --
+   not "current master" drifting under repeated reads. Every candidate
+   in this audit was fetched `?ref=68740713a1d5904edf9ba92a998a522b1b6ce080`
+   explicitly, never a bare `master`/`HEAD` ref.
+
+2. **E1-OBA and E1-CDC are two independent measurements, never blended
+   into one "coverage" number.** E1-OBA is an objective, executed
+   result (the real frozen binary's real verdict). E1-CDC is an expert
+   structural classification against a fixed rubric (below) -- an
+   adapter-fit HYPOTHESIS, not executable support, and must never be
+   reported alongside E1-OBA's numbers as if they were the same kind of
+   evidence.
+
+3. **CDC fit rubric, frozen before aggregation, six categories --
+   `requires new reusable adapter` does NOT count as supported/covered
+   in any metric**:
+   - `existing_abstraction_exact` -- the candidate's real
+     producer/consumer shape matches an existing `ProducerEvidence`/
+     `ConsumerRoute`/`CliContract`/`EnvContract` variant with zero new
+     Rust needed beyond a new per-app call site (the same kind of
+     "wire it up" work K2f's Illuminate adapter already does per app).
+   - `existing_abstraction_new_locator` -- the SHAPE matches an
+     existing abstraction, but reaching it needs a new, still-generic
+     locator/extractor (e.g. a new bounded-scan pattern like
+     `extract_go_flagset_literal_names`, reusable across apps of that
+     same family, not this one app specifically).
+   - `requires_new_reusable_adapter` -- no existing abstraction's shape
+     fits at all; a genuinely new `ProducerEvidence`-style variant or
+     equivalent would be needed, but one that could still serve MULTIPLE
+     future apps of the same newly-observed shape (e.g. the "generated
+     multi-key settings file" pattern batch 1/2 already saw recur).
+   - `requires_app_specific_logic` -- even a new reusable abstraction
+     wouldn't cleanly cover it; this candidate's own idiosyncrasy would
+     need bespoke, non-reusable handling.
+   - `not_applicable` -- no producer/consumer boundary this project's
+     abstractions could ever target (e.g. ringboard: picks a local
+     binary, no external contract at all).
+   - `cannot_determine` -- the investigating agent couldn't reach a
+     confident classification from the real source alone (recorded
+     honestly, not forced into one of the other five).
+
+4. **Unified per-candidate evidence template, structured fields as the
+   primary result -- free prose is supporting detail, never the only
+   record of a classification**:
+   ```
+   candidate:
+   module_path:
+   test_path:
+   nixpkgs_sha: 68740713a1d5904edf9ba92a998a522b1b6ce080
+   oba_targets: [ { option_prefix, watch } ... ]
+   oba_verdict: PASS | FINDING | INCONCLUSIVE | TOOL_ERROR
+   oba_inconclusive_reason: unsupported_predicate | unresolved_config
+     | manifest_construction_ambiguity | path_layout_issue | other | n/a
+   cdc_producer_shape:
+   cdc_consumer_shape:
+   cdc_closest_existing_abstraction:
+   cdc_fit_classification: existing_abstraction_exact |
+     existing_abstraction_new_locator | requires_new_reusable_adapter |
+     requires_app_specific_logic | not_applicable | cannot_determine
+   cdc_evidence: <file:line citations, not a vibe>
+   special_case_required: yes | no
+   finding_manually_verified: yes | no | n/a
+   notes:
+   ```
+   Batches 1/2's existing per-candidate write-ups already carry every
+   fact this schema needs (module/test paths, real verdicts, real
+   source citations) -- backfilling them into these exact fields during
+   aggregation is a reformatting pass, not new investigation. Batches
+   3/4 (still running under their original free-prose brief) get the
+   same backfill treatment once they report.
+
+5. **Double-independent-review subset, after all four batches close**:
+   a second, independent pass re-classifies 8-10 of the 40 candidates'
+   `cdc_fit_classification` from the same real evidence, blind to the
+   first pass's answer, specifically to measure inter-rater consistency
+   on the rubric in (3) -- not to re-run the whole corpus. If the two
+   passes disagree often, specifically between
+   `existing_abstraction_exact`/`_new_locator` and
+   `requires_new_reusable_adapter`, that means the rubric itself isn't
+   operational enough yet, and gets reported as exactly that finding,
+   not smoothed over.
+
+6. **Population caveat, stated in the final report, not just here**:
+   the population is every real NixOS service module with a MATCHING
+   top-level `nixos/tests/X.nix` -- i.e. already test-covered at the
+   module level. This is necessary for OBA (no test.nix, no branch
+   evidence to check at all) but means the holdout is more
+   test-friendly than nixpkgs as a whole. The honest conclusion is
+   "generalizes within NixOS service modules that already have a
+   matching module-level test," never "generalizes across 40 random
+   NixOS services" or "across nixpkgs."
+
 ## Recording schema, per candidate
+
+Superseded by the unified evidence template in the amendment above,
+which is now the authoritative per-candidate schema. Kept below only as
+the original schema batches 1 and 2 were briefed under (why their raw
+write-ups look different before backfilling):
 
 ```
 name, language/build-system, interface mechanism observed
@@ -155,17 +266,34 @@ notes
 
 ## Metrics (computed once the batch is closed, not tracked live)
 
-- **coverage** -- of applicable boundaries, how many were actually
-  analyzable (OBA `supported`/`finding`, not `inconclusive`/`n/a`).
-- **precision** -- of any `finding`s, how many survive manual
+**E1-OBA (objective, from the real executed binary):**
+- **coverage** -- of applicable boundaries (excludes `not_applicable`),
+  how many reached `PASS`/`FINDING` rather than `INCONCLUSIVE`.
+- **precision** -- of any `FINDING`s, how many survive manual
   verification against the real module/test source.
-- **inconclusive rate** -- how often the system honestly declined,
-  and why (bucketed by `ResolveFailure`/gate reason).
-- **adapter reuse** -- how many candidates' real consumer contract
-  would fit an EXISTING CDC abstraction unchanged (structural judgment,
-  see above).
-- **special-case pressure** -- how many would need a genuinely new,
-  per-app `if app == ...`-shaped adapter to go beyond `not_applicable`.
+- **inconclusive rate, broken down by reason** -- `unsupported_predicate`
+  / `unresolved_config` / `manifest_construction_ambiguity` /
+  `path_layout_issue` / `other`, reported as separate counts, never one
+  blended percentage. A 35% inconclusive rate concentrated in one reason
+  is a concrete next H-stage; the same 35% spread across a dozen
+  distinct reasons is a different diagnosis entirely, and the rate alone
+  can't tell those apart.
+
+**E1-CDC (expert structural classification, explicitly not executable
+evidence):**
+- **special-case pressure** -- the headline CDC metric:
+  `(requires_new_reusable_adapter + requires_app_specific_logic) /
+  (all candidates except not_applicable and cannot_determine)`. This is
+  the direct, measured answer to "how much of this is universal vs. how
+  much would need hardcoding per app."
+- **adapter reuse** -- `existing_abstraction_exact +
+  existing_abstraction_new_locator`, over the same denominator. Reported
+  separately from special-case pressure, never netted against it into a
+  single "coverage" figure, and never combined with E1-OBA's own
+  coverage number.
+- **inter-rater consistency** -- from the double-review subset (5
+  above), reported as agreement/disagreement counts on the rubric, not
+  folded into either metric above.
 
 ## What E1 is explicitly not
 
