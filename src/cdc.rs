@@ -68,6 +68,16 @@
 //! [`IlluminateDriver`] (mysql vs postgres), never on app identity.
 //! `doctrine/dbal`/`composer.lock` are never consulted anywhere in this
 //! path.
+//!
+//! K2g (done): Phase D vendoring for `strichliste`/`part-db`, the two
+//! real corpus cases K2e already qualified as needing no new semantic
+//! model. [`acquire_strichliste_evidence`]/[`acquire_part_db_evidence`]
+//! reuse the entire existing K1 pipeline (Phase C/D/E, K2a/K2b)
+//! unchanged. Real find: `strichliste`'s pinned doctrine/dbal 3.10.5
+//! driver is byte-identical to the already-vendored 3.10.6 one -- no
+//! duplicate fixture. `part-db`'s Postgres driver has no `unix_socket`
+//! key at all (`host=` doubles as socket path there) -- the first
+//! non-MySQL-dialect Doctrine fixture in this project.
 
 use std::path::Path;
 use std::process::Command;
@@ -208,12 +218,14 @@ pub fn fetch_composer_lock(rev: &str, package_attr: &str) -> Result<String, CdcE
 }
 
 /// Reads the git commit `fixtures/integrity-lock.toml` already records
-/// for the vendored Doctrine driver fixture -- the existing,
-/// hand-verified provenance record from K1's own Phase A, reused here as
-/// K2a's comparison oracle instead of a second Rust constant duplicating
-/// the same fact under a different name (the removed
-/// `DOCTRINE_DBAL_REV`).
-fn vendored_doctrine_source_reference() -> Result<String, CdcError> {
+/// for a given vendored fixture path -- the existing, hand-verified
+/// provenance record from K1's own Phase A, reused as K2a's (and now
+/// K2g's) comparison oracle instead of a second Rust constant
+/// duplicating the same fact under a different name (the removed
+/// `DOCTRINE_DBAL_REV`). Parameterized by `vendored_path` (K2g) --
+/// originally hardcoded to the one K1/K2a fixture; generalizing it is
+/// the ENTIRE change, callers/behavior for that one path are unchanged.
+fn vendored_fixture_source_reference(vendored_path: &str) -> Result<String, CdcError> {
     #[derive(serde::Deserialize)]
     struct Lock {
         fixture: Vec<Entry>,
@@ -224,7 +236,6 @@ fn vendored_doctrine_source_reference() -> Result<String, CdcError> {
         commit: String,
     }
 
-    const VENDORED_PATH: &str = "fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php";
     let lock_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/integrity-lock.toml");
     let text = std::fs::read_to_string(&lock_path)
         .map_err(|e| CdcError::ToolError(format!("reading {}: {e}", lock_path.display())))?;
@@ -232,13 +243,17 @@ fn vendored_doctrine_source_reference() -> Result<String, CdcError> {
         .map_err(|e| CdcError::ToolError(format!("parsing {}: {e}", lock_path.display())))?;
     lock.fixture
         .into_iter()
-        .find(|e| e.path == VENDORED_PATH)
+        .find(|e| e.path == vendored_path)
         .map(|e| e.commit)
         .ok_or_else(|| {
             CdcError::ToolError(format!(
-                "fixtures/integrity-lock.toml has no entry for {VENDORED_PATH}"
+                "fixtures/integrity-lock.toml has no entry for {vendored_path}"
             ))
         })
+}
+
+fn vendored_doctrine_source_reference() -> Result<String, CdcError> {
+    vendored_fixture_source_reference("fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php")
 }
 
 /// K2a.1: [`fetch_composer_lock`] above (unchanged, still used exactly as
@@ -1058,6 +1073,95 @@ pub fn acquire_illuminate_consumer_contract(
         &connector_source,
         driver,
     )
+}
+
+/// K2g: Phase D vendoring for `strichliste`/`part-db` -- the two real
+/// corpus cases K2e already qualified as needing ZERO new semantic
+/// model (`strichliste`: Symfony's bundle calls Doctrine's own
+/// `DsnParser`, unchanged contract; `part-db`: same mechanism, Postgres
+/// dialect). Reuses the ENTIRE existing K1 pipeline unchanged --
+/// `extract_key_for_value` (Phase C), `extract_accepted_keys` (Phase D,
+/// below), `compare_contract` (Phase E), `build_sentinel_flow_evidence`/
+/// `resolve_consumer_identity`/`fetch_composer_lock` (K2a/K2b) -- this
+/// section only adds two new real acquisition paths and two new
+/// vendored consumer fixtures, no new comparison semantics.
+const STRICHLISTE_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/strichliste.nix";
+const STRICHLISTE_OPTION: &str = "services.strichliste.environment.DATABASE_URL";
+const STRICHLISTE_SINK: &str = "systemd.services.\"strichliste-migrate\".environment.DATABASE_URL";
+
+/// Real: Phase B-shaped -- `environment.DATABASE_URL` is a real option,
+/// sentinel-injected exactly like Kimai's `database.socket`.
+/// `module_override` is the same mutation-testing hook `nixos_eval_expr`
+/// already provides.
+pub fn eval_strichliste_database_url(
+    rev: &str,
+    sentinel: &str,
+    module_override: Option<&Path>,
+) -> Result<String, CdcError> {
+    let expr = nixos_eval_expr(
+        rev,
+        STRICHLISTE_UPSTREAM_PATH,
+        module_override,
+        &format!(
+            r#"services.strichliste = {{ enable = true; domain = "strichliste.example.com"; environment.DATABASE_URL = "mysql://u@localhost/db?charset=utf8&unix_socket={sentinel}"; }};"#
+        ),
+    );
+    eval_nix_raw(&format!(
+        r#"({expr}).config.systemd.services."strichliste-migrate".environment.DATABASE_URL"#
+    ))
+}
+
+pub fn acquire_strichliste_evidence(
+    rev: &str,
+    sentinel: &str,
+    module_override: Option<&Path>,
+) -> Result<ProducerEvidence, CdcError> {
+    let rendered = eval_strichliste_database_url(rev, sentinel, module_override)?;
+    build_sentinel_flow_evidence(STRICHLISTE_OPTION, STRICHLISTE_SINK, sentinel, rendered)
+}
+
+const PART_DB_UPSTREAM_PATH: &str = "nixos/modules/services/web-apps/part-db.nix";
+const PART_DB_OPTION: &str = "services.part-db.settings.DATABASE_URL";
+const PART_DB_SINK: &str = "systemd.services.\"part-db-setup\".restartTriggers[0]";
+
+/// Real: part-db's `settings.DATABASE_URL` renders into `envFile`, a
+/// real `pkgs.writeText` derivation -- reading its content requires
+/// REALIZING that (tiny, cheap) derivation, a genuine (if minor)
+/// difference from Kimai's purely-evaluated string; confirmed fast in
+/// practice, no network needed for a `writeText` FOD. A real Postgres
+/// nuance: `host=` doubles as BOTH a TCP hostname and a unix-socket
+/// directory path (confirmed by reading `part-db.nix`'s own default,
+/// `host=/run/postgresql`) -- there is no separate `unix_socket`
+/// parameter to inject a sentinel into, so the sentinel goes into the
+/// `host=` query parameter instead. `extract_key_for_value` (Phase C,
+/// unchanged) correctly resolves this to `emitted_key = "host"`, not
+/// `"unix_socket"` -- proving Phase C was never hardcoded to look for
+/// one specific key name; that's the exact generality this reuses.
+pub fn eval_part_db_env_file(
+    rev: &str,
+    sentinel: &str,
+    module_override: Option<&Path>,
+) -> Result<String, CdcError> {
+    let expr = nixos_eval_expr(
+        rev,
+        PART_DB_UPSTREAM_PATH,
+        module_override,
+        &format!(
+            r#"services.part-db = {{ enable = true; settings.DATABASE_URL = "postgresql://u@localhost/db?serverVersion=16.6&charset=utf8&host={sentinel}"; }}; services.postgresql.enable = true;"#
+        ),
+    );
+    eval_nix_raw(&format!(
+        r#"builtins.readFile (builtins.head ({expr}).config.systemd.services."part-db-setup".restartTriggers)"#
+    ))
+}
+
+pub fn acquire_part_db_evidence(
+    rev: &str,
+    sentinel: &str,
+    module_override: Option<&Path>,
+) -> Result<ProducerEvidence, CdcError> {
+    let rendered = eval_part_db_env_file(rev, sentinel, module_override)?;
+    build_sentinel_flow_evidence(PART_DB_OPTION, PART_DB_SINK, sentinel, rendered)
 }
 
 /// Phase D: the accepted-keys extractor. Deliberately a bounded literal
@@ -2067,5 +2171,73 @@ mod tests {
             MOVIM_SINK,
             &["DB_HOST", "DB_PORT", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD", "DB_DRIVER"],
         );
+    }
+
+    // --- K2g: Phase D vendoring for strichliste/part-db, real (opt-in
+    // only, same as every other real test in this module). Both reuse
+    // verdict_for_evidence/the K2a provenance pipeline completely
+    // unchanged -- no new comparison semantics, only two new real
+    // acquisition paths and two new vendored consumer fixtures. ---
+
+    /// `strichliste` pins doctrine/dbal 3.10.5, confirmed byte-identical
+    /// to the already-vendored 3.10.6 fixture (see
+    /// `fixtures/integrity-lock.toml`'s own K2g comment) -- reuses
+    /// `accepted_doctrine_keys()` directly, no separate helper needed.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn strichliste_golden_is_pass() {
+        let evidence =
+            acquire_strichliste_evidence(AFTER_REV, "/__OBA_CONTRACT_socket_k2g__/mysql.sock", None)
+                .unwrap();
+        assert!(matches!(evidence, ProducerEvidence::SentinelFlow { .. }));
+        assert_eq!(verdict_for_evidence(&evidence), CdcVerdict::Pass);
+
+        // K2a's own provenance pipeline, unchanged -- proves the
+        // auto-resolved identity for THIS app matches the vendored
+        // fixture's own recorded provenance (3.10.5, not 3.10.6 --
+        // resolved independently, not assumed shared).
+        let lock = fetch_composer_lock(AFTER_REV, "strichliste").unwrap();
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        assert_eq!(identity.version, "3.10.5");
+        assert_eq!(identity.source_reference, "95d84866bf3c04b2ddca1df7c049714660959aef");
+    }
+
+    fn accepted_part_db_keys() -> Vec<String> {
+        let doctrine_src = std::fs::read_to_string(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("fixtures/cdc/doctrine-dbal-4.4.3-pgsql/PDO-PgSQL-Driver.php"),
+        )
+        .unwrap();
+        extract_accepted_keys(&doctrine_src).unwrap()
+    }
+
+    /// `part-db`'s real Postgres deployment has no `unix_socket` DSN
+    /// parameter at all -- the sentinel goes into `host=` (Postgres
+    /// overloads it for both a TCP hostname and a unix-socket directory
+    /// path), so this asserts `emitted_key == "host"`, not
+    /// `"unix_socket"`, and compares against the PGSQL accepted-keys
+    /// list (which genuinely has no `unix_socket` entry either) -- a
+    /// real Pass on a real, different dialect, not a copy of the MySQL
+    /// case with different words.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn part_db_golden_is_pass() {
+        let evidence =
+            acquire_part_db_evidence(AFTER_REV, "/__OBA_CONTRACT_socket_k2g__/pg.sock", None)
+                .unwrap();
+        match &evidence {
+            ProducerEvidence::SentinelFlow { emitted_key, .. } => {
+                assert_eq!(emitted_key, "host");
+            }
+            other => panic!("expected SentinelFlow, got {other:?}"),
+        }
+        let accepted = accepted_part_db_keys();
+        assert!(!accepted.iter().any(|k| k == "unix_socket"));
+        assert_eq!(compare_contract(evidence.emitted_key().unwrap(), &accepted), CdcVerdict::Pass);
+
+        let lock = fetch_composer_lock(AFTER_REV, "part-db").unwrap();
+        let identity = resolve_consumer_identity(&lock, "doctrine/dbal").unwrap();
+        assert_eq!(identity.version, "4.4.3");
+        assert_eq!(identity.source_reference, "61e730f1658814821a85f2402c945f3883407dec");
     }
 }

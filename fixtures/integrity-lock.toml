@@ -126,9 +126,30 @@ sha256 = "6e69d658c8f334d19776fa02fcd59076873abc972df7f489f31e6da59d9f7adb"
 # composer.lock (independently confirmed for each, not assumed shared) --
 # see pkgs/by-name/{ki/kimai,da/davis}/package.nix's `version` at the
 # nixpkgs commits above for how that version pin itself is reached.
+#
+# K2g (Phase D vendoring for strichliste/part-db): strichliste pins
+# doctrine/dbal 3.10.5 (commit 95d84866bf3c04b2ddca1df7c049714660959aef),
+# not 3.10.6 -- fetched THAT commit's own `src/Driver/PDO/MySQL/Driver.php`
+# and diffed it directly against this vendored 3.10.6 file: BYTE-IDENTICAL.
+# Reused this fixture for strichliste rather than vendoring a redundant
+# duplicate -- same "verify before duplicating" discipline K2a.1 already
+# established for the Illuminate MySQL connector.
 [[fixture]]
 path = "fixtures/cdc/doctrine-dbal-3.10.6/PDO-MySQL-Driver.php"
 repo = "doctrine/dbal"
 commit = "c95589d775a0b2e543467d40f8c3ecccf586f2b4"
 upstream_path = "src/Driver/PDO/MySQL/Driver.php"
 sha256 = "8be6a04a3a9b6d91dc9190765cbc06a0aa223c223b7920c4abd45b307107dfce"
+
+# K2g: part-db pins doctrine/dbal 4.4.3, Postgres dialect -- a genuinely
+# different file from the MySQL driver above (its own `constructPdoDsn`
+# has NO `unix_socket` key at all; Postgres overloads `host=` for both a
+# TCP hostname and a unix-socket directory path, confirmed by reading
+# this file directly). First Postgres-dialect Doctrine fixture vendored
+# in this project.
+[[fixture]]
+path = "fixtures/cdc/doctrine-dbal-4.4.3-pgsql/PDO-PgSQL-Driver.php"
+repo = "doctrine/dbal"
+commit = "61e730f1658814821a85f2402c945f3883407dec"
+upstream_path = "src/Driver/PDO/PgSQL/Driver.php"
+sha256 = "3c70c3fb0d848e2154808556e0a5197162647b0a8416fcbca7e1bc9d8d331791"
