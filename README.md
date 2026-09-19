@@ -2484,10 +2484,62 @@ pretending it doesn't exist.
     moment consumer drift was proven, not extended into checking the
     producer too, so K5b and K5c couldn't quietly merge into one round.
 
-**K5c (producer correlation) reuses the exact A/B/C model K4c already
-proved** (`ProducerStillEmitsRemoved` / `ProducerAdoptedNew` /
-`ProducerIrrelevant`) — not reinvented, the same real, checked pattern.
-Not started.
+19. **K5c — correlate `grafana`'s real removed env vars with its real
+    Nix producer. Closed, `8aca6f6`, confirmed green in real CI.**
+    Mirrors K4c's A/B/C split in spirit (`ProducerStillEmitsRemoved` /
+    `ProducerUsesAdded` / `ProducerIrrelevant`) but is a genuinely
+    separate type, `EnvDriftRelevance` — not a reuse of
+    `CliDriftRelevance`, because K5b never built (and was explicitly
+    told not to build) a generic Grafana env-var extractor the way K4a
+    vendored and parsed mimir's full Go source. There is no full
+    `EnvContract` for grafana on either side to run through
+    `diff_env_contracts()` — the removed/added sets K5b already proved
+    by direct source diff are taken as given, not re-derived.
+    `diff_env_contracts()`/`EnvContractDiff` (K5a) stay completely
+    untouched.
+
+    Producer evidence is REAL Nix-evaluated, not source-grepped:
+    `eval_grafana_producer_environment` evaluates
+    `config.systemd.services.grafana.environment` (the real, always-
+    present `attrNames`) and `serviceConfig.EnvironmentFile` for
+    grafana's own default-configured NixOS module — fails closed
+    (`Inconclusive`) if `EnvironmentFile` were ever set, since that
+    would pull in variables this function doesn't read (a real,
+    disclosed limitation, never silently treated as "no drift").
+
+    **Real result: Outcome C, and a categorically stronger one than
+    K4c's mimir result.** `pkgs.grafana`'s NixOS module — at BOTH real
+    pinned versions, `12.3.3` and `13.1.4` — never uses the `GF_*`
+    env-var interface at all: `environment` evaluates to only systemd's
+    own default `{ PATH = ...; }`, `EnvironmentFile` is unset on
+    either. Grafana is configured entirely through a generated
+    `config.ini`, passed via `-config <path>` in `serviceConfig.ExecStart`
+    (confirmed by reading the real evaluated `ExecStart` string at HEAD,
+    and independently at BASE once BASE's own real, unrelated
+    requirement — an explicit `security.secret_key`, no longer defaulted
+    since some version between `12.3.3` and `13.1.4` — was satisfied
+    with a probe value that doesn't touch `environment`/
+    `EnvironmentFile`). Unlike mimir (which at least emits SOME CLI
+    flags, just not either contested one), grafana's producer never
+    touches this interface AT ALL, on either side of the bump — a second,
+    independent, and structurally different way to reach Outcome C.
+
+    5 new offline unit tests (pure `classify_env_drift_relevance`,
+    A/B/C + the "added never fires for grafana's real empty added set"
+    case + a removed-takes-priority-over-added case) + 2 new real
+    `#[ignore]`-by-default tests (HEAD outcome-C correlation; a BASE
+    symmetry check confirming the INI-only interface predates the
+    bump too). Zero changes to K1–K5a code.
+
+**K5 (K5a+K5b+K5c) closed as a proven, parked vertical** — same shape as
+K4's own closure. Two independent interface families (CLI flags, env
+vars) have now each independently landed on Outcome C for their one
+real qualifying case, for two structurally different reasons (mimir:
+emits other flags, just not these two; grafana: never used this
+interface at all). The project's central architectural thesis —
+**contract drift is not itself a finding; a finding requires proven
+producer reachability** — now has two independent confirmations, not
+one.
 
 Parked, deliberately, not from lack of interest: `krill`'s own
 structural CLI drift (a future `K4d`+ adversarial target), `flarum`'s
