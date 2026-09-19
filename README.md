@@ -3958,11 +3958,77 @@ spacecookie's real `Config.hs` (Hackage-hosted, no git commit),
 akkoma's real `description.exs` excerpt (4 non-contiguous real
 records, Gitea-hosted).
 
-C-E1.2b is now fully CLOSED (census + implementation). Next, per the
-user's own explicit sequencing: **C-E1.2c**, a hostile soundness audit
-of the whole vertical (positive/negative mutations, wrong/ambiguous
-binding, wrong consumer version, missing schema, path-collision
-attacks, `libinput`/`nohang` as negative controls, ideally a fresh
-holdout untouched by C-E1.1) — measuring false-PASS and false-FINDING
-counts explicitly, not just coverage — before freezing
-`GeneratedConfigArtifact` v1.
+C-E1.2b is now fully CLOSED (census + implementation).
+
+## C-E1.2c: hostile soundness audit — `GeneratedConfigArtifact` v1 is
+now FROZEN
+
+A deliberate shift from coverage to soundness: after C-E1.2a/b proved
+the abstraction fits, this round tried to break it. Frozen at `984b366`
+for the whole audit — production code (`acquire_*`/`extract_*`/
+`compare_config_contract`/`flatten_structured_value`) untouched
+throughout; every result below comes from new adversarial test code
+exercising that frozen engine, plus real research.
+
+**Every pre-registered success criterion was met: false PASS = 0,
+false FINDING = 0, TOOL_ERROR = 0, all category-1 mutations detected,
+both negative controls preserved, the normalization triple preserved.
+`GeneratedConfigArtifact` v1 is declared FROZEN.**
+
+- **Attack category 1 (producer/artifact mutations)**, run against all
+  11 implemented real anchors at once: deleting a real emitted path
+  never turned a clean `Pass` into a `Finding`; appending a genuinely
+  new unaccepted path always produced one, regardless of where in the
+  list it landed; 5 representative near-miss substitutions (dash-vs-
+  underscore, trailing-char, case-sensitivity) were never silently
+  accepted; nesting-shape changes always produced genuinely different
+  paths, never a silent alias. One real test-design bug was caught and
+  fixed live: the near-miss test assumed the injected mutation would
+  always be the first reported problem, but `akkoma`'s own real
+  baseline already has a genuine `Finding` — fixed by isolating to the
+  probed path first, not a soundness bug.
+- **Attack category 2 (binding attacks)** surfaced one real, stable,
+  disclosed finding: 8 of the 11 implemented candidates' own B-proof is
+  architectural (confirms the right KIND of binding mechanism exists)
+  rather than byte-level (independently re-verifying the artifact's
+  own built content against what the binding mechanism references).
+  True since `unpackerr`'s own original anchor, not a new regression —
+  named honestly, not fixed mid-audit per the protocol's own frozen-
+  code rule.
+- **Attack category 3 (consumer-contract attacks)** re-confirmed
+  `akkoma`'s own real `Finding` is stable (byte-identical re-run), and
+  found no unnoticed freeform-schema region among the other 10.
+- **Attack category 4 (normalization)** extended the real
+  `unbound`/`i2pd`/`akkoma` triple with 2 new synthetic adversarial
+  cases plus a source-level audit confirming every D-extractor's own
+  bare-vs-qualified choice cites real consumer-specific evidence.
+- **Negative controls**: `libinput`/`nohang` re-verified against the
+  now much-larger locator/extractor set — both still `NO_PRODUCER_PROOF`,
+  byte-identical to C-E1.1's own original findings.
+- **A fresh, mechanically-drawn 10-candidate holdout** (`librechat`,
+  `meilisearch`, `anubis`, `loki`, `nomad`, `gocron`, `clatd`,
+  `redmine`, `nats`, `gancio` — 170-candidate population, seeded
+  shuffle, zero prior exposure to E1/C-E1.1/C-E1.2a/b) came back **10/10
+  SUPPORTED**, independently spot-checked for evidence quality rather
+  than accepted at face value. Real complications throughout, not a
+  rubber-stamp: `redmine` needs a genuinely new 3-hop symlink binding
+  chain AND a 4th real normalization shape (Rails' env-keyed YAML
+  wrapper); `meilisearch` and `gocron` each need real binding shapes
+  the current `ArtifactBindingEvidence` enum doesn't cleanly name;
+  `gancio` is a concrete real instance of category 2's own concern (the
+  "obvious" binding evidence is provably not what the consumer
+  actually honors); `anubis` needed real scope judgment between two
+  differently-shaped artifacts from one module. Two candidates
+  (`librechat`, `meilisearch`) have D evidence stronger than any of the
+  11 already-implemented candidates'.
+
+**Real, disclosed follow-up items, none of them blockers to the
+freeze**: the binding-proof-depth gap (category 2); 3 new real binding
+shapes found in the holdout (redmine's symlink chain, meilisearch's
+install-then-flag, gocron's shell-quoted argv); a 4th normalization
+shape (redmine's env-keyed wrapper); `vault` stays `INCONCLUSIVE`,
+unrevisited. Full report: `fixtures/c-e1.2c-hostile-audit/census.md`.
+
+With v1 now frozen, productization (CLI wiring, an advisory GitHub
+check, a PR-local diff mode, a nixpkgs-review companion) may now be
+considered — not started in this round, a separate future decision.

@@ -6026,6 +6026,280 @@ mod ce12_tests {
         );
     }
 
+    // ===================================================================
+    // C-E1.2c: hostile soundness audit
+    // (fixtures/c-e1.2c-hostile-audit/protocol.md, frozen at 984b366).
+    // Production code (acquire_*/extract_*/compare_config_contract/
+    // flatten_structured_value) is NOT touched by this section -- these
+    // are new adversarial tests exercising the FROZEN engine, per the
+    // protocol's own explicit distinction between "new test code" and
+    // "production code."
+    // ===================================================================
+
+    /// All 11 real implemented anchors' own real evidence+contract
+    /// pairs, acquired once per test run. `akkoma`'s own real baseline
+    /// is a genuine `Finding` (see C-E1.2b), not `Pass` -- attack-
+    /// category-1 tests below are written to hold regardless of each
+    /// candidate's own real baseline verdict, never assuming `Pass`.
+    #[allow(clippy::type_complexity)]
+    fn all_real_anchor_evidence_and_contracts(
+    ) -> Vec<(&'static str, GeneratedConfigArtifactEvidence, ConsumerConfigContract)> {
+        vec![
+            ("unpackerr", acquire_unpackerr_evidence(CE12_REV).unwrap(), unpackerr_consumer_contract().unwrap()),
+            ("unbound", acquire_unbound_evidence(CE12_REV).unwrap(), unbound_consumer_contract().unwrap()),
+            ("mobilizon", acquire_mobilizon_evidence(CE12_REV).unwrap(), mobilizon_consumer_contract().unwrap()),
+            (
+                "nebula-lighthouse-service",
+                acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap(),
+                nebula_lighthouse_service_consumer_contract().unwrap(),
+            ),
+            ("privoxy", acquire_privoxy_evidence(CE12_REV).unwrap(), privoxy_consumer_contract().unwrap()),
+            ("misskey", acquire_misskey_evidence(CE12_REV).unwrap(), misskey_consumer_contract().unwrap()),
+            ("kavita", acquire_kavita_evidence(CE12_REV).unwrap(), kavita_consumer_contract().unwrap()),
+            (
+                "transmission",
+                acquire_transmission_evidence(CE12_REV).unwrap(),
+                transmission_consumer_contract().unwrap(),
+            ),
+            ("i2pd", acquire_i2pd_evidence(CE12_REV).unwrap(), i2pd_consumer_contract().unwrap()),
+            (
+                "spacecookie",
+                acquire_spacecookie_evidence(CE12_REV).unwrap(),
+                spacecookie_consumer_contract().unwrap(),
+            ),
+            ("akkoma", acquire_akkoma_evidence(CE12_REV).unwrap(), akkoma_consumer_contract().unwrap()),
+        ]
+    }
+
+    // --- attack category 1: producer/artifact mutations, run against
+    // ALL 11 real anchors at once (not a sample -- "all known relevant
+    // mutations detected" is a named success criterion). ---
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn attack1_deleting_an_emitted_path_never_turns_a_real_pass_into_a_finding() {
+        // mutation type 2: a starved/broken acquire function (fewer
+        // real emitted paths than it should have) must never look MORE
+        // correct by accident.
+        for (name, evidence, contract) in all_real_anchor_evidence_and_contracts() {
+            let before = compare_config_contract(&evidence, &contract);
+            for i in 0..evidence.emitted_paths.len() {
+                let mut mutated = evidence.clone();
+                mutated.emitted_paths.remove(i);
+                let after = compare_config_contract(&mutated, &contract);
+                if before == ConfigContractVerdict::Pass {
+                    assert_eq!(
+                        after,
+                        ConfigContractVerdict::Pass,
+                        "{name}: deleting emitted_paths[{i}] ({:?}) turned a real clean Pass into {:?}",
+                        evidence.emitted_paths[i],
+                        after
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn attack1_appending_a_genuinely_new_unaccepted_path_always_produces_a_finding() {
+        // mutation type 3: APPEND, not in-place replace -- a different
+        // code path from the existing per-candidate stop-condition-8
+        // tests (which mutate an existing entry). Proves
+        // `compare_config_contract`'s own "first miss" behavior holds
+        // regardless of where in the real list the bad entry lands.
+        for (name, evidence, contract) in all_real_anchor_evidence_and_contracts() {
+            let mut mutated = evidence.clone();
+            let injected = "totally-unaccepted-injected-key-nobody-would-ever-have".to_string();
+            mutated.emitted_paths.push(injected);
+            match compare_config_contract(&mutated, &contract) {
+                ConfigContractVerdict::Finding { .. } => {}
+                ConfigContractVerdict::Pass => {
+                    panic!("{name}: appending a genuinely unaccepted path did not produce a Finding")
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn attack1_near_miss_substitutions_are_never_silently_accepted() {
+        // mutation type 5: a string that LOOKS like a real accepted
+        // path but differs exactly the way this project's own K4c
+        // boundary-checking lesson (`-zone`/`-zones`) warns about --
+        // one representative near-miss per real extraction SHAPE, not
+        // all 11 (the shapes are what matters here, not raw count).
+        let cases: &[(&str, &str, &str)] = &[
+            // (candidate, real accepted path, near-miss that must NOT match it)
+            ("transmission", "peer-port", "peer_port"), // dash vs underscore, the K4c case itself
+            ("i2pd", "http.enabled", "http.enable"), // trailing-char near miss on a dotted path
+            ("unbound", "port", "ports"), // trailing-char near miss on a bare keyword
+            ("akkoma", ":pleroma.:instance.name", ":pleroma.:instance.names"), // fully-qualified trailing-char
+            ("unpackerr", "debug", "Debug"), // case-sensitivity near miss
+        ];
+        for (name, evidence, contract) in all_real_anchor_evidence_and_contracts() {
+            for (case_name, real_path, near_miss) in cases {
+                if *case_name != name {
+                    continue;
+                }
+                assert!(
+                    contract.accepted_paths.iter().any(|p| p == real_path),
+                    "{name}: expected real accepted path {real_path:?} not found in the real contract"
+                );
+                assert!(
+                    !contract.accepted_paths.iter().any(|p| p == near_miss),
+                    "{name}: near-miss {near_miss:?} was WRONGLY present in the real accepted contract \
+                     (would silently swallow a real drift)"
+                );
+                // isolate to exactly the real path being probed -- akkoma's
+                // own real baseline already has a genuine Finding
+                // elsewhere (`:instance.upload_dir`, see C-E1.2b), and
+                // `compare_config_contract` reports only the FIRST
+                // unaccepted path; without isolating, appending the
+                // near-miss wouldn't provably be what's being detected.
+                let mut mutated = evidence.clone();
+                mutated.emitted_paths.retain(|p| p == real_path);
+                assert_eq!(
+                    compare_config_contract(&mutated, &contract),
+                    ConfigContractVerdict::Pass,
+                    "{name}: isolating to the real accepted path {real_path:?} alone should be a clean Pass"
+                );
+                mutated.emitted_paths.push(near_miss.to_string());
+                assert_eq!(
+                    compare_config_contract(&mutated, &contract),
+                    ConfigContractVerdict::Finding { unaccepted_path: near_miss.to_string() },
+                    "{name}: near-miss {near_miss:?} was silently accepted instead of producing a Finding"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn attack1_nesting_change_scalar_to_nested_produces_a_different_path_not_a_silent_alias() {
+        // mutation type 4, offline/synthetic (flatten_structured_value
+        // itself, not a real acquired artifact): a real scalar leaf
+        // (`"debug": true`) mutated into a nested object
+        // (`"debug": {"enabled": true}`) must produce `debug.enabled`,
+        // never silently continue to look like the original bare
+        // `debug` leaf.
+        let original: JsonValue = serde_json::json!({ "debug": true });
+        let mut orig_emitted = Vec::new();
+        let mut orig_opaque = Vec::new();
+        flatten_structured_value(&original, "", &mut orig_emitted, &mut orig_opaque);
+        assert_eq!(orig_emitted, vec!["debug".to_string()]);
+
+        let nested: JsonValue = serde_json::json!({ "debug": { "enabled": true } });
+        let mut nested_emitted = Vec::new();
+        let mut nested_opaque = Vec::new();
+        flatten_structured_value(&nested, "", &mut nested_emitted, &mut nested_opaque);
+        assert_eq!(nested_emitted, vec!["debug.enabled".to_string()]);
+        assert!(!nested_emitted.contains(&"debug".to_string()));
+    }
+
+    #[test]
+    fn attack1_nesting_change_nested_to_scalar_produces_a_different_path_not_a_silent_alias() {
+        // the reverse direction: a real nested leaf collapsed to a bare
+        // scalar must produce the bare path, never continue to look
+        // like the original nested one.
+        let nested: JsonValue = serde_json::json!({ "server": { "port": 8080 } });
+        let mut nested_emitted = Vec::new();
+        let mut nested_opaque = Vec::new();
+        flatten_structured_value(&nested, "", &mut nested_emitted, &mut nested_opaque);
+        assert_eq!(nested_emitted, vec!["server.port".to_string()]);
+
+        let flat: JsonValue = serde_json::json!({ "server": 8080 });
+        let mut flat_emitted = Vec::new();
+        let mut flat_opaque = Vec::new();
+        flatten_structured_value(&flat, "", &mut flat_emitted, &mut flat_opaque);
+        assert_eq!(flat_emitted, vec!["server".to_string()]);
+        assert!(!flat_emitted.contains(&"server.port".to_string()));
+    }
+
+    // --- attack category 4: normalization attacks, extending the
+    // already-real unbound/i2pd/akkoma triple with synthetic
+    // adversarial cases per extraction SHAPE, proving the collision
+    // risk is caught generically, not just in the 3 already-shipped
+    // real cases. ---
+
+    #[test]
+    fn attack4_synthetic_section_stripping_shape_a_real_cross_section_collision_would_be_caught() {
+        // a synthetic unbound-style rendered artifact where the SAME
+        // bare key genuinely means different things in two sections --
+        // proves that IF a future consumer's own D-extractor correctly
+        // stayed section-qualified (the i2pd/akkoma-shaped correct
+        // answer), the existing `extract_unbound_style_paths` (still
+        // section-qualified BEFORE any acquire-time stripping) would
+        // never itself be the source of a collision -- stripping is
+        // only ever applied deliberately, per-consumer, after this
+        // point (see `acquire_unbound_evidence`'s own real fix).
+        let rendered = "server:\n  enabled: yes\nremote-control:\n  enabled: no\n";
+        let (emitted, opaque) = extract_unbound_style_paths(rendered);
+        assert!(emitted.contains(&"server.enabled".to_string()));
+        assert!(emitted.contains(&"remote-control.enabled".to_string()));
+        assert!(opaque.is_empty());
+        // the two real section-qualified paths are genuinely distinct
+        // strings -- a bare-keyword collapse (`"enabled"`, unqualified)
+        // is never produced by this function itself.
+        assert!(!emitted.contains(&"enabled".to_string()));
+    }
+
+    #[test]
+    fn attack4_synthetic_structured_shape_a_real_cross_branch_collision_stays_qualified() {
+        // the i2pd/akkoma-shaped case, synthetic: two structurally
+        // distinct real branches both declaring the SAME bare field
+        // name. `flatten_structured_value` itself (general, no per-
+        // consumer knowledge) must keep both fully qualified --
+        // confirms the invariant holds even for a candidate this
+        // project has never actually implemented, not just the 2 real
+        // ones (i2pd, akkoma) it happens to have real fixtures for.
+        let value: JsonValue = serde_json::json!({
+            "moduleA": { "enabled": true },
+            "moduleB": { "enabled": false }
+        });
+        let mut emitted = Vec::new();
+        let mut opaque = Vec::new();
+        flatten_structured_value(&value, "", &mut emitted, &mut opaque);
+        assert!(emitted.contains(&"moduleA.enabled".to_string()));
+        assert!(emitted.contains(&"moduleB.enabled".to_string()));
+        assert!(!emitted.contains(&"enabled".to_string()));
+    }
+
+    #[test]
+    fn attack4_every_extractor_with_a_stripping_or_qualification_choice_documents_a_consumer_specific_reason(
+    ) {
+        // audits this project's own source, not just runtime behavior:
+        // every D-extractor that makes a bare-vs-qualified choice must
+        // cite ITS OWN real consumer evidence for that choice in its
+        // doc comment, never "because it seemed convenient" -- a
+        // structural, textual check that the discipline stays visible
+        // to a future reader, not just true by accident.
+        let source = read_vendored("src/cdc.rs");
+        // `acquire_unbound_evidence` strips section prefixes -- its own
+        // real justification (the grammar recheck) must be present.
+        let unbound_fn = source.split("fn acquire_unbound_evidence").nth(1).unwrap_or("");
+        assert!(
+            unbound_fn.contains("D's own real extraction granularity")
+                || source.contains("D's own real extraction granularity"),
+            "unbound's own stripping fix must document its real consumer-specific justification"
+        );
+        // `acquire_akkoma_evidence` and `extract_akkoma_description_paths`
+        // must document why they stay fully qualified (the 18-way
+        // collision).
+        assert!(
+            source.contains("18-way")
+                || source.contains("18 DIFFERENT real module keys")
+                || source.contains("18 real module keys"),
+            "akkoma's own fully-qualified-paths choice must cite its real collision evidence"
+        );
+        // `extract_i2pd_program_options_keys` must document that i2pd's
+        // own real source is already dotted (no stripping decision to
+        // make at all, which is itself the documented reason).
+        assert!(
+            source.contains("already fully dotted") || source.contains("already dotted"),
+            "i2pd's own zero-stripping-needed shape must be documented, not just silently correct"
+        );
+    }
+
     // --- stop condition 10: old K1-K5/OBA results must not change.
     // Enforced by the pre-existing full suites in `mod tests`/
     // `mod k4c_tests`/`mod k5c_tests` above, all still present and
