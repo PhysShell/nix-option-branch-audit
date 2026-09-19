@@ -4494,3 +4494,78 @@ including on PRs picked with zero prior tuning.
 go**: fixing the `TOOL_ERROR`-on-module-birth bug, and a follow-up S1
 -style re-run afterward to get a real, non-degenerate read on
 actionability — the question this round could not yet answer.
+
+## S1-F1/F2/F3: honest module-lifecycle and transition semantics
+
+The user's own next-step framing: fix what S1 actually found before
+drawing any new sample — a regression rerun on stale code would just
+be re-learning the same lesson. Three fixes, all landed together, all
+concretely traced to a real observation from S1's own 30-PR sample.
+
+**S1-F1 — the P0.** A tool positioning itself as "safe to attach
+next to existing CI" earning an immediate uninstall by hard-failing on
+one of the most ordinary PR shapes nixpkgs sees is about as bad a
+first impression as an advisory Action can make. `run_audit_diff`'s
+own OBA half now partitions targets by real file presence on each side
+*before* calling `analyze()` on the whole manifest: present on both
+sides runs the exact same `analyze()`/`compare()` machinery as always;
+present on exactly one side becomes a real `Added`/`Removed` entry
+(mirroring exactly how CDC's own half already treats a one-sided-
+unanalyzable candidate — OBA simply hadn't caught up); present on
+*neither* side stays a genuine `TOOL_ERROR` (nothing in the comparison
+could ever say anything about a target neither root has ever heard
+of). A new `resolve_within_root_if_exists` distinguishes "genuinely
+doesn't exist" from every other real problem (absolute path, root
+escape, permission) — `resolve_within_root`/`analyze()` themselves are
+completely untouched, so `check`/`diff`/`audit` keep their existing,
+correct "a missing module is a real error" behavior; only
+`audit-diff`'s own orchestration gained the new handling.
+
+**S1-F2 — removal is not resolution.** `classify_transition_bucket`
+used to fold `Finding -> Pass` and `Finding -> Inconclusive` into one
+`resolved_finding` bucket. A real PR (#492803, `ntfy`) showed this
+reading as "someone fixed the coverage gap" when the real event was
+"the option was deleted, and the gap along with it." Now split three
+ways, honestly, without judging whether removing the option was the
+right call (the same D1/D2 "mechanism reports facts, never plays moral
+philosopher" principle, applied one layer up): `resolved_finding`
+stays `Finding -> Pass` only; `Finding -> Inconclusive` is its own
+`finding_became_inconclusive` (a loss of certainty, not a fix); and a
+`Removed`/`RemovedSubject` whose own removed side was a real `Finding`
+is a third, distinct `removed_subject_with_finding`, never counted as
+`resolved_finding` at all. A brand-new subject's first-ever result
+being a `Finding`/`Inconclusive` folds straight into
+`new_finding`/`new_inconclusive` — unambiguous, no split needed there.
+
+**S1-F3 — surface the good news too.** Two real PRs (#559627,
+#561557) each produced a genuine `Inconclusive -> Pass` improvement
+that the original bounded-summary design silently dropped (it wasn't
+one of the four named buckets). Now `resolved_inconclusive`, and it
+appears in `notable` — the exact real positive signal S1 found being
+lost. `resolved_finding` stays the one deliberate exception that
+counts but never appears in `notable` (unambiguous good news needs no
+attention); every other real bucket, including `resolved_inconclusive`,
+now does.
+
+Real, live confirmation against the exact shape S1 found: a new
+`fixtures/synthetic/audit-diff-module-lifecycle/` (`after-with-module/`
+reuses `fixtures/kimai/before`'s own real historical `OBA001`-producing
+module+test verbatim, `before-empty/` deliberately contains nothing)
+proves all three module-lifecycle cases through the real CLI — module
+birth is a real `Added`/`new_finding` (exit 0, not exit 3), module
+death is a real `Removed`/`removed_subject_with_finding` (never
+`resolved_finding`), and module-absent-on-both-sides stays a real
+`TOOL_ERROR` with a clear message. 12 new offline unit tests plus 3 new
+CLI-level tests, zero regressions across the full offline suite (196
+passed), the complete real `--ignored` suite (68 + 19 + 5 passed),
+clippy, and every other integration suite.
+
+**Next, per the user's own explicit staging, NOT started, awaiting
+explicit go**: S1-R — a regression rerun on the SAME frozen 30 PRs,
+expecting the `TOOL_ERROR` count to drop `2 -> 0`, #492803 to stop
+reading as `resolved_finding`, and #559627/#561557's real improvements
+to finally appear in the summary — explicitly NOT a claim that the
+tool is now "beta ready" (the code has now seen these exact 30 PRs),
+only a regression corpus. A fresh, non-overlapping sample (S2, under a
+new frozen release) is what would actually answer the still-open
+actionability question.
