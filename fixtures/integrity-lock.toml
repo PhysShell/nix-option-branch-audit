@@ -174,3 +174,52 @@ repo = "grafana/mimir"
 commit = "e49585d43c6e852225e114bd1ddd98da58a4c060"
 upstream_path = "pkg/querier/querier.go"
 sha256 = "9dd9d1ca5a7f19afdd4283103a1d35fa74e89513047a34dfe03694faf02fa9e9"
+
+# C-E1.2a: the four real, heterogeneous GeneratedConfigArtifact anchors
+# (unpackerr, unbound, mobilizon, nebula-lighthouse-service), qualified
+# by C-E1.1's own A->B->C->D audit
+# (fixtures/c-e1.1-generated-config-audit/census.md). A/B evidence for
+# all four is real, live `nix eval` against `PhysShell/nixpkgs`
+# @ 68740713a1d5904edf9ba92a998a522b1b6ce080 (the same pin C-E1.1 itself
+# audited these candidates against) -- not locked here, since it's
+# fetched fresh by `nix eval --impure` on every `#[ignore]`-tagged real
+# test run, not a static fixture. Only the C-side vendored consumer
+# source is locked below. `mobilizon` is GitLab-hosted (framagit.org),
+# not GitHub -- `repo` here is its current `namespace/path`
+# (`kaihuri/mobilizon`; the project was previously under the
+# `framasoft` namespace, which is why some external references still
+# say `framasoft/mobilizon`), resolved via the framagit API, not `gh`.
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/unpackerr/apps.go"
+repo = "Unpackerr/unpackerr"
+commit = "6f13ffaefc3420353199f0c595c05fbdaab1b78a"
+upstream_path = "pkg/unpackerr/apps.go"
+sha256 = "245391d3f396d0e37989706cc97b21afa16e7cd6b030faaa4b600dc5062e378e"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/unbound/configlexer-excerpt.lex"
+repo = "NLnetLabs/unbound"
+commit = "a45da353d3feb5d8fc00685fa1ceda3816d5108f"
+upstream_path = "util/configlexer.lex"
+sha256 = "7680524e39a169bb5a617bd3fe10892eeb9c70b03e4cf12eae9d75ba3e79e8f5"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/mobilizon/config.exs"
+repo = "kaihuri/mobilizon"
+commit = "e4e3d70747e1214415540eceb2bafeefabf0695c"
+upstream_path = "config/config.exs"
+sha256 = "45ec6420bed0dbae2a08a4bfe510c9cacfd8d5584aa4b5bc061c92ac5dc4bb89"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/nebula-lighthouse-service/file_config.py"
+repo = "manuels/nebula-lighthouse-service"
+commit = "303693032b7aabfd45ede1f5b68e5bf168994a03"
+upstream_path = "file_config.py"
+sha256 = "a6c02a8deb94a149dea3c02783b80c736d436b99dee6c772a650b3810dfbc91c"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/nebula-lighthouse-service/webservice.py"
+repo = "manuels/nebula-lighthouse-service"
+commit = "303693032b7aabfd45ede1f5b68e5bf168994a03"
+upstream_path = "webservice.py"
+sha256 = "08e3930a763b19477dd5f1c095258848e284d7738d84f2b0ae76e2726a4ff830"

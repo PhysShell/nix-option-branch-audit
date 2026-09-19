@@ -3724,3 +3724,87 @@ hardcoded-default-path case with zero CLI arguments at all) — with the
 identical A→B→C→D evidence shape throughout. This is the empirical
 confirmation, not just the design intent, that format/binding are
 locator details under one reusable model.
+
+## C-E1.2a: `GeneratedConfigArtifact`, first real vertical proof
+
+The type system + pipeline `src/cdc.rs` implements now, built exactly to
+the shape C-E1.1 qualified: `GeneratedConfigArtifactEvidence { producer,
+format, content, binding, emitted_paths, opaque_paths }` +
+`ConsumerConfigContract { consumer, accepted_paths }` →
+`compare_config_contract()`, a single, deliberately boring function
+(`emitted_path ∈ accepted_paths`, first miss wins) with **zero
+per-app branching anywhere in it** — every format/binding complication
+is resolved *before* that function runs, by the acquire/extract stage
+that produced the evidence, matching the `ProducerEvidence`/
+`ConsumerRoute` precedent K1-K5 already established. `ConfigFormat`
+(`Toml`/`Yaml`/`ElixirConf`/`HandRolled`) is descriptive metadata only,
+never matched on in comparison logic — the format-is-a-locator-detail
+design constraint C-E1.1 pre-committed to before any evidence existed.
+
+Four deliberately heterogeneous real anchors, all with a real, live
+end-to-end proof against `PhysShell/nixpkgs`
+@ `68740713a1d5904edf9ba92a998a522b1b6ce080` (the same pin C-E1.1
+itself audited these four candidates against):
+
+| anchor | language / format | binding shape | A/B technique |
+|---|---|---|---|
+| `unpackerr` | Go / TOML (`pkgs.formats.toml`) | direct `--config=` `ExecStart` flag | plain `nix eval` |
+| `unbound` | C / hand-rolled `toConf` (no `pkgs.formats.*`) | `environment.etc` activation-time symlink | `builtins.readFile` on a `.source` path value |
+| `mobilizon` | Elixir / `pkgs.formats.elixirConf` | `makeWrapper`-injected env var (`MOBILIZON_CONFIG_PATH`) | `builtins.substring`-sliced `ExecStart`, then `readFile` on the wrapper script |
+| `nebula-lighthouse-service` | Python / `pkgs.formats.yaml` | fully **implicit** — zero CLI args, consumer hardcodes the default path | structural `nix eval` only; the path match itself is a disclosed, cited consumer-source fact |
+
+Every anchor's real end-to-end pipeline (`acquire_*_evidence` →
+`*_consumer_contract` → `compare_config_contract`) asserts a clean
+`Pass`, plus two real mutation proofs each: mutating a **real** emitted
+path flips `Pass → Finding` (stop condition 8), and mutating an
+**unrelated** accepted path leaves the comparison unchanged (stop
+condition 9) — 12 `#[ignore]`-tagged tests total, all against live data,
+not synthetic fixtures (`cargo test --bin oba -- --ignored
+cdc::ce12_tests::real_`). 12 further offline unit tests cover the pure
+comparison/extraction logic in isolation.
+
+**One real bug found and fixed during this round**: `unbound`'s own
+`extract_unbound_style_paths` emits section-prefixed dotted paths
+(`server.port`), but its D-side extractor (`extract_unbound_lexer_keywords`,
+a bounded scan over the real vendored lexer excerpt) only ever returns
+bare keyword names — `unbound`'s real `end_to_end_is_a_clean_pass` test
+failed on the first run with a spurious `Finding {
+"server.auto-trust-anchor-file" }`, a path-granularity mismatch between
+A and D, not a real drift. Fixed by normalizing `unbound`'s own
+`emitted_paths`/`opaque_paths` down to D's own real granularity (bare
+keyword, section prefix stripped) inside `acquire_unbound_evidence`
+itself — matching the same "scope A down to D's own real reach"
+discipline `mobilizon`'s own evidence already needed (its D-extraction
+is deliberately bounded to just the `:instance` config block, so its
+own `emitted_paths` are scoped to that same sub-tree, with every other
+real top-level Elixir config block disclosed as `opaque_paths` rather
+than silently compared against nothing). Both are the shared
+comparison function staying trivial *because* the harder, per-app
+normalization work happens upstream of it, exactly by design.
+
+v1 scope, deliberately bounded (per the pre-registered stop
+conditions): only normalized leaf paths; a JSON/YAML array value is
+opaque, never indexed into (`unpackerr`'s own real `settings.radarr`
+list is the real corpus case this covers, not a hypothetical). No
+auto-discovery of generated configs across nixpkgs, no format-plugin
+registry, and `libinput`/`nohang` (C-E1.1's own 2 real
+`NO_PRODUCER_PROOF` failures) are untouched, kept as negative controls.
+
+Zero regressions: the full pre-existing suite (257 tests across
+`--bin oba` offline + `--ignored` + `tests/golden.rs` +
+`tests/check_root.rs` + `tests/diff_cli.rs` + `tests/fixture_integrity.rs`)
+stays green, unmodified by this round.
+
+Vendored real consumer source (`fixtures/cdc/generated-config-artifact/`,
+sha256-locked in `fixtures/integrity-lock.toml`): `unpackerr`'s real
+`pkg/unpackerr/apps.go` (tag `v0.15.2`), `unbound`'s real
+`util/configlexer.lex` excerpt (tag `release-1.26.0`), `mobilizon`'s
+real `config/config.exs` (tag `5.2.4`, GitLab-hosted at
+`framagit.org/kaihuri/mobilizon` — not GitHub, resolved via the
+framagit API), `nebula-lighthouse-service`'s real `file_config.py` +
+`webservice.py` (tag `v2.0.2`).
+
+Not yet started (separate future rounds, only if this one holds up with
+zero app-specific semantic branching, which it does): **C-E1.2b** (the
+same abstraction applied across the remaining qualified C-E1.1 corpus),
+**C-E1.2c** (a holdout rerun / mutation audit).

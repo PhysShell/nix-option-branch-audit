@@ -1880,6 +1880,673 @@ pub fn evaluate_grafana_env_drift(rev: &str) -> Result<EnvDriftRelevance, CdcErr
     ))
 }
 
+// ---------------------------------------------------------------------
+// C-E1.2a: GeneratedConfigArtifact, the CDC vertical qualified by
+// C-E1.1's own real A->B->C->D executable-fit audit (12/14 real
+// holdout candidates, 93% blind inter-rater agreement --
+// fixtures/c-e1.1-generated-config-audit/census.md). Not a new format-
+// specific family per format (`YamlEvidence`/`TomlEvidence`/... were
+// explicitly rejected in that audit's own protocol before any evidence
+// was looked at) -- ONE evidence model, format and binding mechanism
+// are locator details feeding it, never separate architectures.
+//
+// Four deliberately heterogeneous real anchor proofs, chosen exactly
+// per the user's own instruction, not the easiest four:
+//   - unpackerr (Go, TOML via `pkgs.formats.toml`, direct `--config=`
+//     ExecStart flag)
+//   - unbound (C, a hand-rolled `toConf` serializer -- NOT a
+//     `pkgs.formats.*` call -- bound via an `environment.etc`
+//     activation-time symlink, not a literal ExecStart path)
+//   - mobilizon (Elixir, `pkgs.formats.elixirConf`, a `makeWrapper`-
+//     injected env var)
+//   - nebula-lighthouse-service (Python, `pkgs.formats.yaml`, a FULLY
+//     IMPLICIT binding -- zero CLI args, the consumer's own real source
+//     hardcodes the exact same default path the Nix module targets)
+//
+// Pipeline, deliberately split into named stages (per the user's own
+// explicit instruction) so every real complication ends BEFORE
+// `compare_config_contract`, which stays boring on purpose, the same
+// "weirdness ends before compare()" discipline `ProducerEvidence`/
+// `ConsumerRoute` already established:
+//   acquire generated artifact -> prove artifact binding
+//     -> parse producer paths -> resolve exact consumer
+//     -> extract accepted paths -> compare_config_contract()
+// ---------------------------------------------------------------------
+
+/// The same real `PhysShell/nixpkgs` tree C-E1.1 itself audited all 14
+/// candidates against (`fixtures/c-e1.1-generated-config-audit/
+/// census.md`) -- reusing the exact pin, not re-resolving a fresh one,
+/// so C-E1.2a's own real evidence is directly comparable to what that
+/// audit already cited for these same four modules.
+const CE12_REV: &str = "68740713a1d5904edf9ba92a998a522b1b6ce080";
+
+/// A real Nix-generated config artifact's own content, in the form
+/// leaf-path extraction actually reads. `StructuredValue` covers any
+/// producer using a real `pkgs.formats.*` generator (unpackerr,
+/// mobilizon, nebula-lighthouse-service all qualify) -- the real
+/// Nix-evaluated JSON representation of the value that generator
+/// serialized IS the semantic source of truth, so extraction reads
+/// THAT directly rather than re-parsing rendered TOML/YAML/JSON text
+/// (which would need a real format-specific parser per format, exactly
+/// the "five near-identical adapters" this whole family was designed
+/// to avoid). `RenderedText` covers a hand-rolled serializer with no
+/// single structured Nix value the file's content maps to 1:1 (unbound's
+/// own real `toConf`) -- extraction here genuinely does need a real,
+/// bounded, disclosed text-format reader.
+#[derive(Debug, Clone, PartialEq)]
+enum ArtifactContent {
+    StructuredValue(JsonValue),
+    RenderedText(String),
+}
+
+/// Real config-format identity -- a DESCRIPTIVE/provenance field only.
+/// Never branched on inside `compare_config_contract` or any shared
+/// comparison logic (stop condition 6) -- only the two `ArtifactContent`
+/// extraction paths above care about format, and even those only care
+/// about "structured value available, yes/no", not the specific format
+/// name.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ConfigFormat {
+    Toml,
+    Yaml,
+    ElixirConf,
+    HandRolled,
+}
+
+/// The real, mechanically-distinct ways C-E1.1 found a generated
+/// artifact actually bound to its consumer process -- B's own evidence
+/// shape, never assumed from A alone. Four real variants, one per
+/// anchor; a future candidate needing a fifth gets a fifth variant
+/// here, not a workaround forced into an existing one.
+#[derive(Debug, Clone, PartialEq)]
+enum ArtifactBindingEvidence {
+    /// unpackerr's own real shape: the artifact's path appears literally
+    /// in `ExecStart`'s own argv, behind a named flag.
+    DirectArgv { flag: String, argv: String },
+    /// unbound's own real shape: `environment.etc.<path>.source` is the
+    /// SAME real artifact, and `ExecStart` references the fixed `/etc`
+    /// path that activation-time mechanism populates -- never a literal
+    /// store path on the command line at all.
+    EnvironmentEtcSymlink { etc_path: String },
+    /// mobilizon's own real shape: a `makeWrapper`-generated launcher
+    /// sets an env var to the artifact's own real store path before
+    /// exec'ing the real binary.
+    WrapperScriptEnvVar { var_name: String },
+    /// nebula-lighthouse-service's own real shape: `ExecStart` takes NO
+    /// arguments referencing the artifact at all -- binding is proved
+    /// only by the consumer's own real source hardcoding the identical
+    /// default path the Nix module's `environment.etc` target uses.
+    ImplicitDefaultPath { path: String },
+}
+
+/// One producer's full real evidence -- A (via `content`) + B (via
+/// `binding`) + the D-facing half of C-E1.1's own pipeline, D's actual
+/// extraction (`emitted_paths`/`opaque_paths`) done by
+/// `parse_producer_paths`, a separate named stage, not folded into
+/// acquisition itself.
+#[derive(Debug, Clone, PartialEq)]
+struct GeneratedConfigArtifactEvidence {
+    producer: String,
+    format: ConfigFormat,
+    content: ArtifactContent,
+    binding: ArtifactBindingEvidence,
+    /// Real, normalized, dotted leaf paths -- e.g. `"radarr"` is never
+    /// in here (it's a real list in unpackerr's own corpus, see
+    /// `opaque_paths` below), but a real scalar like `"debug"` is.
+    emitted_paths: Vec<String>,
+    /// Real paths this bounded v1 extraction couldn't reach -- a JSON/
+    /// YAML array, a repeated key under the same section in a
+    /// rendered-text artifact, ... Disclosed, never silently dropped:
+    /// stop condition 7 (missing/ambiguous -> inconclusive, never PASS)
+    /// applies to individual PATHS too, not just whole artifacts --
+    /// `compare_config_contract` only ever compares `emitted_paths`,
+    /// never guesses at what an opaque path might have meant.
+    opaque_paths: Vec<String>,
+}
+
+/// The real, pinned consumer's own accepted-path surface -- D's actual
+/// result, extracted from real vendored consumer source (never modeled
+/// generically; every real consumer format needs its own real,
+/// disclosed, bounded extractor, listed below per anchor).
+#[derive(Debug, Clone, PartialEq)]
+struct ConsumerConfigContract {
+    consumer: String,
+    accepted_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum ConfigContractVerdict {
+    Pass,
+    Finding { unaccepted_path: String },
+}
+
+/// Pure. The ENTIRE comparison semantics for this whole family --
+/// deliberately boring (stop condition 5: every selected candidate goes
+/// through this ONE function; stop condition 6: no `if producer ==
+/// "..."` anywhere in it, ever). `emitted_path ∈ accepted_paths`, full
+/// stop. Every real complication (format quirks, binding shape,
+/// consumer research, which paths were even reachable) happened
+/// upstream, in `acquire_*`/`parse_producer_paths`/the per-consumer
+/// `*_consumer_contract` functions -- not here.
+fn compare_config_contract(
+    evidence: &GeneratedConfigArtifactEvidence,
+    contract: &ConsumerConfigContract,
+) -> ConfigContractVerdict {
+    for path in &evidence.emitted_paths {
+        if !contract.accepted_paths.iter().any(|p| p == path) {
+            return ConfigContractVerdict::Finding { unaccepted_path: path.clone() };
+        }
+    }
+    ConfigContractVerdict::Pass
+}
+
+/// Flattens a real Nix-evaluated JSON structured value into dotted leaf
+/// paths -- the extraction half of `ArtifactContent::StructuredValue`.
+/// A JSON object recurses, extending the dotted path; any scalar
+/// (string/number/bool/null) becomes a real leaf path. A JSON ARRAY is
+/// never indexed into -- its own path is recorded as opaque instead,
+/// never guessed at (unpackerr's own real `radarr` setting -- a list of
+/// per-instance blocks -- is the real corpus case this exists for, not
+/// a hypothetical). v1's own explicit scope limit, per the user's own
+/// instruction not to solve arrays/dynamic map keys in the same round
+/// as everything else.
+fn flatten_structured_value(
+    value: &JsonValue,
+    prefix: &str,
+    emitted: &mut Vec<String>,
+    opaque: &mut Vec<String>,
+) {
+    match value {
+        JsonValue::Object(map) => {
+            for (k, v) in map {
+                let path = if prefix.is_empty() { k.clone() } else { format!("{prefix}.{k}") };
+                flatten_structured_value(v, &path, emitted, opaque);
+            }
+        }
+        JsonValue::Array(_) => {
+            opaque.push(prefix.to_string());
+        }
+        _ => {
+            if !prefix.is_empty() {
+                emitted.push(prefix.to_string());
+            }
+        }
+    }
+}
+
+/// Bounded, disclosed extraction for a hand-rolled `section:\n  key:
+/// value` rendered-text artifact -- unbound's own real shape (see
+/// `fixtures/cdc/generated-config-artifact/unbound/`). A section header
+/// is a line ending in `:` at column 0 (no leading whitespace); an
+/// indented `  key: value` line under it becomes `section.key`. A key
+/// seen MORE than once under the same section (unbound's own real
+/// `access-control`/`control-interface`, which can legitimately repeat)
+/// is moved to `opaque` -- the same "never guess at a real list"
+/// discipline `flatten_structured_value` uses for a JSON array, applied
+/// to rendered text's own equivalent shape.
+fn extract_unbound_style_paths(rendered: &str) -> (Vec<String>, Vec<String>) {
+    let mut emitted: Vec<String> = Vec::new();
+    let mut opaque: Vec<String> = Vec::new();
+    let mut seen_once: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut section = String::new();
+    for line in rendered.lines() {
+        if line.is_empty() {
+            continue;
+        }
+        if !line.starts_with(char::is_whitespace) {
+            if let Some(name) = line.trim_end().strip_suffix(':') {
+                section = name.to_string();
+            }
+            continue;
+        }
+        let trimmed = line.trim();
+        let Some((key, _val)) = trimmed.split_once(':') else {
+            continue;
+        };
+        let path = format!("{section}.{}", key.trim());
+        if opaque.contains(&path) {
+            continue;
+        }
+        if !seen_once.insert(path.clone()) {
+            // second occurrence -- a real repeat, move to opaque and
+            // drop any earlier single-occurrence entry for it.
+            emitted.retain(|p| p != &path);
+            opaque.push(path);
+            continue;
+        }
+        emitted.push(path);
+    }
+    (emitted, opaque)
+}
+
+/// Bounded, disclosed extraction of `toml:"..."` struct-field tags from
+/// a real vendored Go source file -- unpackerr's own real
+/// `fixtures/cdc/generated-config-artifact/unpackerr/apps.go`. Same
+/// "bounded literal scan over one observed real source shape"
+/// discipline K4c's own `extract_go_flagset_literal_names` already
+/// established for a different Go convention -- not a general Go
+/// struct-tag parser.
+fn extract_go_toml_tags(source: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    const NEEDLE: &str = "toml:\"";
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find(NEEDLE) {
+        let pos = search_from + rel;
+        let after = &source[pos + NEEDLE.len()..];
+        if let Some(end) = after.find('"') {
+            let tag = &after[..end];
+            // Go's own `,omitempty`-style tag suffix is a serialization
+            // modifier, not part of the real accepted key name.
+            let name = tag.split(',').next().unwrap_or(tag);
+            if name != "-" && !name.is_empty() {
+                names.push(name.to_string());
+            }
+        }
+        search_from = pos + NEEDLE.len();
+    }
+    names
+}
+
+/// Bounded, disclosed extraction of `NAME{COLON}` lexer keyword entries
+/// from a real vendored excerpt of unbound's own
+/// `util/configlexer.lex` -- see
+/// `fixtures/cdc/generated-config-artifact/unbound/configlexer-excerpt.lex`'s
+/// own doc comment for exactly which real lines/directives this covers
+/// (NOT unbound's complete real accepted-config surface, which is
+/// hundreds of directives -- a real, disclosed, bounded excerpt,
+/// covering exactly what this project's own real test artifact emits).
+fn extract_unbound_lexer_keywords(source: &str) -> Vec<String> {
+    source
+        .lines()
+        .filter_map(|line| {
+            let (keyword, _rest) = line.trim().split_once("{COLON}")?;
+            (!keyword.is_empty()).then(|| keyword.to_string())
+        })
+        .collect()
+}
+
+/// Bounded, disclosed extraction of `get_config(path, 'NAME', ...)`
+/// literal key names from a real vendored Python source file --
+/// nebula-lighthouse-service's own real
+/// `fixtures/cdc/generated-config-artifact/nebula-lighthouse-service/file_config.py`.
+fn extract_python_get_config_keys(source: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    const NEEDLE: &str = "get_config(path, '";
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find(NEEDLE) {
+        let pos = search_from + rel;
+        let after = &source[pos + NEEDLE.len()..];
+        if let Some(end) = after.find('\'') {
+            names.push(after[..end].to_string());
+        }
+        search_from = pos + NEEDLE.len();
+    }
+    names
+}
+
+/// Bounded, disclosed extraction of `config :mobilizon, :instance,`
+/// block field names from a real vendored Elixir schema file --
+/// `fixtures/cdc/generated-config-artifact/mobilizon/config.exs`.
+/// Scoped deliberately narrow: only the `:instance` block (what this
+/// project's own real anchor test actually touches), not mobilizon's
+/// entire real config surface (dozens of other real top-level blocks,
+/// out of this bounded v1's own scope -- see the block's own doc
+/// comment on `acquire_mobilizon_evidence` for why).
+fn extract_elixir_instance_block_keys(source: &str) -> Vec<String> {
+    let Some(start) = source.find("config :mobilizon, :instance,") else {
+        return Vec::new();
+    };
+    let after = &source[start..];
+    let Some(end) = after.find("\n\n") else {
+        return Vec::new();
+    };
+    let block = &after[..end];
+    block
+        .lines()
+        .skip(1) // the `config :mobilizon, :instance,` line itself
+        .filter_map(|line| {
+            let trimmed = line.trim().trim_end_matches(',');
+            trimmed.split_once(':').map(|(key, _)| key.trim().to_string())
+        })
+        .collect()
+}
+
+/// Reads a real vendored C-E1.2a consumer-source fixture (never a live
+/// fetch -- same discipline as every vendored consumer fixture in this
+/// project). `Inconclusive`, not a panic: a missing fixture means this
+/// consumer's contract genuinely can't be extracted right now, not that
+/// the tool should crash.
+fn read_ce12_fixture(relative_path: &str) -> Result<String, CdcError> {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(relative_path);
+    std::fs::read_to_string(&path)
+        .map_err(|e| CdcError::Inconclusive(format!("reading vendored fixture {}: {e}", path.display())))
+}
+
+/// Real: unpackerr's own producer/binding evidence -- A (`pkgs.formats.
+/// toml.generate` over the real `cfg.settings`) + B (the same
+/// artifact's own store path appears literally, behind a real
+/// `--config=` flag, in the real evaluated `ExecStart`). `settings.
+/// radarr` (a real list of per-instance blocks) is genuinely opaque to
+/// this bounded v1 -- the real corpus case `flatten_structured_value`'s
+/// own doc comment names, not a hypothetical.
+fn acquire_unpackerr_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.unpackerr = {{
+              enable = true;
+              settings.debug = true;
+              settings.radarr = [ {{ api_key = "test-key-123"; url = "http://localhost:7878"; }} ];
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          settings = eval.config.services.unpackerr.settings;
+          execStart = eval.config.systemd.services.unpackerr.serviceConfig.ExecStart;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    if !exec_start.contains("--config=") {
+        return Err(CdcError::Inconclusive(
+            "unpackerr's real ExecStart no longer contains a --config= flag -- binding evidence lost"
+                .to_string(),
+        ));
+    }
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "unpackerr".to_string(),
+        format: ConfigFormat::Toml,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::DirectArgv {
+            flag: "--config".to_string(),
+            argv: exec_start.to_string(),
+        },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn unpackerr_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture("fixtures/cdc/generated-config-artifact/unpackerr/apps.go")?;
+    Ok(ConsumerConfigContract {
+        consumer: "unpackerr".to_string(),
+        accepted_paths: extract_go_toml_tags(&source),
+    })
+}
+
+/// Real: unbound's own producer/binding evidence. A -- a hand-rolled
+/// `toConf` serializer, NOT a `pkgs.formats.*` call, so there is no
+/// single structured Nix value the file's own content maps to 1:1;
+/// `builtins.readFile` on the real generated derivation (which Nix
+/// builds on demand, `--impure` already required for `fetchTarball`)
+/// gets the real rendered TEXT instead. B -- a MEANINGFULLY DIFFERENT
+/// real shape from unpackerr's: `ExecStart` never puts a store path on
+/// the command line at all, only the fixed `/etc/unbound/unbound.conf`
+/// -- the real binding is the `environment.etc` activation-time
+/// symlink from that fixed path to the SAME real artifact `A` reads.
+fn acquire_unbound_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.unbound = {{
+              enable = true;
+              settings.server = {{ interface = [ "127.0.0.1" ]; port = 5353; }};
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          rendered = builtins.readFile eval.config.environment.etc."unbound/unbound.conf".source;
+          execStart = eval.config.systemd.services.unbound.serviceConfig.ExecStart;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let rendered = value
+        .get("rendered")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing rendered".to_string()))?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    const ETC_PATH: &str = "/etc/unbound/unbound.conf";
+    if !exec_start.contains(ETC_PATH) {
+        return Err(CdcError::Inconclusive(format!(
+            "unbound's real ExecStart no longer references {ETC_PATH} -- binding evidence lost"
+        )));
+    }
+    let (section_emitted, section_opaque) = extract_unbound_style_paths(rendered);
+    // D's own real extraction granularity (`extract_unbound_lexer_keywords`)
+    // is a bounded scan over BARE directive keywords -- unbound's real
+    // yacc grammar defines each directive's accepted clause(s) in a
+    // separate production this v1 deliberately doesn't parse (out of
+    // the bounded-scope limits this whole round was told to keep to).
+    // Comparing consistently at D's own real granularity means dropping
+    // the section prefix `extract_unbound_style_paths` otherwise carries
+    // -- a disclosed limitation (a same-named directive under two
+    // different real clauses would collide here), not a silent one.
+    let strip_section = |paths: Vec<String>| -> Vec<String> {
+        paths.into_iter().map(|p| p.rsplit('.').next().unwrap_or_default().to_string()).collect()
+    };
+    let emitted_paths = strip_section(section_emitted);
+    let opaque_paths = strip_section(section_opaque);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "unbound".to_string(),
+        format: ConfigFormat::HandRolled,
+        content: ArtifactContent::RenderedText(rendered.to_string()),
+        binding: ArtifactBindingEvidence::EnvironmentEtcSymlink { etc_path: ETC_PATH.to_string() },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn unbound_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source =
+        read_ce12_fixture("fixtures/cdc/generated-config-artifact/unbound/configlexer-excerpt.lex")?;
+    Ok(ConsumerConfigContract {
+        consumer: "unbound".to_string(),
+        accepted_paths: extract_unbound_lexer_keywords(&source),
+    })
+}
+
+/// Real: mobilizon's own producer/binding evidence. A -- `pkgs.formats.
+/// elixirConf.generate` over the real `cfg.settings`. B -- a THIRD real
+/// shape: `ExecStart` runs a `makeWrapper`-generated launcher script,
+/// which sets `MOBILIZON_CONFIG_PATH` to the SAME real artifact before
+/// exec'ing the real binary -- proved by reading the wrapper script's
+/// own real content (`builtins.readFile`, reached via
+/// `builtins.substring` rather than a regex `match`, since Nix's own
+/// string-context tracking -- needed for `readFile` to know which
+/// derivation to build -- survives substring/concatenation but is
+/// documented to NOT survive a `builtins.match` capture).
+///
+/// D-extraction scope, deliberately bounded: only the `:instance` block
+/// (see `extract_elixir_instance_block_keys`'s own doc comment) --
+/// every OTHER real top-level Elixir config block mobilizon exposes
+/// (`Mobilizon.Web.Endpoint`, `Mobilizon.Storage.Repo`, ...) is real but
+/// out of this v1's own scope, so `emitted_paths`/`opaque_paths` here
+/// are scoped to the SAME `:instance` sub-tree, not mobilizon's whole
+/// real settings surface -- comparing a narrower A against a narrower D
+/// consistently, never a mismatched partial comparison.
+fn acquire_mobilizon_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.mobilizon = {{
+              enable = true;
+              settings = {{
+                ":mobilizon" = {{
+                  ":instance" = {{ name = "Test Mobilizon"; hostname = "test.example.com"; }};
+                }};
+              }};
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        execStart = eval.config.systemd.services.mobilizon.serviceConfig.ExecStart;
+        binPath = builtins.substring 0 (builtins.stringLength execStart - 6) execStart;
+        in {{
+          settings = eval.config.services.mobilizon.settings;
+          wrapperContent = builtins.readFile binPath;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    let wrapper = value
+        .get("wrapperContent")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing wrapperContent".to_string()))?;
+    const VAR_NAME: &str = "MOBILIZON_CONFIG_PATH";
+    if !wrapper.contains(&format!("export {VAR_NAME}=")) {
+        return Err(CdcError::Inconclusive(format!(
+            "mobilizon's real wrapper script no longer sets {VAR_NAME} -- binding evidence lost"
+        )));
+    }
+    let instance = settings
+        .get(":mobilizon")
+        .and_then(|v| v.get(":instance"))
+        .cloned()
+        .ok_or_else(|| {
+            CdcError::ToolError("mobilizon settings missing :mobilizon.:instance".to_string())
+        })?;
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&instance, "", &mut emitted_paths, &mut opaque_paths);
+    if let Some(JsonValue::Object(inner)) = settings.get(":mobilizon") {
+        for key in inner.keys() {
+            if key != ":instance" {
+                opaque_paths.push(key.clone());
+            }
+        }
+    }
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "mobilizon".to_string(),
+        format: ConfigFormat::ElixirConf,
+        content: ArtifactContent::StructuredValue(instance),
+        binding: ArtifactBindingEvidence::WrapperScriptEnvVar { var_name: VAR_NAME.to_string() },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn mobilizon_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture("fixtures/cdc/generated-config-artifact/mobilizon/config.exs")?;
+    Ok(ConsumerConfigContract {
+        consumer: "mobilizon".to_string(),
+        accepted_paths: extract_elixir_instance_block_keys(&source),
+    })
+}
+
+/// Real: nebula-lighthouse-service's own producer/binding evidence. A --
+/// `pkgs.formats.yaml.generate` over the real `cfg.settings` (already
+/// flat, dotted-string keys like `"webserver.port"` -- the module's own
+/// real convention, matching the consumer's own `get_config(path,
+/// 'webserver.port', ...)` calls exactly, confirmed by
+/// `flatten_structured_value` needing no further splitting). B -- the
+/// FOURTH, adversarial real shape: `ExecStart` takes ZERO arguments
+/// referencing the artifact at all. Binding is proved only by the real,
+/// vendored consumer source (`webservice.py:40`) hardcoding the
+/// identical default path `environment.etc` targets -- nothing on the
+/// Nix side names it, so this function only confirms the artifact
+/// itself exists and `ExecStart` genuinely takes no arguments; the path
+/// MATCH itself is a real, disclosed, cited fact from vendored source
+/// (`NEBULA_HARDCODED_DEFAULT_PATH`), not re-derived live every run.
+const NEBULA_HARDCODED_DEFAULT_PATH: &str = "/etc/nebula-lighthouse-service/config.yaml";
+
+fn acquire_nebula_lighthouse_service_evidence(
+    rev: &str,
+) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.nebula-lighthouse-service.enable = true;
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          settings = eval.config.services.nebula-lighthouse-service.settings;
+          execStart = eval.config.systemd.services.nebula-lighthouse-service.serviceConfig.ExecStart;
+          etcSource = eval.config.environment.etc."nebula-lighthouse-service/config.yaml".source;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    // `environment.etc."nebula-lighthouse-service/config.yaml"` itself
+    // resolving at all (no attribute-missing error above) is the real
+    // artifact-exists proof; nothing further needed from its value here.
+    let _etc_source = value
+        .get("etcSource")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing etcSource".to_string()))?;
+    if exec_start.split_whitespace().count() != 1 {
+        return Err(CdcError::Inconclusive(
+            "nebula-lighthouse-service's real ExecStart now has arguments -- the implicit-binding \
+             shape this anchor demonstrates no longer applies"
+                .to_string(),
+        ));
+    }
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "nebula-lighthouse-service".to_string(),
+        format: ConfigFormat::Yaml,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::ImplicitDefaultPath {
+            path: NEBULA_HARDCODED_DEFAULT_PATH.to_string(),
+        },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn nebula_lighthouse_service_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture(
+        "fixtures/cdc/generated-config-artifact/nebula-lighthouse-service/file_config.py",
+    )?;
+    Ok(ConsumerConfigContract {
+        consumer: "nebula-lighthouse-service".to_string(),
+        accepted_paths: extract_python_get_config_keys(&source),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3453,4 +4120,358 @@ mod k5c_tests {
         let producer_emitted = eval_grafana_producer_environment(GRAFANA_BASE_REV).unwrap();
         assert_eq!(producer_emitted, std::collections::BTreeSet::from(["PATH".to_string()]));
     }
+}
+
+#[cfg(test)]
+mod ce12_tests {
+    use super::*;
+
+    // --- compare_config_contract: offline, pure. Deliberately boring,
+    // per C-E1.2a's own stop conditions 5/6 -- one shared function,
+    // never branching on `producer`/`consumer` identity. ---
+
+    fn evidence(emitted: &[&str]) -> GeneratedConfigArtifactEvidence {
+        GeneratedConfigArtifactEvidence {
+            producer: "synth".to_string(),
+            format: ConfigFormat::Toml,
+            content: ArtifactContent::RenderedText(String::new()),
+            binding: ArtifactBindingEvidence::DirectArgv {
+                flag: "--config".to_string(),
+                argv: "synth --config /x".to_string(),
+            },
+            emitted_paths: emitted.iter().map(|s| s.to_string()).collect(),
+            opaque_paths: Vec::new(),
+        }
+    }
+
+    fn contract(accepted: &[&str]) -> ConsumerConfigContract {
+        ConsumerConfigContract {
+            consumer: "synth".to_string(),
+            accepted_paths: accepted.iter().map(|s| s.to_string()).collect(),
+        }
+    }
+
+    #[test]
+    fn compare_all_emitted_paths_accepted_is_pass() {
+        let e = evidence(&["debug", "server.port"]);
+        let c = contract(&["debug", "server.port", "server.host"]);
+        assert_eq!(compare_config_contract(&e, &c), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    fn compare_one_unaccepted_emitted_path_is_a_finding() {
+        // stop condition 8: mutating a REAL emitted path away from what
+        // the consumer actually accepts must flip PASS -> FINDING.
+        let e = evidence(&["debug", "server.oldname"]);
+        let c = contract(&["debug", "server.port"]);
+        assert_eq!(
+            compare_config_contract(&e, &c),
+            ConfigContractVerdict::Finding { unaccepted_path: "server.oldname".to_string() }
+        );
+    }
+
+    #[test]
+    fn compare_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        // stop condition 9: a real ACCEPTED path unrelated to anything
+        // actually emitted must never change the verdict either way.
+        let e = evidence(&["debug"]);
+        let c_before = contract(&["debug", "server.port"]);
+        let c_after_unrelated_mutation = contract(&["debug", "server.port", "totally.unrelated"]);
+        assert_eq!(
+            compare_config_contract(&e, &c_before),
+            compare_config_contract(&e, &c_after_unrelated_mutation)
+        );
+    }
+
+    #[test]
+    fn compare_empty_emitted_paths_is_always_pass() {
+        let e = evidence(&[]);
+        let c = contract(&["anything"]);
+        assert_eq!(compare_config_contract(&e, &c), ConfigContractVerdict::Pass);
+    }
+
+    // --- flatten_structured_value: offline, pure ---
+
+    #[test]
+    fn flatten_nested_object_produces_dotted_leaf_paths() {
+        let value: JsonValue = serde_json::json!({
+            "debug": true,
+            "server": { "host": "127.0.0.1", "port": 8080 }
+        });
+        let mut emitted = Vec::new();
+        let mut opaque = Vec::new();
+        flatten_structured_value(&value, "", &mut emitted, &mut opaque);
+        emitted.sort();
+        assert_eq!(emitted, vec!["debug", "server.host", "server.port"]);
+        assert!(opaque.is_empty());
+    }
+
+    #[test]
+    fn flatten_a_list_value_is_opaque_not_indexed_into() {
+        // the real unpackerr corpus shape: `radarr = [{...}];`
+        let value: JsonValue = serde_json::json!({
+            "debug": true,
+            "radarr": [ { "api_key": "x", "url": "http://y" } ]
+        });
+        let mut emitted = Vec::new();
+        let mut opaque = Vec::new();
+        flatten_structured_value(&value, "", &mut emitted, &mut opaque);
+        assert_eq!(emitted, vec!["debug".to_string()]);
+        assert_eq!(opaque, vec!["radarr".to_string()]);
+    }
+
+    // --- extract_unbound_style_paths: offline, pure, against a
+    // synthetic sample matching the REAL rendered shape exactly
+    // (fixtures/cdc/generated-config-artifact/unbound/rendered.conf
+    // carries the real, nix-built content this was modeled on). ---
+
+    #[test]
+    fn extract_unbound_style_single_occurrence_keys_are_emitted() {
+        let rendered = "server:\n  port: 5353\n  chroot: \"\"\nremote-control:\n  control-enable: no\n";
+        let (emitted, opaque) = extract_unbound_style_paths(rendered);
+        assert!(emitted.contains(&"server.port".to_string()));
+        assert!(emitted.contains(&"server.chroot".to_string()));
+        assert!(emitted.contains(&"remote-control.control-enable".to_string()));
+        assert!(opaque.is_empty());
+    }
+
+    #[test]
+    fn extract_unbound_style_repeated_key_becomes_opaque_not_first_or_last() {
+        // the real unbound shape: access-control can appear more than
+        // once under `server:`.
+        let rendered =
+            "server:\n  access-control: 127.0.0.0/8 allow\n  access-control: ::1/128 allow\n";
+        let (emitted, opaque) = extract_unbound_style_paths(rendered);
+        assert!(!emitted.contains(&"server.access-control".to_string()));
+        assert!(opaque.contains(&"server.access-control".to_string()));
+    }
+
+    // --- per-consumer extractors: offline, against the REAL vendored
+    // fixtures (fetched at each package's own exact pinned version, see
+    // fixtures/cdc/generated-config-artifact/<name>/) ---
+
+    fn read_vendored(path: &str) -> String {
+        let full = Path::new(env!("CARGO_MANIFEST_DIR")).join(path);
+        std::fs::read_to_string(&full)
+            .unwrap_or_else(|e| panic!("reading vendored fixture {}: {e}", full.display()))
+    }
+
+    #[test]
+    fn real_vendored_unpackerr_go_struct_yields_the_real_toml_tags() {
+        let source = read_vendored("fixtures/cdc/generated-config-artifact/unpackerr/apps.go");
+        let tags = extract_go_toml_tags(&source);
+        for real in ["debug", "interval", "log_file", "radarr", "sonarr", "webserver"] {
+            assert!(tags.iter().any(|t| t == real), "missing real tag {real:?}; got {tags:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_unbound_lexer_excerpt_yields_the_real_keywords() {
+        let source = read_vendored(
+            "fixtures/cdc/generated-config-artifact/unbound/configlexer-excerpt.lex",
+        );
+        let keywords = extract_unbound_lexer_keywords(&source);
+        for real in ["port", "chroot", "access-control", "control-enable", "interface"] {
+            assert!(keywords.iter().any(|k| k == real), "missing real keyword {real:?}; got {keywords:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_nebula_file_config_yields_the_real_get_config_keys() {
+        let source = read_vendored(
+            "fixtures/cdc/generated-config-artifact/nebula-lighthouse-service/file_config.py",
+        );
+        let keys = extract_python_get_config_keys(&source);
+        let mut sorted = keys.clone();
+        sorted.sort();
+        sorted.dedup();
+        assert_eq!(sorted, vec!["max-port", "min-port", "webserver.ip", "webserver.port"]);
+    }
+
+    #[test]
+    fn real_vendored_mobilizon_config_exs_yields_the_real_instance_keys() {
+        let source = read_vendored("fixtures/cdc/generated-config-artifact/mobilizon/config.exs");
+        let keys = extract_elixir_instance_block_keys(&source);
+        for real in ["name", "hostname", "registrations_open", "federating"] {
+            assert!(keys.iter().any(|k| k == real), "missing real key {real:?}; got {keys:?}");
+        }
+    }
+
+    // --- C-E1.2a real end-to-end anchor proofs: needs a real `nix`
+    // binary + network access (`fetchTarball`), same discipline as the
+    // pre-existing `#[ignore]` tests above. Each anchor proves the FULL
+    // real pipeline (acquire -> compare_config_contract) through the
+    // exact SAME shared `compare_config_contract` (stop conditions 5/6:
+    // one function, zero `if app == ...` branching anywhere in it), for
+    // a genuinely different real language/format/binding shape -- see
+    // this module's own header doc comment for which. Each anchor also
+    // gets its own stop-condition-8 (mutate a REAL emitted path -> must
+    // flip PASS -> FINDING) and stop-condition-9 (mutate an UNRELATED
+    // accepted path -> comparison must not change) proof against REAL
+    // acquired data, not just the synthetic `evidence()`/`contract()`
+    // helpers already covering the same two conditions abstractly above. ---
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_unpackerr_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_unpackerr_evidence(CE12_REV).unwrap();
+        let contract = unpackerr_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_unpackerr_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_unpackerr_evidence(CE12_REV).unwrap();
+        let contract = unpackerr_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"debug".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "debug" {
+                *p = "debug-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "debug-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_unpackerr_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_unpackerr_evidence(CE12_REV).unwrap();
+        let contract_before = unpackerr_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_unbound_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_unbound_evidence(CE12_REV).unwrap();
+        let contract = unbound_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_unbound_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_unbound_evidence(CE12_REV).unwrap();
+        let contract = unbound_consumer_contract().unwrap();
+        assert!(!evidence.emitted_paths.is_empty());
+        let real_path = evidence.emitted_paths[0].clone();
+        evidence.emitted_paths[0] = format!("{real_path}-renamed-to-something-nobody-accepts");
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: format!("{real_path}-renamed-to-something-nobody-accepts")
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_unbound_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_unbound_evidence(CE12_REV).unwrap();
+        let contract_before = unbound_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_mobilizon_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_mobilizon_evidence(CE12_REV).unwrap();
+        let contract = mobilizon_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_mobilizon_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_mobilizon_evidence(CE12_REV).unwrap();
+        let contract = mobilizon_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"hostname".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "hostname" {
+                *p = "hostname-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "hostname-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_mobilizon_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_mobilizon_evidence(CE12_REV).unwrap();
+        let contract_before = mobilizon_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_nebula_lighthouse_service_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
+        let contract = nebula_lighthouse_service_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_nebula_lighthouse_service_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
+        let contract = nebula_lighthouse_service_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"min-port".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "min-port" {
+                *p = "min-port-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "min-port-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_nebula_lighthouse_service_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged(
+    ) {
+        let evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
+        let contract_before = nebula_lighthouse_service_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    // --- stop condition 10: old K1-K5/OBA results must not change.
+    // Enforced by the pre-existing full suites in `mod tests`/
+    // `mod k4c_tests`/`mod k5c_tests` above, all still present and
+    // unmodified by this module -- no dedicated test needed here beyond
+    // running the full suite, done as part of closing this round. ---
 }
