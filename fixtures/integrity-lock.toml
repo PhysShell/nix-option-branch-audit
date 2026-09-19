@@ -223,3 +223,64 @@ repo = "manuels/nebula-lighthouse-service"
 commit = "303693032b7aabfd45ede1f5b68e5bf168994a03"
 upstream_path = "webservice.py"
 sha256 = "08e3930a763b19477dd5f1c095258848e284d7738d84f2b0ae76e2726a4ff830"
+
+# C-E1.2b: the small generic-additions follow-up the transfer census
+# (fixtures/c-e1.2b-transfer-census/census.md) authorized -- 7 new real
+# vendored consumer-source fixtures for the 7 candidates implemented
+# (privoxy, misskey, kavita, transmission, i2pd, spacecookie, akkoma).
+# `privoxy` has no git commit (SourceForge-hosted, not GitHub/GitLab/
+# Gitea) -- `commit` holds the exact real tarball filename instead, and
+# the fixture's own sha256 was independently confirmed byte-identical
+# to nixpkgs' own pinned `hash` for this same tarball (`nix hash
+# convert` on the downloaded file matches `pkgs/by-name/pr/privoxy/
+# package.nix`'s own `sha256-b5Emf4H2JsQWmU24mrYvTQkkbuv0dUuBGG4ToY7pAo8=`
+# exactly). `akkoma` is Gitea-hosted (akkoma.dev), resolved via the
+# Gitea API, not `gh`.
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/privoxy/loadcfg-hashtable-excerpt.c"
+repo = "ijbswa/privoxy"
+commit = "privoxy-4.2.0-stable-src.tar.gz (SourceForge, no git commit)"
+upstream_path = "loadcfg.c"
+sha256 = "e1b2a6daec2c9c0c9512d14ae57f4ca45ed907d8445ec0d3823be97fb802c388"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/misskey/config.ts"
+repo = "misskey-dev/misskey"
+commit = "2954dee1081e601b50b372d7a39e9be361a7c774"
+upstream_path = "packages/backend/src/config.ts"
+sha256 = "728322f83043bf8675cbca1ab306de41804f99148b2df2076b60a8bc1087d17b"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/kavita/configuration-excerpt.cs"
+repo = "Kareadita/Kavita"
+commit = "6bcd5689385d0e96824982d843c54f15ce784ddc"
+upstream_path = "Kavita.Common/Configuration.cs"
+sha256 = "8e351dfd4eb8966f253af7c49efec68439e16a5f04bb71c510b6119697181530"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/transmission/quark-kebab-excerpt.cc"
+repo = "transmission/transmission"
+commit = "838877323facc4cc2b677fe817e203779c437bb1"
+upstream_path = "libtransmission/quark.cc"
+sha256 = "7e3d59d6f5e287442489c18cb3d858a6ee99c163573406123ddea7c49d406e47"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/i2pd/Config.cpp"
+repo = "PurpleI2P/i2pd"
+commit = "635b013a612ff47278ef02acf8580a28e10e26c5"
+upstream_path = "libi2pd/Config.cpp"
+sha256 = "0100acf80d9236fe8fce80ebf6631efc4ea2b740b269bbe0b21f66e8015c0309"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/spacecookie/Config.hs"
+repo = "hackage.haskell.org/package/spacecookie-1.1.0.1"
+commit = "spacecookie-1.1.0.1.tar.gz (Hackage, no git commit)"
+upstream_path = "server/Network/Spacecookie/Config.hs"
+sha256 = "c850ab1f832ba7b0ff9adfbb8acfe420e79accbe93bdf966f8b756e349ae4848"
+
+[[fixture]]
+path = "fixtures/cdc/generated-config-artifact/akkoma/description-excerpt.exs"
+repo = "AkkomaGang/akkoma"
+commit = "4ceb81aa7f86af7b093d3d683940933e96e5dfcb"
+upstream_path = "config/description.exs"
+sha256 = "447ba65caf5aa1c503c4635b7d89b6dca89f2dc7a59aaa1e2a19822f19e8e418"

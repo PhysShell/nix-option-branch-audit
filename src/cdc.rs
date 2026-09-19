@@ -1951,6 +1951,14 @@ enum ConfigFormat {
     Yaml,
     ElixirConf,
     HandRolled,
+    /// C-E1.2b: transmission's/spacecookie's own real format -- plain
+    /// JSON, a real, distinct format tag from `Yaml`/`Toml` even though
+    /// `ArtifactContent::StructuredValue` handles it identically
+    /// (format stays descriptive-only, never branched on).
+    Json,
+    /// C-E1.2b: i2pd's own real format -- `boost::program_options`'
+    /// own real INI-style parser, sections included.
+    Ini,
 }
 
 /// The real, mechanically-distinct ways C-E1.1 found a generated
@@ -1977,6 +1985,22 @@ enum ArtifactBindingEvidence {
     /// only by the consumer's own real source hardcoding the identical
     /// default path the Nix module's `environment.etc` target uses.
     ImplicitDefaultPath { path: String },
+    /// C-E1.2b: privoxy's/spacecookie's own real shape (found
+    /// independently in both, the census's own repeating-pattern case) --
+    /// the artifact's own real store path appears as a bare POSITIONAL
+    /// `ExecStart` argument, with no named flag at all (unlike
+    /// `DirectArgv`, which always has a `--flag`/`-f`-shaped name).
+    DirectPositionalArg { argv: String },
+    /// C-E1.2b: misskey's own real shape -- a real `ExecStartPre` step
+    /// installs the artifact to a FIXED runtime path (not a literal
+    /// store path) before the main process starts, and a `systemd`-level
+    /// `environment` entry points at that same fixed path. A real,
+    /// general NixOS secret-substitution idiom (activation happens at
+    /// every service start, not just Nix activation time), distinct from
+    /// `EnvironmentEtcSymlink` (that's a Nix-level `environment.etc`
+    /// symlink, populated once at system activation, never a per-service-
+    /// start imperative install step).
+    ExecStartPreInstalledEnvVar { var_name: String, install_path: String },
 }
 
 /// One producer's full real evidence -- A (via `content`) + B (via
@@ -2057,6 +2081,26 @@ fn flatten_structured_value(
     opaque: &mut Vec<String>,
 ) {
     match value {
+        // C-E1.2b, found while implementing `akkoma`: a real, general
+        // correctness fix -- `pkgs.formats.elixirConf`'s own SHARED
+        // library (`pkgs/pkgs-lib/formats/elixir-conf/default.nix`)
+        // represents any `mkRaw`/`mkAtom`/`mkTuple`/`mkCharlist`/`mkMap`
+        // value as a real, general `{ _elixirType = "..."; value = ...;
+        // }` wrapper object -- NOT genuine nested config structure, a
+        // Nix-level encoding artifact of the generator itself. Any
+        // future elixirConf-based candidate can produce one, not just
+        // akkoma. Recursing into it would produce nonsense paths like
+        // `...secret_key_base._secret`; the whole wrapper is opaque at
+        // this leaf instead -- real content exists, this v1 doesn't try
+        // to further decompose it, same precedent as a JSON array.
+        // `_secret` is currently only observed in akkoma's own module
+        // (its own `mkSecret`-shaped local convention, not part of the
+        // shared elixirConf library) but is checked the same
+        // structural way -- a marker KEY SHAPE, never an app-identity
+        // check.
+        JsonValue::Object(map) if map.contains_key("_elixirType") || map.contains_key("_secret") => {
+            opaque.push(prefix.to_string());
+        }
         JsonValue::Object(map) => {
             for (k, v) in map {
                 let path = if prefix.is_empty() { k.clone() } else { format!("{prefix}.{k}") };
@@ -2066,6 +2110,16 @@ fn flatten_structured_value(
         JsonValue::Array(_) => {
             opaque.push(prefix.to_string());
         }
+        // C-E1.2b, found while implementing `i2pd`: a real, general
+        // correctness fix, not app-specific -- a JSON `null` leaf means
+        // "this option was never configured" for every candidate built
+        // on a freeform Nix attrset (i2pd's own real module confirms
+        // this directly: `removeNulls = lib.filterAttrsRecursive (_: v:
+        // !isNull v);` strips every null-valued key before rendering the
+        // real artifact, so a null in `cfg.settings` is never actually
+        // emitted). Neither emitted nor opaque -- it simply isn't part
+        // of the real artifact at all, the same way an absent key isn't.
+        JsonValue::Null => {}
         _ => {
             if !prefix.is_empty() {
                 emitted.push(prefix.to_string());
@@ -2115,6 +2169,39 @@ fn extract_unbound_style_paths(rendered: &str) -> (Vec<String>, Vec<String>) {
             continue;
         }
         emitted.push(path);
+    }
+    (emitted, opaque)
+}
+
+/// C-E1.2b: privoxy's own real rendered shape -- flat, with NO sections
+/// at all (confirmed against the real consumer source, `loadcfg.c`'s
+/// own single flat `switch(hash_string(cmd))` dispatch -- there is no
+/// section CONCEPT here to discard, unlike `unbound`'s). Each non-empty
+/// line is `<key> <value...>` (space-separated, no `:` delimiter --
+/// confirmed real privoxy syntax, e.g. `listen-address 127.0.0.1:8118`,
+/// where the colon is part of the VALUE, not a delimiter). A key
+/// repeated (e.g. `actionsfile`, a real Nix-list-valued option rendered
+/// one line per element) moves to `opaque_paths`, matching
+/// `extract_unbound_style_paths`'s own repeated-key precedent.
+fn extract_privoxy_style_paths(rendered: &str) -> (Vec<String>, Vec<String>) {
+    let mut emitted: Vec<String> = Vec::new();
+    let mut opaque: Vec<String> = Vec::new();
+    let mut seen_once: std::collections::HashSet<String> = std::collections::HashSet::new();
+    for line in rendered.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        let key = trimmed.split_whitespace().next().unwrap_or(trimmed).to_string();
+        if opaque.contains(&key) {
+            continue;
+        }
+        if !seen_once.insert(key.clone()) {
+            emitted.retain(|p| p != &key);
+            opaque.push(key);
+            continue;
+        }
+        emitted.push(key);
     }
     (emitted, opaque)
 }
@@ -2544,6 +2631,964 @@ fn nebula_lighthouse_service_consumer_contract() -> Result<ConsumerConfigContrac
     Ok(ConsumerConfigContract {
         consumer: "nebula-lighthouse-service".to_string(),
         accepted_paths: extract_python_get_config_keys(&source),
+    })
+}
+
+// ---------------------------------------------------------------------
+// C-E1.2b: the small, tightly-scoped generic-additions follow-up the
+// transfer census (`fixtures/c-e1.2b-transfer-census/census.md`)
+// authorized -- 2 new `ArtifactBindingEvidence` variants, 1 new
+// `RenderedText` extractor shape, 7 new per-consumer D-extractors, for
+// exactly the 7 candidates the census verdicted `PASS`/`FINDING`
+// (privoxy, misskey, kavita, transmission, i2pd, spacecookie, akkoma).
+// `vault` is DELIBERATELY NOT implemented here -- the census's own
+// `INCONCLUSIVE` verdict for it is a real, disclosed evidence-chain
+// gap (D is not boundedly extractable for the fields its real default
+// config actually emits), not something this small PR is authorized to
+// "just build anyway." Zero changes to `compare_config_contract()`,
+// zero `if app == "X"` anywhere in comparison/contract semantics --
+// every real complication below is resolved inside its own acquire/
+// extractor function, the same "weirdness ends before compare()"
+// discipline every earlier candidate in this vertical already follows.
+// ---------------------------------------------------------------------
+
+/// C-E1.2b: privoxy's own real bounded D-extractor -- a scan over
+/// `loadcfg.c`'s own `#define hash_X <NUMBER>U /* "name" */` table
+/// (the real directive name is literally present in each line's own
+/// trailing C comment). Tolerates one real upstream typo found while
+/// vendoring (`hash_buffer_limit`'s own comment is missing its closing
+/// quote, `/* "buffer-limit */` -- the scan accepts either a closing
+/// `"` or the comment's own closing `*/` as the name's end, so this one
+/// real malformed line still yields the correct name).
+fn extract_privoxy_hash_table_names(source: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    const NEEDLE: &str = "#define hash_";
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find(NEEDLE) {
+        let pos = search_from + rel;
+        let Some(line_end) = source[pos..].find('\n') else {
+            break;
+        };
+        let line = &source[pos..pos + line_end];
+        search_from = pos + line_end;
+        let Some(quote_pos) = line.find('"') else {
+            continue;
+        };
+        let after_quote = &line[quote_pos + 1..];
+        let end = after_quote.find('"').or_else(|| after_quote.find("*/")).unwrap_or(after_quote.len());
+        let name = after_quote[..end].trim();
+        if !name.is_empty() {
+            names.push(name.to_string());
+        }
+    }
+    names
+}
+
+fn acquire_privoxy_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.privoxy = {{
+              enable = true;
+              settings = {{ listen-address = "127.0.0.1:8118"; enable-edit-actions = true; }};
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        execStart = eval.config.systemd.services.privoxy.serviceConfig.ExecStart;
+        lastSpaceIdx = s:
+          let len = builtins.stringLength s;
+              go = i: if i < 0 then -1
+                      else if builtins.substring i 1 s == " " then i
+                      else go (i - 1);
+          in go (len - 1);
+        idx = lastSpaceIdx execStart;
+        binPath = builtins.substring (idx + 1) (builtins.stringLength execStart - idx - 1) execStart;
+        in {{
+          execStart = execStart;
+          rendered = builtins.readFile binPath;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    let rendered = value
+        .get("rendered")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing rendered".to_string()))?;
+    let (emitted_paths, opaque_paths) = extract_privoxy_style_paths(rendered);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "privoxy".to_string(),
+        format: ConfigFormat::HandRolled,
+        content: ArtifactContent::RenderedText(rendered.to_string()),
+        binding: ArtifactBindingEvidence::DirectPositionalArg { argv: exec_start.to_string() },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn privoxy_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture(
+        "fixtures/cdc/generated-config-artifact/privoxy/loadcfg-hashtable-excerpt.c",
+    )?;
+    Ok(ConsumerConfigContract {
+        consumer: "privoxy".to_string(),
+        accepted_paths: extract_privoxy_hash_table_names(&source),
+    })
+}
+
+/// Bounded scan of ONE named TypeScript object-type literal (`type
+/// NAME = { ... };` or `type NAME = Something & { ... };`), returning
+/// each field's own name paired with its own raw type text.
+fn ts_type_literal_body<'a>(source: &'a str, type_name: &str) -> Option<&'a str> {
+    let needle = format!("type {type_name} = ");
+    let rel = source.find(&needle)?;
+    let after = &source[rel + needle.len()..];
+    let brace_rel = after.find('{')?;
+    let body_start = brace_rel + 1;
+    let bytes = after.as_bytes();
+    let mut depth = 1i32;
+    let mut j = body_start;
+    while j < after.len() && depth > 0 {
+        match bytes[j] {
+            b'{' => depth += 1,
+            b'}' => depth -= 1,
+            _ => {}
+        }
+        j += 1;
+    }
+    Some(&after[body_start..j.saturating_sub(1)])
+}
+
+/// Recursively scans a TypeScript object-type literal BODY into
+/// `(dotted_path, raw_type)` pairs, descending into an INLINE nested
+/// object type (misskey's own real `db: { host: string; ... };`
+/// shape) automatically, but treating a field typed as a bare NAMED
+/// type reference (e.g. `redis: RedisOptionsSource;`) as a leaf here
+/// -- the caller resolves a named-type reference separately (one
+/// bounded scan per real observed named type, not a general TS type
+/// checker).
+fn scan_ts_object_body(body: &str, prefix: &str, out: &mut Vec<(String, String)>) {
+    let bytes = body.as_bytes();
+    let mut i = 0;
+    while i < body.len() {
+        while i < body.len() && (bytes[i] as char).is_whitespace() {
+            i += 1;
+        }
+        if i >= body.len() {
+            break;
+        }
+        if body[i..].starts_with("//") {
+            match body[i..].find('\n') {
+                Some(nl) => i += nl + 1,
+                None => break,
+            }
+            continue;
+        }
+        if bytes[i] == b',' || bytes[i] == b';' {
+            i += 1;
+            continue;
+        }
+        let name_start = i;
+        while i < body.len() && bytes[i] != b':' {
+            i += 1;
+        }
+        if i >= body.len() {
+            break;
+        }
+        let raw_name = body[name_start..i].trim();
+        let name = raw_name.trim_end_matches('?').trim();
+        i += 1;
+        while i < body.len() && (bytes[i] as char).is_whitespace() {
+            i += 1;
+        }
+        if name.is_empty() || !name.chars().next().is_some_and(|c| c.is_alphabetic()) {
+            ts_skip_to_next_separator(body, &mut i);
+            continue;
+        }
+        let path = if prefix.is_empty() { name.to_string() } else { format!("{prefix}.{name}") };
+        if i < body.len() && bytes[i] == b'{' {
+            let inner_start = i + 1;
+            let mut depth = 1i32;
+            let mut j = inner_start;
+            while j < body.len() && depth > 0 {
+                match bytes[j] {
+                    b'{' => depth += 1,
+                    b'}' => depth -= 1,
+                    _ => {}
+                }
+                j += 1;
+            }
+            let inner_body = &body[inner_start..j.saturating_sub(1)];
+            scan_ts_object_body(inner_body, &path, out);
+            i = j;
+            // real shape: an inline nested object type can be an ARRAY
+            // of that shape (misskey's own real `dbSlaves?: { ... }[];`)
+            // -- skip the trailing `[]` (and any whitespace before it)
+            // so the next field isn't accidentally consumed as part of
+            // this one's own terminator scan.
+            while i < body.len() && (bytes[i] as char).is_whitespace() {
+                i += 1;
+            }
+            if body[i..].starts_with("[]") {
+                i += 2;
+            }
+            ts_skip_to_next_separator(body, &mut i);
+        } else {
+            let value_start = i;
+            ts_skip_to_next_separator(body, &mut i);
+            let raw_type = body[value_start..i].trim().trim_end_matches(';').trim_end_matches(',').trim();
+            out.push((path, raw_type.to_string()));
+        }
+    }
+}
+
+fn ts_skip_to_next_separator(body: &str, i: &mut usize) {
+    let bytes = body.as_bytes();
+    let mut depth = 0i32;
+    while *i < body.len() {
+        match bytes[*i] {
+            b'{' | b'(' | b'<' | b'[' => depth += 1,
+            b'}' | b')' | b'>' | b']' if depth > 0 => depth -= 1,
+            b';' | b',' if depth == 0 => return,
+            _ => {}
+        }
+        *i += 1;
+    }
+}
+
+/// C-E1.2b: misskey's own real bounded D-extractor -- `Source`'s own
+/// top-level fields, with every field typed exactly `RedisOptionsSource`
+/// (`redis`/`redisForPubsub`/`redisForJobQueue`/`redisForTimelines`/
+/// `redisForReactions`) expanded into `<field>.<redisField>` using that
+/// SECOND named type's own real fields, matching the real two-hop shape
+/// C-E1.1 itself already found.
+fn extract_misskey_source_paths(source: &str) -> Vec<String> {
+    let mut redis_fields = Vec::new();
+    if let Some(body) = ts_type_literal_body(source, "RedisOptionsSource") {
+        scan_ts_object_body(body, "", &mut redis_fields);
+    }
+    let mut raw_fields = Vec::new();
+    if let Some(body) = ts_type_literal_body(source, "Source") {
+        scan_ts_object_body(body, "", &mut raw_fields);
+    }
+    let mut paths = Vec::new();
+    for (path, ty) in raw_fields {
+        if ty.trim() == "RedisOptionsSource" {
+            for (sub_path, _) in &redis_fields {
+                paths.push(format!("{path}.{sub_path}"));
+            }
+        } else {
+            paths.push(path);
+        }
+    }
+    paths
+}
+
+fn acquire_misskey_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.misskey = {{
+              enable = true;
+              settings = {{ url = "https://misskey.example.org/"; }};
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          environment = eval.config.systemd.services.misskey.environment;
+          settings = eval.config.services.misskey.settings;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    const VAR_NAME: &str = "MISSKEY_CONFIG_YML";
+    let install_path = value
+        .get("environment")
+        .and_then(|e| e.get(VAR_NAME))
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| {
+            CdcError::Inconclusive(format!(
+                "misskey's real systemd environment no longer sets {VAR_NAME} -- binding evidence lost"
+            ))
+        })?;
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "misskey".to_string(),
+        format: ConfigFormat::Yaml,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::ExecStartPreInstalledEnvVar {
+            var_name: VAR_NAME.to_string(),
+            install_path: install_path.to_string(),
+        },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn misskey_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture("fixtures/cdc/generated-config-artifact/misskey/config.ts")?;
+    Ok(ConsumerConfigContract {
+        consumer: "misskey".to_string(),
+        accepted_paths: extract_misskey_source_paths(&source),
+    })
+}
+
+/// Bounded scan of ONE named C# class's own public property
+/// declarations (`public <Type> <Name> { get; set; }` / `{ get; init;
+/// }` -- kavita's real `AppSettings` mixes both accessor forms).
+/// Returns each property's own name paired with its own declared type
+/// text.
+fn extract_csharp_class_properties(source: &str, class_name: &str) -> Vec<(String, String)> {
+    let mut props = Vec::new();
+    let needle = format!("class {class_name}");
+    let Some(class_rel) = source.find(&needle) else {
+        return props;
+    };
+    let after = &source[class_rel..];
+    let Some(brace_rel) = after.find('{') else {
+        return props;
+    };
+    let body_start = brace_rel + 1;
+    let bytes = after.as_bytes();
+    let mut depth = 1i32;
+    let mut j = body_start;
+    while j < after.len() && depth > 0 {
+        match bytes[j] {
+            b'{' => depth += 1,
+            b'}' => depth -= 1,
+            _ => {}
+        }
+        j += 1;
+    }
+    let body = &after[body_start..j.saturating_sub(1)];
+    for line in body.lines() {
+        let trimmed = line.trim();
+        if !trimmed.starts_with("public ") {
+            continue;
+        }
+        let Some(brace_pos) = trimmed.find('{') else {
+            continue;
+        };
+        let decl = trimmed[..brace_pos].trim();
+        let mut tokens = decl.split_whitespace();
+        let Some(_public_kw) = tokens.next() else {
+            continue;
+        };
+        let Some(ty) = tokens.next() else {
+            continue;
+        };
+        let Some(name) = tokens.next() else {
+            continue;
+        };
+        props.push((name.to_string(), ty.to_string()));
+    }
+    props
+}
+
+/// C-E1.2b: kavita's own real bounded D-extractor -- `AppSettings`'s
+/// own top-level properties, with the one field typed exactly
+/// `OpenIdConnectSettings` expanded into `<field>.<subfield>` using
+/// that second, real nested class's own properties.
+fn extract_kavita_appsettings_paths(source: &str) -> Vec<String> {
+    let top = extract_csharp_class_properties(source, "AppSettings");
+    let nested = extract_csharp_class_properties(source, "OpenIdConnectSettings");
+    let mut paths = Vec::new();
+    for (name, ty) in top {
+        if ty == "OpenIdConnectSettings" {
+            for (sub_name, _) in &nested {
+                paths.push(format!("{name}.{sub_name}"));
+            }
+        } else {
+            paths.push(name);
+        }
+    }
+    paths
+}
+
+fn acquire_kavita_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.kavita.enable = true;
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          workingDirectory = eval.config.systemd.services.kavita.serviceConfig.WorkingDirectory;
+          settings = eval.config.services.kavita.settings;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    let working_directory = value
+        .get("workingDirectory")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing workingDirectory".to_string()))?;
+    // Real, disclosed acquire-time computation (not a new type/variant):
+    // kavita's own real `preStart` installs the artifact to a fixed
+    // relative path under `WorkingDirectory` (`Configuration.cs`'s own
+    // hardcoded `config/<filename>` convention) -- the resolved path
+    // combines BOTH real evidence sources, unlike `nebula-lighthouse-
+    // service`'s own single hardcoded literal.
+    let install_path = format!("{working_directory}/config/appsettings.json");
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "kavita".to_string(),
+        format: ConfigFormat::Yaml,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::ImplicitDefaultPath { path: install_path },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn kavita_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source =
+        read_ce12_fixture("fixtures/cdc/generated-config-artifact/kavita/configuration-excerpt.cs")?;
+    Ok(ConsumerConfigContract {
+        consumer: "kavita".to_string(),
+        accepted_paths: extract_kavita_appsettings_paths(&source),
+    })
+}
+
+/// C-E1.2b: transmission's own real bounded D-extractor -- every real
+/// KEBAB-CASE string literal in the vendored `quark.cc` excerpt (see
+/// that fixture's own citation for why kebab-spelling, not a per-entry
+/// usage-site comment, is the real, reliable filter here).
+fn extract_transmission_kebab_quarks(source: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    for line in source.lines() {
+        let trimmed = line.trim();
+        let Some(rest) = trimmed.strip_prefix('"') else {
+            continue;
+        };
+        let Some(end) = rest.find('"') else {
+            continue;
+        };
+        let name = &rest[..end];
+        // real, revised filter (see the vendored fixture's own header
+        // comment for the real bug this closes): "contains a dash"
+        // alone silently excludes real single-word keys like `umask`,
+        // which can't be kebab-vs-snake-cased at all. Broadened to
+        // "entirely lowercase/digit/dash" -- covers both real shapes
+        // while still excluding every real snake_case (has `_`) and
+        // camelCase (has an uppercase letter) alias sibling.
+        if !name.is_empty()
+            && name.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+        {
+            names.push(name.to_string());
+        }
+    }
+    names
+}
+
+fn acquire_transmission_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        pkgs = import nixpkgsSrc {{ system = "x86_64-linux"; }};
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.transmission = {{
+              enable = true;
+              package = pkgs.transmission_4;
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          execStart = eval.config.systemd.services.transmission.serviceConfig.ExecStart;
+          settings = eval.config.services.transmission.settings;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    if !exec_start.contains("-g ") {
+        return Err(CdcError::Inconclusive(
+            "transmission's real ExecStart no longer contains a -g flag -- binding evidence lost"
+                .to_string(),
+        ));
+    }
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "transmission".to_string(),
+        format: ConfigFormat::Json,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::DirectArgv {
+            flag: "-g".to_string(),
+            argv: exec_start.to_string(),
+        },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn transmission_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture(
+        "fixtures/cdc/generated-config-artifact/transmission/quark-kebab-excerpt.cc",
+    )?;
+    Ok(ConsumerConfigContract {
+        consumer: "transmission".to_string(),
+        accepted_paths: extract_transmission_kebab_quarks(&source),
+    })
+}
+
+/// C-E1.2b: i2pd's own real bounded D-extractor -- every real
+/// `("key[.subkey...]", value<T>()...)` `boost::program_options`
+/// literal registration in `Config.cpp`. Already fully dotted/section-
+/// qualified in the real consumer source itself (this candidate's own
+/// real positive control for the census's adversarial normalization
+/// check -- see the module's own header comment), so no further path
+/// reconstruction is needed on this side.
+fn extract_i2pd_program_options_keys(source: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    const NEEDLE: &str = "(\"";
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find(NEEDLE) {
+        let pos = search_from + rel;
+        let after = &source[pos + NEEDLE.len()..];
+        let Some(end) = after.find('"') else {
+            break;
+        };
+        let name = &after[..end];
+        search_from = pos + NEEDLE.len() + end;
+        if !name.is_empty()
+            && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '_' || c == '-')
+        {
+            names.push(name.to_string());
+        }
+    }
+    names
+}
+
+fn acquire_i2pd_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.i2pd = {{
+              enable = true;
+              settings = {{ ipv4 = true; ipv6 = false; }};
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          execStart = eval.config.systemd.services.i2pd.serviceConfig.ExecStart;
+          settings = eval.config.services.i2pd.settings;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let settings = value
+        .get("settings")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settings".to_string()))?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    if !exec_start.contains("--conf=") {
+        return Err(CdcError::Inconclusive(
+            "i2pd's real ExecStart no longer contains a --conf= flag -- binding evidence lost"
+                .to_string(),
+        ));
+    }
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "i2pd".to_string(),
+        format: ConfigFormat::Ini,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::DirectArgv {
+            flag: "--conf".to_string(),
+            argv: exec_start.to_string(),
+        },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn i2pd_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture("fixtures/cdc/generated-config-artifact/i2pd/Config.cpp")?;
+    Ok(ConsumerConfigContract {
+        consumer: "i2pd".to_string(),
+        accepted_paths: extract_i2pd_program_options_keys(&source),
+    })
+}
+
+fn extract_spacecookie_fromjson_block<'a>(source: &'a str, type_name: &str) -> &'a str {
+    let needle = format!("instance FromJSON {type_name} where");
+    let Some(rel) = source.find(&needle) else {
+        return "";
+    };
+    let after = &source[rel + needle.len()..];
+    let end = after.find("instance FromJSON").unwrap_or(after.len());
+    &after[..end]
+}
+
+fn extract_spacecookie_block_keys(block: &str) -> Vec<String> {
+    let mut paths: Vec<String> = Vec::new();
+    for needle in [".: \"", ".:? \"", ".:?  \""] {
+        let mut search_from = 0;
+        while let Some(rel) = block[search_from..].find(needle) {
+            let pos = search_from + rel;
+            let after = &block[pos + needle.len()..];
+            let Some(end) = after.find('"') else {
+                break;
+            };
+            let name = &after[..end];
+            search_from = pos + needle.len() + end;
+            if !name.is_empty() && !paths.iter().any(|p| p == name) {
+                paths.push(name.to_string());
+            }
+        }
+    }
+    const MAYBE_PATH_NEEDLE: &str = "maybePath [ \"";
+    let mut search_from = 0;
+    while let Some(rel) = block[search_from..].find(MAYBE_PATH_NEEDLE) {
+        let pos = search_from + rel;
+        let after = &block[pos + MAYBE_PATH_NEEDLE.len()..];
+        let Some(bracket_end) = after.find(']') else {
+            break;
+        };
+        let segment_list = &after[..bracket_end];
+        search_from = pos + MAYBE_PATH_NEEDLE.len() + bracket_end;
+        let segments: Vec<String> = segment_list
+            .split(',')
+            .filter_map(|s| {
+                let s = s.trim().trim_matches('"');
+                (!s.is_empty()).then(|| s.to_string())
+            })
+            .collect();
+        if !segments.is_empty() {
+            let joined = segments.join(".");
+            if !paths.iter().any(|p| p == &joined) {
+                paths.push(joined);
+            }
+        }
+    }
+    paths
+}
+
+/// C-E1.2b: spacecookie's own real bounded D-extractor -- scans each
+/// real `instance FromJSON <Name> where` block separately (`Config`'s
+/// own top-level accessors, and `LogConfig`'s own, prefixed with
+/// `log.` since `Config`'s own `log` field maps to it), recognizing
+/// the exact two real Aeson call shapes both blocks use: a bare `.:
+/// "X"`/`.:? "X"` accessor, and a `maybePath [ "X", "Y" ]` call.
+fn extract_spacecookie_config_paths(source: &str) -> Vec<String> {
+    let config_block = extract_spacecookie_fromjson_block(source, "Config");
+    let log_block = extract_spacecookie_fromjson_block(source, "LogConfig");
+    let mut paths: Vec<String> = extract_spacecookie_block_keys(config_block)
+        .into_iter()
+        .filter(|p| p != "log")
+        .collect();
+    for key in extract_spacecookie_block_keys(log_block) {
+        paths.push(format!("log.{key}"));
+    }
+    paths
+}
+
+fn acquire_spacecookie_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.spacecookie = {{
+              enable = true;
+              settings = {{ hostname = "gopher.example.org"; root = "/var/lib/spacecookie"; }};
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        execStart = eval.config.systemd.services.spacecookie.serviceConfig.ExecStart;
+        lastSpaceIdx = s:
+          let len = builtins.stringLength s;
+              go = i: if i < 0 then -1
+                      else if builtins.substring i 1 s == " " then i
+                      else go (i - 1);
+          in go (len - 1);
+        idx = lastSpaceIdx execStart;
+        jsonPath = builtins.substring (idx + 1) (builtins.stringLength execStart - idx - 1) execStart;
+        in {{
+          execStart = execStart;
+          settingsJson = builtins.fromJSON (builtins.readFile jsonPath);
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    let settings = value
+        .get("settingsJson")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing settingsJson".to_string()))?;
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    flatten_structured_value(&settings, "", &mut emitted_paths, &mut opaque_paths);
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "spacecookie".to_string(),
+        format: ConfigFormat::Json,
+        content: ArtifactContent::StructuredValue(settings),
+        binding: ArtifactBindingEvidence::DirectPositionalArg { argv: exec_start.to_string() },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn spacecookie_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source = read_ce12_fixture("fixtures/cdc/generated-config-artifact/spacecookie/Config.hs")?;
+    Ok(ConsumerConfigContract {
+        consumer: "spacecookie".to_string(),
+        accepted_paths: extract_spacecookie_config_paths(&source),
+    })
+}
+
+/// C-E1.2b: akkoma's own real bounded D-extractor -- see the module's
+/// own citation on the vendored `description-excerpt.exs` for the
+/// real record shape. Emits FULLY QUALIFIED `<group>.<key>.<field>`
+/// paths, per the census's own real FINDING (a naive bare-field
+/// extractor would merge at least 18 real, semantically distinct
+/// config values under the single bare name `:enabled` alone). v1
+/// scope, deliberately bounded: only a record's own DIRECT children
+/// are extracted -- a child that itself declares a further NESTED
+/// `children:` (a real shape, e.g. `:welcome.direct_message`/
+/// `:welcome.email`, each with their OWN `:enabled` sub-field) becomes
+/// its own single leaf path (`:pleroma.:welcome.direct_message`)
+/// rather than being expanded further -- expanding it correctly would
+/// need full recursive nesting support this round doesn't build, and a
+/// naive one-more-level scan would re-introduce the exact collision
+/// bug this fix exists to close.
+fn extract_akkoma_description_paths(source: &str) -> Vec<String> {
+    let mut paths = Vec::new();
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find("group: :") {
+        let record_start = search_from + rel;
+        let after = &source[record_start + "group: :".len()..];
+        let Some(comma_rel) = after.find(',') else {
+            break;
+        };
+        let group = after[..comma_rel].trim().to_string();
+        let body_search_start = record_start + "group: :".len();
+        let record_body_end = source[body_search_start..]
+            .find("group: :")
+            .map(|rel| body_search_start + rel)
+            .unwrap_or(source.len());
+        let record_body = &source[record_start..record_body_end];
+        let Some(key_rel) = record_body.find("key: ") else {
+            search_from = record_body_end;
+            continue;
+        };
+        let after_key = &record_body[key_rel + "key: ".len()..];
+        let Some(key_comma_rel) = after_key.find(',') else {
+            search_from = record_body_end;
+            continue;
+        };
+        let top_key = after_key[..key_comma_rel].trim().to_string();
+        if let Some(children_rel) = record_body.find("children: [") {
+            let children_start = children_rel + "children: [".len();
+            let bytes = record_body.as_bytes();
+            let mut i = children_start;
+            while i < record_body.len() {
+                let Some(entry_rel) = record_body[i..].find("%{") else {
+                    break;
+                };
+                let entry_start = i + entry_rel;
+                let mut depth = 1i32;
+                let mut j = entry_start + 2;
+                while j < record_body.len() && depth > 0 {
+                    match bytes[j] {
+                        b'{' => depth += 1,
+                        b'}' => depth -= 1,
+                        _ => {}
+                    }
+                    j += 1;
+                }
+                let entry_body = &record_body[entry_start..j];
+                if let Some(fk_rel) = entry_body.find("key: :") {
+                    let after_fk = &entry_body[fk_rel + "key: :".len()..];
+                    let end = after_fk
+                        .find(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+                        .unwrap_or(after_fk.len());
+                    let field = &after_fk[..end];
+                    if !field.is_empty() {
+                        paths.push(format!(":{group}.{top_key}.{field}"));
+                    }
+                }
+                i = j;
+            }
+        }
+        search_from = record_body_end;
+    }
+    paths
+}
+
+fn acquire_akkoma_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            networking.hostName = "akkoma";
+            networking.domain = "example.org";
+            services.akkoma = {{
+              enable = true;
+              config = {{
+                ":pleroma" = {{
+                  ":instance" = {{
+                    name = "Test Akkoma";
+                    description = "Test Akkoma server";
+                    email = "akkoma@example.org";
+                    notify_email = "akkoma@example.org";
+                    registrations_open = true;
+                  }};
+                  ":media_proxy" = {{ enabled = false; }};
+                  "Pleroma.Upload" = {{ base_url = "https://media.example.org/media/"; }};
+                }};
+              }};
+              nginx.enable = false;
+            }};
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          execStart = eval.config.systemd.services.akkoma.serviceConfig.ExecStart;
+          configAttrs = eval.config.services.akkoma.config;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let config_attrs = value
+        .get("configAttrs")
+        .cloned()
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing configAttrs".to_string()))?;
+    let exec_start = value
+        .get("execStart")
+        .and_then(JsonValue::as_str)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing execStart".to_string()))?;
+    const VAR_NAME: &str = "AKKOMA_CONFIG_PATH";
+    // B's own real mechanism (see C-E1.1's own citation, re-confirmed
+    // here): `ExecStart` itself carries no path at all -- the wrapper
+    // sets `AKKOMA_CONFIG_PATH` from a SEPARATE `akkoma-config.service`
+    // unit that copies the SAME real config derivation into place
+    // before `akkoma.service` starts. Structurally proving the
+    // cross-unit `bindsTo` link here would need a second real `nix
+    // eval` this v1 doesn't add; the real ExecStart shape is confirmed
+    // instead (the real wrapper binary path, matching the module's own
+    // documented mechanism), consistent with this round's own bounded
+    // scope.
+    if !exec_start.contains("akkoma-env") {
+        return Err(CdcError::Inconclusive(
+            "akkoma's real ExecStart no longer references the real akkoma-env wrapper -- binding evidence lost"
+                .to_string(),
+        ));
+    }
+    // Real, disclosed D-extraction-scope limit found while writing this
+    // acquire function's own real end-to-end test: a default-configured
+    // akkoma module's real `cfg.config` ALWAYS also carries `:joken`/
+    // `:logger`/`:tzdata`/`:web_push_encryption` groups (library-
+    // internal Elixir dependency config, emitted unconditionally by the
+    // module regardless of this project's own `config` setting) -- and
+    // `description.exs` genuinely does NOT document `:joken`/`:tzdata`
+    // at all (confirmed directly: zero `key: :joken`/`key: :tzdata`
+    // entries anywhere in the real file), since that schema's own real
+    // job is documenting the ADMIN-UI-settable `:pleroma` surface, not
+    // every dependency's own internal config. Scoped the same way
+    // `mobilizon`'s own evidence already needed for its bounded
+    // `:instance` block: extract ONLY the real `":pleroma"` sub-object,
+    // every other real top-level group is disclosed as `opaque_paths`
+    // rather than silently compared against a schema that was never
+    // going to describe it.
+    //
+    // A second, narrower real gap of the SAME shape was found by the
+    // real end-to-end test even after this scoping: WITHIN `:pleroma`
+    // itself, a default-configured module also injects real fields
+    // `description.exs` never documents either -- `:instance.
+    // upload_dir` (a computed state-directory path) and the whole
+    // `Pleroma.Repo` group (real Postgres connection settings the
+    // module derives from `services.postgresql`, not a user-settable
+    // admin-UI field). Confirmed directly, not assumed: zero `key:
+    // :upload_dir`/`key: Pleroma.Repo` occurrences anywhere in the real
+    // file. Not chased further with more vendored records -- the real,
+    // honest result this produces (`real_akkoma_end_to_end_is_a_real_
+    // finding_not_a_forced_pass`, in `mod ce12_tests` below) is a
+    // genuine executable FINDING, not a bug to paper over: it is the
+    // real, disclosed boundary of what `description.exs` actually
+    // documents versus what `Config.Reader` will accept, exactly the
+    // distinction C-E1.1's own original akkoma research already named.
+    let mut emitted_paths = Vec::new();
+    let mut opaque_paths = Vec::new();
+    if let JsonValue::Object(top) = &config_attrs {
+        for (key, value) in top {
+            if key == ":pleroma" {
+                flatten_structured_value(value, ":pleroma", &mut emitted_paths, &mut opaque_paths);
+            } else {
+                opaque_paths.push(key.clone());
+            }
+        }
+    }
+    Ok(GeneratedConfigArtifactEvidence {
+        producer: "akkoma".to_string(),
+        format: ConfigFormat::ElixirConf,
+        content: ArtifactContent::StructuredValue(config_attrs),
+        binding: ArtifactBindingEvidence::WrapperScriptEnvVar { var_name: VAR_NAME.to_string() },
+        emitted_paths,
+        opaque_paths,
+    })
+}
+
+fn akkoma_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
+    let source =
+        read_ce12_fixture("fixtures/cdc/generated-config-artifact/akkoma/description-excerpt.exs")?;
+    Ok(ConsumerConfigContract {
+        consumer: "akkoma".to_string(),
+        accepted_paths: extract_akkoma_description_paths(&source),
     })
 }
 
@@ -4297,6 +5342,192 @@ mod ce12_tests {
         }
     }
 
+    // --- C-E1.2b: flatten_structured_value's own 2 new real
+    // correctness fixes, offline, pure ---
+
+    #[test]
+    fn flatten_a_null_leaf_is_neither_emitted_nor_opaque() {
+        // the real i2pd corpus shape: a freeform attrset key left at
+        // its own real `null` default is stripped by the module's own
+        // `removeNulls` before rendering -- never actually emitted.
+        let value: JsonValue = serde_json::json!({ "ipv4": true, "bandwidth": null });
+        let mut emitted = Vec::new();
+        let mut opaque = Vec::new();
+        flatten_structured_value(&value, "", &mut emitted, &mut opaque);
+        assert_eq!(emitted, vec!["ipv4".to_string()]);
+        assert!(opaque.is_empty());
+    }
+
+    #[test]
+    fn flatten_an_elixir_type_wrapper_object_is_opaque_not_recursed_into() {
+        // the real akkoma corpus shape: `pkgs.formats.elixirConf`'s own
+        // shared library wraps `mkAtom`/`mkTuple`/`mkRaw`/... values as
+        // `{ _elixirType = "..."; value = ...; }` -- a Nix-level
+        // encoding artifact, never genuine nested config structure.
+        let value: JsonValue = serde_json::json!({
+            "level": { "_elixirType": "atom", "value": ":info" }
+        });
+        let mut emitted = Vec::new();
+        let mut opaque = Vec::new();
+        flatten_structured_value(&value, "", &mut emitted, &mut opaque);
+        assert!(emitted.is_empty());
+        assert_eq!(opaque, vec!["level".to_string()]);
+    }
+
+    #[test]
+    fn flatten_a_secret_wrapper_object_is_opaque_not_recursed_into() {
+        // akkoma's own real per-module `_secret` placeholder convention
+        // (not part of the shared elixirConf library, but checked the
+        // same structural way -- a marker key shape, not an app-
+        // identity check).
+        let value: JsonValue = serde_json::json!({
+            "secret_key_base": { "_secret": "/var/lib/secrets/akkoma/key-base" }
+        });
+        let mut emitted = Vec::new();
+        let mut opaque = Vec::new();
+        flatten_structured_value(&value, "", &mut emitted, &mut opaque);
+        assert!(emitted.is_empty());
+        assert_eq!(opaque, vec!["secret_key_base".to_string()]);
+    }
+
+    // --- C-E1.2b: the 7 new per-consumer D-extractors, offline,
+    // against the real vendored fixtures ---
+
+    #[test]
+    fn real_vendored_privoxy_hash_table_yields_the_real_directive_names() {
+        let source = read_vendored(
+            "fixtures/cdc/generated-config-artifact/privoxy/loadcfg-hashtable-excerpt.c",
+        );
+        let names = extract_privoxy_hash_table_names(&source);
+        for real in ["actionsfile", "listen-address", "enable-edit-actions", "buffer-limit"] {
+            assert!(names.iter().any(|n| n == real), "missing real name {real:?}; got {names:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_misskey_config_ts_yields_the_real_source_and_redis_paths() {
+        let source = read_vendored("fixtures/cdc/generated-config-artifact/misskey/config.ts");
+        let paths = extract_misskey_source_paths(&source);
+        for real in ["url", "port", "db.host", "db.port", "redis.host", "redis.port", "redisForPubsub.host"] {
+            assert!(paths.iter().any(|p| p == real), "missing real path {real:?}; got {paths:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_kavita_configuration_yields_the_real_appsettings_and_oidc_paths() {
+        let source =
+            read_vendored("fixtures/cdc/generated-config-artifact/kavita/configuration-excerpt.cs");
+        let paths = extract_kavita_appsettings_paths(&source);
+        for real in ["TokenKey", "Port", "IpAddresses", "OpenIdConnectSettings.Authority", "OpenIdConnectSettings.ClientId"] {
+            assert!(paths.iter().any(|p| p == real), "missing real path {real:?}; got {paths:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_transmission_quark_excerpt_yields_the_real_kebab_keys() {
+        let source = read_vendored(
+            "fixtures/cdc/generated-config-artifact/transmission/quark-kebab-excerpt.cc",
+        );
+        let names = extract_transmission_kebab_quarks(&source);
+        for real in ["peer-port", "rpc-bind-address", "watch-dir", "download-dir"] {
+            assert!(names.iter().any(|n| n == real), "missing real name {real:?}; got {names:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_i2pd_config_cpp_yields_the_real_dotted_keys() {
+        let source = read_vendored("fixtures/cdc/generated-config-artifact/i2pd/Config.cpp");
+        let names = extract_i2pd_program_options_keys(&source);
+        for real in ["http.enabled", "httpproxy.enabled", "bob.enabled", "ipv4", "ipv6"] {
+            assert!(names.iter().any(|n| n == real), "missing real name {real:?}; got {names:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_spacecookie_config_hs_yields_the_real_dotted_paths() {
+        let source = read_vendored("fixtures/cdc/generated-config-artifact/spacecookie/Config.hs");
+        let paths = extract_spacecookie_config_paths(&source);
+        for real in ["hostname", "listen.addr", "listen.port", "port", "user", "root", "log.enable", "log.hide-ips"] {
+            assert!(paths.iter().any(|p| p == real), "missing real path {real:?}; got {paths:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_akkoma_description_excerpt_yields_the_real_fully_qualified_paths() {
+        let source = read_vendored(
+            "fixtures/cdc/generated-config-artifact/akkoma/description-excerpt.exs",
+        );
+        let paths = extract_akkoma_description_paths(&source);
+        for real in [
+            ":pleroma.:instance.name",
+            ":pleroma.:instance.email",
+            ":pleroma.Pleroma.Upload.base_url",
+            ":pleroma.:media_proxy.enabled",
+        ] {
+            assert!(paths.iter().any(|p| p == real), "missing real path {real:?}; got {paths:?}");
+        }
+    }
+
+    #[test]
+    fn real_vendored_akkoma_welcome_record_does_not_collapse_its_two_real_enabled_fields() {
+        // the exact adversarial shape this whole fix exists for: a
+        // naive flat scan would merge `:welcome.direct_message.enabled`
+        // and `:welcome.email.enabled` into one bare `:welcome.enabled`.
+        // This v1's own bounded design instead stops one level short --
+        // `:welcome.direct_message`/`:welcome.email` are their own
+        // single leaf paths, never expanded into a colliding `enabled`.
+        let source = read_vendored(
+            "fixtures/cdc/generated-config-artifact/akkoma/description-excerpt.exs",
+        );
+        let paths = extract_akkoma_description_paths(&source);
+        assert!(paths.iter().any(|p| p == ":pleroma.:welcome.direct_message"));
+        assert!(paths.iter().any(|p| p == ":pleroma.:welcome.email"));
+        assert!(!paths.iter().any(|p| p == ":pleroma.:welcome.enabled"));
+    }
+
+    // --- C-E1.2b's own real adversarial-normalization invariant,
+    // turned into a permanent, checked test (not just a research
+    // finding) -- the SAME bare-key-collision shape resolved in the
+    // OPPOSITE direction for three real, different consumers,
+    // confirming the correct answer is per-consumer semantic work,
+    // never a safe default either way. ---
+
+    #[test]
+    fn normalization_is_per_consumer_never_a_default_unbound_vs_i2pd_vs_akkoma() {
+        // unbound: bare-key stripping is SOUND (its D-extractor,
+        // `extract_unbound_lexer_keywords`, only ever returns bare
+        // names -- confirmed via the real grammar recheck that its two
+        // real clauses share zero tokens, see census.md).
+        let unbound_accepted = extract_unbound_lexer_keywords(&read_vendored(
+            "fixtures/cdc/generated-config-artifact/unbound/configlexer-excerpt.lex",
+        ));
+        assert!(unbound_accepted.iter().any(|k| k == "port"));
+        assert!(!unbound_accepted.iter().any(|k| k.contains('.')));
+
+        // i2pd: bare-key stripping would be UNSOUND -- its own real
+        // consumer source already registers fully-dotted keys, and the
+        // bare name "enabled" genuinely collides across 7 real
+        // sections. The correct D-extraction keeps the dots.
+        let i2pd_accepted = extract_i2pd_program_options_keys(&read_vendored(
+            "fixtures/cdc/generated-config-artifact/i2pd/Config.cpp",
+        ));
+        assert!(i2pd_accepted.iter().any(|k| k == "http.enabled"));
+        assert!(i2pd_accepted.iter().any(|k| k == "bob.enabled"));
+        assert!(!i2pd_accepted.iter().any(|k| k == "enabled"));
+
+        // akkoma: bare-key stripping would ALSO be unsound (18-way
+        // collision) -- confirming this is real per-consumer semantic
+        // work, not something INI-vs-line-format alone predicts
+        // (i2pd's own real format is INI-flavored, akkoma's is
+        // Elixir's `Config` DSL -- two structurally different real
+        // formats reaching the identical "don't strip" conclusion).
+        let akkoma_accepted = extract_akkoma_description_paths(&read_vendored(
+            "fixtures/cdc/generated-config-artifact/akkoma/description-excerpt.exs",
+        ));
+        assert!(akkoma_accepted.iter().any(|p| p == ":pleroma.:media_proxy.enabled"));
+        assert!(!akkoma_accepted.iter().any(|p| p == "enabled"));
+    }
+
     // --- C-E1.2a real end-to-end anchor proofs: needs a real `nix`
     // binary + network access (`fetchTarball`), same discipline as the
     // pre-existing `#[ignore]` tests above. Each anchor proves the FULL
@@ -4461,6 +5692,332 @@ mod ce12_tests {
     ) {
         let evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
         let contract_before = nebula_lighthouse_service_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    // --- C-E1.2b real end-to-end anchor proofs: the 7 candidates the
+    // transfer census verdicted PASS/FINDING, same real discipline as
+    // the 4 C-E1.2a anchors above (clean pass + stop-condition-8
+    // mutation + stop-condition-9 mutation, all against real acquired
+    // data). `akkoma`'s own "clean pass" is real per this v1's own
+    // bounded fully-qualified extraction -- consistent with the
+    // census's own note that a full qualified extractor might not
+    // reproduce the FINDING verdict, which is fine: 2b was a fit
+    // census, not a verdict pre-commitment. `vault` is deliberately
+    // absent -- see this file's own C-E1.2b module header comment. ---
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_privoxy_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_privoxy_evidence(CE12_REV).unwrap();
+        let contract = privoxy_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_privoxy_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_privoxy_evidence(CE12_REV).unwrap();
+        let contract = privoxy_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"listen-address".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "listen-address" {
+                *p = "listen-address-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "listen-address-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_privoxy_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_privoxy_evidence(CE12_REV).unwrap();
+        let contract_before = privoxy_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_misskey_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_misskey_evidence(CE12_REV).unwrap();
+        let contract = misskey_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_misskey_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_misskey_evidence(CE12_REV).unwrap();
+        let contract = misskey_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"url".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "url" {
+                *p = "url-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "url-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_misskey_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_misskey_evidence(CE12_REV).unwrap();
+        let contract_before = misskey_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_kavita_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_kavita_evidence(CE12_REV).unwrap();
+        let contract = kavita_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_kavita_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_kavita_evidence(CE12_REV).unwrap();
+        let contract = kavita_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"Port".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "Port" {
+                *p = "Port-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "Port-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_kavita_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_kavita_evidence(CE12_REV).unwrap();
+        let contract_before = kavita_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_transmission_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_transmission_evidence(CE12_REV).unwrap();
+        let contract = transmission_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_transmission_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_transmission_evidence(CE12_REV).unwrap();
+        let contract = transmission_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"peer-port".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "peer-port" {
+                *p = "peer-port-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "peer-port-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_transmission_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_transmission_evidence(CE12_REV).unwrap();
+        let contract_before = transmission_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_i2pd_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_i2pd_evidence(CE12_REV).unwrap();
+        let contract = i2pd_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_i2pd_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_i2pd_evidence(CE12_REV).unwrap();
+        let contract = i2pd_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"http.enabled".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "http.enabled" {
+                *p = "http.enabled-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "http.enabled-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_i2pd_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_i2pd_evidence(CE12_REV).unwrap();
+        let contract_before = i2pd_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_spacecookie_end_to_end_is_a_clean_pass() {
+        let evidence = acquire_spacecookie_evidence(CE12_REV).unwrap();
+        let contract = spacecookie_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_spacecookie_mutating_a_real_emitted_path_flips_to_finding() {
+        let mut evidence = acquire_spacecookie_evidence(CE12_REV).unwrap();
+        let contract = spacecookie_consumer_contract().unwrap();
+        assert!(evidence.emitted_paths.contains(&"hostname".to_string()));
+        for p in evidence.emitted_paths.iter_mut() {
+            if p == "hostname" {
+                *p = "hostname-renamed-to-something-nobody-accepts".to_string();
+            }
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: "hostname-renamed-to-something-nobody-accepts".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_spacecookie_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_spacecookie_evidence(CE12_REV).unwrap();
+        let contract_before = spacecookie_consumer_contract().unwrap();
+        let mut contract_after = contract_before.clone();
+        contract_after.accepted_paths.push("totally-unrelated-key".to_string());
+        assert_eq!(
+            compare_config_contract(&evidence, &contract_before),
+            compare_config_contract(&evidence, &contract_after)
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_akkoma_end_to_end_is_a_real_finding_not_a_forced_pass() {
+        // Genuine, executable-verified result, NOT the outcome this
+        // test was originally written expecting: a default-configured
+        // akkoma module's own real `:instance` block ALWAYS also
+        // carries a module-INJECTED `upload_dir` field (a computed
+        // state-directory path, confirmed present regardless of this
+        // acquire function's own config) that `description.exs` itself
+        // genuinely never documents anywhere (confirmed directly --
+        // zero `key: :upload_dir` occurrences in the real file; `:joken`/
+        // `:tzdata` have the identical zero-coverage shape for their
+        // own entire groups, see `acquire_akkoma_evidence`'s own doc
+        // comment). The census's own protocol explicitly allowed this
+        // outcome ("if akkoma stops being a finding after a real
+        // qualified extractor, that's fine too -- 2b was a fit census,
+        // not a verdict pre-commitment") -- here executable evidence
+        // decided the opposite direction just as legitimately: this
+        // candidate's real default config does NOT cleanly pass against
+        // `description.exs`'s own real, honestly-bounded schema.
+        let evidence = acquire_akkoma_evidence(CE12_REV).unwrap();
+        let contract = akkoma_consumer_contract().unwrap();
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: ":pleroma.:instance.upload_dir".to_string()
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_akkoma_mutating_a_real_emitted_path_flips_to_a_different_finding() {
+        // stop condition 8, isolated to exactly ONE real, known-
+        // accepted path (`Pleroma.Upload.base_url`) rather than the
+        // full real acquired evidence -- a default-configured akkoma
+        // module injects several more real fields beyond what
+        // `description.exs` documents (`upload_dir` above is one;
+        // `Pleroma.Repo.*` connection settings are another), and
+        // `compare_config_contract` reports only the FIRST unaccepted
+        // path it finds. Isolating to a single, definitely-accepted
+        // real path (confirmed by the clean baseline `Pass` assertion
+        // below) is what makes mutating it provably the CAUSE of its
+        // own new Finding, without this test depending on JSON
+        // iteration order across several unrelated real gaps.
+        let mut evidence = acquire_akkoma_evidence(CE12_REV).unwrap();
+        let real_path = ":pleroma.Pleroma.Upload.base_url".to_string();
+        assert!(evidence.emitted_paths.contains(&real_path));
+        evidence.emitted_paths.retain(|p| p == &real_path);
+        let contract = akkoma_consumer_contract().unwrap();
+        assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
+        for p in evidence.emitted_paths.iter_mut() {
+            *p = format!("{real_path}-renamed-to-something-nobody-accepts");
+        }
+        assert_eq!(
+            compare_config_contract(&evidence, &contract),
+            ConfigContractVerdict::Finding {
+                unaccepted_path: format!("{real_path}-renamed-to-something-nobody-accepts")
+            }
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_akkoma_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
+        let evidence = acquire_akkoma_evidence(CE12_REV).unwrap();
+        let contract_before = akkoma_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
         assert_eq!(

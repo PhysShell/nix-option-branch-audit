@@ -3875,3 +3875,94 @@ per-consumer D-extractors, none app-specific) are the recommended
 follow-up, not a redesign. Building any of that is explicitly **not
 authorized by this round** — the census's job was the fit question,
 not the implementation. Full results: `fixtures/c-e1.2b-transfer-census/census.md`.
+
+## C-E1.2b implementation: the small generic-additions follow-up
+
+Built exactly the small, tightly-scoped set the census authorized and
+nothing more: `ArtifactBindingEvidence::DirectPositionalArg` (a bare
+positional CLI argument, needed independently by both `privoxy` and
+`spacecookie` — the census's own "repeating pattern" finding),
+`ArtifactBindingEvidence::ExecStartPreInstalledEnvVar` (misskey's real
+`ExecStartPre`-installed-runtime-path idiom), `ConfigFormat::{Json,
+Ini}` (descriptive only, as ever), one new flat/no-section
+`RenderedText` extractor (privoxy), and 7 new per-consumer bounded
+D-extractors (privoxy/misskey/kavita/transmission/i2pd/
+spacecookie/akkoma). `compare_config_contract()` itself is
+byte-for-byte unchanged. `vault` is deliberately absent — the census's
+own `INCONCLUSIVE` verdict (D not boundedly extractable for the fields
+its real default config actually emits) stands; this round did not
+"just build it anyway."
+
+**Result: 6 real anchors land a clean `Pass` (privoxy, misskey, kavita,
+transmission, i2pd, spacecookie); `akkoma` lands as a genuine,
+executable `Finding`, not a forced `Pass`.** That last result is the
+round's own most important outcome, and it went the opposite direction
+from what the census's own optimistic branch suggested might happen.
+Building the real, fully-qualified D-extractor the census called for
+(`config/description.exs`'s own real `group.key.field` records) is
+necessary but not sufficient: a default-configured `akkoma` module also
+injects several more real fields `description.exs` itself never
+documents at all — `:instance.upload_dir` (a computed state-directory
+path) and the whole `Pleroma.Repo` connection-settings group, alongside
+the already-known `:joken`/`:tzdata` groups with zero `description.exs`
+coverage for either. Confirmed directly (zero matching `key:` entries
+anywhere in the real file), not assumed. The real, honest conclusion:
+`description.exs` documents the admin-UI-settable `:pleroma` surface,
+not everything `Config.Reader` will actually accept — the same
+distinction C-E1.1's own original akkoma research first named, now
+demonstrated executably rather than just argued. Recorded as a real
+`Finding`, with the mutation tests isolated to a single, definitely-
+accepted real path (`Pleroma.Upload.base_url`) so stop condition 8
+stays provable independent of this real, disclosed gap.
+
+**Two real, general correctness fixes to `flatten_structured_value`
+itself, found via real end-to-end testing, not invented in advance**:
+a JSON `null` leaf is now neither emitted nor opaque (i2pd's own real
+module strips null-valued freeform-attrset keys before rendering —
+confirmed directly against the real module source — so a null was
+never actually part of the real artifact); a `{ _elixirType: ...,
+value: ... }`/`{ _secret: ... }` wrapper object (`pkgs.formats.
+elixirConf`'s own real encoding for `mkRaw`/`mkAtom`/`mkTuple`/a
+per-module secret-reference convention) is now opaque rather than
+recursed into, since it's a Nix-level encoding artifact, never genuine
+nested config structure. Both are general fixes usable by any future
+candidate hitting the same real shape, not app-specific patches.
+
+**The census's own adversarial normalization concern is now a
+permanent, checked test, not just a research finding**:
+`normalization_is_per_consumer_never_a_default_unbound_vs_i2pd_vs_akkoma`
+asserts all three real outcomes side by side — `unbound` (bare-key
+stripping sound), `i2pd` (stripping would be unsound, dots kept),
+`akkoma` (stripping would be unsound, fully-qualified paths kept) — so
+a future change can't silently reintroduce the collision risk this
+whole line of work exists to catch.
+
+**Zero regressions**: 63/63 real tests pass (K1-K5's own real proofs +
+all 4 C-E1.2a anchors + all 7 new C-E1.2b candidates), 153 offline
+tests (up from 141, +12 new: 3 `flatten_structured_value` fixes + 7
+D-extractor tests + 1 nested-collision regression + 1 cross-consumer
+normalization invariant), plus the full `tests/golden.rs`/
+`tests/check_root.rs`/`tests/diff_cli.rs`/`tests/fixture_integrity.rs`
+suites, all green. `compare_config_contract()` unchanged; zero
+`if app == "X"` anywhere in comparison/contract semantics.
+
+7 new real vendored consumer-source fixtures, sha256-locked in
+`fixtures/integrity-lock.toml`: privoxy's real `loadcfg.c` hash-table
+excerpt (SourceForge-hosted, no git commit — the fixture's own sha256
+independently confirmed byte-identical to nixpkgs' own pinned tarball
+hash), misskey's real `config.ts`, kavita's real `Configuration.cs`
+excerpt, transmission's real `quark.cc` excerpt (revised once during
+real testing — see its own header comment for the real `umask`-shaped
+bug that revision closes), i2pd's real full `Config.cpp`,
+spacecookie's real `Config.hs` (Hackage-hosted, no git commit),
+akkoma's real `description.exs` excerpt (4 non-contiguous real
+records, Gitea-hosted).
+
+C-E1.2b is now fully CLOSED (census + implementation). Next, per the
+user's own explicit sequencing: **C-E1.2c**, a hostile soundness audit
+of the whole vertical (positive/negative mutations, wrong/ambiguous
+binding, wrong consumer version, missing schema, path-collision
+attacks, `libinput`/`nohang` as negative controls, ideally a fresh
+holdout untouched by C-E1.1) — measuring false-PASS and false-FINDING
+counts explicitly, not just coverage — before freezing
+`GeneratedConfigArtifact` v1.
