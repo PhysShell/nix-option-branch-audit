@@ -664,6 +664,34 @@ fn scan_options(
         }
 
         if segs == ["options"] {
+            // E1/GAP-4 fix: an `options = {...}` block reached ONLY by
+            // walking down from another option's own `mkOption {...}`
+            // call (e.g. xandikos's real `nginx = mkOption { type =
+            // types.submodule { options = { enable = ...; }; }; };`) is
+            // NOT a second top-level root -- it's that option's own
+            // nested submodule, and `walk_options_block`'s own recursion
+            // (below, inside the `is_mk_option_call` branch) now finds
+            // and walks it with the correct, extended path. Processing
+            // it AGAIN here, from a fresh empty path, is exactly the bug
+            // this fix closes: a same-named leaf anywhere inside that
+            // submodule (`enable`, `host`, `port`, ...) would silently
+            // collide with an unrelated option of the same bare name
+            // elsewhere in the file, and `run_target`'s gate-1 lookup
+            // (`options.iter().find(|o| o.path == watched_path)`) has no
+            // way to tell the two apart -- a real, demonstrated
+            // false-positive-CAPABLE bug (see
+            // `fixtures/synthetic/h2-nested-submodule-collision/`),
+            // found by the E1 holdout audit on real, unfamiliar code
+            // (`xandikos`), not a hypothetical. Kimai's own `siteOpts`
+            // submodule is unaffected: it's a plain `let`-bound function
+            // value, referenced only by NAME (`types.submodule
+            // siteOpts`) elsewhere, never itself inside an `mkOption
+            // {...}` call -- `is_nested_inside_mk_option_call` correctly
+            // returns `false` for it, so it keeps being walked from a
+            // fresh empty path exactly as before this fix.
+            if is_nested_inside_mk_option_call(&node) {
+                continue;
+            }
             walk_options_block(file, src, &value, &mut Vec::new(), &mut out);
             continue;
         }
@@ -719,6 +747,19 @@ fn walk_options_block(
                 default_known_value,
                 span: span_of(file, src, &entry),
             });
+            // E1/GAP-4 fix: this option's own declaration is recorded
+            // above regardless (a submodule-typed option, e.g. `nginx`
+            // itself, is still a real, directly declared option) --
+            // additionally, if its type wraps a nested `options = {...}`
+            // submodule block (inline `types.submodule {...}`, possibly
+            // itself wrapped in `types.attrsOf`/`types.nullOr`/...), walk
+            // THAT block too, with the path already extended by this
+            // entry's own name (`path` above, not a fresh `Vec::new()`)
+            // -- so `nginx.enable` is recorded at `["nginx","enable"]`,
+            // never at the bare, collision-prone `["enable"]`.
+            if let Some(nested) = find_nested_options_block(&value) {
+                walk_options_block(file, src, &nested, path, out);
+            }
         } else if value.kind() == NODE_ATTR_SET {
             walk_options_block(file, src, &value, path, out);
         }
@@ -755,6 +796,48 @@ fn mk_option_field(apply_node: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
         }
     }
     None
+}
+
+/// E1/GAP-4 fix. True if `node` sits inside (a strict descendant of)
+/// some `mkOption {...}` call's own subtree -- i.e. reachable only by
+/// walking DOWN from that call, never a genuinely independent top-level
+/// block. `.ancestors()` includes `node` itself first (same convention
+/// `resolve_ident_binding` already uses), hence `.skip(1)`. Distinguishes
+/// xandikos's real `nginx = mkOption { type = types.submodule { options
+/// = {...}; }; };` (nested inside `nginx`'s own call -- `true`) from
+/// kimai's real `siteOpts = {...}: { options = {...}; };` (a plain
+/// `let`-bound function value, referenced only by name elsewhere,
+/// `types.submodule siteOpts` -- never itself inside an `mkOption` call
+/// -- `false`).
+fn is_nested_inside_mk_option_call(node: &SyntaxNode) -> bool {
+    node.ancestors()
+        .skip(1)
+        .any(|a| a.kind() == NODE_APPLY && is_mk_option_call(&a))
+}
+
+/// E1/GAP-4 fix. Finds a `types.submodule { options = {...}; }`-shaped
+/// nested options block declared INLINE inside one option's own
+/// `mkOption {...}` call -- searched generically anywhere within the
+/// call's own subtree (not hardcoded to the `type` field specifically),
+/// since a submodule can appear through `types.attrsOf`/`types.nullOr`/
+/// ... wrapping it too. The FIRST such block found (by `descendants()`'s
+/// own pre-order traversal) is returned; a call containing more than one
+/// `options = {...}` block at the same nesting level is a shape this
+/// project's real corpus has never shown, not silently guessed at.
+fn find_nested_options_block(mk_option_call: &SyntaxNode) -> Option<SyntaxNode> {
+    mk_option_call.descendants().find_map(|d| {
+        if d.kind() != NODE_ATTRPATH_VALUE {
+            return None;
+        }
+        let mut children = d.children();
+        let attrpath = children.next()?;
+        let segs = attrpath_segments(&attrpath)?;
+        if segs != ["options"] {
+            return None;
+        }
+        let value = children.next()?;
+        (value.kind() == NODE_ATTR_SET).then_some(value)
+    })
 }
 
 // ---------------------------------------------------------------------

@@ -1283,3 +1283,92 @@ fn h1_3b_census_counts_unclassified_instance_entries() {
         "c26's hidden.services.synth.foo entry must be counted; got {unclassified}"
     );
 }
+
+// --- E1/GAP-4 regression: nested-submodule declaration collision. Found
+// by the E1 holdout audit as a real, demonstrated false-positive-CAPABLE
+// bug (not just a coverage gap): a nested `options = {...}` block found
+// inside another option's own `mkOption {...}` call used to be walked
+// from a fresh, EMPTY path -- so a same-named leaf anywhere else in the
+// file (`enable`, `host`, `port`, ...) could silently be matched by
+// gate 1 instead of the real declaration. Fixed by scoping a nested
+// submodule's own declarations under the outer option's real path.
+
+fn discovered_option_paths(report: &Value) -> Vec<String> {
+    report["discovered_options"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|o| {
+            o["path"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|s| s.as_str().unwrap())
+                .collect::<Vec<_>>()
+                .join(".")
+        })
+        .collect()
+}
+
+#[test]
+fn h2_case14_nested_submodule_collision_no_longer_false_positives() {
+    // The exact minimal E1 bisect reproducer. Before this fix: a real,
+    // demonstrated false OBA001 -- gate 1 matched the unrelated nested
+    // `nested.enable` (default true) instead of the real top-level
+    // `enable` (mkEnableOption, itself still invisible per the separate
+    // GAP-1 -- not this test's concern), so the tool's own fabricated
+    // "default" disagreed with reality and it reported a transition that
+    // never actually happened. After this fix: the collision-only entry
+    // can no longer be matched at the bare, wrong path -- the correct,
+    // honest result is `OptionNotFound` (P0 fixes the false-positive
+    // CAPABILITY, not full coverage -- that's P1's `mkEnableOption`
+    // support, a separate, later fix).
+    let reports = run_golden();
+    let r = target(&reports, "h2-case14-nested-submodule-collision");
+    assert_eq!(
+        verdict_kind(r, "enable"),
+        "OptionNotFound",
+        "must NOT be OBA001 (a false finding) or PASS (right-answer-wrong-mechanism) -- \
+         the wrong, collision-sourced declaration must no longer be matchable at all"
+    );
+    let paths = discovered_option_paths(r);
+    assert!(
+        !paths.contains(&"enable".to_string()),
+        "no entry should exist at the bare, collision-prone path any more; got {paths:?}"
+    );
+    assert!(
+        paths.contains(&"services.bisect.nested.enable".to_string()),
+        "the nested submodule's own `enable` must be recorded at its real, scoped path \
+         instead; got {paths:?}"
+    );
+}
+
+#[test]
+fn h2_case15_xandikos_real_nested_submodule_collision_no_longer_false_positives() {
+    // The real, in-the-wild case the E1 holdout audit actually found this
+    // bug on: xandikos's `nginx = mkOption { type = types.submodule {
+    // options = { enable = mkOption { default = false; ... }; ...}; };
+    // };`. Before this fix: a real `PASS` on `enable`, but backed by the
+    // WRONG declaration (`nginx.enable`, not `services.xandikos.enable`
+    // itself) -- numerically harmless only by coincidence (both defaults
+    // happened to be `false`), not because the mechanism was sound. After
+    // this fix: same as the synthetic case above -- `OptionNotFound`,
+    // honest and disclosed, not a right-answer-wrong-mechanism PASS.
+    let reports = run_golden();
+    let r = target(&reports, "h2-case15-xandikos-real-nested-submodule-collision");
+    assert_eq!(
+        verdict_kind(r, "enable"),
+        "OptionNotFound",
+        "must no longer be a PASS backed by the wrong (nginx.enable) declaration"
+    );
+    let paths = discovered_option_paths(r);
+    assert!(
+        !paths.contains(&"enable".to_string()),
+        "no entry should exist at the bare, collision-prone path any more; got {paths:?}"
+    );
+    assert!(
+        paths.contains(&"services.xandikos.nginx.enable".to_string()),
+        "nginx's own real `enable` must be recorded at its real, scoped path instead; \
+         got {paths:?}"
+    );
+}

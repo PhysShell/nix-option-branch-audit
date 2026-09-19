@@ -361,3 +361,34 @@ test = "fixtures/synthetic/h2-single-ref-h2-only/test.nix"
 cfg_ident = "cfg"
 option_prefix = ["services", "synthSingleRefH2Only"]
 watch = ["x"]
+
+# --- E1/GAP-4 regression: nested-submodule declaration collision
+# (scan_options walking a nested `options = {...}` block, found inside
+# another option's own `mkOption {...}` call, from a fresh EMPTY path --
+# so a same-named leaf anywhere else in the file could silently be
+# matched instead of the real declaration). Found by the E1 holdout
+# audit as a real, demonstrated false-positive-CAPABLE bug on real,
+# unfamiliar code (xandikos) -- fixed by scoping a nested submodule's
+# own options under the outer option's real path instead of a fresh
+# one. Case 1 (synthetic, minimal, the exact E1 bisect reproducer) and
+# case 2 (the real xandikos module/test, vendored from E1) both assert
+# the SAME thing: the collision-only entry can no longer be matched at
+# the bare, wrong path -- the correct fail-closed result here is
+# OptionNotFound (GAP-1's own separate mkEnableOption gap still hides
+# the real declaration; P0 fixes the false-positive, not full coverage).
+
+[[target]]
+name = "h2-case14-nested-submodule-collision"
+module = "fixtures/synthetic/h2-nested-submodule-collision/module.nix"
+test = "fixtures/synthetic/h2-nested-submodule-collision/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "bisect"]
+watch = ["enable"]
+
+[[target]]
+name = "h2-case15-xandikos-real-nested-submodule-collision"
+module = "fixtures/e1-holdout-audit/xandikos/module.nix"
+test = "fixtures/e1-holdout-audit/xandikos/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xandikos"]
+watch = ["enable"]

@@ -3334,3 +3334,154 @@ moment conjunctions are supported.
 - Only *after* the davis golden lands: a small real census (20–30 web-app
   modules), not before — numbers without knowing what they mean yet aren't
   worth collecting.
+
+## E1: frozen-code holdout generalization audit
+
+After K1-K5 (CDC) and PR D3 closed, and after confirming H2 itself was
+already closed (a stale roadmap claim corrected before redoing already-
+finished work), the user's own question resurfaced in a form that could
+finally be measured instead of debated: **does the model this project
+already built generalize to real NixOS service modules that played no
+role in building it, or does it only work on the corpus it was shaped
+by?**
+
+Protocol pre-registered (`fixtures/e1-holdout-audit/protocol.md`)
+**before** any candidate was inspected: `src/cdc.rs`/`src/main.rs` frozen
+at `c8e42a1`; a 636-candidate real population from `NixOS/nixpkgs` master
+(every service module with a matching top-level `nixos/tests/X.nix`,
+pinned at tree `68740713a1d5904edf9ba92a998a522b1b6ce080`); a 77-name
+exclusion list covering every app K1-K5 ever touched, deep or shallow;
+a deterministic seeded shuffle (seed = the freeze commit's own short SHA
+as an integer) drawing the first 40 candidates. Amended once, between
+batches 2 and 3, with user-requested safeguards against the audit
+quietly becoming a self-assessment: E1-OBA (objective, executed) and
+E1-CDC (expert structural classification) kept as two independent
+metric tracks, never blended into one "coverage" number; a frozen
+six-category CDC fit rubric where "requires a new reusable adapter"
+explicitly does not count as supported; a unified structured per-
+candidate evidence schema; a planned blind double-review subset for
+inter-rater consistency; and the population caveat stated explicitly
+("generalizes within NixOS service modules that already have a matching
+module-level test," never "across nixpkgs").
+
+Executed via four parallel research passes (10 candidates each) plus one
+blind double-review pass, zero `src/` changes anywhere. Full results:
+`fixtures/e1-holdout-audit/census.md`.
+
+**E1-OBA (objective, the real frozen binary): 6 candidate-level PASS (5
+clean + 1 right-answer-wrong-mechanism) / 2 FINDING (both manually
+verified genuine) / 32 INCONCLUSIVE / 0 TOOL_ERROR.** 84% of the
+inconclusives (27/32) traced to ONE root cause never hit by K1-K5's own
+corpus: `mkEnableOption` — nixpkgs's own standard helper for a service's
+`enable` toggle — is invisible to `scan_options`'s declaration scanner.
+A second cause (a common nested-`options`-block declaration idiom losing
+the `option_prefix` boundary) contributed 31%, overlapping. Five further
+distinct structural gaps were each found exactly once. **One real,
+demonstrated false-positive-CAPABLE bug, not just a coverage gap**:
+`xandikos`'s reported `PASS` was backed by the WRONG declaration — a
+same-named leaf inside an unrelated nested submodule silently collided
+with the real one — proven both in the wild and with a minimal
+reproducer producing a genuine false `OBA001` on a case that's actually
+a clean real PASS.
+
+**E1-CDC (expert structural classification, explicitly not executable
+evidence)**: first-pass 37% special-case pressure / 63% adapter reuse. A
+blind double-review of 10 candidates disagreed 50% of the time,
+concentrated exactly on the existing-abstraction-fits vs. requires-new-
+adapter boundary — the honest number is "roughly two-thirds/one-third,
+±8 points depending on rater," reported as a real finding about the
+rubric's own current sharpness, not smoothed over. Most load-bearing
+structural signal: 35% of candidates (14/40) are "a generated multi-key
+config file read back" (JSON/YAML/TOML/HCL/INI/Elixir-conf/bash-array) —
+a shape no existing CDC abstraction models at all, and the single most
+common real pattern in the holdout.
+
+E1's own best result wasn't "let's research more" — it pointed at one
+specific correctness bug and one specific bottleneck. User's own
+prioritized order for what comes next: **P0 (the xandikos false-
+positive, correctness before coverage) → P1 (`mkEnableOption` support,
+since it alone accounts for ~84% of E1's inconclusives) → P2 (the
+nested-`options`-idiom gap, only if still needed after re-measuring) →
+E1-R (rerun the SAME frozen 40-candidate holdout — not reshuffled — as a
+regression benchmark)**. CDC deliberately frozen at E1's own result for
+now: the generated-config-file pattern is real and load-bearing, but the
+rubric's own 50% inter-rater disagreement means classifying it precisely
+enough to design a new abstraction isn't ready yet — a separate,
+later `C-E1.1` would need to define an executable fit criterion first
+(a verifiable Nix-produces-exact-file → consumer-reads-same-file →
+known-parser/schema chain), not just "support YAML/JSON/TOML."
+
+## P0: the xandikos nested-submodule declaration collision (GAP-4), fixed
+
+Root cause, found by E1 (see above), confirmed by direct inspection of
+`scan_options`/`walk_options_block` (`src/main.rs`), not assumed: a
+nested `options = {...}` block declared INLINE inside another option's
+own `mkOption {...}` call (e.g. xandikos's real `nginx = mkOption { type
+= types.submodule { options = { enable = mkOption {...}; }; }; };`) was
+found TWICE — once correctly, as the `nginx` option's own value, which
+current code recorded as a single leaf without recursing into it; and a
+SECOND time, independently, by `scan_options`'s own generic
+`root.descendants()` search (which matches ANY `NODE_ATTRPATH_VALUE`
+with attrpath exactly `["options"]`, anywhere in the file, with no
+awareness of where it sits structurally) — walked from a completely
+FRESH, EMPTY path, the exact same convention used for a genuinely
+top-level `options = {...}` block. A same-named leaf declared this way
+(`enable`, `host`, `port` — extremely common names) then silently
+collides with an unrelated option of the same bare name elsewhere in the
+file, and `run_target`'s gate-1 lookup
+(`options.iter().find(|o| o.path == watched_path)`) has no way to tell
+the two apart. **Real, demonstrated consequence, not hypothetical**:
+xandikos's reported `PASS` on `enable` was backed by
+`services.xandikos.nginx.enable`'s own declaration (`default = false`),
+not `services.xandikos.enable` itself (`mkEnableOption`, itself
+separately invisible per the still-open P1 gap) — numerically harmless
+here only because the two defaults happened to coincide.
+
+Kimai's own real `siteOpts` submodule — the ORIGINAL reason this
+"nested `options = {...}` block, walked from an empty path" convention
+existed in the first place — needed to keep working unchanged: it's a
+plain `let`-bound function value, referenced only by NAME elsewhere
+(`types.attrsOf (types.submodule siteOpts)`), never itself sitting
+inside an `mkOption {...}` call. The fix turns on exactly that
+distinction: `is_nested_inside_mk_option_call` walks a candidate
+`options = {...}` node's ancestors and checks whether any of them is a
+real `mkOption {...}` call — `false` for kimai's siteOpts (correctly
+unaffected, still walked from a fresh empty path, exactly as before),
+`true` for xandikos's `nginx` submodule (now skipped in `scan_options`'s
+own generic search). Instead, `walk_options_block` itself now recognizes
+this shape directly: after recording an `mkOption`-declared option's own
+leaf, `find_nested_options_block` searches that SAME call's subtree for
+a nested `options = {...}` block (inline `types.submodule {...}`,
+possibly wrapped in `types.attrsOf`/`types.nullOr`/...) and, if found,
+recurses into it with the path already extended by the outer option's
+own name — so `nginx.enable` is correctly recorded at
+`["nginx","enable"]`, never at the bare, collision-prone `["enable"]`.
+
+**Two permanent regression tests** (`h2-case14`/`h2-case15` in
+`targets/golden.toml`, `tests/golden.rs`): the exact minimal E1
+reproducer (`fixtures/synthetic/h2-nested-submodule-collision/`,
+promoted from the audit's own `fixtures/e1-holdout-audit/_bisect/`) and
+the real, in-the-wild `xandikos` case (reusing E1's own vendored
+fixture directly, not a duplicate). Both assert the SAME thing: the
+collision-only entry can no longer be matched at the bare, wrong path —
+the correct, honest post-fix result is `OptionNotFound` (P0 fixes the
+false-positive CAPABILITY; full coverage on either case still needs P1's
+`mkEnableOption` support, a separate, later fix — asserting a clean
+`PASS` here would overclaim what this fix alone achieves). A design
+choice worth stating explicitly, reasoned through before writing any
+fixture: this collision is ONLY dangerous when the watched option's own
+real declaration is independently absent from the flat scan for some
+OTHER reason (here, P1's still-open `mkEnableOption` gap) — pre-order
+tree traversal guarantees a genuinely top-level declaration is always
+discovered before any of its own nested descendants, so `.find()`'s
+first-match semantics already protect against the collision whenever
+the real declaration exists in the list at all. An isolated "collision
+alone, no other gap involved" variant was designed, then deliberately
+NOT added, once this was worked out: it would have passed identically
+before and after the fix, a non-differentiating test that would have
+overclaimed what the fix specifically proves.
+
+All 5 existing K1-H2 offline test suites (129+9+11+1 = 150 tests) and
+the full `tests/golden.rs` suite (47 → 49) pass unchanged — zero
+regressions, confirmed by a real run, not assumed from the diff's small
+size.
