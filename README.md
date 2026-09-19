@@ -2154,21 +2154,52 @@ no longer accepts."
     have produced very convincing garbage. Same standing rule as every
     other frozen layer: reopened only by a concrete counterexample.
 
-**K3b (real-drift census) is next, required before any more K3 code —
-and deliberately does NOT touch `diff_contracts()` or any other K3a
-code.** The question K3b actually answers is sharper than "can a
-differential checker be built" (already close to obvious): **is there
-enough real historical contract change across the four already-
-qualified consumer families for differential mode to be useful, not
-just intellectually tidy?**
-Search the small set of already-qualified consumer families (Doctrine
-MySQL, Doctrine PostgreSQL, Illuminate MySQL, Illuminate PostgreSQL) for
-at least one REAL historical nixpkgs package bump where the extractable
-contract actually changed — explicitly not started with a synthetic
-rename standing in for evidence; if the corpus shows no real drift, that
-is itself a real, reportable result, not a reason to fabricate one. K3c
-(producer correlation — does Nix still emit a name the consumer just
-dropped) only happens once K3b finds a real case to correlate against.
+12. **K3b — real historical contract-drift census. Closed,
+    `fixtures/cdc/k3b-drift-census/census.md`, zero `src/cdc.rs`
+    changes — `diff_contracts()`/K3a untouched.** The question K3b
+    actually answers is sharper than "can a differential checker be
+    built" (already close to obvious): **is there enough real
+    historical contract change across the four already-qualified
+    consumer families for differential mode to be useful, not just
+    intellectually tidy?** For each family, the OLDEST real nixpkgs
+    commit for that app (its own `init at` commit) was compared against
+    the current `AFTER_REV` pin — real historical package bumps for
+    real, currently-qualified consumer apps, never hand-picked upstream
+    release tags. Same resolution pipeline already proven in
+    K2a/K2a.1 (`fetch_composer_lock`); same accepted-key extraction
+    rule this project's own real extractors already use.
+
+    **Result: kimai** (Doctrine MySQL, 3.9.4 → 3.10.6): no drift —
+    `constructPdoDsn` byte-identical across the whole real range.
+    **part-db** (Doctrine PostgreSQL, 4.2.1 → 4.4.3): no drift within
+    its own real window — but `doctrine/dbal`'s own git history for
+    this exact file has two real, dated events (a removed
+    `default_dbname` alias, 2021–2022; an added `gssencmode` key, March
+    2024), BOTH already resolved one way or the other before `part-db`
+    ever entered nixpkgs (Dec 2024) — real drift exists in the family's
+    own history, genuinely invisible to the one currently-qualified
+    consumer of it. **agorakit** (Illuminate MySQL, v8.83.27 →
+    v11.44.2): a real `added_only` event, `use_db_after_connecting`
+    (Jan 2025) — nothing removed. **movim** (Illuminate PostgreSQL,
+    v10.43.0 → v12.69.2): no drift by key name, but a real MECHANISM
+    change for `charset`/`application_name` (moved from post-connect
+    SQL statements to embedded DSN parameters, same key names) —
+    confirmed this project's own extractor (which checks both
+    array-keyed and bare-variable syntactic forms) doesn't misread this
+    as a removal, validating that K2f design choice was load-bearing,
+    not speculative decoration.
+
+    **Decision, per the rule fixed BEFORE this census started**: zero
+    of the four families show a real removed/renamed token inside any
+    currently-qualified consumer's own observable window. **Honest
+    conclusion: NOT yet K3c** — proceeding now would mean building
+    producer-correlation logic with nothing real to correlate against.
+    Two directions recorded, neither started this round: expand the
+    corpus toward an app old enough to straddle `doctrine/dbal`'s real
+    4.0-line removal, or look at a different interface family (CLI
+    flags, env-var naming) where rename/removal is plausibly more
+    common than in these two comparatively conservative database-driver
+    libraries.
 
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
