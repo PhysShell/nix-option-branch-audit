@@ -1,0 +1,35 @@
+name: Test suite (offline)
+
+# The real, disclosed gap found while verifying K2f: no existing workflow
+# ran a plain, unscoped `cargo test` -- k1.yml only ever runs
+# `cargo test --bin oba -- --ignored "cdc::"` (the binary's own unit
+# tests, real-eval ones only), kani.yml only runs `cargo kani`, and
+# dogfood.yml exercises the composite action, not `cargo test` at all
+# (its own comment claiming "cargo test already covers the analysis...
+# far more thoroughly" was true of intent, never of what CI actually
+# ran). `tests/{check_root,diff_cli,fixture_integrity,golden}.rs` --
+# every black-box integration suite this project treats as part of its
+# own proof chain -- had never been exercised by CI at all, only by a
+# contributor's local `cargo test`.
+#
+# Deliberately NOT a restructuring of the other three workflows: one
+# small, ordinary job, no real `nix`/network needed (a plain
+# `cargo test` skips every `#[ignore]`d real-eval test -- k1.yml already
+# owns those). Reuse: `dtolnay/rust-toolchain@stable`, the same action
+# k1.yml/kani.yml already use.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo test (all targets, offline -- #[ignore]d real-eval tests excluded)
+        run: cargo test
