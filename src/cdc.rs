@@ -116,7 +116,19 @@
 //! bug) from "producer adopted the new flag" (handled, no finding) from
 //! "producer never emitted either" (drift real, producer irrelevant).
 //! Deliberately Mimir-specific throughout -- no generic CLI extractor
-//! framework, no `krill` work this round.
+//! framework, no `krill` work this round. Real result: Outcome C --
+//! `mimir`'s own NixOS module never emits either flag name by default,
+//! proving producer-relevance filtering matters, not just that upstream
+//! changed something. K4 (K4a+K4b+K4c) FROZEN as a proven, parked
+//! vertical.
+//!
+//! K5a (done): [`EnvContract`]/[`EnvContractDiff`]/[`diff_env_contracts`]
+//! -- environment-variable contracts, the next interface family, chosen
+//! because the producer side already exists and is already proven
+//! ([`ProducerEvidence::FlatEnvVars`], K2d). Pure model only,
+//! deliberately not reusing `CliContract`/`ConsumerContract`. K5b (real
+//! historical env-var drift census) and K5c (producer correlation,
+//! reusing K4c's own A/B/C model) are not started.
 
 use std::path::Path;
 use std::process::Command;
@@ -1626,6 +1638,82 @@ pub fn evaluate_mimir_cli_drift(rev: &str) -> Result<CliDriftRelevance, CdcError
     Ok(classify_cli_drift_relevance(MIMIR_REMOVED_FLAG, MIMIR_ADDED_FLAG, &argv))
 }
 
+/// K5: environment-variable contracts -- the next interface family,
+/// chosen over `krill`'s structural CLI-drift rabbit hole because this
+/// project's producer-side acquisition for env vars already exists and
+/// is already proven on three real apps
+/// ([`ProducerEvidence::FlatEnvVars`], K2d, real-verified on
+/// agorakit/movim/snipe-it) -- K5 tests a NEW consumer family against
+/// an ALREADY-PROVEN producer side, not both halves at once the way K4
+/// had to.
+///
+/// K5a (this section): the pure model ONLY, mirroring K3a/K4a's own
+/// scope exactly -- no extraction, no real nixpkgs research (K5b's job,
+/// not started). Deliberately a genuinely separate type from
+/// `CliContract`/`ConsumerContract`, not a shared abstraction forced
+/// because all three are "a name and a diff" -- same discipline the
+/// design review required for K4a. Diffs variable NAMES only this
+/// round -- deliberately does not model `required?`/`default?`/`parse
+/// kind?` yet, even though a real env var clearly has more shape than a
+/// bare name; K3a's/K4a's own "scope must end somewhere" discipline
+/// applies here too.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnvContract {
+    pub consumer: String,
+    pub version: String,
+    pub variables: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnvContractDiff {
+    pub removed: Vec<String>,
+    pub added: Vec<String>,
+    pub retained: Vec<String>,
+}
+
+/// Pure. Fail-closed on a `consumer` mismatch (the env-var analogue of
+/// K3a's library/dialect check and K4c's `program` check) and on a
+/// duplicate variable name in either input contract, never silently
+/// deduped. Results are sorted, so input ordering never affects the
+/// outcome.
+pub fn diff_env_contracts(
+    base: &EnvContract,
+    head: &EnvContract,
+) -> Result<EnvContractDiff, CdcError> {
+    if base.consumer != head.consumer {
+        return Err(CdcError::Inconclusive(format!(
+            "cannot diff different env-var consumers: {:?} (base) vs {:?} (head)",
+            base.consumer, head.consumer
+        )));
+    }
+    let base_vars = require_no_duplicate_vars(&base.variables, "base")?;
+    let head_vars = require_no_duplicate_vars(&head.variables, "head")?;
+
+    let mut removed: Vec<String> =
+        base_vars.iter().filter(|v| !head_vars.contains(v)).cloned().collect();
+    let mut added: Vec<String> =
+        head_vars.iter().filter(|v| !base_vars.contains(v)).cloned().collect();
+    let mut retained: Vec<String> =
+        base_vars.iter().filter(|v| head_vars.contains(v)).cloned().collect();
+    removed.sort();
+    added.sort();
+    retained.sort();
+    Ok(EnvContractDiff { removed, added, retained })
+}
+
+fn require_no_duplicate_vars(vars: &[String], side: &str) -> Result<Vec<String>, CdcError> {
+    let mut seen = std::collections::HashSet::new();
+    for v in vars {
+        if !seen.insert(v.as_str()) {
+            return Err(CdcError::Inconclusive(format!(
+                "{side} env contract has a duplicate variable {v:?} -- refusing to diff an \
+                 ambiguous contract"
+            )));
+        }
+    }
+    Ok(vars.to_vec())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2999,5 +3087,103 @@ mod k4c_tests {
     fn mimir_producer_correlation_is_outcome_c_producer_irrelevant() {
         let relevance = evaluate_mimir_cli_drift(AFTER_REV).unwrap();
         assert_eq!(relevance, CliDriftRelevance::ProducerIrrelevant);
+    }
+}
+
+#[cfg(test)]
+mod k5a_tests {
+    use super::*;
+
+    fn contract(consumer: &str, version: &str, vars: &[&str]) -> EnvContract {
+        EnvContract {
+            consumer: consumer.to_string(),
+            version: version.to_string(),
+            variables: vars.iter().map(|v| v.to_string()).collect(),
+        }
+    }
+
+    #[test]
+    fn diff_of_a_contract_with_itself_is_empty() {
+        let c = contract("foo", "1.4", &["DB_HOST", "DB_PORT", "DB_SOCKET"]);
+        let diff = diff_env_contracts(&c, &c).unwrap();
+        assert!(diff.removed.is_empty());
+        assert!(diff.added.is_empty());
+        let mut expected = vec!["DB_HOST", "DB_PORT", "DB_SOCKET"];
+        expected.sort();
+        assert_eq!(diff.retained, expected);
+    }
+
+    /// The exact motivating scenario named going into K5: a real
+    /// removed/renamed env var, with a producer/consumer-relevant name.
+    #[test]
+    fn diff_detects_a_real_removed_and_added_variable() {
+        let base = contract("foo", "1.4", &["DATABASE_URL", "DB_HOST"]);
+        let head = contract("foo", "1.5", &["DB_URL", "DB_HOST"]);
+        let diff = diff_env_contracts(&base, &head).unwrap();
+        assert_eq!(diff.removed, vec!["DATABASE_URL".to_string()]);
+        assert_eq!(diff.added, vec!["DB_URL".to_string()]);
+        assert_eq!(diff.retained, vec!["DB_HOST".to_string()]);
+    }
+
+    #[test]
+    fn diff_mismatched_consumer_is_inconclusive() {
+        let base = contract("foo", "1.4", &["DB_HOST"]);
+        let head = contract("bar", "1.0", &["DB_HOST"]);
+        assert!(matches!(diff_env_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_duplicate_variable_in_base_is_inconclusive_not_deduped() {
+        let base = contract("foo", "1.4", &["DB_HOST", "DB_HOST"]);
+        let head = contract("foo", "1.5", &["DB_HOST"]);
+        assert!(matches!(diff_env_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_duplicate_variable_in_head_is_inconclusive_not_deduped() {
+        let base = contract("foo", "1.4", &["DB_HOST"]);
+        let head = contract("foo", "1.5", &["DB_HOST", "DB_HOST"]);
+        assert!(matches!(diff_env_contracts(&base, &head), Err(CdcError::Inconclusive(_))));
+    }
+
+    #[test]
+    fn diff_result_does_not_depend_on_input_variable_ordering() {
+        let base_a = contract("foo", "1.4", &["DB_HOST", "DB_PORT", "DB_SOCKET"]);
+        let base_b = contract("foo", "1.4", &["DB_SOCKET", "DB_HOST", "DB_PORT"]);
+        let head = contract("foo", "1.5", &["DB_PORT", "DB_HOST"]);
+        assert_eq!(
+            diff_env_contracts(&base_a, &head).unwrap(),
+            diff_env_contracts(&base_b, &head).unwrap()
+        );
+    }
+
+    // --- Property-based tests (proptest), same crate/tier K3a's and
+    // K4a's own tests already use -- not a new precedent.
+
+    proptest::proptest! {
+        #[test]
+        fn prop_diff_of_a_contract_with_itself_is_always_empty(vars in proptest::prelude::prop::collection::btree_set("[A-C]{1,4}", 0..6)) {
+            let vars: Vec<String> = vars.into_iter().collect();
+            let c = contract("foo", "1.0", &vars.iter().map(String::as_str).collect::<Vec<_>>());
+            let diff = diff_env_contracts(&c, &c).unwrap();
+            proptest::prop_assert!(diff.removed.is_empty());
+            proptest::prop_assert!(diff.added.is_empty());
+        }
+
+        #[test]
+        fn prop_removed_and_added_are_symmetric_under_swap(
+            base_vars in proptest::prelude::prop::collection::btree_set("[A-C]{1,4}", 0..6),
+            head_vars in proptest::prelude::prop::collection::btree_set("[A-C]{1,4}", 0..6),
+        ) {
+            let base_vars: Vec<String> = base_vars.into_iter().collect();
+            let head_vars: Vec<String> = head_vars.into_iter().collect();
+            let base = contract("foo", "1.0", &base_vars.iter().map(String::as_str).collect::<Vec<_>>());
+            let head = contract("foo", "2.0", &head_vars.iter().map(String::as_str).collect::<Vec<_>>());
+            let forward = diff_env_contracts(&base, &head).unwrap();
+            let backward = diff_env_contracts(&head, &base).unwrap();
+            proptest::prop_assert_eq!(forward.removed, backward.added);
+            proptest::prop_assert_eq!(forward.added, backward.removed);
+            proptest::prop_assert_eq!(forward.retained, backward.retained);
+        }
     }
 }
