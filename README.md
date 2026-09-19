@@ -1917,15 +1917,122 @@ surface at once:
    config parser. K2e's own job was only to make that decision
    mechanical for whoever picks it up next, per the user's own framing —
    the choice is now genuinely informed, not a hunch.
+8. **K2f — Laravel/Illuminate consumer adapter. Closed, `9e03eca`,
+   confirmed green in real CI (`gh run view --log`: 25 passed, 0 failed,
+   35.5s).** The corpus-justified choice from K2e, picked explicitly over
+   package-bump drift and the strichliste/part-db Phase D vendoring
+   (both real, both cheaper, both deliberately deferred — user's own
+   reasoning: this is "the only next step both corpus-confirmed AND
+   expanding the checker's actual semantic power, not just closing a
+   technical tail"). Held to a tight, fully-specified model: `Nix
+   FlatEnvVars -> DB_* keys -> config/database.php -> Laravel config
+   structure -> Illuminate\Database -> consumer contract`, with the
+   explicit rule that the contract must come from Illuminate, never
+   Doctrine, even though `doctrine/dbal` sits right there in
+   `composer.lock` — confirmed vestigial for exactly this reason in K2e.
 
-Explicitly **not next**, regardless of how tempting: a new
-`ProducerEvidence`/consumer-adapter class, generic sink discovery, a
-package-bump differential checker, H2 predicates, D3, or fixing movim's
-`mariadb`-path bug. The next decision — a Laravel-config-aware consumer
-adapter (corpus-justified: 4 apps, one chain shape) vs. package-bump
-drift vs. Phase D vendoring for strichliste/part-db's already-covered
-shape — is for whoever picks this up, informed by K2e's real evidence,
-not decided in advance in this document.
+   **Reachability made explicit type, not hidden in an extractor** — the
+   design review's own sketch, built close to literally:
+   `ConsumerHop { layer, from_key, to_key }`, `ConsumerRoute::Direct |
+   Mediated { hops }`, `ConsumerContractEvidence { route,
+   consumer_library, accepted_keys }`. Phase E's `compare_contract`
+   (frozen, K1) is reused completely UNCHANGED against
+   `ConsumerRoute::resolved_key()` — no type-level room for a mediated
+   route to become "stronger" or "weaker" than a direct one, same
+   discipline K2b established for `ProducerEvidence`.
+
+   **Two new pure extractors, both bounded literal scans** — Phase D's
+   own reuse-first discipline applied a second time, not reinvented:
+   `extract_config_key_for_env_var` (the exact `'<key>' => env('<ENV_VAR>'
+   ...)` shape `config/database.php` uses, one simple cast tolerated;
+   `Ok(None)` when the env var isn't present at all is a real, valid
+   outcome — not every `FlatEnvVars` key is part of the DB config
+   surface — never an error) and `illuminate_connector_accepts_key`
+   (does the vendored Illuminate connector source reference a key at
+   all, via array-keyed `$config['host']` (MySQL) or boundary-checked
+   bare-variable `$host` (Postgres, after its own `extract($config,
+   EXTR_SKIP)`) — deliberately NOT `isset(...)`-only, since `host`/
+   `database` are read unconditionally by both drivers, confirmed by
+   reading the real vendored source directly).
+
+   **A real research finding that reshaped the design before any code
+   was written**: MySQL's and Postgres's Illuminate connectors are
+   structurally different, not just differently-named — MySQL's
+   `MySqlConnector.php` uses array-keyed `isset($config['unix_socket'])`;
+   Postgres's `PostgresConnector.php` uses `extract($config, EXTR_SKIP)`
+   then bare-variable checks, and has **no unix-socket concept at all**
+   (no `hasSocket()`-equivalent exists there, confirmed by reading the
+   real pinned source). The socket-naming defect class this whole
+   project is built around structurally cannot occur for a Postgres
+   deployment via Illuminate — a real, disclosed finding, not a gap.
+   Resolved by branching the adapter on `IlluminateDriver` (a property of
+   how a deployment configures its connection), never on app identity —
+   satisfies "no `if app == ...`" while still genuinely covering movim.
+   Also caught for real during research: snipe-it's `config/database.php`
+   maps `DB_SOCKET` -> `unix_socket` identically in BOTH its `mysql` and
+   `mariadb` connection blocks — confirmed this is NOT ambiguity (same
+   distinct key twice), which is why the extractor checks distinct
+   resolved values rather than raw occurrence count.
+
+   **Illuminate connector fixtures vendored and integrity-locked**
+   (`fixtures/cdc/illuminate-database/`, same discipline as K1's Doctrine
+   fixture) — `MySqlConnector.php`/`Connector.php` verified BYTE-IDENTICAL
+   (diffed directly, not assumed) between agorakit's pinned
+   `laravel/framework` v11.44.2 and snipe-it's pinned v12.59.0; one
+   fixture serves both, citation covers both commits.
+   `PostgresConnector.php` is movim's own pinned `illuminate/database`
+   v12.69.2, a structurally different file, not shared with the MySQL
+   pair.
+
+   **All 5 stop-condition items met**: ONE shared adapter
+   (`acquire_illuminate_consumer_contract`), zero app-name branches
+   anywhere, works on all three (✓ — real tests below); mapping derived
+   from exact pinned application/framework source, never a hardcoded
+   env-var list (✓ — both extractors read real vendored/fetched bytes);
+   missing/ambiguous mapping is `Inconclusive`, never guessed (✓ — 6 new
+   offline tests covering absent/duplicate/conflicting/malformed shapes);
+   `doctrine/dbal`'s presence never affects these three apps' verdict (✓
+   — structurally true, nothing in this path references `doctrine/dbal`
+   or `composer.lock` at all); Kimai/Davis/Symfony paths unchanged (✓ —
+   zero K1/K2a/K2b/K2d/K2a.1 code touched, all 21 pre-existing real tests
+   pass unchanged).
+
+   **Real-verified for all three**: agorakit's `DB_HOST` -> `host`
+   (MySQL) — Pass; snipe-it's `DB_SOCKET` -> `unix_socket` (MySQL) — Pass,
+   the exact K1-defect-class key, via a fully mediated route, never
+   Doctrine's contract; movim's `DB_HOST` -> `host` (Postgres, a
+   genuinely different connector source) — Pass; movim's `DB_SOCKET` —
+   `Inconclusive`, correctly, for the real reason above. A mutation-style
+   positive control (`consumer_contract_evidence_mismatched_key_is_a_real_finding`)
+   renames the mapped key and confirms the detector flips from `Pass` to
+   a real `Finding`, not a vacuous always-pass.
+
+   **`flarum` deliberately NOT required for closure**, per the design
+   review: its own chain (same terminal library, `doctrine/dbal` real but
+   migrations-only, per K2e) is a genuine multi-consumer case the review
+   explicitly said to record as a future corpus case rather than distort
+   v1 for "pretty 4/4" — not attempted this round.
+
+   111 tests total in the `oba` binary's own unit-test target (was 94):
+   86 offline (was 73, +13) + 25 real/ignored (was 21, +4).
+   `tests/fixture_integrity.rs` passes with the 3 new vendored files'
+   sha256 locks. **Real, disclosed CI gap found while verifying this
+   round, pre-existing, not introduced here**: no workflow runs a plain,
+   unscoped `cargo test` — `k1.yml` only ever runs `cargo test --bin oba
+   -- --ignored "cdc::"`, so `tests/fixture_integrity.rs`/`tests/golden.rs`
+   and the rest of the `tests/*.rs` black-box suites are exercised
+   locally only, never in CI. Not fixed this round — flagged, not glossed
+   over, same discipline as every other gap this project has found in
+   itself.
+
+Explicitly **not next**, regardless of how tempting: generic sink
+discovery, a package-bump differential checker, H2 predicates, D3,
+fixing movim's `mariadb`-path bug, or the untouched CI-coverage gap just
+found. The next decision — extend the Laravel adapter to `flarum`'s
+multi-consumer case, Phase D vendoring for strichliste/part-db's
+already-covered shape, or package-bump drift — is for whoever picks
+this up next, informed by real evidence, not decided in advance in this
+document.
 
 ## Productization: from research phase to a usable CI product
 

@@ -356,6 +356,16 @@ adapter at all, K1's existing model already covers them once Phase D
 vendors the right `doctrine/dbal` version (3.10.5 for both, already
 identified, not yet vendored).
 
+**K2f (`9e03eca`) acted on exactly this signal**: `ConsumerRoute`/
+`ConsumerContractEvidence` + `acquire_illuminate_consumer_contract`,
+real-verified for `agorakit`/`snipe-it` (MySQL) and `movim` (Postgres --
+a genuinely different connector shape, with NO unix-socket concept at
+all, a real finding in its own right). `flarum` deliberately excluded
+from closure, per the design review -- its multi-consumer shape
+(primary path Illuminate, optional migration-only path Doctrine) is a
+real, distinct future corpus case, not folded into v1 for a round
+number. See `README.md`'s own K2f section for the full writeup.
+
 ### K2e stop condition
 
 - [x] Every app with `doctrine/dbal` present got a real chain, not a
