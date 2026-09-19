@@ -1,0 +1,22 @@
+# P3a: a real combined audit manifest -- one real [[target]] (OBA) plus
+# one real [[cdc_target]] (CDC), BOTH resolved against the SAME
+# `--root`. Unlike every other OBA fixture in this project, `module`/
+# `test` here name REAL paths inside an actual nixpkgs checkout
+# (nixos/modules/services/web-apps/kimai.nix, nixos/tests/kimai.nix),
+# not this project's own trimmed 2-file vendored copy -- because CDC's
+# own half of this SAME command needs `--root` to be a real nixpkgs
+# tree (`cdc::NixpkgsSource::LocalPath`), and both engines share one
+# `--root`. The test using this file materializes a real local nixpkgs
+# checkout itself (via the same real `fetchTarball` technique
+# `cdc.rs`'s own `real_nixpkgs_source_local_path_...` test uses) and is
+# `#[ignore]`d for needing real network access.
+[[target]]
+name = "kimai"
+module = "nixos/modules/services/web-apps/kimai.nix"
+test = "nixos/tests/kimai.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[cdc_target]]
+name = "unpackerr"

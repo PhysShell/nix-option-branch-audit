@@ -1,0 +1,5 @@
+# P3a: a [[cdc_target]] naming a candidate that isn't in
+# cdc::CDC_CANDIDATE_NAMES must be a real TOOL_ERROR at manifest
+# validation time, before any nix eval is ever attempted.
+[[cdc_target]]
+name = "not-a-real-candidate"

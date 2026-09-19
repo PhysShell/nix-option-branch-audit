@@ -150,8 +150,10 @@
 //! producer reachability is proven.
 
 use std::path::Path;
+use std::path::PathBuf;
 use std::process::Command;
 
+use serde::Serialize;
 use serde_json::Value as JsonValue;
 
 /// Tree state immediately before the fix -- a real, but otherwise
@@ -508,10 +510,23 @@ fn eval_nix_raw(expr: &str) -> Result<String, CdcError> {
 /// (the tool ran fine, the *evidence shape* is the problem) -- that
 /// distinction is drawn in [`build_flat_env_vars_evidence`], not here.
 fn eval_nix_json(expr: &str) -> Result<JsonValue, CdcError> {
-    let out = Command::new("nix")
-        .args(["eval", "--impure", "--json", "--expr", expr])
-        .output()
-        .map_err(|e| CdcError::ToolError(format!("spawning `nix`: {e}")))?;
+    eval_nix_json_with_env(expr, &[])
+}
+
+/// P3a: same real semantic oracle as [`eval_nix_json`], plus real
+/// environment variables set on the `nix` CHILD PROCESS itself (never
+/// splicing their values into `expr`'s own text) -- the actual, tested
+/// safety mechanism `NixpkgsSource::LocalPath` relies on for passing a
+/// genuinely untrusted `--root` path into a Nix expression with zero
+/// string-injection surface, confirmed directly via a real `nix eval
+/// --impure --json` run before this function existed.
+fn eval_nix_json_with_env(expr: &str, env: &[(&str, String)]) -> Result<JsonValue, CdcError> {
+    let mut cmd = Command::new("nix");
+    cmd.args(["eval", "--impure", "--json", "--expr", expr]);
+    for (k, v) in env {
+        cmd.env(k, v);
+    }
+    let out = cmd.output().map_err(|e| CdcError::ToolError(format!("spawning `nix`: {e}")))?;
     if !out.status.success() {
         return Err(CdcError::ToolError(format!(
             "nix eval failed:\n{}",
@@ -1913,12 +1928,83 @@ pub fn evaluate_grafana_env_drift(rev: &str) -> Result<EnvDriftRelevance, CdcErr
 //     -> extract accepted paths -> compare_config_contract()
 // ---------------------------------------------------------------------
 
+/// P3a: where a `GeneratedConfigArtifact` acquire function gets its
+/// `nixpkgsSrc` from -- the real, load-bearing abstraction that makes
+/// `oba audit --root <local nixpkgs checkout>` possible without
+/// touching any of the 11 acquire functions' own real evaluation
+/// logic, just how they obtain the tree to evaluate it against.
+#[derive(Debug, Clone)]
+pub enum NixpkgsSource {
+    /// A real, internally-controlled `PhysShell/nixpkgs` commit,
+    /// fetched via `builtins.fetchTarball` -- this project's own
+    /// existing real-evidence-gathering convention (every research
+    /// round's own citations are pinned to a specific commit for
+    /// reproducibility). The commit string is NEVER untrusted input --
+    /// every real caller passes one of this project's own pinned-
+    /// commit constants -- so plain string interpolation into the Nix
+    /// expression is safe here.
+    PinnedRev(&'static str),
+    /// A real local filesystem checkout -- what `oba audit --root
+    /// <path>` uses. GENUINE untrusted input (an arbitrary CLI
+    /// argument), so the path is NEVER textually interpolated into the
+    /// Nix expression at all: `NixpkgsSource::eval` passes it through a
+    /// real environment variable and reads it back via
+    /// `builtins.getEnv` inside the expression, so a path containing
+    /// `"`/interpolation-triggering characters can never break out of
+    /// the intended Nix syntax context. Verified directly (real `nix
+    /// eval --impure --json` with `NIXPKGS_PATH_ARG=<path>`) before
+    /// relying on it for any real acquire function.
+    LocalPath(PathBuf),
+}
+
+/// The env var name `NixpkgsSource::LocalPath`'s own real path travels
+/// through -- a real environment variable, not string interpolation,
+/// is the actual safety mechanism (see `NixpkgsSource`'s own doc
+/// comment); the name itself carries no safety property, it's just a
+/// shared constant so the setter (`NixpkgsSource::eval`) and the
+/// Nix-side reader (`builtins.getEnv`) can't drift apart.
+const NIXPKGS_LOCAL_PATH_ENV_VAR: &str = "OBA_CDC_NIXPKGS_LOCAL_PATH";
+
+impl NixpkgsSource {
+    /// Evaluates `let nixpkgsSrc = <this source>; in <body>` against
+    /// this source, safely. `body` is real Nix source text an acquire
+    /// function itself controls (never untrusted input), so ordinary
+    /// string interpolation into ITS OWN construction is fine -- the
+    /// one real untrusted-input boundary this function exists to
+    /// guard is specifically `LocalPath`'s own path value, handled via
+    /// `builtins.getEnv`, never string interpolation.
+    fn eval(&self, body: &str) -> Result<JsonValue, CdcError> {
+        // NOTE: no `in` between the `nixpkgsSrc` binding and `body` --
+        // `body` (every acquire function's own real Nix text) is
+        // written as a CONTINUATION of this same `let`'s own binding
+        // list (its own `eval = ...;` etc.), providing its own closing
+        // `in { ... }` at the end. Inserting an `in` here would close
+        // the `let` block before `eval` ever got bound -- caught before
+        // ever being trusted, by a real end-to-end `nix eval` run (see
+        // the P3a commit's own real verification).
+        match self {
+            NixpkgsSource::PinnedRev(rev) => {
+                let expr = format!(
+                    r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz"; {body}"#
+                );
+                eval_nix_json_with_env(&expr, &[])
+            }
+            NixpkgsSource::LocalPath(path) => {
+                let expr = format!(
+                    r#"let nixpkgsSrc = /. + builtins.getEnv "{NIXPKGS_LOCAL_PATH_ENV_VAR}"; {body}"#
+                );
+                eval_nix_json_with_env(&expr, &[(NIXPKGS_LOCAL_PATH_ENV_VAR, path.display().to_string())])
+            }
+        }
+    }
+}
+
 /// The same real `PhysShell/nixpkgs` tree C-E1.1 itself audited all 14
 /// candidates against (`fixtures/c-e1.1-generated-config-audit/
 /// census.md`) -- reusing the exact pin, not re-resolving a fresh one,
 /// so C-E1.2a's own real evidence is directly comparable to what that
 /// audit already cited for these same four modules.
-const CE12_REV: &str = "68740713a1d5904edf9ba92a998a522b1b6ce080";
+const CE12_REV: NixpkgsSource = NixpkgsSource::PinnedRev("68740713a1d5904edf9ba92a998a522b1b6ce080");
 
 /// A real Nix-generated config artifact's own content, in the form
 /// leaf-path extraction actually reads. `StructuredValue` covers any
@@ -1945,8 +2031,9 @@ enum ArtifactContent {
 /// extraction paths above care about format, and even those only care
 /// about "structured value available, yes/no", not the specific format
 /// name.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ConfigFormat {
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ConfigFormat {
     Toml,
     Yaml,
     ElixirConf,
@@ -2038,8 +2125,9 @@ struct ConsumerConfigContract {
     accepted_paths: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum ConfigContractVerdict {
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum ConfigContractVerdict {
     Pass,
     Finding { unaccepted_path: String },
 }
@@ -2316,28 +2404,25 @@ fn read_ce12_fixture(relative_path: &str) -> Result<String, CdcError> {
 /// radarr` (a real list of per-instance blocks) is genuinely opaque to
 /// this bounded v1 -- the real corpus case `flatten_structured_value`'s
 /// own doc comment names, not a hypothetical.
-fn acquire_unpackerr_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_unpackerr_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.unpackerr = {{
+          configuration = {
+            services.unpackerr = {
               enable = true;
               settings.debug = true;
-              settings.radarr = [ {{ api_key = "test-key-123"; url = "http://localhost:7878"; }} ];
-            }};
+              settings.radarr = [ { api_key = "test-key-123"; url = "http://localhost:7878"; } ];
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           settings = eval.config.services.unpackerr.settings;
           execStart = eval.config.systemd.services.unpackerr.serviceConfig.ExecStart;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -2386,27 +2471,24 @@ fn unpackerr_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
 /// the command line at all, only the fixed `/etc/unbound/unbound.conf`
 /// -- the real binding is the `environment.etc` activation-time
 /// symlink from that fixed path to the SAME real artifact `A` reads.
-fn acquire_unbound_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_unbound_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.unbound = {{
+          configuration = {
+            services.unbound = {
               enable = true;
-              settings.server = {{ interface = [ "127.0.0.1" ]; port = 5353; }};
-            }};
+              settings.server = { interface = [ "127.0.0.1" ]; port = 5353; };
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           rendered = builtins.readFile eval.config.environment.etc."unbound/unbound.conf".source;
           execStart = eval.config.systemd.services.unbound.serviceConfig.ExecStart;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let rendered = value
         .get("rendered")
         .and_then(JsonValue::as_str)
@@ -2474,33 +2556,30 @@ fn unbound_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
 /// are scoped to the SAME `:instance` sub-tree, not mobilizon's whole
 /// real settings surface -- comparing a narrower A against a narrower D
 /// consistently, never a mismatched partial comparison.
-fn acquire_mobilizon_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_mobilizon_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.mobilizon = {{
+          configuration = {
+            services.mobilizon = {
               enable = true;
-              settings = {{
-                ":mobilizon" = {{
-                  ":instance" = {{ name = "Test Mobilizon"; hostname = "test.example.com"; }};
-                }};
-              }};
-            }};
+              settings = {
+                ":mobilizon" = {
+                  ":instance" = { name = "Test Mobilizon"; hostname = "test.example.com"; };
+                };
+              };
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
+          };
+        };
         execStart = eval.config.systemd.services.mobilizon.serviceConfig.ExecStart;
         binPath = builtins.substring 0 (builtins.stringLength execStart - 6) execStart;
-        in {{
+        in {
           settings = eval.config.services.mobilizon.settings;
           wrapperContent = builtins.readFile binPath;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -2567,26 +2646,23 @@ fn mobilizon_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
 const NEBULA_HARDCODED_DEFAULT_PATH: &str = "/etc/nebula-lighthouse-service/config.yaml";
 
 fn acquire_nebula_lighthouse_service_evidence(
-    rev: &str,
+    nixpkgs: &NixpkgsSource,
 ) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
+          configuration = {
             services.nebula-lighthouse-service.enable = true;
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           settings = eval.config.services.nebula-lighthouse-service.settings;
           execStart = eval.config.systemd.services.nebula-lighthouse-service.serviceConfig.ExecStart;
           etcSource = eval.config.environment.etc."nebula-lighthouse-service/config.yaml".source;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -2684,21 +2760,19 @@ fn extract_privoxy_hash_table_names(source: &str) -> Vec<String> {
     names
 }
 
-fn acquire_privoxy_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_privoxy_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.privoxy = {{
+          configuration = {
+            services.privoxy = {
               enable = true;
-              settings = {{ listen-address = "127.0.0.1:8118"; enable-edit-actions = true; }};
-            }};
+              settings = { listen-address = "127.0.0.1:8118"; enable-edit-actions = true; };
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
+          };
+        };
         execStart = eval.config.systemd.services.privoxy.serviceConfig.ExecStart;
         lastSpaceIdx = s:
           let len = builtins.stringLength s;
@@ -2708,12 +2782,11 @@ fn acquire_privoxy_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence
           in go (len - 1);
         idx = lastSpaceIdx execStart;
         binPath = builtins.substring (idx + 1) (builtins.stringLength execStart - idx - 1) execStart;
-        in {{
+        in {
           execStart = execStart;
           rendered = builtins.readFile binPath;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let exec_start = value
         .get("execStart")
         .and_then(JsonValue::as_str)
@@ -2891,27 +2964,24 @@ fn extract_misskey_source_paths(source: &str) -> Vec<String> {
     paths
 }
 
-fn acquire_misskey_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_misskey_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.misskey = {{
+          configuration = {
+            services.misskey = {
               enable = true;
-              settings = {{ url = "https://misskey.example.org/"; }};
-            }};
+              settings = { url = "https://misskey.example.org/"; };
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           environment = eval.config.systemd.services.misskey.environment;
           settings = eval.config.services.misskey.settings;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -3022,24 +3092,21 @@ fn extract_kavita_appsettings_paths(source: &str) -> Vec<String> {
     paths
 }
 
-fn acquire_kavita_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_kavita_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
+          configuration = {
             services.kavita.enable = true;
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           workingDirectory = eval.config.systemd.services.kavita.serviceConfig.WorkingDirectory;
           settings = eval.config.services.kavita.settings;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -3108,28 +3175,25 @@ fn extract_transmission_kebab_quarks(source: &str) -> Vec<String> {
     names
 }
 
-fn acquire_transmission_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        pkgs = import nixpkgsSrc {{ system = "x86_64-linux"; }};
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_transmission_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"pkgs = import nixpkgsSrc { system = "x86_64-linux"; };
+        eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.transmission = {{
+          configuration = {
+            services.transmission = {
               enable = true;
               package = pkgs.transmission_4;
-            }};
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           execStart = eval.config.systemd.services.transmission.serviceConfig.ExecStart;
           settings = eval.config.services.transmission.settings;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -3198,27 +3262,24 @@ fn extract_i2pd_program_options_keys(source: &str) -> Vec<String> {
     names
 }
 
-fn acquire_i2pd_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_i2pd_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.i2pd = {{
+          configuration = {
+            services.i2pd = {
               enable = true;
-              settings = {{ ipv4 = true; ipv6 = false; }};
-            }};
+              settings = { ipv4 = true; ipv6 = false; };
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           execStart = eval.config.systemd.services.i2pd.serviceConfig.ExecStart;
           settings = eval.config.services.i2pd.settings;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let settings = value
         .get("settings")
         .cloned()
@@ -3330,21 +3391,19 @@ fn extract_spacecookie_config_paths(source: &str) -> Vec<String> {
     paths
 }
 
-fn acquire_spacecookie_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_spacecookie_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
-            services.spacecookie = {{
+          configuration = {
+            services.spacecookie = {
               enable = true;
-              settings = {{ hostname = "gopher.example.org"; root = "/var/lib/spacecookie"; }};
-            }};
+              settings = { hostname = "gopher.example.org"; root = "/var/lib/spacecookie"; };
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
+          };
+        };
         execStart = eval.config.systemd.services.spacecookie.serviceConfig.ExecStart;
         lastSpaceIdx = s:
           let len = builtins.stringLength s;
@@ -3354,12 +3413,11 @@ fn acquire_spacecookie_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvid
           in go (len - 1);
         idx = lastSpaceIdx execStart;
         jsonPath = builtins.substring (idx + 1) (builtins.stringLength execStart - idx - 1) execStart;
-        in {{
+        in {
           execStart = execStart;
           settingsJson = builtins.fromJSON (builtins.readFile jsonPath);
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let exec_start = value
         .get("execStart")
         .and_then(JsonValue::as_str)
@@ -3468,42 +3526,39 @@ fn extract_akkoma_description_paths(source: &str) -> Vec<String> {
     paths
 }
 
-fn acquire_akkoma_evidence(rev: &str) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
-    let expr = format!(
-        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
-        eval = import (nixpkgsSrc + "/nixos") {{
+fn acquire_akkoma_evidence(nixpkgs: &NixpkgsSource) -> Result<GeneratedConfigArtifactEvidence, CdcError> {
+    let body: String = r#"eval = import (nixpkgsSrc + "/nixos") {
           system = "x86_64-linux";
-          configuration = {{
+          configuration = {
             networking.hostName = "akkoma";
             networking.domain = "example.org";
-            services.akkoma = {{
+            services.akkoma = {
               enable = true;
-              config = {{
-                ":pleroma" = {{
-                  ":instance" = {{
+              config = {
+                ":pleroma" = {
+                  ":instance" = {
                     name = "Test Akkoma";
                     description = "Test Akkoma server";
                     email = "akkoma@example.org";
                     notify_email = "akkoma@example.org";
                     registrations_open = true;
-                  }};
-                  ":media_proxy" = {{ enabled = false; }};
-                  "Pleroma.Upload" = {{ base_url = "https://media.example.org/media/"; }};
-                }};
-              }};
+                  };
+                  ":media_proxy" = { enabled = false; };
+                  "Pleroma.Upload" = { base_url = "https://media.example.org/media/"; };
+                };
+              };
               nginx.enable = false;
-            }};
+            };
             system.stateVersion = "24.05";
-            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            fileSystems."/" = { device = "/dev/sda1"; fsType = "ext4"; };
             boot.loader.grub.device = "/dev/sda";
-          }};
-        }};
-        in {{
+          };
+        };
+        in {
           execStart = eval.config.systemd.services.akkoma.serviceConfig.ExecStart;
           configAttrs = eval.config.services.akkoma.config;
-        }}"#
-    );
-    let value = eval_nix_json(&expr)?;
+        }"#.to_string();
+    let value = nixpkgs.eval(&body)?;
     let config_attrs = value
         .get("configAttrs")
         .cloned()
@@ -3589,6 +3644,147 @@ fn akkoma_consumer_contract() -> Result<ConsumerConfigContract, CdcError> {
     Ok(ConsumerConfigContract {
         consumer: "akkoma".to_string(),
         accepted_paths: extract_akkoma_description_paths(&source),
+    })
+}
+
+// ---------------------------------------------------------------------
+// P3a: the public surface `oba audit` (src/main.rs) drives. `GeneratedConfigArtifact`
+// v1 is frozen (C-E1.2c) -- this is presentation-layer wiring only, no
+// new analysis logic, no new candidates. `vault` stays absent (its own
+// real INCONCLUSIVE D-extraction gap, C-E1.2b, still stands).
+// ---------------------------------------------------------------------
+
+/// The complete, real list of `GeneratedConfigArtifact` candidates
+/// `oba audit` can check today -- exactly the 11 real anchors
+/// C-E1.2a/b implemented and C-E1.2c hostile-audited. Adding a name
+/// here without a matching real `acquire_*`/`*_consumer_contract` pair
+/// in [`run_cdc_candidate`] is a compile-time-invisible but real bug;
+/// `cdc_candidate_names_have_a_matching_dispatch_arm` in `mod
+/// ce12_tests` below is the actual safety net for that.
+pub const CDC_CANDIDATE_NAMES: &[&str] = &[
+    "unpackerr",
+    "unbound",
+    "mobilizon",
+    "nebula-lighthouse-service",
+    "privoxy",
+    "misskey",
+    "kavita",
+    "transmission",
+    "i2pd",
+    "spacecookie",
+    "akkoma",
+];
+
+/// C-E1.2c's own real, audited finding
+/// (`fixtures/c-e1.2c-hostile-audit/attack-categories-2-3.md`), made a
+/// permanent, queryable fact rather than something a report reader has
+/// to already know: for 9 of the 11 real candidates, B's real proof is
+/// ARCHITECTURAL (confirms the right KIND of binding mechanism exists)
+/// rather than BYTE-EXACT (independently re-verifying the referenced
+/// artifact's own real built content). Only `privoxy`/`spacecookie`
+/// read `content` from the EXACT SAME extracted path their own B-check
+/// also verifies, by construction -- no possible divergence. This is a
+/// property of what each real acquire function actually DOES, not of
+/// the `ArtifactBindingEvidence` variant shape alone (a hypothetical
+/// future `DirectPositionalArg`-using candidate could easily NOT share
+/// this property), so it is deliberately tracked per real candidate
+/// name here, not inferred from the binding enum.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProofDepth {
+    ByteExact,
+    Structural,
+}
+
+fn proof_depth_for_candidate(name: &str) -> ProofDepth {
+    match name {
+        "privoxy" | "spacecookie" => ProofDepth::ByteExact,
+        _ => ProofDepth::Structural,
+    }
+}
+
+/// A short, stable, human-readable binding SHAPE label -- descriptive
+/// only, the same "never branched on for comparison semantics"
+/// discipline `ConfigFormat` itself already follows.
+fn binding_kind_label(binding: &ArtifactBindingEvidence) -> &'static str {
+    match binding {
+        ArtifactBindingEvidence::DirectArgv { .. } => "exec-flag",
+        ArtifactBindingEvidence::DirectPositionalArg { .. } => "exec-positional-arg",
+        ArtifactBindingEvidence::EnvironmentEtcSymlink { .. } => "environment-etc-symlink",
+        ArtifactBindingEvidence::WrapperScriptEnvVar { .. } => "wrapper-script-env-var",
+        ArtifactBindingEvidence::ExecStartPreInstalledEnvVar { .. } => "exec-start-pre-installed-env-var",
+        ArtifactBindingEvidence::ImplicitDefaultPath { .. } => "implicit-default-path",
+    }
+}
+
+/// One real, complete outcome for one CDC candidate -- everything
+/// `oba audit`'s own unified report needs, without leaking `cdc.rs`'s
+/// own internal per-function plumbing (11 separate `acquire_*`/
+/// `*_consumer_contract` pairs, `NixpkgsSource`, `CdcError`) into
+/// `main.rs`. Every field here is either a real evidence value already
+/// produced by the frozen v1 engine, or a real, disclosed
+/// classification derived from it (`proof_depth`) -- never an invented
+/// confidence score.
+#[derive(Debug, Serialize)]
+pub struct CdcCandidateOutcome {
+    pub candidate: String,
+    pub producer: String,
+    pub format: ConfigFormat,
+    pub binding_kind: &'static str,
+    pub proof_depth: ProofDepth,
+    pub consumer: String,
+    pub emitted_paths: Vec<String>,
+    pub opaque_paths: Vec<String>,
+    pub accepted_paths: Vec<String>,
+    pub verdict: ConfigContractVerdict,
+}
+
+/// Runs exactly one real CDC candidate's own full pipeline (acquire ->
+/// consumer contract -> `compare_config_contract`, the SAME frozen v1
+/// engine every earlier round real-tested) against `nixpkgs`, and
+/// packages the result for `oba audit`. `CdcError::ToolError` here
+/// means the analysis never ran at all (a real tool error, matching
+/// OBA's own TOOL_ERROR concept -- `oba audit` must not report this as
+/// a finding); `CdcError::Inconclusive` is real, reportable evidence
+/// (CDC002) that the engine ran but a binding/consumer-contract link
+/// couldn't be proven.
+pub fn run_cdc_candidate(
+    name: &str,
+    nixpkgs: &NixpkgsSource,
+) -> Result<CdcCandidateOutcome, CdcError> {
+    let (evidence, contract) = match name {
+        "unpackerr" => (acquire_unpackerr_evidence(nixpkgs)?, unpackerr_consumer_contract()?),
+        "unbound" => (acquire_unbound_evidence(nixpkgs)?, unbound_consumer_contract()?),
+        "mobilizon" => (acquire_mobilizon_evidence(nixpkgs)?, mobilizon_consumer_contract()?),
+        "nebula-lighthouse-service" => (
+            acquire_nebula_lighthouse_service_evidence(nixpkgs)?,
+            nebula_lighthouse_service_consumer_contract()?,
+        ),
+        "privoxy" => (acquire_privoxy_evidence(nixpkgs)?, privoxy_consumer_contract()?),
+        "misskey" => (acquire_misskey_evidence(nixpkgs)?, misskey_consumer_contract()?),
+        "kavita" => (acquire_kavita_evidence(nixpkgs)?, kavita_consumer_contract()?),
+        "transmission" => (acquire_transmission_evidence(nixpkgs)?, transmission_consumer_contract()?),
+        "i2pd" => (acquire_i2pd_evidence(nixpkgs)?, i2pd_consumer_contract()?),
+        "spacecookie" => (acquire_spacecookie_evidence(nixpkgs)?, spacecookie_consumer_contract()?),
+        "akkoma" => (acquire_akkoma_evidence(nixpkgs)?, akkoma_consumer_contract()?),
+        _ => {
+            return Err(CdcError::ToolError(format!(
+                "unknown CDC candidate {name:?} -- known candidates: {CDC_CANDIDATE_NAMES:?}"
+            )));
+        }
+    };
+    let verdict = compare_config_contract(&evidence, &contract);
+    Ok(CdcCandidateOutcome {
+        candidate: name.to_string(),
+        producer: evidence.producer,
+        format: evidence.format,
+        binding_kind: binding_kind_label(&evidence.binding),
+        proof_depth: proof_depth_for_candidate(name),
+        consumer: contract.consumer,
+        emitted_paths: evidence.emitted_paths,
+        opaque_paths: evidence.opaque_paths,
+        accepted_paths: contract.accepted_paths,
+        verdict,
     })
 }
 
@@ -5545,15 +5741,51 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_unpackerr_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_unpackerr_evidence(CE12_REV).unwrap();
+        let evidence = acquire_unpackerr_evidence(&CE12_REV).unwrap();
         let contract = unpackerr_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
 
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn real_nixpkgs_source_local_path_produces_the_identical_real_result_as_pinned_rev() {
+        // P3a: the actual feature this whole refactor exists to
+        // deliver -- `oba audit --root <local nixpkgs checkout>` needs
+        // `NixpkgsSource::LocalPath` to work identically to the
+        // already-proven `PinnedRev` path, not just compile. Real,
+        // not synthetic: materializes a genuine local store path via
+        // the SAME `fetchTarball` this project's own `PinnedRev` path
+        // already uses (so this test needs no separately-vendored
+        // checkout), then re-derives unpackerr's real evidence THROUGH
+        // `LocalPath` against that real local directory, confirming
+        // the result is genuinely identical to `PinnedRev`'s own --
+        // not just "it didn't crash."
+        let NixpkgsSource::PinnedRev(rev) = &CE12_REV else {
+            unreachable!("CE12_REV is always a PinnedRev");
+        };
+        let local_path = eval_nix_raw(&format!(
+            r#"builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz""#
+        ))
+        .expect("materializing a real local nixpkgs store path via fetchTarball");
+        let local_source = NixpkgsSource::LocalPath(PathBuf::from(local_path.trim()));
+
+        let via_pinned_rev = acquire_unpackerr_evidence(&CE12_REV).unwrap();
+        let via_local_path = acquire_unpackerr_evidence(&local_source).unwrap();
+        assert_eq!(via_pinned_rev.emitted_paths, via_local_path.emitted_paths);
+        assert_eq!(via_pinned_rev.opaque_paths, via_local_path.opaque_paths);
+        assert_eq!(via_pinned_rev.content, via_local_path.content);
+
+        let contract = unpackerr_consumer_contract().unwrap();
+        assert_eq!(
+            compare_config_contract(&via_local_path, &contract),
+            ConfigContractVerdict::Pass
+        );
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_unpackerr_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_unpackerr_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_unpackerr_evidence(&CE12_REV).unwrap();
         let contract = unpackerr_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"debug".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5572,7 +5804,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_unpackerr_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_unpackerr_evidence(CE12_REV).unwrap();
+        let evidence = acquire_unpackerr_evidence(&CE12_REV).unwrap();
         let contract_before = unpackerr_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5585,7 +5817,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_unbound_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_unbound_evidence(CE12_REV).unwrap();
+        let evidence = acquire_unbound_evidence(&CE12_REV).unwrap();
         let contract = unbound_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5593,7 +5825,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_unbound_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_unbound_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_unbound_evidence(&CE12_REV).unwrap();
         let contract = unbound_consumer_contract().unwrap();
         assert!(!evidence.emitted_paths.is_empty());
         let real_path = evidence.emitted_paths[0].clone();
@@ -5609,7 +5841,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_unbound_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_unbound_evidence(CE12_REV).unwrap();
+        let evidence = acquire_unbound_evidence(&CE12_REV).unwrap();
         let contract_before = unbound_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5622,7 +5854,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_mobilizon_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_mobilizon_evidence(CE12_REV).unwrap();
+        let evidence = acquire_mobilizon_evidence(&CE12_REV).unwrap();
         let contract = mobilizon_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5630,7 +5862,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_mobilizon_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_mobilizon_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_mobilizon_evidence(&CE12_REV).unwrap();
         let contract = mobilizon_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"hostname".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5649,7 +5881,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_mobilizon_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_mobilizon_evidence(CE12_REV).unwrap();
+        let evidence = acquire_mobilizon_evidence(&CE12_REV).unwrap();
         let contract_before = mobilizon_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5662,7 +5894,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_nebula_lighthouse_service_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
+        let evidence = acquire_nebula_lighthouse_service_evidence(&CE12_REV).unwrap();
         let contract = nebula_lighthouse_service_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5670,7 +5902,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_nebula_lighthouse_service_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_nebula_lighthouse_service_evidence(&CE12_REV).unwrap();
         let contract = nebula_lighthouse_service_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"min-port".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5690,7 +5922,7 @@ mod ce12_tests {
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_nebula_lighthouse_service_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged(
     ) {
-        let evidence = acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap();
+        let evidence = acquire_nebula_lighthouse_service_evidence(&CE12_REV).unwrap();
         let contract_before = nebula_lighthouse_service_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5714,7 +5946,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_privoxy_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_privoxy_evidence(CE12_REV).unwrap();
+        let evidence = acquire_privoxy_evidence(&CE12_REV).unwrap();
         let contract = privoxy_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5722,7 +5954,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_privoxy_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_privoxy_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_privoxy_evidence(&CE12_REV).unwrap();
         let contract = privoxy_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"listen-address".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5741,7 +5973,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_privoxy_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_privoxy_evidence(CE12_REV).unwrap();
+        let evidence = acquire_privoxy_evidence(&CE12_REV).unwrap();
         let contract_before = privoxy_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5754,7 +5986,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_misskey_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_misskey_evidence(CE12_REV).unwrap();
+        let evidence = acquire_misskey_evidence(&CE12_REV).unwrap();
         let contract = misskey_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5762,7 +5994,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_misskey_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_misskey_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_misskey_evidence(&CE12_REV).unwrap();
         let contract = misskey_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"url".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5781,7 +6013,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_misskey_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_misskey_evidence(CE12_REV).unwrap();
+        let evidence = acquire_misskey_evidence(&CE12_REV).unwrap();
         let contract_before = misskey_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5794,7 +6026,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_kavita_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_kavita_evidence(CE12_REV).unwrap();
+        let evidence = acquire_kavita_evidence(&CE12_REV).unwrap();
         let contract = kavita_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5802,7 +6034,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_kavita_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_kavita_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_kavita_evidence(&CE12_REV).unwrap();
         let contract = kavita_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"Port".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5821,7 +6053,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_kavita_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_kavita_evidence(CE12_REV).unwrap();
+        let evidence = acquire_kavita_evidence(&CE12_REV).unwrap();
         let contract_before = kavita_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5834,7 +6066,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_transmission_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_transmission_evidence(CE12_REV).unwrap();
+        let evidence = acquire_transmission_evidence(&CE12_REV).unwrap();
         let contract = transmission_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5842,7 +6074,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_transmission_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_transmission_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_transmission_evidence(&CE12_REV).unwrap();
         let contract = transmission_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"peer-port".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5861,7 +6093,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_transmission_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_transmission_evidence(CE12_REV).unwrap();
+        let evidence = acquire_transmission_evidence(&CE12_REV).unwrap();
         let contract_before = transmission_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5874,7 +6106,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_i2pd_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_i2pd_evidence(CE12_REV).unwrap();
+        let evidence = acquire_i2pd_evidence(&CE12_REV).unwrap();
         let contract = i2pd_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5882,7 +6114,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_i2pd_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_i2pd_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_i2pd_evidence(&CE12_REV).unwrap();
         let contract = i2pd_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"http.enabled".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5901,7 +6133,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_i2pd_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_i2pd_evidence(CE12_REV).unwrap();
+        let evidence = acquire_i2pd_evidence(&CE12_REV).unwrap();
         let contract_before = i2pd_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5914,7 +6146,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_spacecookie_end_to_end_is_a_clean_pass() {
-        let evidence = acquire_spacecookie_evidence(CE12_REV).unwrap();
+        let evidence = acquire_spacecookie_evidence(&CE12_REV).unwrap();
         let contract = spacecookie_consumer_contract().unwrap();
         assert_eq!(compare_config_contract(&evidence, &contract), ConfigContractVerdict::Pass);
     }
@@ -5922,7 +6154,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_spacecookie_mutating_a_real_emitted_path_flips_to_finding() {
-        let mut evidence = acquire_spacecookie_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_spacecookie_evidence(&CE12_REV).unwrap();
         let contract = spacecookie_consumer_contract().unwrap();
         assert!(evidence.emitted_paths.contains(&"hostname".to_string()));
         for p in evidence.emitted_paths.iter_mut() {
@@ -5941,7 +6173,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_spacecookie_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_spacecookie_evidence(CE12_REV).unwrap();
+        let evidence = acquire_spacecookie_evidence(&CE12_REV).unwrap();
         let contract_before = spacecookie_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -5971,7 +6203,7 @@ mod ce12_tests {
         // decided the opposite direction just as legitimately: this
         // candidate's real default config does NOT cleanly pass against
         // `description.exs`'s own real, honestly-bounded schema.
-        let evidence = acquire_akkoma_evidence(CE12_REV).unwrap();
+        let evidence = acquire_akkoma_evidence(&CE12_REV).unwrap();
         let contract = akkoma_consumer_contract().unwrap();
         assert_eq!(
             compare_config_contract(&evidence, &contract),
@@ -5996,7 +6228,7 @@ mod ce12_tests {
         // below) is what makes mutating it provably the CAUSE of its
         // own new Finding, without this test depending on JSON
         // iteration order across several unrelated real gaps.
-        let mut evidence = acquire_akkoma_evidence(CE12_REV).unwrap();
+        let mut evidence = acquire_akkoma_evidence(&CE12_REV).unwrap();
         let real_path = ":pleroma.Pleroma.Upload.base_url".to_string();
         assert!(evidence.emitted_paths.contains(&real_path));
         evidence.emitted_paths.retain(|p| p == &real_path);
@@ -6016,7 +6248,7 @@ mod ce12_tests {
     #[test]
     #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
     fn real_akkoma_mutating_an_unrelated_accepted_path_leaves_the_result_unchanged() {
-        let evidence = acquire_akkoma_evidence(CE12_REV).unwrap();
+        let evidence = acquire_akkoma_evidence(&CE12_REV).unwrap();
         let contract_before = akkoma_consumer_contract().unwrap();
         let mut contract_after = contract_before.clone();
         contract_after.accepted_paths.push("totally-unrelated-key".to_string());
@@ -6045,29 +6277,29 @@ mod ce12_tests {
     fn all_real_anchor_evidence_and_contracts(
     ) -> Vec<(&'static str, GeneratedConfigArtifactEvidence, ConsumerConfigContract)> {
         vec![
-            ("unpackerr", acquire_unpackerr_evidence(CE12_REV).unwrap(), unpackerr_consumer_contract().unwrap()),
-            ("unbound", acquire_unbound_evidence(CE12_REV).unwrap(), unbound_consumer_contract().unwrap()),
-            ("mobilizon", acquire_mobilizon_evidence(CE12_REV).unwrap(), mobilizon_consumer_contract().unwrap()),
+            ("unpackerr", acquire_unpackerr_evidence(&CE12_REV).unwrap(), unpackerr_consumer_contract().unwrap()),
+            ("unbound", acquire_unbound_evidence(&CE12_REV).unwrap(), unbound_consumer_contract().unwrap()),
+            ("mobilizon", acquire_mobilizon_evidence(&CE12_REV).unwrap(), mobilizon_consumer_contract().unwrap()),
             (
                 "nebula-lighthouse-service",
-                acquire_nebula_lighthouse_service_evidence(CE12_REV).unwrap(),
+                acquire_nebula_lighthouse_service_evidence(&CE12_REV).unwrap(),
                 nebula_lighthouse_service_consumer_contract().unwrap(),
             ),
-            ("privoxy", acquire_privoxy_evidence(CE12_REV).unwrap(), privoxy_consumer_contract().unwrap()),
-            ("misskey", acquire_misskey_evidence(CE12_REV).unwrap(), misskey_consumer_contract().unwrap()),
-            ("kavita", acquire_kavita_evidence(CE12_REV).unwrap(), kavita_consumer_contract().unwrap()),
+            ("privoxy", acquire_privoxy_evidence(&CE12_REV).unwrap(), privoxy_consumer_contract().unwrap()),
+            ("misskey", acquire_misskey_evidence(&CE12_REV).unwrap(), misskey_consumer_contract().unwrap()),
+            ("kavita", acquire_kavita_evidence(&CE12_REV).unwrap(), kavita_consumer_contract().unwrap()),
             (
                 "transmission",
-                acquire_transmission_evidence(CE12_REV).unwrap(),
+                acquire_transmission_evidence(&CE12_REV).unwrap(),
                 transmission_consumer_contract().unwrap(),
             ),
-            ("i2pd", acquire_i2pd_evidence(CE12_REV).unwrap(), i2pd_consumer_contract().unwrap()),
+            ("i2pd", acquire_i2pd_evidence(&CE12_REV).unwrap(), i2pd_consumer_contract().unwrap()),
             (
                 "spacecookie",
-                acquire_spacecookie_evidence(CE12_REV).unwrap(),
+                acquire_spacecookie_evidence(&CE12_REV).unwrap(),
                 spacecookie_consumer_contract().unwrap(),
             ),
-            ("akkoma", acquire_akkoma_evidence(CE12_REV).unwrap(), akkoma_consumer_contract().unwrap()),
+            ("akkoma", acquire_akkoma_evidence(&CE12_REV).unwrap(), akkoma_consumer_contract().unwrap()),
         ]
     }
 
@@ -6305,4 +6537,47 @@ mod ce12_tests {
     // `mod k4c_tests`/`mod k5c_tests` above, all still present and
     // unmodified by this module -- no dedicated test needed here beyond
     // running the full suite, done as part of closing this round. ---
+
+    // --- P3a: the public `run_cdc_candidate` registry `oba audit`
+    // itself will call -- real, not just compiled. ---
+
+    #[test]
+    fn an_unknown_candidate_name_is_a_real_tool_error_not_a_panic() {
+        let err = run_cdc_candidate("not-a-real-candidate", &CE12_REV).unwrap_err();
+        assert!(matches!(err, CdcError::ToolError(_)));
+    }
+
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn every_declared_cdc_candidate_name_dispatches_through_the_real_registry() {
+        // the real safety net `CDC_CANDIDATE_NAMES`'s own doc comment
+        // promises: every declared name reaches a real, working
+        // `acquire_*`/`*_consumer_contract` pair through
+        // `run_cdc_candidate` (the SAME public entry point `oba audit`
+        // itself uses), not just the raw per-candidate functions the
+        // rest of this module already tests directly.
+        for name in CDC_CANDIDATE_NAMES {
+            let outcome = run_cdc_candidate(name, &CE12_REV)
+                .unwrap_or_else(|e| panic!("{name}: run_cdc_candidate failed: {e}"));
+            assert_eq!(&outcome.candidate, name);
+            // a real, disclosed classification, not silently absent --
+            // every real candidate has a definite proof_depth, akkoma's
+            // own real Finding included.
+            let _ = outcome.proof_depth;
+        }
+    }
+
+    #[test]
+    fn proof_depth_matches_the_real_c_e1_2c_audit_finding() {
+        // turns the audit's own real, cited conclusion
+        // (attack-categories-2-3.md) into a permanent, checked
+        // invariant: exactly privoxy/spacecookie are byte-exact,
+        // every other real candidate is structural.
+        for name in CDC_CANDIDATE_NAMES {
+            let depth = proof_depth_for_candidate(name);
+            let expected =
+                if *name == "privoxy" || *name == "spacecookie" { ProofDepth::ByteExact } else { ProofDepth::Structural };
+            assert_eq!(depth, expected, "{name}: proof_depth classification drifted from the real audit finding");
+        }
+    }
 }

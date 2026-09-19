@@ -1,0 +1,4 @@
+# P3a: a manifest with neither [[target]] nor [[cdc_target]] entries
+# has nothing to audit at all -- the same "detector died, silently
+# green" concern `check`'s own empty-manifest rejection already guards
+# against, extended to cover audit's own second engine.

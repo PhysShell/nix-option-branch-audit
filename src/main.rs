@@ -93,6 +93,19 @@ enum Command {
     /// Compare option-branch analysis between two roots under one
     /// manifest.
     Diff(DiffArgs),
+    /// P3a: run OBA (option-branch analysis) and/or CDC
+    /// (`GeneratedConfigArtifact` contract checks) over one root and one
+    /// manifest, unified under one finding schema. Read-only, exactly
+    /// like `check` -- no new analysis logic, this wires the two
+    /// already-frozen engines (OBA's own `analyze()`, CDC's own
+    /// `cdc::run_cdc_candidate`) into one command.
+    Audit(AuditArgs),
+}
+
+#[derive(clap::ValueEnum, Clone, Copy, Debug, PartialEq, Eq)]
+enum AuditFormat {
+    Text,
+    Json,
 }
 
 #[derive(clap::Args)]
@@ -149,9 +162,48 @@ struct DiffArgs {
     json: bool,
 }
 
+#[derive(clap::Args)]
+struct AuditArgs {
+    /// Filesystem root BOTH engines resolve against: OBA's own
+    /// `module`/`test` paths (same real security boundary as `check
+    /// --root`, see its own doc comment) AND CDC's own nixpkgs tree
+    /// (`cdc::NixpkgsSource::LocalPath`, so `oba audit --root
+    /// ./my-nixpkgs-checkout` can check a REAL local checkout, not just
+    /// this project's own internally-pinned commits).
+    #[arg(long, default_value = ".")]
+    root: PathBuf,
+    /// Path to a TOML target manifest, resolved relative to the current
+    /// directory (same convention as `check`/`diff`). May contain
+    /// `[[target]]` entries (OBA), `[[cdc_target]]` entries (CDC), or
+    /// both -- `validate_manifest` requires at least one of either, never
+    /// both empty.
+    #[arg(long)]
+    targets: PathBuf,
+    /// `text` (default, human-readable) or `json` (the versioned
+    /// `schema_version: 1`, `mode: "audit"` envelope).
+    #[arg(long, value_enum, default_value_t = AuditFormat::Text)]
+    format: AuditFormat,
+}
+
 #[derive(serde::Deserialize, Debug, Clone)]
 struct TargetFile {
+    #[serde(default)]
     target: Vec<Target>,
+    /// P3a: `oba audit`'s own real CDC surface -- a target here is
+    /// nothing but a NAME selecting one of `cdc::CDC_CANDIDATE_NAMES`'s
+    /// own already-frozen-v1 candidates (validated in
+    /// `validate_manifest`), never a place to describe a NEW analysis
+    /// (that would be reopening `GeneratedConfigArtifact` v1's own
+    /// freeze, C-E1.2c, not wiring the existing engine into a CLI).
+    /// Absent/empty in every pre-existing manifest -- `check`/`diff`
+    /// never read this field, only `audit` does.
+    #[serde(default)]
+    cdc_target: Vec<CdcTargetSpec>,
+}
+
+#[derive(serde::Deserialize, Debug, Clone)]
+struct CdcTargetSpec {
+    name: String,
 }
 
 #[derive(serde::Deserialize, Debug, Clone)]
@@ -179,8 +231,31 @@ struct Target {
 }
 
 fn validate_manifest(m: &TargetFile) -> Result<(), String> {
-    if m.target.is_empty() {
-        return Err("manifest has no [[target]] entries".to_string());
+    // P3a: a manifest with real `cdc_target` entries and zero `[[target]]`
+    // ones is legitimate for `oba audit` (a CDC-only audit) -- the
+    // original "detector died, silently green" concern this check
+    // exists for is about a manifest with NOTHING to watch at all, not
+    // specifically about OBA's own `[[target]]` array.
+    if m.target.is_empty() && m.cdc_target.is_empty() {
+        return Err("manifest has no [[target]] or [[cdc_target]] entries".to_string());
+    }
+    {
+        let mut seen_cdc_names = std::collections::HashSet::new();
+        for t in &m.cdc_target {
+            if t.name.trim().is_empty() {
+                return Err("a [[cdc_target]] has an empty name".to_string());
+            }
+            if !seen_cdc_names.insert(t.name.as_str()) {
+                return Err(format!("duplicate [[cdc_target]] name: {}", t.name));
+            }
+            if !cdc::CDC_CANDIDATE_NAMES.contains(&t.name.as_str()) {
+                return Err(format!(
+                    "[[cdc_target]] {:?} is not a known GeneratedConfigArtifact candidate -- known candidates: {:?} (adding a NEW candidate means reopening the frozen v1 engine in src/cdc.rs, not editing a manifest)",
+                    t.name,
+                    cdc::CDC_CANDIDATE_NAMES
+                ));
+            }
+        }
     }
     let mut seen_names = std::collections::HashSet::new();
     for t in &m.target {
@@ -4057,6 +4132,15 @@ fn run(cli: &Cli) -> anyhow::Result<i32> {
         return run_diff(&args.base_root, &args.head_root, &args.targets, args.json);
     }
 
+    if let Some(Command::Audit(args)) = &cli.command {
+        if cli.targets.is_some() || cli.census.is_some() {
+            anyhow::bail!(
+                "cannot combine the `audit` subcommand with legacy top-level --targets/--census"
+            );
+        }
+        return run_audit(&args.root, &args.targets, args.format);
+    }
+
     if let Some(dir) = &cli.census {
         return run_census(dir, cli.json);
     }
@@ -4266,6 +4350,445 @@ fn run_diff(
             "=== diff summary: unchanged={unchanged}  added={added}  removed={removed}  changed={changed} ==="
         );
         print_diff_human(&comparison);
+    }
+
+    Ok(exit_code)
+}
+
+/// P3a: `oba audit`'s own unified schema. Wraps BOTH OBA's own
+/// per-target `Verdict` results and CDC's own `GeneratedConfigArtifact`
+/// comparison results under one JSON envelope, WITHOUT merging their
+/// internal semantics into one Rust enum -- `Verdict` and
+/// `cdc::ConfigContractVerdict` stay their own separate types; this is
+/// a presentation-layer unification only. Every checked target
+/// (OBA option or CDC candidate) produces exactly one `AuditResult`,
+/// including a clean `Pass` -- `code`/`severity` are `None` for `Pass`
+/// (a code names a PROBLEM class, "uncovered option branch"/"emitted
+/// config path rejected", never "nothing's wrong").
+#[derive(Serialize, Debug)]
+struct AuditEnvelope {
+    schema_version: u32,
+    tool: ToolInfo,
+    mode: &'static str,
+    summary: AuditSummary,
+    results: Vec<AuditResult>,
+}
+
+#[derive(Serialize, Debug, Default)]
+struct AuditSummary {
+    pass: usize,
+    finding: usize,
+    inconclusive: usize,
+    tool_error: usize,
+}
+
+#[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+enum ResultVerdict {
+    Pass,
+    Finding,
+    Inconclusive,
+    ToolError,
+}
+
+#[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+enum Severity {
+    Warning,
+    Error,
+    Inconclusive,
+}
+
+#[derive(Serialize, Debug)]
+struct AuditResult {
+    /// Which real analyzer engine produced this result -- `"oba"` or
+    /// `"cdc"`. Routes a JSON reader to the right evidence sub-shape;
+    /// never changes comparison semantics (the two engines' own
+    /// comparison functions are untouched by this whole command).
+    engine: &'static str,
+    target: String,
+    verdict: ResultVerdict,
+    /// `"OBA001"` / `"CDC001"` / `"CDC002"` -- `None` for `Pass`, a
+    /// code names a problem class, never "nothing's wrong".
+    #[serde(skip_serializing_if = "Option::is_none")]
+    code: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    severity: Option<Severity>,
+    message: String,
+    /// A real, ordered, human-and-machine-readable chain from the Nix
+    /// option/producer through to the mismatch (or the clean pass) --
+    /// so a maintainer can understand a result without reading
+    /// `cdc.rs`/`main.rs`'s own internal types.
+    provenance: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    cdc_evidence: Option<CdcResultEvidence>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    oba_evidence: Option<ObaResultEvidence>,
+}
+
+/// The exact shape the user's own P3a design sketch specified:
+/// producer/binding/consumer/comparison as real, separately-inspectable
+/// evidence, `proof_depth` visible rather than folded into a single
+/// opaque `PASS` a reader could misread as "byte-exact proof this
+/// process reads these exact bytes" -- C-E1.2c's own real, audited
+/// finding (9 of 11 real candidates are architectural, not byte-exact)
+/// stays visible on every single result, not just in a README.
+#[derive(Serialize, Debug)]
+struct CdcResultEvidence {
+    producer: CdcProducerEvidence,
+    binding: CdcBindingEvidence,
+    consumer: CdcConsumerEvidence,
+    comparison: CdcComparisonEvidence,
+}
+
+#[derive(Serialize, Debug)]
+struct CdcProducerEvidence {
+    proved: bool,
+    format: cdc::ConfigFormat,
+}
+
+#[derive(Serialize, Debug)]
+struct CdcBindingEvidence {
+    kind: &'static str,
+    proof_depth: cdc::ProofDepth,
+}
+
+#[derive(Serialize, Debug)]
+struct CdcConsumerEvidence {
+    name: String,
+}
+
+#[derive(Serialize, Debug)]
+struct CdcComparisonEvidence {
+    emitted_paths: Vec<String>,
+    accepted_paths: Vec<String>,
+    opaque_paths: Vec<String>,
+}
+
+#[derive(Serialize, Debug)]
+struct ObaResultEvidence {
+    option: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    predicate_source: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_outcome: Option<bool>,
+    test_assignments: usize,
+}
+
+fn cdc_outcome_to_result(name: &str, outcome: cdc::CdcCandidateOutcome) -> AuditResult {
+    let mut provenance = vec![
+        format!("Nix option: services.{}", outcome.candidate),
+        format!("rendered artifact: {:?} format", outcome.format),
+        format!("process binding: {} ({:?})", outcome.binding_kind, outcome.proof_depth),
+        format!("pinned upstream consumer: {}", outcome.consumer),
+        format!("accepted contract: {} real accepted path(s)", outcome.accepted_paths.len()),
+    ];
+    let (verdict, code, severity, message) = match &outcome.verdict {
+        cdc::ConfigContractVerdict::Pass => {
+            provenance.push("comparison: every real emitted path is accepted".to_string());
+            (ResultVerdict::Pass, None, None, "every real emitted config path is accepted by the pinned consumer".to_string())
+        }
+        cdc::ConfigContractVerdict::Finding { unaccepted_path } => {
+            provenance.push(format!("mismatch: emitted path {unaccepted_path:?} is not in the accepted contract"));
+            (
+                ResultVerdict::Finding,
+                Some("CDC001"),
+                Some(Severity::Error),
+                format!("emitted config path {unaccepted_path:?} is rejected by the pinned consumer's own real accepted contract"),
+            )
+        }
+    };
+    AuditResult {
+        engine: "cdc",
+        target: name.to_string(),
+        verdict,
+        code,
+        severity,
+        message,
+        provenance,
+        cdc_evidence: Some(CdcResultEvidence {
+            producer: CdcProducerEvidence { proved: true, format: outcome.format },
+            binding: CdcBindingEvidence { kind: outcome.binding_kind, proof_depth: outcome.proof_depth },
+            consumer: CdcConsumerEvidence { name: outcome.consumer },
+            comparison: CdcComparisonEvidence {
+                emitted_paths: outcome.emitted_paths,
+                accepted_paths: outcome.accepted_paths,
+                opaque_paths: outcome.opaque_paths,
+            },
+        }),
+        oba_evidence: None,
+    }
+}
+
+fn cdc_error_to_result(name: &str, err: &cdc::CdcError) -> AuditResult {
+    match err {
+        cdc::CdcError::Inconclusive(reason) => AuditResult {
+            engine: "cdc",
+            target: name.to_string(),
+            verdict: ResultVerdict::Inconclusive,
+            code: Some("CDC002"),
+            severity: Some(Severity::Inconclusive),
+            message: format!("consumer/binding evidence incomplete: {reason}"),
+            provenance: vec![
+                format!("Nix option: services.{name}"),
+                format!("evidence gap: {reason}"),
+            ],
+            cdc_evidence: None,
+            oba_evidence: None,
+        },
+        cdc::CdcError::ToolError(reason) => AuditResult {
+            engine: "cdc",
+            target: name.to_string(),
+            verdict: ResultVerdict::ToolError,
+            code: None,
+            severity: None,
+            message: format!("analysis did not run: {reason}"),
+            provenance: vec![format!("tool error: {reason}")],
+            cdc_evidence: None,
+            oba_evidence: None,
+        },
+    }
+}
+
+fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
+    let target = option.to_string();
+    match verdict {
+        Verdict::OptionNotFound { option } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Inconclusive,
+            code: None,
+            severity: Some(Severity::Inconclusive),
+            message: "no mkOption declaration found for this watched option".to_string(),
+            provenance: vec![format!("Nix option: {option}"), "declaration: not found".to_string()],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: None,
+                default_outcome: None,
+                test_assignments: 0,
+            }),
+        },
+        Verdict::PredicateNotFound { option } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Inconclusive,
+            code: None,
+            severity: Some(Severity::Inconclusive),
+            message: "declaration found, but no direct branch predicate was found for this option".to_string(),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                "declaration: found".to_string(),
+                "predicate: not found".to_string(),
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: None,
+                default_outcome: None,
+                test_assignments: 0,
+            }),
+        },
+        Verdict::DefaultUnresolved { option, predicate } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Inconclusive,
+            code: None,
+            severity: Some(Severity::Inconclusive),
+            message: "predicate found, but its default outcome could not be statically classified".to_string(),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                format!("predicate: {}", predicate.source()),
+                "default outcome: unresolved".to_string(),
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: Some(predicate.source().to_string()),
+                default_outcome: None,
+                test_assignments: 0,
+            }),
+        },
+        Verdict::TestValueUnresolved { option, predicate, default_outcome, .. } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Inconclusive,
+            code: None,
+            severity: Some(Severity::Inconclusive),
+            message: "a classifiable default and predicate exist, but no test assignment's value could be statically classified".to_string(),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                format!("predicate: {}", predicate.source()),
+                format!("default outcome: {default_outcome:?}"),
+                "test evidence: unresolved".to_string(),
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: Some(predicate.source().to_string()),
+                default_outcome: *default_outcome,
+                test_assignments: 0,
+            }),
+        },
+        Verdict::TestConfigUnresolved { option, predicate, default_outcome, .. } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Inconclusive,
+            code: None,
+            severity: Some(Severity::Inconclusive),
+            message: "a classifiable default exists, but part of the test config that could contain this option was not visible to the scanner (imports/alias/function call)".to_string(),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                format!("predicate: {}", predicate.source()),
+                format!("default outcome: {default_outcome:?}"),
+                "test config: partially opaque".to_string(),
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: Some(predicate.source().to_string()),
+                default_outcome: *default_outcome,
+                test_assignments: 0,
+            }),
+        },
+        Verdict::Oba001 { option, predicate, default_outcome, .. } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Finding,
+            code: Some("OBA001"),
+            severity: Some(Severity::Warning),
+            message: "uncovered option branch: no test assignment provably flips this predicate away from its default".to_string(),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                format!("predicate: {}", predicate.source()),
+                format!("default outcome: {default_outcome:?}"),
+                "test evidence: none flips it".to_string(),
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: Some(predicate.source().to_string()),
+                default_outcome: *default_outcome,
+                test_assignments: 0,
+            }),
+        },
+        Verdict::Pass { option, predicate, default_outcome, evidence, .. } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Pass,
+            code: None,
+            severity: None,
+            message: "a real test assignment provably flips this predicate away from its default".to_string(),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                format!("predicate: {}", predicate.source()),
+                format!("default outcome: {default_outcome}"),
+                format!("test evidence: {} assignment(s) prove a transition", evidence.len()),
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: Some(predicate.source().to_string()),
+                default_outcome: Some(*default_outcome),
+                test_assignments: evidence.len(),
+            }),
+        },
+    }
+}
+
+/// `root` is the real, shared security/evaluation boundary for BOTH
+/// engines -- see `AuditArgs::root`'s own doc comment. CDC's own
+/// candidates need `root`'s real, absolute, canonicalized form (a
+/// relative `--root .` would be meaningless once handed to `nix eval`
+/// as an evaluation root from an arbitrary child process's own cwd).
+fn run_audit(root: &Path, targets_path: &Path, format: AuditFormat) -> anyhow::Result<i32> {
+    let manifest_src = fs::read_to_string(targets_path)
+        .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", targets_path.display()))?;
+    let manifest: TargetFile = toml::from_str(&manifest_src)
+        .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
+    validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
+
+    let mut results = Vec::new();
+
+    if !manifest.target.is_empty() {
+        let oba_reports = analyze(root, &manifest)?.targets;
+        for report in &oba_reports {
+            for verdict in &report.verdicts {
+                results.push(oba_verdict_to_result(verdict.option(), verdict));
+            }
+        }
+    }
+
+    if !manifest.cdc_target.is_empty() {
+        let root_abs = root
+            .canonicalize()
+            .map_err(|e| anyhow::anyhow!("resolving --root {} for CDC: {e}", root.display()))?;
+        let nixpkgs = cdc::NixpkgsSource::LocalPath(root_abs);
+        for t in &manifest.cdc_target {
+            let result = match cdc::run_cdc_candidate(&t.name, &nixpkgs) {
+                Ok(outcome) => cdc_outcome_to_result(&t.name, outcome),
+                Err(err) => cdc_error_to_result(&t.name, &err),
+            };
+            results.push(result);
+        }
+    }
+
+    let mut summary = AuditSummary::default();
+    for r in &results {
+        match r.verdict {
+            ResultVerdict::Pass => summary.pass += 1,
+            ResultVerdict::Finding => summary.finding += 1,
+            ResultVerdict::Inconclusive => summary.inconclusive += 1,
+            ResultVerdict::ToolError => summary.tool_error += 1,
+        }
+    }
+
+    // same 4-state escalation this whole project's exit-code contract
+    // already uses (check/diff), worst-state-wins: a per-candidate CDC
+    // tool error is real evidence the audit is incomplete, so it
+    // outranks a mere finding the same way a manifest-level tool error
+    // always has.
+    let exit_code = if summary.tool_error > 0 {
+        3
+    } else if summary.inconclusive > 0 {
+        2
+    } else if summary.finding > 0 {
+        1
+    } else {
+        0
+    };
+
+    match format {
+        AuditFormat::Json => {
+            let envelope = AuditEnvelope {
+                schema_version: 1,
+                tool: ToolInfo { name: "oba", version: env!("CARGO_PKG_VERSION") },
+                mode: "audit",
+                summary,
+                results,
+            };
+            println!("{}", serde_json::to_string_pretty(&envelope)?);
+        }
+        AuditFormat::Text => {
+            println!(
+                "=== audit summary: pass={} finding={} inconclusive={} tool_error={} ===",
+                summary.pass, summary.finding, summary.inconclusive, summary.tool_error
+            );
+            for r in &results {
+                let tag = match r.verdict {
+                    ResultVerdict::Pass => "PASS".to_string(),
+                    ResultVerdict::Finding => format!("FINDING {}", r.code.unwrap_or("?")),
+                    ResultVerdict::Inconclusive => {
+                        format!("INCONCLUSIVE{}", r.code.map(|c| format!(" {c}")).unwrap_or_default())
+                    }
+                    ResultVerdict::ToolError => "TOOL_ERROR".to_string(),
+                };
+                println!("[{}] {} :: {} -- {}", r.engine, tag, r.target, r.message);
+                for step in &r.provenance {
+                    println!("    -> {step}");
+                }
+            }
+        }
     }
 
     Ok(exit_code)

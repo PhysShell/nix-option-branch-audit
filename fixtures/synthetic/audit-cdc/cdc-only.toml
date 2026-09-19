@@ -1,0 +1,5 @@
+# P3a: a real CDC-only audit manifest -- zero [[target]] entries, one
+# real [[cdc_target]]. Needs real network access (fetchTarball); the
+# test using this file is `#[ignore]`d accordingly.
+[[cdc_target]]
+name = "spacecookie"

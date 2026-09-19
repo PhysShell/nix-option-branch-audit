@@ -4032,3 +4032,121 @@ unrevisited. Full report: `fixtures/c-e1.2c-hostile-audit/census.md`.
 With v1 now frozen, productization (CLI wiring, an advisory GitHub
 check, a PR-local diff mode, a nixpkgs-review companion) may now be
 considered — not started in this round, a separate future decision.
+
+## P3a: `oba audit` — CDC wired into the CLI for real
+
+The first productization step, deliberately small and CLI-first (per
+the user's own explicit sequencing: CLI + a stable report contract
+before any GitHub Action): `GeneratedConfigArtifact` was runnable only
+via `cargo test --ignored` until now — real, frozen, hostile-audited,
+but invisible to anyone who isn't reading this repository's own source.
+`oba audit` wires it into a real, standalone command, unified with
+OBA's own existing option-branch analysis under one report schema. No
+new analysis logic, no new candidates — the frozen v1 engine
+(`acquire_*`/`extract_*`/`compare_config_contract`) is untouched;
+this is presentation-layer wiring only.
+
+```
+oba audit --root <nixpkgs checkout> --targets targets.toml --format json
+```
+
+**The real prerequisite this needed**: every one of the 11 real
+`acquire_*` functions was hardcoded to `builtins.fetchTarball` one
+specific `PhysShell/nixpkgs` commit — there was no way to point CDC at
+an arbitrary local checkout at all. Refactored around a new
+`NixpkgsSource` enum (`PinnedRev` for this project's own existing
+research citations, `LocalPath` for a real `--root`) that both engines
+now share. `LocalPath`'s own real untrusted-input safety matters: the
+path is NEVER textually interpolated into the Nix expression (a real
+injection surface for a genuine CLI argument) — it travels through a
+real environment variable, read back inside the expression via
+`builtins.getEnv`, verified directly with a real `nix eval` run before
+being trusted. A real, live end-to-end test
+(`real_nixpkgs_source_local_path_produces_the_identical_real_result_as_pinned_rev`)
+confirms `LocalPath` produces byte-identical evidence to the
+already-proven `PinnedRev` path. One real bug was caught by this same
+verification pass, before it ever shipped: the wrapper's own first
+draft inserted an `in` immediately after `nixpkgsSrc`'s own binding,
+which would have closed the `let` block before any acquire function's
+own `eval = ...;` binding — caught by the first real `nix eval` run
+against it, not discovered by a human reviewing Nix syntax by eye.
+
+**The evidence model stays visible, exactly as specified**: a `PASS`
+in the JSON output is never bare. `GeneratedConfigArtifact` v1's own
+C-E1.2c hostile-audit finding — 9 of the 11 real candidates prove
+binding *architecturally* (the right kind of mechanism is confirmed
+present), not *byte-exactly* (independently re-verifying the specific
+artifact's own built content) — is now a real, queryable field on
+every single result (`proof_depth: "structural"` vs `"byte_exact"`,
+the latter only for `privoxy`/`spacecookie`, whose own acquire
+functions read content from the exact same path their own binding
+check verifies). No invented confidence percentages anywhere.
+
+```yaml
+verdict: finding
+code: CDC001
+severity: error
+provenance:
+  - "Nix option: services.akkoma"
+  - "rendered artifact: ElixirConf format"
+  - "process binding: wrapper-script-env-var (Structural)"
+  - "pinned upstream consumer: akkoma"
+  - "accepted contract: 66 real accepted path(s)"
+  - "mismatch: emitted path \":pleroma.:instance.upload_dir\" is not in the accepted contract"
+```
+
+**Unified without merging semantics**: OBA's own `Verdict` enum and
+CDC's own `ConfigContractVerdict` stay completely separate Rust types —
+`run_audit` converts each into one shared `AuditResult` (`engine: "oba"
+| "cdc"`, `verdict`, an optional `code`/`severity` — `None` for a clean
+`Pass`, since a code names a problem class, never "nothing's wrong" —
+`message`, a real ordered `provenance` chain, and an engine-specific
+evidence sub-object). Named codes: `OBA001` (uncovered option branch,
+warning), `CDC001` (emitted config path rejected by the pinned
+consumer, error), `CDC002` (consumer/binding evidence incomplete,
+inconclusive — `CdcError::Inconclusive`). A genuine `CdcError::ToolError`
+(the analysis never ran at all) is its own `tool_error` verdict, never
+disguised as a finding — matching OBA's own existing TOOL_ERROR
+concept exactly, worst-state-wins in the same 4-state exit code scheme
+`check`/`diff` already use (0 clean / 1 finding / 2 inconclusive / 3
+tool error).
+
+**The manifest format grows one new, optional, additive section**:
+`[[cdc_target]]` entries (just a `name` selecting one of
+`cdc::CDC_CANDIDATE_NAMES`'s own 11 real candidates) sit alongside
+OBA's own existing `[[target]]` entries in the same TOML file — every
+pre-existing manifest keeps working unmodified with `check`/`diff`
+(confirmed directly: `oba check --targets targets/golden.toml` still
+runs byte-identical to before). An unknown or duplicate `[[cdc_target]]`
+name is a real `TOOL_ERROR` at validation time, before any `nix eval`
+is attempted — adding a genuinely new candidate means reopening the
+frozen v1 engine in `src/cdc.rs`, never editing a manifest.
+
+**Real, live confirmation, not just passing tests**: run against a real
+freshly-fetched local nixpkgs checkout with a manifest mixing a real
+OBA target (kimai) and two real CDC targets (unpackerr, akkoma), `oba
+audit` correctly reproduced akkoma's own already-known real
+`CDC001` finding (the exact same `:instance.upload_dir` mismatch
+C-E1.2b/c already established) and a real OBA001 on kimai's own
+current upstream test — through the actual CLI, not a direct Rust
+function call. 10 new CLI acceptance tests
+(`tests/audit_cli.rs`, matching `tests/diff_cli.rs`'s own real
+subprocess-spawning convention): manifest validation (empty, unknown
+candidate, duplicate name) offline; the OBA-only path against the
+existing real kimai/before→kimai/after historical fixture, offline;
+the CDC-only and combined paths against a real, freshly-materialized
+local nixpkgs checkout, `#[ignore]`d for real network access. Plus 2
+new real tests in `src/cdc.rs` itself (`run_cdc_candidate`'s own
+registry dispatches correctly for all 11 candidates; `proof_depth`
+classification matches the real C-E1.2c audit finding, turned into a
+permanent, checked invariant rather than only living in this README).
+
+**Not started in this round, per the user's own explicit staging**:
+P3b (`oba audit-diff`, base/head roots, finding delta — the same D2
+"two independent roots, no git inside the core tool" philosophy `oba
+diff` already established), P3c (an advisory, non-blocking GitHub
+Action with bounded step-summary output and the full JSON as an
+artifact — this project's own PR D3 `${{ }}`-splicing lesson already
+named as the reason the summary must stay bounded and rendered by real
+code, never templated). `nixpkgs-review` integration stays untouched,
+a later, optional fourth step.

@@ -1,0 +1,8 @@
+# P3a: a manifest declaring the same [[cdc_target]] name twice must be
+# a real TOOL_ERROR, matching this project's own existing duplicate-
+# [[target]]-name rejection.
+[[cdc_target]]
+name = "unpackerr"
+
+[[cdc_target]]
+name = "unpackerr"
