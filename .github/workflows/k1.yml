@@ -1,13 +1,22 @@
 name: K1 (CDC real-eval proof)
 
 # K1.1: the reproducibility gap the user's own hostile review flagged --
-# K1's real historical/mutation proof (src/cdc.rs's `#[ignore]`-by-default
-# tests, 8 total) needs a real `nix` binary and network access, so it
+# every real, `#[ignore]`-by-default test across this whole project (K1's
+# own historical/mutation proof, every later K2-K5/C-E1.2a/b/c real
+# candidate proof, the C-E1.2c hostile-audit attack suite, P3a's own real
+# CLI/registry tests) needs a real `nix` binary and network access, so it
 # doesn't run under kani.yml (Kani-only toolchain) or dogfood.yml (no
-# `nix`). Without this job, "K1 works" was a claim backed only by one
-# specific dev machine, not CI. This job runs ONLY those 8 tests
-# (`--ignored cdc::`) -- the offline half of src/cdc.rs (11 tests) already
-# runs everywhere via a plain `cargo test`, no separate job needed for it.
+# `nix`). Without this job, "it works" was a claim backed only by one
+# specific dev machine, not CI. Runs both real suites this project now
+# has: `--bin oba`'s own real tests (`--ignored "cdc::"`) and
+# `tests/audit_cli.rs`'s own real CLI-level tests (P3a; a real gap found
+# and closed as a direct follow-up commit right after P3a's own -- this
+# workflow only ever targeted `--bin oba`, so a real `#[ignore]`d test
+# living in a SEPARATE integration-test binary was never actually
+# exercised by any CI workflow until this line existed). The offline half
+# of both
+# (`cargo test`'s own default run, no `--ignored`) already runs
+# everywhere via `test.yml`, no separate job needed for it.
 #
 # Reuse survey (AGENTS.md step 3/5): cachix/install-nix-action is the same
 # action PhysShell/nixpkgs's own CI (nixpkgs-vet job) already uses for
@@ -37,3 +46,5 @@ jobs:
             experimental-features = nix-command
       - name: Run K1's real historical + mutation proof
         run: cargo test --bin oba -- --ignored "cdc::"
+      - name: Run P3a's real CLI/registry tests (tests/audit_cli.rs)
+        run: cargo test --test audit_cli -- --ignored
