@@ -65,8 +65,8 @@ instead of appearing to (mis)sum across one merged column.
 |---|---|---|---|---|
 | kimai | supported (SentinelFlow) | supported (3.10.6 @ `c95589d7`) | fetched_source | **direct** |
 | davis | supported (EvaluatedLiteral) | supported (3.10.6 @ `c95589d7`) | fetched_source | **direct** |
-| strichliste | supported (SentinelFlow, verified for real) | supported* (3.10.5 @ `95d84866`, resolved for real; Phase D for this exact version not vendored) | fetched_source | **mediated-known** (Symfony bundle calls Doctrine's own `DsnParser` -- see K2e below) |
-| part-db | supported (SentinelFlow-shaped) | unsupported (Postgres dialect, wrong driver vendored) | fetched_source | **mediated-known** (same bundle mechanism as strichliste) |
+| strichliste | supported (SentinelFlow, verified for real) | **supported** (3.10.5 @ `95d84866`; Phase D vendored K2g, real `Pass` verdict) | fetched_source | **mediated-known** (Symfony bundle calls Doctrine's own `DsnParser` -- see K2e below) |
+| part-db | supported (SentinelFlow-shaped) | **supported** (4.4.3 @ `61e730f1`, Postgres dialect; Phase D vendored K2g, real `Pass` verdict) | fetched_source | **mediated-known** (same bundle mechanism as strichliste) |
 | agorakit | supported (`FlatEnvVars`, K2d, verified for real) | unsupported (Laravel; `doctrine/dbal` 3.9.4 present, confirmed NOT the runtime consumer) | fetched_source | **mediated-known** (Illuminate\Database; doctrine/dbal vestigial) |
 | movim | supported (`FlatEnvVars`, K2d, verified for real via the `postgresql` path -- see sub-finding below for the `mariadb` path's own real nixpkgs bug) | unsupported (`doctrine/dbal` 4.4.4 present, confirmed NOT the runtime consumer) | fetched_source | **mediated-known** (Illuminate\Database/Eloquent; doctrine/dbal vestigial) |
 | snipe-it | supported (`FlatEnvVars`, K2d, verified for real; **has** a dedicated `DB_SOCKET` key) | unsupported (Laravel; `doctrine/dbal` 3.10.5 present, confirmed NOT the runtime consumer) | fetched_source | **mediated-known** (Illuminate\Database; doctrine/dbal vestigial) |
@@ -96,10 +96,12 @@ separately since they were never in question.
 - `not_applicable`: 8 -- baikal, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms, postfixadmin.
 - 5 + 1 + 8 = 14. ✓
 
-**consumer support** (14 census candidates)
-- `supported`: 1 -- strichliste (resolved for real this round; full PASS still pending Phase D vendoring of 3.10.5, see below). (+ kimai, davis as frozen K1 baseline.)
-- `unsupported`: 13 -- part-db (wrong DSN dialect); agorakit/movim/snipe-it/flarum (`doctrine/dbal` present, and as of K2e CONFIRMED not the real runtime consumer -- see the K2e section below, no longer just a suspicion); baikal/bookstack/civicrm/engelsystem/grocy/invoiceplane/librenms/postfixadmin (absent from the dependency closure entirely).
-- 1 + 13 = 14. ✓
+**consumer support** (14 census candidates -- updated after K2g vendored
+Phase D for both strichliste and part-db; original K2c/K2e-round counts
+were 1/13, see git history for that version of this file)
+- `supported`: 2 -- strichliste, part-db (both Phase D vendored in K2g, real `Pass` verdicts). (+ kimai, davis as frozen K1 baseline.)
+- `unsupported`: 12 -- agorakit/movim/snipe-it/flarum (`doctrine/dbal` present, and as of K2e CONFIRMED not the real runtime consumer -- see the K2e section below, no longer just a suspicion); baikal/bookstack/civicrm/engelsystem/grocy/invoiceplane/librenms/postfixadmin (absent from the dependency closure entirely).
+- 2 + 12 = 14. ✓
 
 **provenance location** (14 census candidates)
 - `fetched_source`: 11 -- strichliste, part-db, agorakit, movim, snipe-it, bookstack, civicrm, engelsystem, grocy, invoiceplane, librenms. (+ kimai, davis, both `fetched_source`.)
@@ -178,6 +180,15 @@ too, since the pinned version and reference resolved for real, but a full
 PASS *verdict* for strichliste specifically still needs that one vendored
 file; a small, well-scoped K2c follow-up (vendor one more pinned file,
 add one more real test), not part of what this round claims.
+
+**Closed by K2g (`86c83e4`)**: 3.10.5 confirmed BYTE-IDENTICAL to the
+vendored 3.10.6 fixture (diffed directly, not assumed identical) --
+`strichliste_golden_is_pass` now gives strichliste a real, full end-to-
+end `Pass` verdict, not just a resolved identity. `part-db` closed in
+the same round, with a genuinely different real finding: its Postgres
+deployment has no `unix_socket` DSN parameter at all -- `host=` doubles
+as a socket-directory path there, confirmed by reading both its Nix
+module and the pinned doctrine/dbal 4.4.3 Postgres driver directly.
 
 ## Real, recurring sub-findings (not new buckets, but worth keeping)
 
@@ -352,9 +363,11 @@ up as one.
 The other 2 (`strichliste`, `part-db`) are a genuinely different shape
 entirely: mediated through a Symfony bundle that ultimately calls
 Doctrine's OWN parser, unchanged contract -- these do NOT need a new
-adapter at all, K1's existing model already covers them once Phase D
-vendors the right `doctrine/dbal` version (3.10.5 for both, already
-identified, not yet vendored).
+adapter at all, only K1's existing model vendored against each app's own
+pinned `doctrine/dbal` version (3.10.5 for strichliste, 4.4.3 for
+part-db -- NOT the same version, corrected here; the original K2c note
+above assumed both were 3.10.5, which was never independently confirmed
+for part-db at the time). **Closed by K2g, see below.**
 
 **K2f (`9e03eca`) acted on exactly this signal**: `ConsumerRoute`/
 `ConsumerContractEvidence` + `acquire_illuminate_consumer_contract`,
@@ -365,6 +378,14 @@ from closure, per the design review -- its multi-consumer shape
 (primary path Illuminate, optional migration-only path Doctrine) is a
 real, distinct future corpus case, not folded into v1 for a round
 number. See `README.md`'s own K2f section for the full writeup.
+
+**K2g (`86c83e4`) closed the strichliste/part-db side.** Both now have
+real, full end-to-end `Pass` verdicts, not just resolved identities --
+`strichliste`'s pinned 3.10.5 driver confirmed byte-identical to the
+existing 3.10.6 fixture (no duplicate vendored); `part-db`'s pinned
+4.4.3 Postgres driver is a genuinely new fixture with no `unix_socket`
+key at all -- `host=` doubles as the socket path there. See
+`README.md`'s own K2g section for the full writeup.
 
 ### K2e stop condition
 

@@ -2049,14 +2049,57 @@ before any more intelligence gets added to the checker):
    (86 passed, 25 ignored), `tests/check_root.rs` (9 passed),
    `tests/diff_cli.rs` (11 passed), `tests/fixture_integrity.rs`
    (1 passed), `tests/golden.rs` (47 passed) — 154 tests total, 37s.
-10. **Phase D vendoring for `strichliste`/`part-db`.** The user's own
-    pick among the three K2e/K2f-opened options (over `flarum`'s
-    multi-consumer case and package-bump drift) — two real corpus cases,
-    zero new semantic model needed (K2e already qualified their consumer
-    route as Symfony's bundle → Doctrine's own `DsnParser`, contract
-    unchanged), a cheap way to grow real end-to-end coverage and confirm
-    K2a's/K2e's conclusions actually compose into one pipeline rather
-    than staying separately-proven facts.
+10. **K2g — Phase D vendoring for `strichliste`/`part-db`. Closed,
+    `86c83e4`, confirmed green in real CI (`gh run view --log`: 27
+    passed, 0 failed, 41.4s).** The user's own pick among the three
+    K2e/K2f-opened options (over `flarum`'s multi-consumer case and
+    package-bump drift) — two real corpus cases, zero new semantic model
+    needed (K2e already qualified their consumer route as Symfony's
+    bundle → Doctrine's own `DsnParser`, contract unchanged), a cheap
+    way to grow real end-to-end coverage and confirm K2a's/K2e's
+    conclusions actually compose into one pipeline rather than staying
+    separately-proven facts. Reuses the ENTIRE existing K1 pipeline
+    unchanged (Phase C/D/E, K2a's `resolve_consumer_identity`/
+    `fetch_composer_lock`, K2b's `build_sentinel_flow_evidence`) — no new
+    comparison semantics, only two new real acquisition functions and
+    two new vendored consumer fixtures.
+
+    **`strichliste`**: `environment.DATABASE_URL` is a real option,
+    sentinel-injected exactly like Kimai's `database.socket`. Pins
+    doctrine/dbal 3.10.5 — fetched that exact commit's own MySQL driver
+    and diffed it directly against the already-vendored 3.10.6 fixture:
+    BYTE-IDENTICAL. Reused rather than duplicated (same "verify before
+    vendoring a duplicate" discipline K2a.1 already established for the
+    Illuminate MySQL connector) — no new fixture file for this one.
+
+    **`part-db`**: a genuinely different real finding. Its
+    `settings.DATABASE_URL` renders into `envFile`, a real
+    `pkgs.writeText` derivation — reading it requires REALIZING that
+    (tiny, cheap) derivation, a real if minor difference from Kimai's
+    purely-evaluated string. More importantly: part-db's real Postgres
+    deployment has **no separate `unix_socket` DSN parameter at all** —
+    confirmed by reading both `part-db.nix`'s own default
+    (`host=/run/postgresql`) and the pinned doctrine/dbal 4.4.3 Postgres
+    driver's `constructPdoDsn` directly (no `unix_socket` key anywhere
+    in it). Postgres overloads `host=` for both a TCP hostname and a
+    unix-socket directory path, so the sentinel goes into `host=`
+    instead — `extract_key_for_value` (Phase C, completely unchanged)
+    correctly resolves `emitted_key = "host"`, not `"unix_socket"`,
+    proving Phase C was never hardcoded to one specific key name. First
+    Postgres-dialect Doctrine fixture vendored in this project.
+
+    `vendored_doctrine_source_reference` generalized into
+    `vendored_fixture_source_reference(path)`, parameterized by vendored
+    path — the original K1/K2a call site's own behavior is completely
+    unchanged, that's the entire change to that function.
+
+    2 new real tests (`strichliste_golden_is_pass`,
+    `part_db_golden_is_pass`), both full end-to-end `Pass` verdicts on
+    the CURRENT real deployment — no historical before/after pair exists
+    for these two apps (unlike Kimai/Davis), so this is honest
+    coverage-extension, not fabricated defect-reproduction. 27 real
+    tests total (was 25, +2); zero offline tests added (no new pure
+    logic); `fixture_integrity` passes with the new sha256 lock.
 
 Explicitly **not next yet**, deliberately, not from lack of interest:
 `flarum`'s multi-consumer shape (kept as a future *adversarial* corpus
