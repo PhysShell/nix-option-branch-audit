@@ -53,6 +53,21 @@
 //! source-based one K2a already had ([`fetch_composer_lock`], unchanged)
 //! -- closes the locator gap K2c found recurring 3x
 //! (flarum/baikal/postfixadmin).
+//!
+//! K2e (done, `fixtures/cdc/k2c-census/`): consumer reachability census --
+//! for every app where `doctrine/dbal` is present, traced the real chain
+//! to whatever actually consumes the Nix-emitted key. Found
+//! agorakit/movim/snipe-it's `doctrine/dbal` is confirmed vestigial;
+//! `Illuminate\Database` is the real consumer via `config/database.php`.
+//! Census-only, zero code here.
+//!
+//! K2f (done): [`ConsumerRoute`]/[`ConsumerContractEvidence`] give that
+//! reachability chain an explicit type, and
+//! [`acquire_illuminate_consumer_contract`] proves it for real against
+//! agorakit/movim/snipe-it -- ONE adapter, branching only on
+//! [`IlluminateDriver`] (mysql vs postgres), never on app identity.
+//! `doctrine/dbal`/`composer.lock` are never consulted anywhere in this
+//! path.
 
 use std::path::Path;
 use std::process::Command;
@@ -750,6 +765,301 @@ pub fn acquire_movim_evidence(rev: &str) -> Result<ProducerEvidence, CdcError> {
     build_flat_env_vars_evidence(MOVIM_SINK, rendered)
 }
 
+/// K2f: `FlatEnvVars` evidence (K2d) never had a consumer-side verdict
+/// path -- for agorakit/movim/snipe-it, K2e proved WHY: `doctrine/dbal`
+/// is present in all three but is confirmed NOT the real consumer of
+/// these `DB_*` keys, `Illuminate\Database` is. This section gives that
+/// route an explicit type, not a hidden assumption inside an extractor:
+/// `ConsumerRoute` names every real hop between a Nix-emitted key and
+/// its actual terminal consumer, so a `Finding` can explain not just
+/// "was this key accepted" but "why Illuminate is even the right
+/// library to check against."
+///
+/// Deliberately does NOT touch `doctrine/dbal`, `composer.lock`, or any
+/// K1/K2a/K2b/K2d code path at all -- this is a parallel pipeline, not a
+/// modification of the existing one. `ConsumerRoute::Direct` exists for
+/// completeness (the Kimai/Davis/Symfony-bundle shape K1/K2e already
+/// cover) but nothing in this module currently constructs it; K2f only
+/// ever builds `Mediated`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConsumerHop {
+    pub layer: String,
+    pub from_key: String,
+    pub to_key: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ConsumerRoute {
+    Direct,
+    Mediated { hops: Vec<ConsumerHop> },
+}
+
+impl ConsumerRoute {
+    /// The key to actually compare against a consumer's accepted-keys
+    /// list -- the original emitted key for `Direct`, the LAST hop's
+    /// `to_key` for `Mediated` (falling back to `original` only if
+    /// `hops` is somehow empty, which no K2f constructor ever produces).
+    pub fn resolved_key<'a>(&'a self, original: &'a str) -> &'a str {
+        match self {
+            ConsumerRoute::Direct => original,
+            ConsumerRoute::Mediated { hops } => {
+                hops.last().map(|h| h.to_key.as_str()).unwrap_or(original)
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConsumerContractEvidence {
+    pub route: ConsumerRoute,
+    pub consumer_library: String,
+    pub accepted_keys: Vec<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum IlluminateDriver {
+    MySql,
+    Postgres,
+}
+
+impl IlluminateDriver {
+    fn consumer_library_name(self) -> &'static str {
+        match self {
+            IlluminateDriver::MySql => "Illuminate\\Database\\Connectors\\MySqlConnector",
+            IlluminateDriver::Postgres => "Illuminate\\Database\\Connectors\\PostgresConnector",
+        }
+    }
+}
+
+/// Pure. Reuse survey: same bounded-literal-scan discipline Phase D
+/// already established for Doctrine's driver source (a general PHP
+/// parser would be strictly less trustworthy for this one exact, narrow,
+/// pinned shape, not more) -- this isn't a new precedent, it's the same
+/// one applied to a second real source shape.
+///
+/// Scans `config/database.php`-shaped source for `'<key>' =>
+/// env('<env_var>' ...)`, tolerating one simple cast immediately before
+/// `env(` (`(int)`/`(bool)` etc. -- both `(int) env(` and `(int)env(`,
+/// both seen in real vendored fixtures below). `Ok(None)` means
+/// `env_var` doesn't appear in this file AT ALL -- a real, valid
+/// outcome (not every `FlatEnvVars` key is part of the DB connection
+/// surface), never an error. Two or more DISTINCT resolved keys, or an
+/// occurrence that doesn't backward-parse into the expected shape, is
+/// `Inconclusive` -- checked on DISTINCT values, not raw occurrence
+/// count, because the real corpus has a case that would otherwise be a
+/// false ambiguity: snipe-it's `config/database.php` maps `DB_SOCKET`
+/// -> `unix_socket` identically in BOTH its `mysql` and `mariadb`
+/// connection blocks (verified against the real file, not assumed).
+pub fn extract_config_key_for_env_var(
+    php_source: &str,
+    env_var: &str,
+) -> Result<Option<String>, CdcError> {
+    let needle = format!("env('{env_var}'");
+    let mut resolved: Vec<String> = Vec::new();
+    let mut search_from = 0;
+    let mut found_any = false;
+    while let Some(rel) = php_source[search_from..].find(&needle) {
+        found_any = true;
+        let pos = search_from + rel;
+        let before = strip_optional_php_cast(php_source[..pos].trim_end()).trim_end();
+        let Some(before_arrow) = before.strip_suffix("=>") else {
+            return Err(CdcError::Inconclusive(format!(
+                "env('{env_var}'...) at byte {pos} is not immediately preceded by '=>' \
+                 (after an optional cast) -- unrecognized shape"
+            )));
+        };
+        let Some(before_quote) = before_arrow.trim_end().strip_suffix('\'') else {
+            return Err(CdcError::Inconclusive(format!(
+                "env('{env_var}'...) at byte {pos}: preceding key is not single-quoted -- \
+                 unrecognized shape"
+            )));
+        };
+        let Some(key_start) = before_quote.rfind('\'') else {
+            return Err(CdcError::Inconclusive(format!(
+                "env('{env_var}'...) at byte {pos}: no matching opening quote for the \
+                 preceding key"
+            )));
+        };
+        let key = &before_quote[key_start + 1..];
+        if key.is_empty() || !key.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+            return Err(CdcError::Inconclusive(format!(
+                "env('{env_var}'...) at byte {pos}: extracted key {key:?} doesn't look like \
+                 a PHP array key"
+            )));
+        }
+        if !resolved.iter().any(|k| k == key) {
+            resolved.push(key.to_string());
+        }
+        search_from = pos + needle.len();
+    }
+    if !found_any {
+        return Ok(None);
+    }
+    match resolved.len() {
+        1 => Ok(Some(resolved.into_iter().next().unwrap())),
+        _ => Err(CdcError::Inconclusive(format!(
+            "env('{env_var}'...) resolves to {} distinct keys ({resolved:?}), expected exactly 1",
+            resolved.len()
+        ))),
+    }
+}
+
+/// Strips one trailing simple PHP cast (`(int)`, `(bool)`, ...) if
+/// present immediately at the end of `s` -- a bare `(<alpha-only>)`
+/// group, nothing fancier. Not a general expression parser: if what
+/// precedes `env(` isn't `=>` (with or without one such cast in
+/// between), [`extract_config_key_for_env_var`] already refuses via its
+/// own `unrecognized shape` error, so a false-positive "strip" here
+/// can't silently manufacture an incorrect key.
+fn strip_optional_php_cast(s: &str) -> &str {
+    let Some(stripped) = s.strip_suffix(')') else { return s };
+    let Some(open) = stripped.rfind('(') else { return s };
+    let inner = &stripped[open + 1..];
+    if !inner.is_empty() && inner.chars().all(|c| c.is_ascii_alphabetic()) {
+        stripped[..open].trim_end()
+    } else {
+        s
+    }
+}
+
+/// Pure. Does the vendored Illuminate connector source (the caller
+/// concatenates the driver-specific connector with the shared base
+/// `Connector.php`, since `username`/`password` are read there, common
+/// to every driver) reference `key` at all -- via EITHER of the two real
+/// syntactic shapes actually observed in the pinned source (verified by
+/// reading it, not assumed): array-keyed (`$config['host']`, MySQL's
+/// shape -- checked as a plain bounded substring since the key sits
+/// between two literal `'` delimiters with no room for a false match)
+/// or boundary-checked bare-variable (`$host`, Postgres's shape after
+/// its own `extract($config, EXTR_SKIP)` call -- boundary-checked so
+/// `$host` doesn't false-match inside a longer identifier like
+/// `$hostname`). Deliberately NOT an `isset(...)`-only scan:
+/// `host`/`database` are read UNCONDITIONALLY by both drivers (no
+/// `isset` gate at all, confirmed by reading the real vendored source),
+/// so requiring the `isset(...)` wrapper specifically would wrongly
+/// report them as unaccepted.
+pub fn illuminate_connector_accepts_key(source: &str, key: &str) -> bool {
+    source.contains(&format!("$config['{key}']")) || php_bare_var_referenced(source, key)
+}
+
+fn php_bare_var_referenced(source: &str, key: &str) -> bool {
+    let needle = format!("${key}");
+    let mut search_from = 0;
+    while let Some(rel) = source[search_from..].find(&needle) {
+        let pos = search_from + rel;
+        let after = &source[pos + needle.len()..];
+        let boundary_ok =
+            after.chars().next().is_none_or(|c| !c.is_ascii_alphanumeric() && c != '_');
+        if boundary_ok {
+            return true;
+        }
+        search_from = pos + needle.len();
+    }
+    false
+}
+
+/// Pure: combines the two extractors above into one
+/// `ConsumerContractEvidence` for ONE specific Nix-emitted key.
+/// `database_php`/`connector_source` are the caller's already-fetched
+/// real bytes -- no I/O here. Fail-closed like every other K2f piece: an
+/// unresolved config mapping propagates as `Inconclusive`, never a
+/// guessed route -- this is also the honest, correct outcome for a key
+/// that genuinely isn't part of this app's DB config surface at all
+/// (e.g. `DB_SOCKET` against movim's `config/database.php`, which never
+/// mentions it -- Postgres via Illuminate has no unix-socket concept at
+/// all, confirmed by reading `PostgresConnector.php` directly).
+pub fn build_consumer_contract_evidence(
+    nix_key: &str,
+    layer_name: &str,
+    database_php: &str,
+    connector_source: &str,
+    driver: IlluminateDriver,
+) -> Result<ConsumerContractEvidence, CdcError> {
+    let Some(mapped_key) = extract_config_key_for_env_var(database_php, nix_key)? else {
+        return Err(CdcError::Inconclusive(format!(
+            "{nix_key} does not appear in {layer_name} at all -- not part of this consumer's \
+             DB config surface"
+        )));
+    };
+    let accepted = illuminate_connector_accepts_key(connector_source, &mapped_key);
+    let route = ConsumerRoute::Mediated {
+        hops: vec![ConsumerHop {
+            layer: layer_name.to_string(),
+            from_key: nix_key.to_string(),
+            to_key: mapped_key.clone(),
+        }],
+    };
+    Ok(ConsumerContractEvidence {
+        route,
+        consumer_library: driver.consumer_library_name().to_string(),
+        accepted_keys: if accepted { vec![mapped_key] } else { Vec::new() },
+    })
+}
+
+/// Phase E (frozen, K1) reused UNCHANGED -- `compare_contract`'s
+/// signature only ever sees `&str`/`&[String]`, never `ConsumerRoute`
+/// itself, same "no type-level room for one path to become stronger
+/// than another" discipline K2b established for `ProducerEvidence`.
+pub fn verdict_for_consumer_contract(evidence: &ConsumerContractEvidence, nix_key: &str) -> CdcVerdict {
+    compare_contract(evidence.route.resolved_key(nix_key), &evidence.accepted_keys)
+}
+
+/// Real: reads the vendored, integrity-locked Illuminate connector
+/// fixtures (see `fixtures/integrity-lock.toml`) -- NOT a live fetch.
+/// `doctrine/dbal`'s presence in any of these three apps' `composer.lock`
+/// is never consulted anywhere in this function or its callers --
+/// requirement (d), satisfied structurally, not by omission.
+fn illuminate_fixture_source(driver: IlluminateDriver) -> Result<String, CdcError> {
+    let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let base_path = manifest_dir.join("fixtures/cdc/illuminate-database/Connectors/Connector.php");
+    let driver_path = manifest_dir.join(match driver {
+        IlluminateDriver::MySql => "fixtures/cdc/illuminate-database/Connectors/MySqlConnector.php",
+        IlluminateDriver::Postgres => {
+            "fixtures/cdc/illuminate-database/Connectors/PostgresConnector.php"
+        }
+    });
+    let base_src = std::fs::read_to_string(&base_path)
+        .map_err(|e| CdcError::ToolError(format!("reading {}: {e}", base_path.display())))?;
+    let driver_src = std::fs::read_to_string(&driver_path)
+        .map_err(|e| CdcError::ToolError(format!("reading {}: {e}", driver_path.display())))?;
+    Ok(format!("{driver_src}\n{base_src}"))
+}
+
+/// Real: `pkgs.<attr>.src + "/config/database.php"`, the same
+/// `pkgs.<attr>.src` oracle `fetch_composer_lock` (K2a) already uses --
+/// asking Nix for the app's own fetched source, not a second fetch
+/// mechanism.
+fn fetch_config_database_php(rev: &str, package_attr: &str) -> Result<String, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        pkgs = import nixpkgsSrc {{ system = "x86_64-linux"; }};
+        in builtins.readFile (pkgs.{package_attr}.src + "/config/database.php")"#
+    );
+    eval_nix_raw(&expr)
+}
+
+/// Real acquisition: the ONE shared adapter -- no `if app == ...`
+/// anywhere in this function or anything it calls. Branches only on
+/// `driver` (a property of how the deployment configures its DB
+/// connection, not of which app it is), exactly the boundary the design
+/// review asked for.
+pub fn acquire_illuminate_consumer_contract(
+    rev: &str,
+    package_attr: &str,
+    nix_key: &str,
+    driver: IlluminateDriver,
+) -> Result<ConsumerContractEvidence, CdcError> {
+    let database_php = fetch_config_database_php(rev, package_attr)?;
+    let connector_source = illuminate_fixture_source(driver)?;
+    build_consumer_contract_evidence(
+        nix_key,
+        "config/database.php",
+        &database_php,
+        &connector_source,
+        driver,
+    )
+}
+
 /// Phase D: the accepted-keys extractor. Deliberately a bounded literal
 /// scan over `isset($params['<key>'])`, not a PHP parser -- this is the
 /// exact, narrow shape `constructPdoDsn()` actually uses (verified
@@ -1125,6 +1435,165 @@ mod tests {
         assert_eq!(resolved.content, "local content");
     }
 
+    // --- K2f: Laravel/Illuminate consumer adapter, offline
+    // (extract_config_key_for_env_var, illuminate_connector_accepts_key,
+    // build_consumer_contract_evidence are all pure -- only
+    // fetch_config_database_php/illuminate_fixture_source/
+    // acquire_illuminate_consumer_contract touch nix/network or the
+    // filesystem, covered separately below) ---
+
+    #[test]
+    fn config_mapping_env_var_absent_is_none_not_an_error() {
+        let php = "return ['host' => env('DB_HOST', 'localhost')];";
+        assert_eq!(extract_config_key_for_env_var(php, "DB_SOCKET").unwrap(), None);
+    }
+
+    #[test]
+    fn config_mapping_resolves_the_real_shaped_entry() {
+        let php = "'unix_socket' => env('DB_SOCKET', ''),";
+        assert_eq!(
+            extract_config_key_for_env_var(php, "DB_SOCKET").unwrap(),
+            Some("unix_socket".to_string())
+        );
+    }
+
+    #[test]
+    fn config_mapping_tolerates_a_simple_cast_with_or_without_a_space() {
+        let php_with_space = "'port' => (int) env('DB_PORT', 3306),";
+        let php_without_space = "'port'=>(int)env('DB_PORT', 3306),";
+        assert_eq!(
+            extract_config_key_for_env_var(php_with_space, "DB_PORT").unwrap(),
+            Some("port".to_string())
+        );
+        assert_eq!(
+            extract_config_key_for_env_var(php_without_space, "DB_PORT").unwrap(),
+            Some("port".to_string())
+        );
+    }
+
+    /// The real corpus case this exists to NOT flag as ambiguous:
+    /// snipe-it's `mysql` and `mariadb` blocks both map `DB_SOCKET` ->
+    /// `unix_socket` identically.
+    #[test]
+    fn config_mapping_same_key_repeated_is_not_ambiguous() {
+        let php = "'unix_socket' => env('DB_SOCKET', ''), 'unix_socket' => env('DB_SOCKET', ''),";
+        assert_eq!(
+            extract_config_key_for_env_var(php, "DB_SOCKET").unwrap(),
+            Some("unix_socket".to_string())
+        );
+    }
+
+    #[test]
+    fn config_mapping_two_distinct_keys_is_inconclusive() {
+        let php = "'unix_socket' => env('DB_SOCKET', ''), 'db_socket' => env('DB_SOCKET', ''),";
+        assert!(matches!(
+            extract_config_key_for_env_var(php, "DB_SOCKET"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn config_mapping_unrecognized_shape_is_inconclusive_not_skipped() {
+        let php = "some_function(env('DB_SOCKET', ''));"; // not preceded by "'<key>' =>"
+        assert!(matches!(
+            extract_config_key_for_env_var(php, "DB_SOCKET"),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn illuminate_accepts_array_keyed_form() {
+        let source = "return isset($config['unix_socket']) && ! empty($config['unix_socket']);";
+        assert!(illuminate_connector_accepts_key(source, "unix_socket"));
+        assert!(!illuminate_connector_accepts_key(source, "charset"));
+    }
+
+    #[test]
+    fn illuminate_accepts_unconditional_array_access_not_just_isset() {
+        // host/database are read unconditionally in the real vendored
+        // source -- never isset()-gated.
+        let source = r#""mysql:host={$config['host']};dbname={$config['database']}""#;
+        assert!(illuminate_connector_accepts_key(source, "host"));
+        assert!(illuminate_connector_accepts_key(source, "database"));
+    }
+
+    #[test]
+    fn illuminate_accepts_bare_var_form_with_boundary_check() {
+        let source = "$host = isset($host) ? \"host={$host};\" : '';";
+        assert!(illuminate_connector_accepts_key(source, "host"));
+        // must not false-match inside a longer identifier
+        assert!(!illuminate_connector_accepts_key(source, "hos"));
+    }
+
+    #[test]
+    fn illuminate_rejects_a_longer_identifier_false_match() {
+        let source = "$hostname = 'example.com';";
+        assert!(!illuminate_connector_accepts_key(source, "host"));
+    }
+
+    #[test]
+    fn consumer_contract_evidence_absent_from_config_is_inconclusive() {
+        let php = "return ['host' => env('DB_HOST', 'localhost')];";
+        assert!(matches!(
+            build_consumer_contract_evidence(
+                "DB_SOCKET",
+                "config/database.php",
+                php,
+                "",
+                IlluminateDriver::MySql
+            ),
+            Err(CdcError::Inconclusive(_))
+        ));
+    }
+
+    #[test]
+    fn consumer_contract_evidence_success_carries_the_full_route_and_passes() {
+        let php = "'unix_socket' => env('DB_SOCKET', ''),";
+        let connector = "isset($config['unix_socket'])";
+        let evidence = build_consumer_contract_evidence(
+            "DB_SOCKET",
+            "config/database.php",
+            php,
+            connector,
+            IlluminateDriver::MySql,
+        )
+        .unwrap();
+        match &evidence.route {
+            ConsumerRoute::Mediated { hops } => {
+                assert_eq!(hops.len(), 1);
+                assert_eq!(hops[0].layer, "config/database.php");
+                assert_eq!(hops[0].from_key, "DB_SOCKET");
+                assert_eq!(hops[0].to_key, "unix_socket");
+            }
+            other => panic!("expected Mediated, got {other:?}"),
+        }
+        assert_eq!(evidence.accepted_keys, vec!["unix_socket".to_string()]);
+        assert_eq!(verdict_for_consumer_contract(&evidence, "DB_SOCKET"), CdcVerdict::Pass);
+    }
+
+    /// Mutation-style proof the detector is actually alive: renaming the
+    /// real accepted key breaks the same evidence into a real Finding,
+    /// not a false Pass -- a positive control, per this project's own
+    /// discipline (every detector needs one proving it isn't vacuous).
+    #[test]
+    fn consumer_contract_evidence_mismatched_key_is_a_real_finding() {
+        let php = "'unixSocket' => env('DB_SOCKET', ''),"; // app-layer rename
+        let connector = "isset($config['unix_socket'])"; // real Illuminate contract, unchanged
+        let evidence = build_consumer_contract_evidence(
+            "DB_SOCKET",
+            "config/database.php",
+            php,
+            connector,
+            IlluminateDriver::MySql,
+        )
+        .unwrap();
+        assert!(evidence.accepted_keys.is_empty());
+        assert!(matches!(
+            verdict_for_consumer_contract(&evidence, "DB_SOCKET"),
+            CdcVerdict::Finding { .. }
+        ));
+    }
+
     // --- Phase E: boring comparison, offline ---
 
     #[test]
@@ -1332,6 +1801,100 @@ mod tests {
         let resolved = resolve_composer_lock(AFTER_REV, "strichliste").unwrap();
         assert_eq!(resolved.origin, ComposerLockOrigin::PackageSource);
         assert_eq!(resolved.content, old_path_content);
+    }
+
+    // --- K2f: Laravel/Illuminate consumer adapter, real (opt-in only,
+    // same as every other real test in this module). ONE shared
+    // acquire_illuminate_consumer_contract call for all three apps below
+    // -- the only thing that varies per call is the (rev, package_attr,
+    // nix_key, driver) arguments, never a branch on app identity. Zero
+    // reference to doctrine/dbal or composer.lock anywhere in this
+    // section, satisfying requirement (d) by construction, not by
+    // omission. ---
+
+    /// The exact K1-defect-class key, on the one app in this trio that
+    /// actually renders it: snipe-it's real `DB_SOCKET` maps to
+    /// `unix_socket` in `config/database.php` and IS accepted by
+    /// Illuminate's real `MySqlConnector` -- Pass, via a fully mediated
+    /// route, never Doctrine's contract.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn snipeit_db_socket_is_accepted_by_illuminate_mysql_connector() {
+        let evidence = acquire_illuminate_consumer_contract(
+            AFTER_REV,
+            "snipe-it",
+            "DB_SOCKET",
+            IlluminateDriver::MySql,
+        )
+        .unwrap();
+        match &evidence.route {
+            ConsumerRoute::Mediated { hops } => {
+                assert_eq!(hops.len(), 1);
+                assert_eq!(hops[0].layer, "config/database.php");
+                assert_eq!(hops[0].from_key, "DB_SOCKET");
+                assert_eq!(hops[0].to_key, "unix_socket");
+            }
+            other => panic!("expected Mediated, got {other:?}"),
+        }
+        assert_eq!(evidence.consumer_library, "Illuminate\\Database\\Connectors\\MySqlConnector");
+        assert_eq!(verdict_for_consumer_contract(&evidence, "DB_SOCKET"), CdcVerdict::Pass);
+    }
+
+    /// agorakit renders no `DB_SOCKET` at all (confirmed real in K2d) --
+    /// `DB_HOST` is the key that actually proves the pipeline generalizes
+    /// beyond the one socket-shaped field.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn agorakit_db_host_is_accepted_by_illuminate_mysql_connector() {
+        let evidence = acquire_illuminate_consumer_contract(
+            AFTER_REV,
+            "agorakit",
+            "DB_HOST",
+            IlluminateDriver::MySql,
+        )
+        .unwrap();
+        assert_eq!(evidence.route.resolved_key("DB_HOST"), "host");
+        assert_eq!(verdict_for_consumer_contract(&evidence, "DB_HOST"), CdcVerdict::Pass);
+    }
+
+    /// movim, via the SAME shared adapter, branching only on
+    /// `IlluminateDriver::Postgres` -- proves the "one adapter, no
+    /// app-name branch" requirement across a genuinely different
+    /// connector source, not just a second MySQL app.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn movim_db_host_is_accepted_by_illuminate_postgres_connector() {
+        let evidence = acquire_illuminate_consumer_contract(
+            AFTER_REV,
+            "movim",
+            "DB_HOST",
+            IlluminateDriver::Postgres,
+        )
+        .unwrap();
+        assert_eq!(evidence.route.resolved_key("DB_HOST"), "host");
+        assert_eq!(evidence.consumer_library, "Illuminate\\Database\\Connectors\\PostgresConnector");
+        assert_eq!(verdict_for_consumer_contract(&evidence, "DB_HOST"), CdcVerdict::Pass);
+    }
+
+    /// A real, valuable negative finding, not a gap: movim's own
+    /// `config/database.php` never renders a `DB_SOCKET` key at all, and
+    /// Postgres's real Illuminate connector has no unix-socket concept
+    /// whatsoever (confirmed by reading `PostgresConnector.php` directly
+    /// -- no `hasSocket()`-equivalent exists there). The K1 defect class
+    /// this whole project is built around structurally cannot occur for
+    /// movim's Postgres deployment.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball + a package source fetch)"]
+    fn movim_has_no_unix_socket_concept_via_postgres() {
+        assert!(matches!(
+            acquire_illuminate_consumer_contract(
+                AFTER_REV,
+                "movim",
+                "DB_SOCKET",
+                IlluminateDriver::Postgres,
+            ),
+            Err(CdcError::Inconclusive(_))
+        ));
     }
 
     // --- Real end-to-end: needs a real `nix` binary + network, opt-in

@@ -89,6 +89,38 @@ commit = "5530e24f2100f4c2ca766050a805a12d7541662f"
 upstream_path = "nixos/tests/ifm.nix"
 sha256 = "7dd644d17f75431034809b380998be4aa1198d0797b36b29fe8e1b124c9d15c5"
 
+# K2f (Laravel/Illuminate consumer adapter) fixtures. MySqlConnector.php
+# and the shared base Connector.php verified BYTE-IDENTICAL (modulo pure
+# whitespace/formatting and one unrelated, semantically-equivalent
+# refactor in an unrelated method) between agorakit's pinned
+# laravel/framework v11.44.2 (f85216c82cbd38b66d67ebd20ea762cb3751a4b4)
+# and snipe-it's pinned v12.59.0 (70a838b1a6f12abaf5bebb76ea4f28fbd37451fa)
+# -- diffed directly, not assumed; vendored from the v11.44.2 commit,
+# citation covers both. PostgresConnector.php is movim's own pinned
+# `illuminate/database` v12.69.2 (499f5112164d5bc4b744e0ac259b44e0a4c8aacc)
+# -- a structurally different file (its own `extract($config, EXTR_SKIP)`
+# idiom, no `unix_socket` concept at all), not shared with the MySQL pair.
+[[fixture]]
+path = "fixtures/cdc/illuminate-database/Connectors/MySqlConnector.php"
+repo = "laravel/framework"
+commit = "f85216c82cbd38b66d67ebd20ea762cb3751a4b4"
+upstream_path = "src/Illuminate/Database/Connectors/MySqlConnector.php"
+sha256 = "0c0426e63484ce7881d26bca798ac94d463dacfe7363dc5c2fc8c8f09c813771"
+
+[[fixture]]
+path = "fixtures/cdc/illuminate-database/Connectors/Connector.php"
+repo = "laravel/framework"
+commit = "f85216c82cbd38b66d67ebd20ea762cb3751a4b4"
+upstream_path = "src/Illuminate/Database/Connectors/Connector.php"
+sha256 = "ce4daaf2b28220a6446e9d336acddab2438c24b28ffc745d6b07b22ead5887bb"
+
+[[fixture]]
+path = "fixtures/cdc/illuminate-database/Connectors/PostgresConnector.php"
+repo = "illuminate/database"
+commit = "499f5112164d5bc4b744e0ac259b44e0a4c8aacc"
+upstream_path = "Connectors/PostgresConnector.php"
+sha256 = "6e69d658c8f334d19776fa02fcd59076873abc972df7f489f31e6da59d9f7adb"
+
 # K1 (CDC spike) consumer-contract fixture. The exact doctrine/dbal
 # version pinned by BOTH kimai 2.66.0's and davis v5.4.4's own
 # composer.lock (independently confirmed for each, not assumed shared) --
