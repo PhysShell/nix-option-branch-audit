@@ -513,3 +513,32 @@ fn audit_diff_reversed_kimai_transition_is_a_real_new_finding_with_a_notable_ent
     // Action) reconstructs.
     assert!(notable["message"].as_str().unwrap().contains("uncovered option branch"));
 }
+
+#[test]
+fn audit_diff_summary_path_writes_a_real_bounded_markdown_file() {
+    // P3c: `--summary-path` is the whole reason a consuming GitHub
+    // Action can stay "dumb" -- it never re-renders the JSON report
+    // itself, only `cat`s this file verbatim into the step summary.
+    let summary_path = std::env::temp_dir().join("oba-test-audit-diff-summary-path.md");
+    let _ = std::fs::remove_file(&summary_path);
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/kimai/after",
+        "--head-root",
+        "fixtures/kimai/before",
+        "--targets",
+        "fixtures/synthetic/diff-kimai/targets.toml",
+        "--format",
+        "json",
+        "--summary-path",
+        summary_path.to_str().unwrap(),
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let markdown = std::fs::read_to_string(&summary_path).expect("summary file was written");
+    assert!(markdown.contains("## Nix contract audit"));
+    assert!(markdown.contains("| New findings | 1 |"));
+    assert!(markdown.contains("### NEW FINDING"));
+    assert!(markdown.contains("**OBA001** `database.socket` (oba)"));
+    let _ = std::fs::remove_file(&summary_path);
+}

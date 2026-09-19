@@ -4152,7 +4152,13 @@ fn run(cli: &Cli) -> anyhow::Result<i32> {
                 "cannot combine the `audit-diff` subcommand with legacy top-level --targets/--census"
             );
         }
-        return run_audit_diff(&args.base_root, &args.head_root, &args.targets, args.format);
+        return run_audit_diff(
+            &args.base_root,
+            &args.head_root,
+            &args.targets,
+            args.format,
+            args.summary_path.as_deref(),
+        );
     }
 
     if let Some(dir) = &cli.census {
@@ -4869,6 +4875,14 @@ struct AuditDiffArgs {
     targets: PathBuf,
     #[arg(long, value_enum, default_value_t = AuditFormat::Text)]
     format: AuditFormat,
+    /// P3c: when set, ALSO write a bounded, ready-to-post GitHub Actions
+    /// step-summary Markdown document to this path -- computed from the
+    /// SAME run, zero extra `nix eval` cost. Exists so a consuming
+    /// Action never has to reclassify or reformat the JSON report
+    /// itself (see `render_github_summary`'s own doc comment); `--format`
+    /// (json/text) is unaffected either way.
+    #[arg(long = "summary-path")]
+    summary_path: Option<PathBuf>,
 }
 
 /// CDC's own diff algebra, parallel to (never modifying) OBA's own
@@ -5164,11 +5178,68 @@ fn cdc_verdict_str(v: ResultVerdict) -> &'static str {
     }
 }
 
+/// P3c: renders `--summary-path`'s own bounded GitHub Actions step
+/// summary, in Markdown, ready to append to `$GITHUB_STEP_SUMMARY`
+/// verbatim. Pure and fully offline-testable -- takes an
+/// already-computed `AuditDiffSummary` (built once, by `run_audit_diff`
+/// itself), never re-derives anything from raw JSON. This is the whole
+/// point of P3c's own "dumb Action" requirement: every classification
+/// decision (`new_finding` vs `new_inconclusive`, what counts as
+/// notable) already happened in `classify_transition_bucket`/
+/// `push_notable`; this function only ever formats already-decided
+/// facts as Markdown, the same way a consuming Action's `run:` step is
+/// only ever meant to `cat` this file into the real step summary, never
+/// re-interpret the JSON report itself.
+fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
+    use std::fmt::Write as _;
+    let mut out = String::new();
+    out.push_str("## Nix contract audit\n\n");
+    if exit_code == 2 {
+        out.push_str(
+            "_Analysis was inconclusive on at least one side -- see the full artifact for details._\n\n",
+        );
+    }
+    out.push_str("| | |\n|---|---:|\n");
+    let _ = writeln!(out, "| New findings | {} |", summary.new_findings);
+    let _ = writeln!(out, "| Resolved findings | {} |", summary.resolved_findings);
+    let _ = writeln!(out, "| New inconclusives | {} |", summary.new_inconclusives);
+    let _ = writeln!(out, "| Evidence-only changes | {} |", summary.evidence_changed);
+    let _ = writeln!(out, "| Unchanged | {} |", summary.unchanged);
+    out.push('\n');
+
+    for n in &summary.notable {
+        let heading = match n.bucket {
+            "new_finding" => "NEW FINDING",
+            "new_inconclusive" => "NEW INCONCLUSIVE",
+            // Defensive: push_notable is only ever called with these two
+            // bucket labels today, but this function never assumes that
+            // silently -- an unrecognized future bucket still renders,
+            // just without a specially-cased heading.
+            other => other,
+        };
+        let _ = writeln!(out, "### {heading}");
+        let _ = writeln!(out, "**{}** `{}` ({})", n.code.unwrap_or("-"), n.subject, n.engine);
+        out.push('\n');
+        let _ = writeln!(out, "> {}", n.message);
+        if let Some(detail) = &n.detail {
+            let _ = writeln!(out, ">\n> {detail}");
+        }
+        out.push('\n');
+    }
+
+    if summary.notable_total > summary.notable.len() {
+        let _ = writeln!(out, "_+{} more in the full artifact._", summary.notable_total - summary.notable.len());
+    }
+
+    out
+}
+
 fn run_audit_diff(
     base_root: &Path,
     head_root: &Path,
     targets_path: &Path,
     format: AuditFormat,
+    summary_path: Option<&Path>,
 ) -> anyhow::Result<i32> {
     let manifest_src = fs::read_to_string(targets_path)
         .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", targets_path.display()))?;
@@ -5335,6 +5406,12 @@ fn run_audit_diff(
         } else {
             0
         };
+
+    if let Some(path) = summary_path {
+        let markdown = render_github_summary(&summary, exit_code);
+        fs::write(path, markdown)
+            .map_err(|e| anyhow::anyhow!("writing --summary-path {}: {e}", path.display()))?;
+    }
 
     match format {
         AuditFormat::Json => {
@@ -7398,5 +7475,97 @@ mod tests {
         }
         assert_eq!(total, NOTABLE_LIMIT + 5);
         assert_eq!(notable.len(), NOTABLE_LIMIT);
+    }
+
+    // =======================================================================
+    // P3c: `render_github_summary` -- pure, offline, exactly the Markdown
+    // a consuming Action `cat`s verbatim into `$GITHUB_STEP_SUMMARY`.
+    // =======================================================================
+
+    #[test]
+    fn render_github_summary_bare_counts_appear_even_with_no_notable_entries() {
+        let summary = AuditDiffSummary {
+            unchanged: 47,
+            new_findings: 2,
+            resolved_findings: 1,
+            new_inconclusives: 1,
+            evidence_changed: 3,
+            ..Default::default()
+        };
+        let md = render_github_summary(&summary, 0);
+        assert!(md.contains("## Nix contract audit"));
+        assert!(md.contains("| New findings | 2 |"));
+        assert!(md.contains("| Resolved findings | 1 |"));
+        assert!(md.contains("| New inconclusives | 1 |"));
+        assert!(md.contains("| Evidence-only changes | 3 |"));
+        assert!(md.contains("| Unchanged | 47 |"));
+        // exit 0 -- no inconclusive caveat.
+        assert!(!md.contains("inconclusive on at least one side"));
+    }
+
+    #[test]
+    fn render_github_summary_exit_code_2_adds_the_inconclusive_caveat() {
+        let md = render_github_summary(&AuditDiffSummary::default(), 2);
+        assert!(md.contains("inconclusive on at least one side"));
+    }
+
+    #[test]
+    fn render_github_summary_renders_a_notable_finding_with_real_text_verbatim() {
+        let summary = AuditDiffSummary {
+            new_findings: 1,
+            notable_total: 1,
+            notable: vec![NotableChange {
+                bucket: "new_finding",
+                engine: "cdc",
+                subject: "akkoma".to_string(),
+                code: Some("CDC001"),
+                message: "emitted path is not in the accepted contract".to_string(),
+                detail: Some("mismatch: :instance.upload_dir".to_string()),
+            }],
+            ..Default::default()
+        };
+        let md = render_github_summary(&summary, 0);
+        assert!(md.contains("### NEW FINDING"));
+        assert!(md.contains("**CDC001** `akkoma` (cdc)"));
+        assert!(md.contains("> emitted path is not in the accepted contract"));
+        assert!(md.contains("> mismatch: :instance.upload_dir"));
+    }
+
+    #[test]
+    fn render_github_summary_new_inconclusive_gets_its_own_heading() {
+        let summary = AuditDiffSummary {
+            new_inconclusives: 1,
+            notable_total: 1,
+            notable: vec![NotableChange {
+                bucket: "new_inconclusive",
+                engine: "cdc",
+                subject: "vault".to_string(),
+                code: Some("CDC002"),
+                message: "consumer binding could not be proven".to_string(),
+                detail: None,
+            }],
+            ..Default::default()
+        };
+        let md = render_github_summary(&summary, 0);
+        assert!(md.contains("### NEW INCONCLUSIVE"));
+        assert!(!md.contains("### NEW FINDING"));
+    }
+
+    #[test]
+    fn render_github_summary_truncation_note_only_appears_when_actually_truncated() {
+        let mut summary = AuditDiffSummary { notable_total: 1, ..Default::default() };
+        summary.notable.push(NotableChange {
+            bucket: "new_finding",
+            engine: "cdc",
+            subject: "x".to_string(),
+            code: None,
+            message: "m".to_string(),
+            detail: None,
+        });
+        assert!(!render_github_summary(&summary, 0).contains("more in the full artifact"));
+
+        summary.notable_total = 15;
+        let md = render_github_summary(&summary, 0);
+        assert!(md.contains("_+14 more in the full artifact._"));
     }
 }
