@@ -126,9 +126,28 @@
 //! -- environment-variable contracts, the next interface family, chosen
 //! because the producer side already exists and is already proven
 //! ([`ProducerEvidence::FlatEnvVars`], K2d). Pure model only,
-//! deliberately not reusing `CliContract`/`ConsumerContract`. K5b (real
-//! historical env-var drift census) and K5c (producer correlation,
-//! reusing K4c's own A/B/C model) are not started.
+//! deliberately not reusing `CliContract`/`ConsumerContract`.
+//!
+//! K5b (done, `fixtures/cdc/k5b-env-drift-census/`): a real historical
+//! env-var drift census across a bounded ~29-candidate corpus -- found a
+//! real, source-verified removal on a real nixpkgs-crossed pair:
+//! `grafana` `12.3.3` -> `13.1.4`, the whole `[auth.passwordless]`
+//! section (`GF_AUTH_PASSWORDLESS_ENABLED`/
+//! `GF_AUTH_PASSWORDLESS_CODE_EXPIRATION`) removed, no replacement added.
+//!
+//! K5c (done): [`evaluate_grafana_env_drift`] correlates that removal
+//! with the real Nix producer -- [`EnvDriftRelevance`] mirrors K4c's A/B/C
+//! split in spirit but is a genuinely separate type (no full `EnvContract`
+//! exists for grafana on either side; K5b's confirmed removed/added sets
+//! are taken as given, not re-derived through `diff_env_contracts`). Real
+//! result: Outcome C, and a categorically stronger one than mimir's --
+//! grafana's own NixOS module never used the `GF_*` env-var interface at
+//! all, on either side of the bump (`environment` evaluates to only
+//! systemd's own default `PATH`, `EnvironmentFile` is unset); it
+//! configures entirely via a generated `config.ini` passed with
+//! `-config`. Second independent interface family confirming the same
+//! architectural point K4c already made: drift is not a finding until
+//! producer reachability is proven.
 
 use std::path::Path;
 use std::process::Command;
@@ -1714,6 +1733,153 @@ fn require_no_duplicate_vars(vars: &[String], side: &str) -> Result<Vec<String>,
     Ok(vars.to_vec())
 }
 
+/// K5c: correlates the real, K5b-confirmed env-var removal (`grafana`
+/// `12.3.3` -> `13.1.4`, `GF_AUTH_PASSWORDLESS_ENABLED`/
+/// `GF_AUTH_PASSWORDLESS_CODE_EXPIRATION`) with the real Nix-evaluated
+/// producer -- the same "drift is not a finding until producer
+/// reachability is proven" correlation K4c already did for CLI flags,
+/// applied to a SECOND, independent interface family. Deliberately does
+/// NOT reuse [`CliDriftRelevance`]: K5b never built (and was explicitly
+/// told not to build) a generic Grafana env-var extractor the way K4a
+/// vendored and parsed mimir's full Go source, so there is no full
+/// `EnvContract` for grafana on either side to run through
+/// [`diff_env_contracts`] -- the removed/added sets below are exactly
+/// what K5b already proved by direct source diff at both real tags,
+/// taken as given, not re-derived. `diff_env_contracts`/`EnvContractDiff`
+/// (K5a) stay completely untouched by this section.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EnvDriftRelevance {
+    /// The real HEAD producer still emits at least one of the removed variables.
+    ProducerStillEmitsRemoved,
+    /// The real HEAD producer emits at least one of the added (replacement)
+    /// variables. Never observed for grafana's own case -- K5b found a
+    /// pure removal, no replacement -- kept for family completeness only,
+    /// the same way K4c's own `ProducerAdoptedNew` stays real even though
+    /// THIS correlation can never reach it.
+    ProducerUsesAdded,
+    /// The producer's real emitted-variable evidence intersects neither
+    /// the removed nor the added set.
+    ProducerIrrelevant,
+}
+
+/// The exact pair K5b confirmed by direct source diff at both real tags
+/// (`v12.3.3`/`v13.1.4`) -- see `fixtures/cdc/k5b-env-drift-census/census.md`.
+/// A pure removal: the `[auth.passwordless]` section has no successor in
+/// `13.1.4`'s config surface, so the added set is genuinely empty, not
+/// merely unresearched.
+const GRAFANA_REMOVED_ENV_VARS: [&str; 2] =
+    ["GF_AUTH_PASSWORDLESS_ENABLED", "GF_AUTH_PASSWORDLESS_CODE_EXPIRATION"];
+const GRAFANA_ADDED_ENV_VARS: [&str; 0] = [];
+
+/// `12.3.3`, the oldest real `PhysShell/nixpkgs` commit touching
+/// `pkgs/by-name/gr/grafana/package.nix` -- K5b's own base revision,
+/// resolved to its full SHA here (K5b's census recorded only the short
+/// form).
+const GRAFANA_BASE_REV: &str = "3f222263343f664103f13efc3a3591191e89a425";
+
+/// Pure. Exact set-membership check -- unlike K4c's `argv_contains_flag`,
+/// no boundary logic is needed here: these are whole environment-variable
+/// NAMES compared by exact string equality, not a substring scan over a
+/// combined argv string, so there is no `-zone`/`-zones`-style prefix-
+/// collision risk to guard against.
+pub fn classify_env_drift_relevance(
+    removed: &[&str],
+    added: &[&str],
+    producer_emitted: &std::collections::BTreeSet<String>,
+) -> EnvDriftRelevance {
+    if removed.iter().any(|v| producer_emitted.contains(*v)) {
+        EnvDriftRelevance::ProducerStillEmitsRemoved
+    } else if added.iter().any(|v| producer_emitted.contains(*v)) {
+        EnvDriftRelevance::ProducerUsesAdded
+    } else {
+        EnvDriftRelevance::ProducerIrrelevant
+    }
+}
+
+/// Real: `pkgs.grafana`'s own NixOS module, evaluated with its own
+/// default configuration (`services.grafana.enable = true;`, no
+/// `environment`/`EnvironmentFile` override) -- the same "ask Nix, don't
+/// hand-interpret the module" discipline K1/K4c already used. Producer
+/// evidence is the real KEYS the module sets on the systemd unit's
+/// `environment=` (`systemd.services.<name>.environment`, a NixOS-level
+/// option that always exists, default `{}`) -- not a source grep.
+///
+/// Fails closed (`Inconclusive`, never silently absorbed as "no drift")
+/// if the module sets `serviceConfig.EnvironmentFile`: that would pull
+/// additional variables in from a file this function doesn't read, so
+/// the real emitted-variable set would be genuinely incomplete evidence,
+/// not merely inconvenient to fetch. Grafana's real HEAD module does not
+/// set it (verified: `hasEnvironmentFile = false`), so this branch is
+/// disclosed, not exercised, for the one case this project actually has.
+///
+/// Sets `services.grafana.settings.security.secret_key` to a fixed probe
+/// value -- a real requirement of the OLDER (`12.3.3`) module, whose
+/// `serviceConfig` cannot be evaluated at all (even for unrelated keys
+/// like `EnvironmentFile`) without it once that module dropped its own
+/// hardcoded default; confirmed to not affect `environment`/
+/// `EnvironmentFile` on the HEAD module either (a config-file value the
+/// env-var interface has nothing to do with).
+fn eval_grafana_producer_environment(
+    rev: &str,
+) -> Result<std::collections::BTreeSet<String>, CdcError> {
+    let expr = format!(
+        r#"let nixpkgsSrc = builtins.fetchTarball "https://github.com/PhysShell/nixpkgs/archive/{rev}.tar.gz";
+        eval = import (nixpkgsSrc + "/nixos") {{
+          system = "x86_64-linux";
+          configuration = {{
+            services.grafana.enable = true;
+            services.grafana.settings.security.secret_key = "OBA_K5C_PROBE_ONLY";
+            system.stateVersion = "24.05";
+            fileSystems."/" = {{ device = "/dev/sda1"; fsType = "ext4"; }};
+            boot.loader.grub.device = "/dev/sda";
+          }};
+        }};
+        in {{
+          environmentKeys = builtins.attrNames eval.config.systemd.services.grafana.environment;
+          hasEnvironmentFile = (eval.config.systemd.services.grafana.serviceConfig.EnvironmentFile or null) != null;
+        }}"#
+    );
+    let value = eval_nix_json(&expr)?;
+    let has_environment_file = value
+        .get("hasEnvironmentFile")
+        .and_then(JsonValue::as_bool)
+        .ok_or_else(|| {
+            CdcError::ToolError("nix eval result missing hasEnvironmentFile".to_string())
+        })?;
+    if has_environment_file {
+        return Err(CdcError::Inconclusive(
+            "grafana's real serviceConfig.EnvironmentFile is set -- the real emitted-variable \
+             set may include variables from that file, which this function does not read"
+                .to_string(),
+        ));
+    }
+    let keys = value
+        .get("environmentKeys")
+        .and_then(JsonValue::as_array)
+        .ok_or_else(|| CdcError::ToolError("nix eval result missing environmentKeys".to_string()))?;
+    keys.iter()
+        .map(|k| {
+            k.as_str().map(str::to_string).ok_or_else(|| {
+                CdcError::ToolError("environmentKeys contained a non-string entry".to_string())
+            })
+        })
+        .collect()
+}
+
+/// Real: the full K5c pipeline -- evaluate grafana's real HEAD producer
+/// environment, classify against the K5b-confirmed removed/added sets.
+/// Fails closed via `?` propagation, same as [`evaluate_mimir_cli_drift`]
+/// -- never falls back to guessing if evaluation doesn't behave as
+/// expected.
+pub fn evaluate_grafana_env_drift(rev: &str) -> Result<EnvDriftRelevance, CdcError> {
+    let producer_emitted = eval_grafana_producer_environment(rev)?;
+    Ok(classify_env_drift_relevance(
+        &GRAFANA_REMOVED_ENV_VARS,
+        &GRAFANA_ADDED_ENV_VARS,
+        &producer_emitted,
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3185,5 +3351,106 @@ mod k5a_tests {
             proptest::prop_assert_eq!(forward.added, backward.removed);
             proptest::prop_assert_eq!(forward.retained, backward.retained);
         }
+    }
+}
+
+#[cfg(test)]
+mod k5c_tests {
+    use super::*;
+
+    // --- classify_env_drift_relevance: offline, pure ---
+
+    #[test]
+    fn classify_a_producer_still_emits_removed() {
+        let emitted: std::collections::BTreeSet<String> =
+            ["PATH".to_string(), "GF_AUTH_PASSWORDLESS_ENABLED".to_string()].into_iter().collect();
+        assert_eq!(
+            classify_env_drift_relevance(&GRAFANA_REMOVED_ENV_VARS, &GRAFANA_ADDED_ENV_VARS, &emitted),
+            EnvDriftRelevance::ProducerStillEmitsRemoved
+        );
+    }
+
+    #[test]
+    fn classify_b_producer_uses_added() {
+        // a synthetic removed/added pair -- grafana's own real added set
+        // is empty, so this branch is exercised with hypothetical names,
+        // not grafana's constants (see `classify_empty_added_set_...`
+        // below for the real, always-empty-added case).
+        let removed = ["OLD_VAR"];
+        let added = ["NEW_VAR"];
+        let emitted: std::collections::BTreeSet<String> = ["NEW_VAR".to_string()].into_iter().collect();
+        assert_eq!(
+            classify_env_drift_relevance(&removed, &added, &emitted),
+            EnvDriftRelevance::ProducerUsesAdded
+        );
+    }
+
+    #[test]
+    fn classify_c_producer_irrelevant() {
+        let emitted: std::collections::BTreeSet<String> = ["PATH".to_string()].into_iter().collect();
+        assert_eq!(
+            classify_env_drift_relevance(&GRAFANA_REMOVED_ENV_VARS, &GRAFANA_ADDED_ENV_VARS, &emitted),
+            EnvDriftRelevance::ProducerIrrelevant
+        );
+    }
+
+    /// Grafana's own real case: a pure removal, no replacement -- the
+    /// `ProducerUsesAdded` branch is real code, but genuinely
+    /// unreachable for THIS correlation (`GRAFANA_ADDED_ENV_VARS` is
+    /// empty). Confirmed explicitly rather than left implicit.
+    #[test]
+    fn classify_empty_added_set_never_fires_producer_uses_added() {
+        let emitted: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+        assert_eq!(
+            classify_env_drift_relevance(&GRAFANA_REMOVED_ENV_VARS, &GRAFANA_ADDED_ENV_VARS, &emitted),
+            EnvDriftRelevance::ProducerIrrelevant
+        );
+    }
+
+    #[test]
+    fn classify_removed_takes_priority_over_added() {
+        let removed = ["OLD_VAR"];
+        let added = ["NEW_VAR"];
+        let emitted: std::collections::BTreeSet<String> =
+            ["OLD_VAR".to_string(), "NEW_VAR".to_string()].into_iter().collect();
+        assert_eq!(
+            classify_env_drift_relevance(&removed, &added, &emitted),
+            EnvDriftRelevance::ProducerStillEmitsRemoved
+        );
+    }
+
+    // --- Real end-to-end: needs a real `nix` binary and network access
+    // (fetchTarball), opt-in only, same as every other real test in
+    // this module. ---
+
+    /// The actual K5c finding: grafana's real NixOS module, evaluated
+    /// with its own default configuration, configures Grafana entirely
+    /// via a generated `config.ini` (`-config <path>`, part of
+    /// `serviceConfig.ExecStart`) -- it never sets `environment` beyond
+    /// systemd's own default `PATH`, and never sets `EnvironmentFile`
+    /// either. Outcome C: real, source-verified upstream env-var removal
+    /// (K5b) exists, but this producer's interface to Grafana was never
+    /// `GF_*` env vars at all -- a categorically stronger C than K4c's
+    /// mimir result (which at least emitted SOME CLI flags, just not
+    /// either contested one).
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn grafana_producer_correlation_is_outcome_c_producer_irrelevant() {
+        let relevance = evaluate_grafana_env_drift(AFTER_REV).unwrap();
+        assert_eq!(relevance, EnvDriftRelevance::ProducerIrrelevant);
+    }
+
+    /// Symmetry check: the BASE producer (`12.3.3`) already used the
+    /// same INI-only interface. `12.3.3`'s module requires an explicit
+    /// `settings.security.secret_key` to reach `serviceConfig.ExecStart`
+    /// at all (a real, unrelated module difference this project doesn't
+    /// otherwise model), so [`eval_grafana_producer_environment`] -- which
+    /// never touches `ExecStart` -- is exactly the right amount of real
+    /// evidence to check here.
+    #[test]
+    #[ignore = "needs a real `nix` binary and network access (fetchTarball)"]
+    fn grafana_base_producer_also_never_used_the_env_interface() {
+        let producer_emitted = eval_grafana_producer_environment(GRAFANA_BASE_REV).unwrap();
+        assert_eq!(producer_emitted, std::collections::BTreeSet::from(["PATH".to_string()]));
     }
 }
