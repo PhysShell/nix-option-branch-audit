@@ -2285,6 +2285,42 @@ no longer accepts."
     flag in head, ordering-independence) + 2 property-based (`proptest`,
     same crate/tier K3a's own tests already use).
 
+15. **K4b — real historical CLI-flag drift census. Closed,
+    `fixtures/cdc/k4b-cli-drift-census/census.md`, zero `src/cdc.rs`
+    changes — `diff_cli_contracts()`/K4a untouched.** Same question as
+    K3b, applied to the new family: does at least one real nixpkgs
+    package bump, for a real CLI-driven service, cross a real upstream
+    removal or rename of a CLI flag? Bounded corpus: ~21 real
+    candidates from a targeted NixOS module search (`ExecStart`/args
+    built directly from a package binary + flags), confirmed by build
+    system into 6 Rust, 12 Go, 3 Python.
+
+    **Result: found, at tier-1 (source) confidence, on a real
+    nixpkgs-crossed pair.** `mimir` (Go — its own `RegisterFlags(f
+    *flag.FlagSet)` convention, NOT `cobra`, a real correction to the
+    pre-round assumption), real nixpkgs pin `2.14.0` → `3.2.1`. Read
+    `pkg/querier/querier.go` directly at both exact real tags:
+    `-querier.prefer-availability-zone` (`f.StringVar`, one zone) →
+    `-querier.prefer-availability-zones` (`f.Var`, a comma-separated
+    list — a real type change alongside the rename). Exactly the trap
+    this round was warned against avoided: this is a real
+    nixpkgs-crossed pair, not an upstream changelog entry no actual
+    consumer ever observed (the `doctrine/dbal` `default_dbname` lesson
+    from K3b/K3b.1).
+
+    Lighter-touch corpus breadth, recorded not chased further once the
+    decision rule's bar was already cleared: `krill` (Rust, real but
+    messier — positional-option restructuring + a subcommand removal,
+    medium confidence, a same-name-adjacent complexity explicitly NOT
+    solved here, same discipline as `movim` in K3b); `autobrr` and
+    `borgbackup` show no drift in their checked ranges.
+
+    **Decision, per the rule fixed before this round**: ≥1 real
+    removed/renamed flag found → **proceed to K4c**. Deliberately NOT
+    checked this round: whether `mimir`'s own real NixOS module still
+    emits the old `-querier.prefer-availability-zone` name after the
+    bump — that correlation is entirely K4c's job, not K4b's.
+
 Parked, deliberately, not from lack of interest: `flarum`'s multi-
 consumer shape (one instance shouldn't force multi-consumer semantics
 into the type system before a second one shows the shape repeats), H2,
