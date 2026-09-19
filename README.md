@@ -2435,21 +2435,59 @@ pretending it doesn't exist.
     unit-test target (was 184): 124 offline (was 116, +8) + 28
     real/ignored (unchanged). Zero changes to K1–K4c code.
 
-**K5b (real historical env-var rename/removal census) is next,
-required before K5c, not started.** Same discipline as K3b/K4b: real
-nixpkgs-crossed package bumps only, never an upstream changelog entry
-no real consumer ever observed. Starting point deliberately NOT
-Laravel — this project already knows exactly how much human creativity
-a framework can interpose between an env var and its real consumer
-(K2e/K2f); K5b starts with apps whose Nix side renders environment
-directly (`systemd.services.*.environment`/`Environment=`/env files)
-AND whose consumer reads it close to directly (`getenv()` or an
-equivalent declarative registration), so the first differential proof
-stays clean.
+18. **K5b — real historical env-var drift census. Closed,
+    `fixtures/cdc/k5b-env-drift-census/census.md`, zero `src/cdc.rs`
+    changes — `diff_env_contracts()`/K5a untouched.** Same discipline
+    as K3b/K4b: real nixpkgs-crossed package bumps only, never an
+    upstream changelog entry no real consumer ever observed. Corpus
+    deliberately excluded Laravel/Symfony from the start (not filtered
+    out after the fact) — this project already knows exactly how much
+    human creativity a framework can interpose between an env var and
+    its real consumer (K2e/K2f). ~29 real candidates identified from a
+    targeted NixOS module search (`systemd.services.*.environment` set
+    directly for a binary); 3 investigated to real depth before the
+    bounded search stopped, per the explicit instruction not to keep
+    digging once a real qualifying case exists.
+
+    **Result: found, at source+schema confidence, on a real
+    nixpkgs-crossed pair.** `grafana` (Go), real nixpkgs pin `12.3.3` →
+    `13.1.4`. Consumer mechanism confirmed at the SOURCE level, not
+    assumed from the well-known `GF_*` documentation convention alone:
+    `pkg/setting/setting.go`'s `envKey := EnvKey(section.Name(),
+    key.Name()); envValue := os.Getenv(envKey)` — a real, direct
+    `os.Getenv()` call reading a name mechanically derived from the INI
+    config schema. Removed: `GF_AUTH_PASSWORDLESS_ENABLED`,
+    `GF_AUTH_PASSWORDLESS_CODE_EXPIRATION` — the entire
+    `[auth.passwordless]` section, confirmed absent by diffing the real
+    `conf/defaults.ini` directly at both exact real tags, corroborated
+    by a real, dated upstream commit. A pure removal, not a rename — no
+    direct successor key group.
+
+    **A real methodological trap caught and discarded before trusting
+    anything**: a more recent-looking rename
+    (`[marketplace]`→`[plugins_marketplace]`) turned out to postdate
+    `v13.1.4` entirely when checked directly against both real pinned
+    versions — the section doesn't exist in EITHER file. Discarded, not
+    reported — exactly the `doctrine/dbal`/`default_dbname` trap from
+    K3b/K3b.1, caught again here on the first attempt by verifying
+    against real fetched files rather than trusting a commit message's
+    own framing.
+
+    Lighter-touch breadth, real negative data points: `vaultwarden`
+    and `lldap` show no drift in their checked ranges.
+
+    **Decision, per the rule fixed before this census started**: ≥1
+    real removed env var found → **proceed to K5c**. Explicitly NOT
+    checked this round, per the explicit instruction: whether
+    `grafana`'s real NixOS module still sets either removed variable —
+    that correlation is entirely K5c's job. The search stopped the
+    moment consumer drift was proven, not extended into checking the
+    producer too, so K5b and K5c couldn't quietly merge into one round.
 
 **K5c (producer correlation) reuses the exact A/B/C model K4c already
 proved** (`ProducerStillEmitsRemoved` / `ProducerAdoptedNew` /
 `ProducerIrrelevant`) — not reinvented, the same real, checked pattern.
+Not started.
 
 Parked, deliberately, not from lack of interest: `krill`'s own
 structural CLI drift (a future `K4d`+ adversarial target), `flarum`'s
