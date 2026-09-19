@@ -5013,6 +5013,90 @@ fn compare_cdc(
     Ok(entries)
 }
 
+/// Classifies a bare `VerdictKind` into the SAME coarse Pass/Finding/
+/// Inconclusive space `oba_verdict_to_result` already assigns every real
+/// `Verdict` -- reused, not reinvented, so a `VerdictTransition{from,to}`
+/// (kind-only, no full `Verdict` payload) can be bucketed the same way a
+/// full result already is elsewhere in this file.
+fn oba_kind_class(kind: VerdictKind) -> ResultVerdict {
+    match kind {
+        VerdictKind::Oba001 => ResultVerdict::Finding,
+        VerdictKind::Pass => ResultVerdict::Pass,
+        VerdictKind::OptionNotFound
+        | VerdictKind::PredicateNotFound
+        | VerdictKind::DefaultUnresolved
+        | VerdictKind::TestValueUnresolved
+        | VerdictKind::TestConfigUnresolved => ResultVerdict::Inconclusive,
+    }
+}
+
+/// A bounded, already-classified transition worth a maintainer's
+/// immediate attention -- P3c's own real requirement: a consuming
+/// GitHub Action must never re-derive "is this a new finding" from raw
+/// JSON itself (that would smuggle real analysis logic into YAML/jq).
+/// Every field here is either a bare fact already decided elsewhere
+/// (`bucket`/`engine`/`code`) or existing text this analysis already
+/// produced verbatim (`message`/`detail`, the single most specific
+/// existing provenance line) -- nothing here is new judgment.
+#[derive(Serialize, Debug, Clone, PartialEq)]
+struct NotableChange {
+    bucket: &'static str,
+    engine: &'static str,
+    subject: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    code: Option<&'static str>,
+    message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    detail: Option<String>,
+}
+
+/// Per invariant-adjacent P3c requirement: the summary stays bounded
+/// even when a real corpus produces far more than a handful of new
+/// findings/inconclusives -- `notable_total` (uncapped) lets a consumer
+/// print "+N more in the full artifact" without recomputing anything.
+const NOTABLE_LIMIT: usize = 10;
+
+/// The one real judgment call in P3c's bounded summary, made exactly
+/// ONCE here in tested Rust -- never re-derived by a consuming Action's
+/// own jq/shell logic. `from`/`to` are already-computed `ResultVerdict`s
+/// (see `oba_kind_class`/`CdcDiff::verdict_transition`), so this is pure
+/// classification, no analysis. `Inconclusive -> Inconclusive` under a
+/// different underlying kind, and `Inconclusive -> Pass` (good news, but
+/// not one of the four named buckets P3c's own spec asks for), both
+/// deliberately return `None`.
+fn classify_transition_bucket(from: ResultVerdict, to: ResultVerdict) -> Option<&'static str> {
+    if to == ResultVerdict::Finding && from != ResultVerdict::Finding {
+        Some("new_finding")
+    } else if from == ResultVerdict::Finding && to != ResultVerdict::Finding {
+        Some("resolved_finding")
+    } else if from == ResultVerdict::Pass && to == ResultVerdict::Inconclusive {
+        Some("new_inconclusive")
+    } else {
+        None
+    }
+}
+
+fn push_notable(
+    notable: &mut Vec<NotableChange>,
+    notable_total: &mut usize,
+    bucket: &'static str,
+    engine: &'static str,
+    subject: String,
+    result: &AuditResult,
+) {
+    *notable_total += 1;
+    if notable.len() < NOTABLE_LIMIT {
+        notable.push(NotableChange {
+            bucket,
+            engine,
+            subject,
+            code: result.code,
+            message: result.message.clone(),
+            detail: result.provenance.last().cloned(),
+        });
+    }
+}
+
 #[derive(Serialize, Debug)]
 struct AuditDiffEnvelope {
     schema_version: u32,
@@ -5045,6 +5129,30 @@ struct AuditDiffSummary {
     /// classification -- same boundary `oba diff` itself already draws.
     oba_verdict_transitions: std::collections::BTreeMap<String, usize>,
     cdc_verdict_transitions: std::collections::BTreeMap<String, usize>,
+    /// Derived, bounded-summary-friendly counts, computed from the SAME
+    /// per-entry transitions above -- never a second source of truth.
+    /// `new_finding`/`resolved_finding` cross the Pass/Finding boundary
+    /// in either direction; `new_inconclusive` is specifically
+    /// Pass -> Inconclusive (a real regression in confidence, not just
+    /// "still don't know" -- Inconclusive -> Inconclusive under a
+    /// different `VerdictKind`, e.g. OBA's own sub-kinds, deliberately
+    /// bumps neither counter). `evidence_changed` is a `Changed` entry
+    /// with NO verdict transition at all (CDC's own `EvidenceChanged`,
+    /// e.g. a `proof_depth` move) -- distinct from `changed` above,
+    /// which already counts every `Changed` entry regardless of kind.
+    new_findings: usize,
+    resolved_findings: usize,
+    new_inconclusives: usize,
+    evidence_changed: usize,
+    /// Uncapped count backing `notable` below -- lets a consumer print
+    /// "+N more in the full artifact" without recomputing anything.
+    notable_total: usize,
+    /// First `NOTABLE_LIMIT` new-finding/new-inconclusive entries, in
+    /// deterministic (per-engine, then identity/candidate-sorted) order
+    /// -- already fully classified and formatted; a consuming Action
+    /// only ever needs to print these fields verbatim, never reclassify
+    /// them.
+    notable: Vec<NotableChange>,
 }
 
 fn cdc_verdict_str(v: ResultVerdict) -> &'static str {
@@ -5125,6 +5233,7 @@ fn run_audit_diff(
     }
 
     let mut summary = AuditDiffSummary::default();
+    let mut notable_total = 0usize;
     for entry in &oba_entries {
         match &entry.diff {
             TargetDiff::Unchanged => summary.unchanged += 1,
@@ -5137,6 +5246,39 @@ fn run_audit_diff(
                 .oba_verdict_transitions
                 .entry(format!("{}->{}", t.from.as_str(), t.to.as_str()))
                 .or_insert(0) += 1;
+
+            let (from_class, to_class) = (oba_kind_class(t.from), oba_kind_class(t.to));
+            let TargetDiff::Changed { head, .. } = &entry.diff else {
+                unreachable!("verdict_transition() is only Some for TargetDiff::Changed")
+            };
+            match classify_transition_bucket(from_class, to_class) {
+                Some("new_finding") => {
+                    summary.new_findings += 1;
+                    let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
+                    push_notable(
+                        &mut summary.notable,
+                        &mut notable_total,
+                        "new_finding",
+                        "oba",
+                        entry.identity.watched_path.clone(),
+                        &result,
+                    );
+                }
+                Some("resolved_finding") => summary.resolved_findings += 1,
+                Some("new_inconclusive") => {
+                    summary.new_inconclusives += 1;
+                    let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
+                    push_notable(
+                        &mut summary.notable,
+                        &mut notable_total,
+                        "new_inconclusive",
+                        "oba",
+                        entry.identity.watched_path.clone(),
+                        &result,
+                    );
+                }
+                _ => {}
+            }
         }
     }
     for entry in &cdc_entries {
@@ -5151,8 +5293,41 @@ fn run_audit_diff(
                 .cdc_verdict_transitions
                 .entry(format!("{}->{}", cdc_verdict_str(from), cdc_verdict_str(to)))
                 .or_insert(0) += 1;
+
+            let CdcDiff::Changed { head, .. } = &entry.diff else {
+                unreachable!("verdict_transition() is only Some for CdcDiff::Changed")
+            };
+            match classify_transition_bucket(from, to) {
+                Some("new_finding") => {
+                    summary.new_findings += 1;
+                    push_notable(
+                        &mut summary.notable,
+                        &mut notable_total,
+                        "new_finding",
+                        "cdc",
+                        entry.candidate.clone(),
+                        head,
+                    );
+                }
+                Some("resolved_finding") => summary.resolved_findings += 1,
+                Some("new_inconclusive") => {
+                    summary.new_inconclusives += 1;
+                    push_notable(
+                        &mut summary.notable,
+                        &mut notable_total,
+                        "new_inconclusive",
+                        "cdc",
+                        entry.candidate.clone(),
+                        head,
+                    );
+                }
+                _ => {}
+            }
+        } else if matches!(entry.diff, CdcDiff::Changed { .. }) {
+            summary.evidence_changed += 1;
         }
     }
+    summary.notable_total = notable_total;
 
     let exit_code =
         if base_oba_inconclusive || head_oba_inconclusive || cdc_inconclusive_or_tool_error {
@@ -5175,13 +5350,17 @@ fn run_audit_diff(
         }
         AuditFormat::Text => {
             println!(
-                "=== audit-diff summary: unchanged={} added={} removed={} changed={} cdc_added_subject={} cdc_removed_subject={} ===",
+                "=== audit-diff summary: unchanged={} added={} removed={} changed={} cdc_added_subject={} cdc_removed_subject={} new_findings={} resolved_findings={} new_inconclusives={} evidence_changed={} ===",
                 summary.unchanged,
                 summary.added,
                 summary.removed,
                 summary.changed,
                 summary.cdc_added_subject,
-                summary.cdc_removed_subject
+                summary.cdc_removed_subject,
+                summary.new_findings,
+                summary.resolved_findings,
+                summary.new_inconclusives,
+                summary.evidence_changed,
             );
             for entry in &oba_entries {
                 print_oba_diff_entry_human(entry);
@@ -7102,5 +7281,122 @@ mod tests {
         let head = vec![cdc_result("unpackerr", ResultVerdict::Pass, &["debug"])];
         let err = compare_cdc(&base, &head).unwrap_err();
         assert!(format!("{err}").contains("duplicate CDC candidate"));
+    }
+
+    // =======================================================================
+    // P3c: bounded summary classification (`classify_transition_bucket`,
+    // `oba_kind_class`) -- the one real judgment call in the bounded
+    // summary, pinned down here so a consuming Action never has to
+    // re-derive it from raw JSON.
+    // =======================================================================
+
+    #[test]
+    fn oba_kind_class_matches_the_real_oba_verdict_to_result_mapping() {
+        // Oba001 is the only real Finding-class kind, Pass the only
+        // Pass-class kind, every other kind is Inconclusive -- the exact
+        // same mapping `oba_verdict_to_result` already encodes per-kind.
+        assert_eq!(oba_kind_class(VerdictKind::Oba001), ResultVerdict::Finding);
+        assert_eq!(oba_kind_class(VerdictKind::Pass), ResultVerdict::Pass);
+        for k in [
+            VerdictKind::OptionNotFound,
+            VerdictKind::PredicateNotFound,
+            VerdictKind::DefaultUnresolved,
+            VerdictKind::TestValueUnresolved,
+            VerdictKind::TestConfigUnresolved,
+        ] {
+            assert_eq!(oba_kind_class(k), ResultVerdict::Inconclusive);
+        }
+    }
+
+    #[test]
+    fn classify_transition_bucket_crossing_into_finding_is_always_new_finding() {
+        for from in [ResultVerdict::Pass, ResultVerdict::Inconclusive] {
+            assert_eq!(
+                classify_transition_bucket(from, ResultVerdict::Finding),
+                Some("new_finding")
+            );
+        }
+    }
+
+    #[test]
+    fn classify_transition_bucket_crossing_out_of_finding_is_always_resolved_finding() {
+        for to in [ResultVerdict::Pass, ResultVerdict::Inconclusive] {
+            assert_eq!(
+                classify_transition_bucket(ResultVerdict::Finding, to),
+                Some("resolved_finding")
+            );
+        }
+    }
+
+    #[test]
+    fn classify_transition_bucket_pass_to_inconclusive_is_new_inconclusive() {
+        assert_eq!(
+            classify_transition_bucket(ResultVerdict::Pass, ResultVerdict::Inconclusive),
+            Some("new_inconclusive")
+        );
+    }
+
+    #[test]
+    fn classify_transition_bucket_inconclusive_to_pass_is_unbucketed_good_news() {
+        // Real, deliberate: this is a real improvement, but not one of
+        // the four named buckets P3c's own spec asks for -- the bounded
+        // summary stays focused on what needs attention, not everything
+        // that changed for the better.
+        assert_eq!(classify_transition_bucket(ResultVerdict::Inconclusive, ResultVerdict::Pass), None);
+    }
+
+    #[test]
+    fn classify_transition_bucket_same_class_is_unbucketed() {
+        // e.g. OBA's own OptionNotFound -> DefaultUnresolved: a real
+        // VerdictChanged (different VerdictKind) that never crosses a
+        // Pass/Finding/Inconclusive boundary at all.
+        assert_eq!(classify_transition_bucket(ResultVerdict::Inconclusive, ResultVerdict::Inconclusive), None);
+        assert_eq!(classify_transition_bucket(ResultVerdict::Pass, ResultVerdict::Pass), None);
+        assert_eq!(classify_transition_bucket(ResultVerdict::Finding, ResultVerdict::Finding), None);
+    }
+
+    #[test]
+    fn compare_cdc_new_finding_transition_is_classified_and_pushed_to_notable() {
+        // Full pipeline, one level below run_audit_diff itself: a real
+        // Pass -> Finding CdcDiff must both classify as "new_finding" and
+        // carry the head result's own real code/message/provenance
+        // verbatim into a NotableChange -- no new text invented.
+        let base = cdc_result("akkoma", ResultVerdict::Pass, &["debug"]);
+        let head = cdc_result("akkoma", ResultVerdict::Finding, &["debug", "upload_dir"]);
+        let diff = compare_cdc_result(&base, &head);
+        let CdcDiff::Changed { head: boxed_head, changes, .. } = &diff else {
+            panic!("expected Changed, got {diff:?}");
+        };
+        assert!(changes.contains(&CdcChangeKind::VerdictChanged));
+        let (from, to) = diff.verdict_transition().expect("a real verdict transition");
+        assert_eq!(classify_transition_bucket(from, to), Some("new_finding"));
+
+        let mut notable = Vec::new();
+        let mut total = 0usize;
+        push_notable(&mut notable, &mut total, "new_finding", "cdc", "akkoma".to_string(), boxed_head);
+        assert_eq!(total, 1);
+        assert_eq!(notable.len(), 1);
+        assert_eq!(notable[0].bucket, "new_finding");
+        assert_eq!(notable[0].engine, "cdc");
+        assert_eq!(notable[0].code, Some("CDC001"));
+        assert_eq!(notable[0].message, boxed_head.message);
+        assert_eq!(notable[0].detail.as_deref(), Some("synthetic provenance"));
+    }
+
+    #[test]
+    fn push_notable_stays_bounded_but_notable_total_keeps_counting() {
+        // Invariant-adjacent for P3c: a real corpus with far more than
+        // NOTABLE_LIMIT new findings must still produce a small, bounded
+        // `notable` list, while `notable_total` stays the real, uncapped
+        // count -- the difference is exactly what a consuming Action
+        // prints as "+N more in the full artifact".
+        let result = cdc_result("akkoma", ResultVerdict::Finding, &["upload_dir"]);
+        let mut notable = Vec::new();
+        let mut total = 0usize;
+        for i in 0..(NOTABLE_LIMIT + 5) {
+            push_notable(&mut notable, &mut total, "new_finding", "cdc", format!("candidate-{i}"), &result);
+        }
+        assert_eq!(total, NOTABLE_LIMIT + 5);
+        assert_eq!(notable.len(), NOTABLE_LIMIT);
     }
 }

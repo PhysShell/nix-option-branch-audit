@@ -449,3 +449,67 @@ fn combined_audit_diff_unifies_real_oba_and_real_cdc_self_diffs() {
     assert_eq!(v["oba"][0]["diff"]["kind"], "unchanged");
     assert_eq!(v["cdc"][0]["diff"]["kind"], "unchanged");
 }
+
+// =======================================================================
+// P3c: the bounded summary fields (`new_findings`/`resolved_findings`/
+// `new_inconclusives`/`evidence_changed`/`notable`) a consuming GitHub
+// Action reads verbatim, never reclassifies. Real, offline, using the
+// same kimai historical fixture already proven for the plain change
+// algebra above -- run in BOTH directions, since the forward direction
+// only ever exercises "resolved_finding" and the reverse direction is
+// needed to reach a real "new_finding".
+// =======================================================================
+
+#[test]
+fn audit_diff_forward_kimai_transition_is_a_resolved_finding_not_a_new_one() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/kimai/before",
+        "--head-root",
+        "fixtures/kimai/after",
+        "--targets",
+        "fixtures/synthetic/diff-kimai/targets.toml",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    assert_eq!(v["summary"]["resolved_findings"], 1);
+    assert_eq!(v["summary"]["new_findings"], 0);
+    assert_eq!(v["summary"]["new_inconclusives"], 0);
+    // a resolved finding is deliberately NOT surfaced in `notable` (only
+    // new_finding/new_inconclusive are -- see classify_transition_bucket's
+    // own doc comment), so the bounded list stays empty here.
+    assert_eq!(v["summary"]["notable_total"], 0);
+    assert_eq!(v["summary"]["notable"].as_array().unwrap().len(), 0);
+}
+
+#[test]
+fn audit_diff_reversed_kimai_transition_is_a_real_new_finding_with_a_notable_entry() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/kimai/after",
+        "--head-root",
+        "fixtures/kimai/before",
+        "--targets",
+        "fixtures/synthetic/diff-kimai/targets.toml",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    assert_eq!(v["summary"]["new_findings"], 1);
+    assert_eq!(v["summary"]["resolved_findings"], 0);
+    assert_eq!(v["summary"]["notable_total"], 1);
+    let notable = &v["summary"]["notable"][0];
+    assert_eq!(notable["bucket"], "new_finding");
+    assert_eq!(notable["engine"], "oba");
+    assert_eq!(notable["code"], "OBA001");
+    assert_eq!(notable["subject"], "database.socket");
+    // the message/detail text is the real, already-produced analysis
+    // text, reused verbatim -- not something this test (or a future
+    // Action) reconstructs.
+    assert!(notable["message"].as_str().unwrap().contains("uncovered option branch"));
+}
