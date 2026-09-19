@@ -4290,3 +4290,137 @@ only, a real finding never fails the workflow, a real tool error does;
 no per-item inline annotations in the first version), and real
 shadow-mode dogfooding against real nixpkgs PRs before any maintainer
 contact.
+
+## P3c: `audit-diff/action.yml` — a deliberately dumb advisory Action
+
+The user's own opening framing for this round: after P3b, the engine
+is right — the real risk now is duplicating policy and diff logic in
+YAML, because YAML only pretends to be a configuration format until it
+gets real power over CI. The whole round is built around one rule: the
+Action never analyzes anything itself. No jq reimplementing
+`AddedSubject` semantics, no re-classifying a finding, no guessing from
+raw JSON — it only runs the CLI and displays an already-computed
+result.
+
+```
+GitHub Action → resolve/download oba → prepare base/head roots
+  → oba audit-diff → canonical JSON artifact → small bounded summary
+```
+
+**The one real judgment call moved into tested Rust, not left for
+YAML.** `oba audit-diff`'s JSON `summary` gained four new derived
+counts — `new_findings`, `resolved_findings`, `new_inconclusives`,
+`evidence_changed` — plus a capped `notable` list (first
+`NOTABLE_LIMIT` = 10 new-finding/new-inconclusive entries, each already
+carrying its real `code`/`message`/the single most specific existing
+provenance line, verbatim, no new text invented) and an uncapped
+`notable_total` so a consumer can print "+N more in the full artifact"
+without recomputing anything. All of this comes from exactly one new
+pure function, `classify_transition_bucket(from, to)`, applied
+uniformly to both engines via `oba_kind_class` (OBA's own 7-way
+`VerdictKind`, reduced into the same Pass/Finding/Inconclusive space
+`oba_verdict_to_result` already assigns each verdict — reused, not
+reinvented) and CDC's own already-unified `ResultVerdict`. A consuming
+Action only ever reads these fields; it never re-derives what counts as
+a finding.
+
+**`--summary-path`, so the step summary costs zero extra `nix eval`.**
+A second new pure function, `render_github_summary(&AuditDiffSummary,
+exit_code)`, renders a ready-to-post Markdown document — bare counts as
+a small table, one `### NEW FINDING`/`### NEW INCONCLUSIVE` section per
+notable entry, a truncation note only when `notable_total` actually
+exceeds what's shown, and an inconclusive caveat only at exit code 2.
+`audit-diff --summary-path <file>` writes this Markdown to disk in the
+SAME run that produces the JSON report — no second, expensive real
+evaluation just to get a human-readable summary. A consuming Action's
+entire job is `cat`-ing that file into `$GITHUB_STEP_SUMMARY` verbatim.
+
+**14 new offline tests** (`classify_transition_bucket`'s full truth
+table — crossing into Finding is always `new_finding`, crossing out is
+always `resolved_finding`, `Pass → Inconclusive` is `new_inconclusive`,
+`Inconclusive → Pass` and same-class transitions are deliberately
+unbucketed; `oba_kind_class` checked against the real
+`oba_verdict_to_result` mapping; `push_notable`'s bounding; 5 pure
+`render_github_summary` tests; a real end-to-end pipeline test chaining
+`compare_cdc_result` → `classify_transition_bucket` → `push_notable`)
+plus 3 new CLI tests (the real historical kimai fixture run in both
+directions — forward is a real `resolved_finding` with an empty
+`notable` list, since only new findings/inconclusives are surfaced
+there; reversed is a real `new_finding` with a real notable entry
+carrying `OBA001`'s own real text; a real `--summary-path` file
+written and checked against a live CLI run).
+
+**`audit-diff/action.yml`** mirrors `diff/action.yml`'s own "remain
+stupid" contract exactly (install a pinned release, run the CLI, hand
+back the report) with one deliberate difference: **advisory exit
+translation**. CLI exit 2 (a real, disclosed fail-closed
+`INCONCLUSIVE` on either side) makes the Action step *succeed*, not
+fail — unlike `diff/action.yml`, which fails on exit 2. Only CLI exit
+3 (the analysis never ran at all — a bad manifest, an escaping root, a
+duplicate identity) fails the step. This is the direct, load-bearing
+consequence of this whole project's own fail-closed design: "I don't
+know" must never read as "broken" at the CI boundary, or every
+maintainer eventually learns to treat a real `INCONCLUSIVE` the same
+as a tool bug. The real, untranslated exit code is still an output, so
+a stricter consuming workflow can build its own policy on top — that
+judgment stays one level above this Action, same boundary
+`diff/action.yml` already drew for regression/improvement calls.
+Outputs stay deliberately small and scalar (`exit-code`,
+`added-findings`, `resolved-findings`, `new-inconclusives`, `changed`,
+`report-path`) — no `report-json` at all this time (unlike
+`diff/action.yml`'s convenience-only one): P3c's own spec is explicit
+that the full report belongs in the artifact, never threaded through
+Actions' own output/expression plumbing. No inline annotations in this
+version — a CDC finding's real "here's the exact wrong line" mapping
+spans a whole producer → artifact → binding → consumer chain, and
+picking one line would be false precision; summary + artifact first,
+annotations later only if a reliable primary source location emerges.
+
+**A real release was needed first, same reason `diff/action.yml`
+needed one**: v0.3.0 and earlier predate `audit`/`audit-diff` (and
+`--summary-path`) entirely — cut `v0.4.0` (isolated version-bump
+commit, full local gate green, CI green on that exact commit, tag
+pushed, then a real clean-scratch-dir install + `--help` + a live
+`audit-diff --summary-path` run against this repo's own fixtures, all
+checked against the actual published binary before trusting it in any
+workflow) *before* writing `audit-diff/action.yml`'s own dogfood, per
+PR A's own acceptance bar. Deliberately not a moving `v1` alias tag
+yet — a concrete, dogfooded release first, an alias/tag policy
+decision later.
+
+**`dogfood-audit-diff.yml`, the real acceptance gate, run against the
+actual published `v0.4.0` binary**, exactly as specified up front:
+
+```
+self diff        → 0 meaningful changes
+buggy → fixed     → a real resolved finding
+fixed → buggy     → a real new (added) finding
+inconclusive      → Action step succeeds (advisory, not a failure)
+tool error        → Action step fails
+```
+
+All five real against this repo's own historical `fixtures/kimai/
+before`/`fixtures/kimai/after` pair (the same real
+`5530e24f2` → `37f81efa4` fix P3b's own dogfood already proves) plus
+`targets/golden.toml` compared against itself (the same real
+`OptionNotFound`-on-both-sides inconclusive shape `dogfood.yml`/
+`dogfood-diff.yml` already exercise) for the inconclusive case, and an
+unknown `[[cdc_target]]` name (a real `TOOL_ERROR` at manifest
+validation, needing no `nix`/network at all) for the tool-error case —
+so this whole workflow stays as cheap as `dogfood-diff.yml`, no `nix`
+provisioning required. The inconclusive step needed no
+`continue-on-error` at all: it naturally succeeds, which is itself part
+of the proof that the advisory translation works, not just a claim
+about it. Confirmed green on the very first real CI run, every step
+conclusion checked individually via `gh run view --json jobs`, not
+just the job's overall green checkmark.
+
+**Not started in this round, per the user's own explicit staging**:
+real shadow-mode dogfooding against real nixpkgs PRs — collecting real
+statistics (PRs inspected / applicable cases / findings / inconclusives
+/ manual confirmations / false positives / runtime) for some real
+stretch of time, never posting a PR comment during this phase — before
+any maintainer contact. Per the user's own closing observation: the
+next real unknown is no longer technical (`cdc.rs` can't answer it) —
+whether the signal is actually useful to a maintainer on a live stream
+of real changes, and how often the tool gets in the way.
