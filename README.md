@@ -4601,3 +4601,62 @@ test config/`ExecStart`/environment/generated config/package version,
 counted separately so neither number can be accused of cherry-picking)
 — the only round that can actually answer the still-open actionability
 question.
+
+## S2: prevalence + stress cohorts — the first real precision measurement
+
+Frozen at `v0.4.1` (`4ba459b`), real-verified from a clean scratch-dir
+install of the actual published release. 50 fresh PRs, non-overlapping
+with S1 (reusing S1's own 132 already-screened, never-drawn survivors
+plus a small top-up fetch), split into two cohorts whose metrics stay
+strictly separate throughout: **S2-A** (30, plain mechanical draw —
+"how often does `v0.4.1` say anything at all") and **S2-B** (20,
+mechanically content-filtered for a real chance of a transition —
+"when there's a real chance, how accurate is it").
+
+**`TOOL_ERROR` is 0/50** — S1-F1's fix holds completely on fresh,
+non-overlapping data, including two new real module births
+(`#532540`, `#552038`), a test-file-birth variant against a
+pre-existing module (`#469112`, `#559239`), and two real module
+deaths (`#563778` pghero, `#559393` go-neb) — none of which hard-fail.
+
+**Zero false findings across all 7 real notable entries, both
+cohorts** — but **actionable precision (S2-B) is only 60% (3/5)**
+against **100% correctness precision** — the real gap S1's own quiet
+sample couldn't show. Two correct findings weren't about what their
+own PR actually changed: `#547038` surfaced a real, pre-existing gap
+only because the PR happened to add the FIRST test file for that
+module (an `Added`-via-new-test-file artifact); `#554495`'s real
+finding sat on a plain passthrough unrelated to the PR's own real new
+logic (which is gated on `config.system.stateVersion`, outside any
+watched option entirely — a real scope boundary, not a false result).
+
+**Real, newly-discovered limitations, none fixed during this round per
+its own freeze**: the shared `exporters.nix` framework's `extraOpts`
+convention hides real `mkOption` declarations from **every Prometheus
+exporter module in nixpkgs** (`#552038`) — the most consequential gap
+by breadth this round found; nginx splits an option's own declaration
+and its real predicate across two files (`#549553`), outside
+`analyze()`'s single-module-file model; a likely-related nested
+`attrsOf(submodule)` declaration gap (`#559009`); one real, unexplained
+`OptionNotFound` anomaly on an apparently-standard flat declaration
+shape (`#558149`), verified twice, not root-caused. A second,
+independent real confirmation of the already-known "`EvidenceChanged`
+never populated for OBA" gap (`#528118`, mirroring S1's own `#559055`).
+Two clean negative confirmations that `removed_subject_with_finding`
+correctly stays silent on a Pass-class removal — though no PR in this
+round positively triggered it.
+
+**Verdict, per the pre-registered decision rule**: fix concrete issues
+found, then re-run — explicitly neither "ship beta" nor "reconsider
+positioning". Real applicability (~70-73% across both cohorts), zero
+false findings, trivial runtime (`0.005s`-`0.11s` per real run), and a
+genuinely quiet tool on ordinary PRs (28/30 S2-A PRs completely
+silent) are all confirmed; the PR-relevance gap and the `exporters.nix`
+breadth are the concrete blockers to close before any beta claim.
+
+**Not started, per the user's own explicit staging, awaiting explicit
+go**: fixing `#558149`'s anomaly, a product-level answer for the
+`Added`-via-new-test-file PR-relevance nuance, and — the next real
+priority by breadth, though not undertaken here — scanner work on the
+`exporters.nix extraOpts` pattern. A fresh S2-style re-run after those
+fixes, reusing the same cohort machinery, is the natural next check.
