@@ -4150,3 +4150,143 @@ artifact — this project's own PR D3 `${{ }}`-splicing lesson already
 named as the reason the summary must stay bounded and rendered by real
 code, never templated). `nixpkgs-review` integration stays untouched,
 a later, optional fourth step.
+
+## P3b: `oba audit-diff` — base/head comparison, unified
+
+`oba audit`'s own single-root report answers "what does this checkout
+look like." It doesn't answer "did this PR change anything" without a
+human diffing two JSON blobs by eye. `oba audit-diff` answers that
+directly, reusing `oba diff`'s own D2 philosophy exactly: two
+independent roots, no Git inside the core tool at all (a caller
+supplies two already-checked-out directories, however it got them).
+
+```
+oba audit-diff --base-root <dir> --head-root <dir> --targets targets.toml --format json
+```
+
+**Two engines, two comparison strategies, one report — deliberately
+not one reimplementation of the other.** OBA's half is not new code:
+`run_audit_diff` calls the already-proven `analyze()`/`compare()` pair
+completely unchanged for every `[[target]]` entry, exactly the same
+functions `oba diff` itself already calls — a real reuse, not a
+parallel implementation that happens to agree today. CDC has no
+existing `compare()` to reuse (nothing needed one before this), so
+`compare_cdc_result` is genuinely new: it classifies each named
+`[[cdc_target]]` candidate against both roots' own real
+`run_cdc_candidate` output as `Unchanged`, `AddedSubject` (unanalyzable
+on base, real on head), `RemovedSubject` (the reverse), or `Changed`
+with an explicit `changes: [verdict_changed | evidence_changed]` list.
+
+**Comparing normalized results, never raw JSON, per the user's own
+explicit instruction.** `provenance`/`message` text is allowed to
+differ harmlessly between two runs (a path string, a source snippet) —
+`cdc_evidence_differs` compares only the structured `cdc_evidence`/
+`oba_evidence` sub-objects, ignoring prose entirely. A `ProofDepth`
+change (`structural` → `byte_exact` or back) is real signal and
+correctly surfaces as its own `evidence_changed`, distinct from a
+`verdict_changed` — confirmed by a dedicated offline test
+(`cdc_diff_evidence_changed_when_verdict_same_but_evidence_differs`).
+When both verdict and evidence differ at once, only `verdict_changed`
+is reported (not both) — a verdict change already implies the evidence
+moved; reporting both would double-count the same real transition.
+
+**Change algebra stays boring accounting, semantic transition is
+reported separately — the same split this project already committed to
+for OBA's own `ChangeKind` vs `VerdictKind` pair.** `AuditDiffSummary`
+tracks `unchanged`/`added`/`removed`/`changed` (D2's own vocabulary,
+unchanged) completely apart from `oba_verdict_transitions`/
+`cdc_verdict_transitions` (two separate `BTreeMap<String, usize>` keyed
+`"<from>->to"`, e.g. `"oba001->pass"`) — kept as two separate maps, not
+one shared vocabulary, because OBA's 7-way `VerdictKind` and CDC's
+4-way `ResultVerdict` are genuinely different enumerations, not aliases
+of each other. Neither core type is ever named "regression" or
+"improvement" — that judgment call belongs in a future P3c summary
+renderer, not in the comparison core itself.
+
+**Nine invariants, fixed before writing the comparison logic, each with
+its own test**:
+
+1. `audit-diff A A` is all `Unchanged` — `oba_only_self_diff_is_all_unchanged`
+   (offline) and `cdc_only_self_diff_is_unchanged`/
+   `combined_audit_diff_unifies_real_oba_and_real_cdc_self_diffs` (real,
+   `#[ignore]`d) all confirm this against real local checkouts, not
+   only synthetic fixtures.
+2. Target/finding order never affects the result —
+   `compare_cdc_is_order_independent` (the comparison is built entirely
+   from `BTreeMap`/`BTreeSet`, order-independent by construction, not
+   by a later sort pass) plus `audit_diff_json_is_byte_stable_across_repeated_runs`
+   at the real CLI level.
+3. A duplicate `[[cdc_target]]` identity is a real `TOOL_ERROR`, never
+   first-wins — `compare_cdc_duplicate_candidate_on_one_side_is_an_error`.
+   In practice this path is unreachable today (`validate_manifest`
+   already rejects a duplicate name before any comparison runs), and
+   it's checked directly anyway rather than assumed — this project's
+   own standing rule against taking "should be unreachable" on faith.
+4. Presentation/provenance-only differences never create a semantic
+   change — `cdc_diff_provenance_text_alone_never_creates_a_change`.
+5. PASS/FINDING/INCONCLUSIVE transitions are counted explicitly, not
+   folded into a generic "changed" bucket — `oba_verdict_transitions`/
+   `cdc_verdict_transitions`, confirmed live by
+   `oba_only_diff_reaches_the_real_historical_oba001_to_pass_transition`
+   reaching the real `"oba001->pass"` key through the actual CLI.
+6. A `proof_depth` change is its own `EvidenceChanged`, never a new
+   finding — covered above.
+7. Base/head root confinement is preserved — `run_audit_diff` reuses
+   `analyze()`'s own existing root-confinement logic unchanged for OBA;
+   CDC's `LocalPath` confinement (P3a) applies identically to both
+   roots since both are canonicalized the same way.
+8. No Git inside the core — `--base-root`/`--head-root` are plain
+   directories; the caller (a future P3c Action) owns checking them
+   out.
+9. Exit code never fails just because a `Finding` or a real transition
+   appears — `audit_diff_exit_code_is_2_when_either_side_is_inconclusive_never_1`
+   and the historical-transition test above both confirm exit 0 for a
+   real, non-trivial `Changed` result. `audit-diff` uses the exact same
+   0/2/3 scheme as `oba diff` (never a bare 1): 3 for a tool/input
+   error, 2 if OBA is inconclusive on either side or any CDC result is
+   `Inconclusive`/`ToolError` on either side (a per-candidate CDC
+   `ToolError` counts toward exit 2, not 3 — a real, disclosed "couldn't
+   determine this one" within an otherwise-successful comparison, not a
+   whole-run failure), 0 otherwise.
+
+**Candidate-applicability drift is modeled explicitly, not folded into
+an ordinary transition** — a CDC candidate becoming analyzable (or
+stopping being analyzable) between base and head is `AddedSubject`/
+`RemovedSubject`, never a same-subject `VerdictChanged`, per the user's
+own explicit warning that conflating the two would eventually make a
+future GitHub summary lie about what actually happened. A real
+historical trigger for this case was attempted (`akkoma`/`spacecookie`
+against an older pinned revision) and did not materialize — both
+candidates were already stable across every real revision available —
+an honest negative result, not a gap: covered instead by two dedicated
+synthetic unit tests
+(`cdc_diff_added_subject_when_base_could_not_be_analyzed_and_head_is_real`,
+`cdc_diff_removed_subject_when_base_is_real_and_head_could_not_be_analyzed`),
+plus a third confirming both sides being unanalyzable is `Unchanged`,
+not `Added`+`Removed`
+(`cdc_diff_both_sides_tool_error_is_unchanged_not_added_or_removed`).
+
+**Real, live confirmation**: manually run against two genuinely
+different real local nixpkgs checkouts (an older pinned revision and
+the current `CE12_REV`), `spacecookie` and `akkoma` both correctly
+compared `Unchanged` — the real negative case above. 13 new offline
+tests (11 pure `CdcDiff`/`compare_cdc` unit tests in `src/main.rs`,
+plus `oba_only_self_diff_is_all_unchanged` and
+`oba_only_diff_reaches_the_real_historical_oba001_to_pass_transition`
+at the CLI level) and 2 new real `#[ignore]`d CLI tests
+(`cdc_only_self_diff_is_unchanged`,
+`combined_audit_diff_unifies_real_oba_and_real_cdc_self_diffs`) all
+pass. Zero new clippy warnings. All pre-existing suites
+(`golden.rs`, `check_root.rs`, `diff_cli.rs`, `fixture_integrity.rs`,
+the full offline `--bin oba` suite, and the full real `--ignored`
+suite across both `--bin oba` and `tests/audit_cli.rs`) stay green.
+
+**Not started in this round, per the user's own explicit staging**:
+P3c (the advisory GitHub Action itself — checkout base/head, run
+`audit-diff`, publish the full JSON as an artifact plus a bounded job
+summary that hides `Unchanged` by default and shows only new findings,
+resolved findings, new inconclusives, and evidence changes; advisory
+only, a real finding never fails the workflow, a real tool error does;
+no per-item inline annotations in the first version), and real
+shadow-mode dogfooding against real nixpkgs PRs before any maintainer
+contact.

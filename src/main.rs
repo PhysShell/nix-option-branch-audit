@@ -100,6 +100,11 @@ enum Command {
     /// already-frozen engines (OBA's own `analyze()`, CDC's own
     /// `cdc::run_cdc_candidate`) into one command.
     Audit(AuditArgs),
+    /// P3b: compare `audit`'s own unified result between two roots --
+    /// the same real D2 "two directories, no Git inside core" philosophy
+    /// `oba diff` already established, extended to cover CDC's own
+    /// results too.
+    AuditDiff(AuditDiffArgs),
 }
 
 #[derive(clap::ValueEnum, Clone, Copy, Debug, PartialEq, Eq)]
@@ -4141,6 +4146,15 @@ fn run(cli: &Cli) -> anyhow::Result<i32> {
         return run_audit(&args.root, &args.targets, args.format);
     }
 
+    if let Some(Command::AuditDiff(args)) = &cli.command {
+        if cli.targets.is_some() || cli.census.is_some() {
+            anyhow::bail!(
+                "cannot combine the `audit-diff` subcommand with legacy top-level --targets/--census"
+            );
+        }
+        return run_audit_diff(&args.base_root, &args.head_root, &args.targets, args.format);
+    }
+
     if let Some(dir) = &cli.census {
         return run_census(dir, cli.json);
     }
@@ -4399,7 +4413,7 @@ enum Severity {
     Inconclusive,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct AuditResult {
     /// Which real analyzer engine produced this result -- `"oba"` or
     /// `"cdc"`. Routes a JSON reader to the right evidence sub-shape;
@@ -4433,7 +4447,7 @@ struct AuditResult {
 /// process reads these exact bytes" -- C-E1.2c's own real, audited
 /// finding (9 of 11 real candidates are architectural, not byte-exact)
 /// stays visible on every single result, not just in a README.
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct CdcResultEvidence {
     producer: CdcProducerEvidence,
     binding: CdcBindingEvidence,
@@ -4441,31 +4455,31 @@ struct CdcResultEvidence {
     comparison: CdcComparisonEvidence,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct CdcProducerEvidence {
     proved: bool,
     format: cdc::ConfigFormat,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct CdcBindingEvidence {
     kind: &'static str,
     proof_depth: cdc::ProofDepth,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct CdcConsumerEvidence {
     name: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct CdcComparisonEvidence {
     emitted_paths: Vec<String>,
     accepted_paths: Vec<String>,
     opaque_paths: Vec<String>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct ObaResultEvidence {
     option: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -4792,6 +4806,425 @@ fn run_audit(root: &Path, targets_path: &Path, format: AuditFormat) -> anyhow::R
     }
 
     Ok(exit_code)
+}
+
+// =======================================================================
+// P3b: `oba audit-diff` -- the unified counterpart to `oba diff`.
+// `oba audit` (P3a) answers "what's in one state"; this answers "what
+// changed between two states", the minimal next layer a real PR
+// workflow actually needs (without it, a future GitHub Action would
+// just print two huge reports side by side).
+//
+// Pre-registered invariants (checked by real tests below, not just
+// asserted in prose):
+//   1. `audit-diff A A` -> every entry `Unchanged`.
+//   2. Target/finding order never affects the result (deterministic,
+//      sorted output).
+//   3. A duplicate identity on either side is a real TOOL_ERROR, never
+//      first-wins -- OBA's own existing `compare()`/`CompareError`
+//      already enforces this for OBA identities; CDC's own candidate
+//      names are already guaranteed unique by `validate_manifest`
+//      (defensively re-checked here anyway, not just trusted).
+//   4. Presentation/provenance text changing alone never creates a
+//      semantic (`VerdictChanged`) diff by itself -- only a REAL
+//      `verdict` difference does; evidence-only differences (e.g. a
+//      real `proof_depth` change, or a real dotted-path list changing)
+//      become their own `EvidenceChanged`, never a brand-new finding.
+//   5. PASS/FINDING/INCONCLUSIVE(/TOOL_ERROR for CDC) transitions are
+//      counted explicitly, never silently absorbed into "Changed".
+//   6. A CDC candidate's own real ANALYZABILITY changing (a real
+//      `ToolError` on one side, a real verdict on the other) is its own
+//      `AddedSubject`/`RemovedSubject` kind, never an ordinary
+//      `VerdictChanged` -- "couldn't even try" -> "here's a real
+//      verdict" is a qualitatively different, more significant event
+//      than an ordinary verdict flip.
+//   7. `--base-root`/`--head-root` keep the exact same real security
+//      boundary `check --root`/`diff --*-root` already have.
+//   8. No Git anywhere in this file -- two plain directories in, a pure
+//      comparison out, exactly `oba diff`'s own D2 philosophy.
+//   9. Exit code never fails just because a real `Finding` exists --
+//      matching `oba diff`'s own existing 0/2/3 scheme (0 = comparison
+//      produced; 2 = analysis inconclusive on either side, INCLUDING a
+//      per-CDC-candidate real `ToolError` -- a real, disclosed
+//      "couldn't determine this one" state within an otherwise-
+//      successful run, not the same class as a whole-run failure; 3 =
+//      a genuine whole-run tool/input error -- bad manifest, a missing
+//      OBA module/test file, a duplicate identity). Exit `1` never
+//      appears for this command at all, same as `oba diff`.
+// =======================================================================
+
+#[derive(clap::Args)]
+struct AuditDiffArgs {
+    /// Same real security boundary as `audit --root`/`diff --base-root`.
+    #[arg(long)]
+    base_root: PathBuf,
+    /// Same real security boundary as `audit --root`/`diff --head-root`.
+    #[arg(long)]
+    head_root: PathBuf,
+    /// ONE manifest applied to both roots -- same deliberate choice
+    /// `oba diff` already made (comparing two different *specifications*
+    /// of what to watch is a different, messier question this tool
+    /// isn't trying to answer).
+    #[arg(long)]
+    targets: PathBuf,
+    #[arg(long, value_enum, default_value_t = AuditFormat::Text)]
+    format: AuditFormat,
+}
+
+/// CDC's own diff algebra, parallel to (never modifying) OBA's own
+/// existing `ChangeKind`/`TargetDiff`/`compare()`. CDC candidates are
+/// always present on both sides by construction (one shared manifest,
+/// `validate_manifest` already guarantees each `[[cdc_target]]` name is
+/// unique) -- there is no ordinary "Added/Removed" the way OBA's own
+/// `compare()` has for an option genuinely absent from one side's own
+/// watch list. What CAN happen, and needs its own real vocabulary
+/// (invariant 6 above), is a candidate's own real analyzability
+/// changing between base and head.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum CdcChangeKind {
+    VerdictChanged,
+    EvidenceChanged,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+enum CdcDiff {
+    Unchanged,
+    AddedSubject { head: Box<AuditResult> },
+    RemovedSubject { base: Box<AuditResult> },
+    Changed { base: Box<AuditResult>, head: Box<AuditResult>, changes: Vec<CdcChangeKind> },
+}
+
+impl CdcDiff {
+    fn verdict_transition(&self) -> Option<(ResultVerdict, ResultVerdict)> {
+        match self {
+            CdcDiff::Changed { base, head, changes } if changes.contains(&CdcChangeKind::VerdictChanged) => {
+                Some((base.verdict, head.verdict))
+            }
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+struct CdcComparisonEntry {
+    candidate: String,
+    diff: CdcDiff,
+}
+
+/// Mirrors `compare()`'s own `CompareError` shape and purpose (invariant
+/// 3) -- defensive, not load-bearing: `validate_manifest` already
+/// rejects a duplicate `[[cdc_target]]` name before any audit ever
+/// runs, so this should be unreachable in practice, but "should be
+/// unreachable" is exactly the kind of claim this project's own
+/// discipline never takes on faith.
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct DuplicateCdcCandidateError {
+    side: CompareSide,
+    candidate: String,
+}
+
+impl std::fmt::Display for DuplicateCdcCandidateError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "duplicate CDC candidate result on the {:?} side: {}", self.side, self.candidate)
+    }
+}
+
+impl std::error::Error for DuplicateCdcCandidateError {}
+
+fn index_cdc_results_by_candidate(
+    results: &[AuditResult],
+    side: CompareSide,
+) -> Result<std::collections::BTreeMap<String, &AuditResult>, DuplicateCdcCandidateError> {
+    let mut index = std::collections::BTreeMap::new();
+    for r in results.iter().filter(|r| r.engine == "cdc") {
+        if index.insert(r.target.clone(), r).is_some() {
+            return Err(DuplicateCdcCandidateError { side, candidate: r.target.clone() });
+        }
+    }
+    Ok(index)
+}
+
+/// Real difference in EVIDENCE (not just the top-level `verdict`) --
+/// `proof_depth`, `binding.kind`, `consumer.name`, or any of the real
+/// dotted-path lists differing. Deliberately does NOT look at
+/// `provenance`/`message` text at all (invariant 4 -- presentation
+/// text is explicitly excluded from ever counting as a change on its
+/// own).
+fn cdc_evidence_differs(base: &AuditResult, head: &AuditResult) -> bool {
+    base.cdc_evidence != head.cdc_evidence || base.oba_evidence != head.oba_evidence
+}
+
+fn compare_cdc_result(base: &AuditResult, head: &AuditResult) -> CdcDiff {
+    match (base.verdict, head.verdict) {
+        (ResultVerdict::ToolError, ResultVerdict::ToolError) => CdcDiff::Unchanged,
+        (ResultVerdict::ToolError, _) => CdcDiff::AddedSubject { head: Box::new(head.clone()) },
+        (_, ResultVerdict::ToolError) => CdcDiff::RemovedSubject { base: Box::new(base.clone()) },
+        (b, h) => {
+            let mut changes = Vec::new();
+            if b != h {
+                changes.push(CdcChangeKind::VerdictChanged);
+            } else if cdc_evidence_differs(base, head) {
+                // only flagged when the verdict itself did NOT change --
+                // if it did, the evidence differing is expected/implied,
+                // not worth double-reporting (invariant 4/5).
+                changes.push(CdcChangeKind::EvidenceChanged);
+            }
+            if changes.is_empty() {
+                CdcDiff::Unchanged
+            } else {
+                CdcDiff::Changed { base: Box::new(base.clone()), head: Box::new(head.clone()), changes }
+            }
+        }
+    }
+}
+
+/// Pure: given both sides' already-complete real `AuditResult` lists,
+/// produces a deterministic, sorted-by-candidate-name CDC comparison.
+/// No filesystem, no Git, no GitHub (invariant 8).
+fn compare_cdc(
+    base_results: &[AuditResult],
+    head_results: &[AuditResult],
+) -> anyhow::Result<Vec<CdcComparisonEntry>> {
+    let base_index = index_cdc_results_by_candidate(base_results, CompareSide::Base)
+        .map_err(|e| anyhow::anyhow!("{e}"))?;
+    let head_index = index_cdc_results_by_candidate(head_results, CompareSide::Head)
+        .map_err(|e| anyhow::anyhow!("{e}"))?;
+    let mut names: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+    names.extend(base_index.keys().cloned());
+    names.extend(head_index.keys().cloned());
+    let mut entries = Vec::with_capacity(names.len());
+    for candidate in names {
+        // both indexes are built from the SAME shared manifest's own
+        // `[[cdc_target]]` list applied to both roots, so a name
+        // present in the union is, by construction, present in BOTH
+        // indexes -- there is no real "candidate only exists on one
+        // side" case for CDC the way there is for OBA's own `[[target]]`
+        // entries (see this whole section's own header comment).
+        let (Some(base), Some(head)) = (base_index.get(&candidate), head_index.get(&candidate))
+        else {
+            anyhow::bail!(
+                "internal error: CDC candidate {candidate:?} missing from one side despite one shared manifest"
+            );
+        };
+        entries.push(CdcComparisonEntry { candidate, diff: compare_cdc_result(base, head) });
+    }
+    Ok(entries)
+}
+
+#[derive(Serialize, Debug)]
+struct AuditDiffEnvelope {
+    schema_version: u32,
+    tool: ToolInfo,
+    mode: &'static str,
+    summary: AuditDiffSummary,
+    oba: Vec<ComparisonEntry>,
+    cdc: Vec<CdcComparisonEntry>,
+}
+
+#[derive(Serialize, Debug, Default)]
+struct AuditDiffSummary {
+    unchanged: usize,
+    added: usize,
+    removed: usize,
+    changed: usize,
+    /// CDC's own `AddedSubject`/`RemovedSubject` kept as their own
+    /// counters, never merged into `added`/`removed` -- those two mean
+    /// "watch list itself changed" for OBA; conflating a real
+    /// analyzability change into the same bucket would make a future
+    /// summary reader draw the wrong conclusion about WHY the count
+    /// moved (invariant 6).
+    cdc_added_subject: usize,
+    cdc_removed_subject: usize,
+    /// Bare counts of `"{from}->{to}"` pairs, kept SEPARATE per engine
+    /// (OBA's own 7-way `VerdictKind` and CDC's own 4-way
+    /// `ResultVerdict` are different vocabularies; merging them into one
+    /// map would make e.g. `"pass->finding"` ambiguous about which
+    /// engine it came from). Explicitly NOT a regression/improvement
+    /// classification -- same boundary `oba diff` itself already draws.
+    oba_verdict_transitions: std::collections::BTreeMap<String, usize>,
+    cdc_verdict_transitions: std::collections::BTreeMap<String, usize>,
+}
+
+fn cdc_verdict_str(v: ResultVerdict) -> &'static str {
+    match v {
+        ResultVerdict::Pass => "pass",
+        ResultVerdict::Finding => "finding",
+        ResultVerdict::Inconclusive => "inconclusive",
+        ResultVerdict::ToolError => "tool_error",
+    }
+}
+
+fn run_audit_diff(
+    base_root: &Path,
+    head_root: &Path,
+    targets_path: &Path,
+    format: AuditFormat,
+) -> anyhow::Result<i32> {
+    let manifest_src = fs::read_to_string(targets_path)
+        .map_err(|e| anyhow::anyhow!("reading targets manifest {}: {e}", targets_path.display()))?;
+    let manifest: TargetFile = toml::from_str(&manifest_src)
+        .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
+    validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
+
+    // OBA half: reuse `analyze()`/`compare()` completely unchanged --
+    // this is the EXACT machinery `oba diff` already ships, tested, and
+    // relies on; P3b adds nothing new to it.
+    let (oba_entries, base_oba_inconclusive, head_oba_inconclusive) = if manifest.target.is_empty() {
+        (Vec::new(), false, false)
+    } else {
+        let base_analysis = analyze(base_root, &manifest)?;
+        let head_analysis = analyze(head_root, &manifest)?;
+        let comparison =
+            compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
+        let inconclusive_side = |report: &AnalysisReport| {
+            report
+                .targets
+                .iter()
+                .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
+        };
+        (
+            comparison.entries,
+            inconclusive_side(&base_analysis),
+            inconclusive_side(&head_analysis),
+        )
+    };
+
+    // CDC half: real, new for P3b -- run_cdc_candidate for every
+    // declared candidate against BOTH roots (each root's own real
+    // NixpkgsSource::LocalPath), then compare_cdc().
+    let mut cdc_entries = Vec::new();
+    let mut cdc_inconclusive_or_tool_error = false;
+    if !manifest.cdc_target.is_empty() {
+        let base_abs = base_root
+            .canonicalize()
+            .map_err(|e| anyhow::anyhow!("resolving --base-root {} for CDC: {e}", base_root.display()))?;
+        let head_abs = head_root
+            .canonicalize()
+            .map_err(|e| anyhow::anyhow!("resolving --head-root {} for CDC: {e}", head_root.display()))?;
+        let base_nixpkgs = cdc::NixpkgsSource::LocalPath(base_abs);
+        let head_nixpkgs = cdc::NixpkgsSource::LocalPath(head_abs);
+        let mut base_results = Vec::new();
+        let mut head_results = Vec::new();
+        for t in &manifest.cdc_target {
+            base_results.push(match cdc::run_cdc_candidate(&t.name, &base_nixpkgs) {
+                Ok(outcome) => cdc_outcome_to_result(&t.name, outcome),
+                Err(err) => cdc_error_to_result(&t.name, &err),
+            });
+            head_results.push(match cdc::run_cdc_candidate(&t.name, &head_nixpkgs) {
+                Ok(outcome) => cdc_outcome_to_result(&t.name, outcome),
+                Err(err) => cdc_error_to_result(&t.name, &err),
+            });
+        }
+        cdc_inconclusive_or_tool_error = base_results
+            .iter()
+            .chain(head_results.iter())
+            .any(|r| matches!(r.verdict, ResultVerdict::Inconclusive | ResultVerdict::ToolError));
+        cdc_entries = compare_cdc(&base_results, &head_results)?;
+    }
+
+    let mut summary = AuditDiffSummary::default();
+    for entry in &oba_entries {
+        match &entry.diff {
+            TargetDiff::Unchanged => summary.unchanged += 1,
+            TargetDiff::Added { .. } => summary.added += 1,
+            TargetDiff::Removed { .. } => summary.removed += 1,
+            TargetDiff::Changed { .. } => summary.changed += 1,
+        }
+        if let Some(t) = entry.diff.verdict_transition() {
+            *summary
+                .oba_verdict_transitions
+                .entry(format!("{}->{}", t.from.as_str(), t.to.as_str()))
+                .or_insert(0) += 1;
+        }
+    }
+    for entry in &cdc_entries {
+        match &entry.diff {
+            CdcDiff::Unchanged => summary.unchanged += 1,
+            CdcDiff::AddedSubject { .. } => summary.cdc_added_subject += 1,
+            CdcDiff::RemovedSubject { .. } => summary.cdc_removed_subject += 1,
+            CdcDiff::Changed { .. } => summary.changed += 1,
+        }
+        if let Some((from, to)) = entry.diff.verdict_transition() {
+            *summary
+                .cdc_verdict_transitions
+                .entry(format!("{}->{}", cdc_verdict_str(from), cdc_verdict_str(to)))
+                .or_insert(0) += 1;
+        }
+    }
+
+    let exit_code =
+        if base_oba_inconclusive || head_oba_inconclusive || cdc_inconclusive_or_tool_error {
+            2
+        } else {
+            0
+        };
+
+    match format {
+        AuditFormat::Json => {
+            let envelope = AuditDiffEnvelope {
+                schema_version: 1,
+                tool: ToolInfo { name: "oba", version: env!("CARGO_PKG_VERSION") },
+                mode: "audit-diff",
+                summary,
+                oba: oba_entries,
+                cdc: cdc_entries,
+            };
+            println!("{}", serde_json::to_string_pretty(&envelope)?);
+        }
+        AuditFormat::Text => {
+            println!(
+                "=== audit-diff summary: unchanged={} added={} removed={} changed={} cdc_added_subject={} cdc_removed_subject={} ===",
+                summary.unchanged,
+                summary.added,
+                summary.removed,
+                summary.changed,
+                summary.cdc_added_subject,
+                summary.cdc_removed_subject
+            );
+            for entry in &oba_entries {
+                print_oba_diff_entry_human(entry);
+            }
+            for entry in &cdc_entries {
+                print_cdc_diff_entry_human(entry);
+            }
+        }
+    }
+
+    Ok(exit_code)
+}
+
+fn print_oba_diff_entry_human(entry: &ComparisonEntry) {
+    let path = &entry.identity.watched_path;
+    match &entry.diff {
+        TargetDiff::Unchanged => {}
+        TargetDiff::Added { head } => println!("[oba] ADDED    {path} -> {:?}", head.verdict.kind()),
+        TargetDiff::Removed { base } => println!("[oba] REMOVED  {path} <- {:?}", base.verdict.kind()),
+        TargetDiff::Changed { base, head, changes } => {
+            println!(
+                "[oba] CHANGED  {path}  {:?} -> {:?}  ({changes:?})",
+                base.verdict.kind(),
+                head.verdict.kind()
+            );
+        }
+    }
+}
+
+fn print_cdc_diff_entry_human(entry: &CdcComparisonEntry) {
+    let name = &entry.candidate;
+    match &entry.diff {
+        CdcDiff::Unchanged => {}
+        CdcDiff::AddedSubject { head } => {
+            println!("[cdc] ADDED_SUBJECT    {name} -> {:?}", head.verdict)
+        }
+        CdcDiff::RemovedSubject { base } => {
+            println!("[cdc] REMOVED_SUBJECT  {name} <- {:?}", base.verdict)
+        }
+        CdcDiff::Changed { base, head, changes } => {
+            println!("[cdc] CHANGED  {name}  {:?} -> {:?}  ({changes:?})", base.verdict, head.verdict);
+        }
+    }
 }
 
 fn print_diff_human(comparison: &ComparisonReport) {
@@ -6479,5 +6912,195 @@ mod tests {
                 }
             }
         }
+    }
+
+    // --- P3b: CDC's own diff algebra (compare_cdc_result/compare_cdc),
+    // offline, pure -- covers every CdcDiff kind including the two
+    // (AddedSubject/RemovedSubject) that don't have a ready-made real
+    // historical trigger in this project's own real corpus (confirmed
+    // by trying: akkoma/spacecookie are both already stable across the
+    // real BEFORE_REV/current pin, so this specific edge needs a
+    // constructed case to be tested at all -- exactly the situation
+    // synthetic fixtures exist for). ---
+
+    fn cdc_result(target: &str, verdict: ResultVerdict, emitted: &[&str]) -> AuditResult {
+        AuditResult {
+            engine: "cdc",
+            target: target.to_string(),
+            verdict,
+            code: match verdict {
+                ResultVerdict::Finding => Some("CDC001"),
+                ResultVerdict::Inconclusive => Some("CDC002"),
+                _ => None,
+            },
+            severity: None,
+            message: "synthetic".to_string(),
+            provenance: vec!["synthetic provenance".to_string()],
+            cdc_evidence: Some(CdcResultEvidence {
+                producer: CdcProducerEvidence { proved: true, format: cdc::ConfigFormat::Toml },
+                binding: CdcBindingEvidence { kind: "exec-flag", proof_depth: cdc::ProofDepth::Structural },
+                consumer: CdcConsumerEvidence { name: target.to_string() },
+                comparison: CdcComparisonEvidence {
+                    emitted_paths: emitted.iter().map(|s| s.to_string()).collect(),
+                    accepted_paths: vec!["debug".to_string()],
+                    opaque_paths: Vec::new(),
+                },
+            }),
+            oba_evidence: None,
+        }
+    }
+
+    fn cdc_tool_error_result(target: &str) -> AuditResult {
+        AuditResult {
+            engine: "cdc",
+            target: target.to_string(),
+            verdict: ResultVerdict::ToolError,
+            code: None,
+            severity: None,
+            message: "synthetic tool error".to_string(),
+            provenance: vec!["synthetic".to_string()],
+            cdc_evidence: None,
+            oba_evidence: None,
+        }
+    }
+
+    #[test]
+    fn cdc_diff_identical_results_is_unchanged() {
+        let a = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
+        let b = a.clone();
+        assert_eq!(compare_cdc_result(&a, &b), CdcDiff::Unchanged);
+    }
+
+    #[test]
+    fn cdc_diff_provenance_text_alone_never_creates_a_change() {
+        // invariant 4: presentation/provenance text differing must
+        // never, on its own, produce anything but Unchanged.
+        let mut a = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
+        let mut b = a.clone();
+        a.provenance = vec!["one real phrasing".to_string()];
+        b.provenance = vec!["a totally different real phrasing".to_string()];
+        a.message = "phrasing A".to_string();
+        b.message = "phrasing B".to_string();
+        assert_eq!(compare_cdc_result(&a, &b), CdcDiff::Unchanged);
+    }
+
+    #[test]
+    fn cdc_diff_verdict_changed_when_verdict_differs() {
+        let base = cdc_result("akkoma", ResultVerdict::Pass, &["debug"]);
+        let head = cdc_result("akkoma", ResultVerdict::Finding, &["debug", "upload_dir"]);
+        let diff = compare_cdc_result(&base, &head);
+        match &diff {
+            CdcDiff::Changed { changes, .. } => {
+                assert_eq!(changes, &vec![CdcChangeKind::VerdictChanged]);
+            }
+            other => panic!("expected Changed, got {other:?}"),
+        }
+        assert_eq!(diff.verdict_transition(), Some((ResultVerdict::Pass, ResultVerdict::Finding)));
+    }
+
+    #[test]
+    fn cdc_diff_evidence_changed_when_verdict_same_but_evidence_differs() {
+        // invariant 4/6: a real proof_depth (or any other evidence-only)
+        // difference with the SAME verdict on both sides must be
+        // EvidenceChanged, never treated as a brand-new finding.
+        let base = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
+        let mut head = base.clone();
+        head.cdc_evidence.as_mut().unwrap().binding.proof_depth = cdc::ProofDepth::ByteExact;
+        let diff = compare_cdc_result(&base, &head);
+        match &diff {
+            CdcDiff::Changed { changes, .. } => {
+                assert_eq!(changes, &vec![CdcChangeKind::EvidenceChanged]);
+            }
+            other => panic!("expected Changed, got {other:?}"),
+        }
+        // EvidenceChanged alone must never be reported as a verdict
+        // transition -- there isn't one.
+        assert_eq!(diff.verdict_transition(), None);
+    }
+
+    #[test]
+    fn cdc_diff_verdict_changed_alone_when_both_verdict_and_evidence_differ() {
+        // when the verdict itself changes, the evidence differing too is
+        // expected/implied -- must not ALSO report EvidenceChanged
+        // redundantly (invariant 4/5's own "don't double-report" reading).
+        let base = cdc_result("akkoma", ResultVerdict::Pass, &["debug"]);
+        let mut head = cdc_result("akkoma", ResultVerdict::Finding, &["debug", "upload_dir"]);
+        head.cdc_evidence.as_mut().unwrap().binding.proof_depth = cdc::ProofDepth::ByteExact;
+        let diff = compare_cdc_result(&base, &head);
+        match &diff {
+            CdcDiff::Changed { changes, .. } => assert_eq!(changes, &vec![CdcChangeKind::VerdictChanged]),
+            other => panic!("expected Changed, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn cdc_diff_added_subject_when_base_could_not_be_analyzed_and_head_is_real() {
+        let base = cdc_tool_error_result("nats");
+        let head = cdc_result("nats", ResultVerdict::Pass, &["config"]);
+        match compare_cdc_result(&base, &head) {
+            CdcDiff::AddedSubject { head: h } => assert_eq!(h.verdict, ResultVerdict::Pass),
+            other => panic!("expected AddedSubject, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn cdc_diff_removed_subject_when_base_is_real_and_head_could_not_be_analyzed() {
+        let base = cdc_result("nats", ResultVerdict::Pass, &["config"]);
+        let head = cdc_tool_error_result("nats");
+        match compare_cdc_result(&base, &head) {
+            CdcDiff::RemovedSubject { base: b } => assert_eq!(b.verdict, ResultVerdict::Pass),
+            other => panic!("expected RemovedSubject, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn cdc_diff_both_sides_tool_error_is_unchanged_not_added_or_removed() {
+        let base = cdc_tool_error_result("nats");
+        let head = cdc_tool_error_result("nats");
+        assert_eq!(compare_cdc_result(&base, &head), CdcDiff::Unchanged);
+    }
+
+    #[test]
+    fn compare_cdc_self_diff_is_all_unchanged() {
+        // invariant 1, CDC half.
+        let results = vec![
+            cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]),
+            cdc_result("akkoma", ResultVerdict::Finding, &["debug", "upload_dir"]),
+            cdc_tool_error_result("vault"),
+        ];
+        let entries = compare_cdc(&results, &results).unwrap();
+        assert_eq!(entries.len(), 3);
+        assert!(entries.iter().all(|e| e.diff == CdcDiff::Unchanged));
+    }
+
+    #[test]
+    fn compare_cdc_is_order_independent() {
+        // invariant 2, CDC half.
+        let base_a = vec![
+            cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]),
+            cdc_result("akkoma", ResultVerdict::Finding, &["upload_dir"]),
+        ];
+        let base_b = vec![base_a[1].clone(), base_a[0].clone()];
+        let head = vec![
+            cdc_result("akkoma", ResultVerdict::Pass, &["debug"]),
+            cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]),
+        ];
+        let entries_a = compare_cdc(&base_a, &head).unwrap();
+        let entries_b = compare_cdc(&base_b, &head).unwrap();
+        assert_eq!(entries_a, entries_b);
+    }
+
+    #[test]
+    fn compare_cdc_duplicate_candidate_on_one_side_is_an_error() {
+        // invariant 3, CDC half -- defensive, since validate_manifest
+        // already prevents this upstream; still checked directly here,
+        // not just trusted.
+        let base = vec![
+            cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]),
+            cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]),
+        ];
+        let head = vec![cdc_result("unpackerr", ResultVerdict::Pass, &["debug"])];
+        let err = compare_cdc(&base, &head).unwrap_err();
+        assert!(format!("{err}").contains("duplicate CDC candidate"));
     }
 }
