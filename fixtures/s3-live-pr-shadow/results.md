@@ -22,6 +22,19 @@ before finalizing this version. `#504200` is confirmed correct
 §7); the "~8%" figure was a real arithmetic error, corrected to the
 actual count below (§11).
 
+**Second correction, found while compiling `results-regression.md`
+(S3-R, after the S3-F1/F2/F3 fix round)**: `#551640` was wrongly
+described as a "true module birth" in the per-PR table (it is not —
+the real module file is byte-identical at both the PR's base and head
+commit, a pure version-bump PR that never touches the module at all;
+an investigation artifact, not a tool defect, corrected in place
+below). `#562066`'s own entry claimed its pre-fix rendered markdown
+heading read "EXISTING UNCOVERED BRANCH BECAME OBSERVABLE" — checked
+directly and found false; that heading override was never wired for
+this PR's own `resolved_inconclusive` bucket. The underlying raw-JSON
+`transition_origin` bug for `#562066` is real and unaffected by this
+correction. See `results-regression.md` for the full account of both.
+
 **A process incident occurred mid-round and is fully disclosed here
 before the results, since it bears directly on how much to trust
 this round's own discipline.** See "Incident" section below the
@@ -136,7 +149,7 @@ examined.
 | #550492 | hostapd (WPA3 fix) | oba=yes | `transitionDisable`→honest OptionNotFound. Root cause: doubly-nested `attrsOf(submodule(lambda))` declaration, beyond `option_prefix`'s one-block design; real test coverage exists but is invisible | none | 2-10min |
 | #550647 | tpm2 (pkcs11 registration) | oba=yes | `pkcs11.enable`→PASS both sides, correct, genuine coverage confirmed. 4 unwatched `optionalString` sites consistent with the known S2-F1-class limitation (function-parameter indirection) | none | 2-10min |
 | #551107 | metabase (test fix only) | oba=yes | `ssl.enable`/`openFirewall`→pre-existing untested-branch findings, correctly suppressed from notable since unchanged by this PR (memory-bump-only fix) | none (correctly quiet) | <2min |
-| #551640 | matrix-continuwuity (true module birth) | oba=yes | `enable`→PASS; `admin.enable`→correct DefaultUnresolved (non-literal default) | none (clean PASS not notable) | <2min |
+| #551640 | matrix-continuwuity (version bump; **NOT a true module birth — see S3-R correction below**) | oba=yes | `enable`→PASS; `admin.enable`→correct DefaultUnresolved (non-literal default) | none (clean PASS not notable) | <2min |
 | #553136 | fwupd (test migration) | oba=yes | `enable`→consistent TestConfigUnresolved. Root cause: `makeInstalledTest {...}` wrapper shape | none | 2-10min |
 | #553682 | suricata (unrelated package change) | oba=yes | `enable`→PASS, unrelated to PR diff | none | <2min |
 | #554062 | adguardhome (HTTP settings preserve) | oba=yes | consistent OptionNotFound both sides — **same `with lib.types;` root cause as #483921, 2nd independent hit on the same module** | none | 2-10min |
@@ -152,7 +165,7 @@ examined.
 | #560031 | throttled (systemd unit tweak) | **oba=no** | no NixOS test exists for throttled | n/a | — |
 | #560443 | alertmanager-gotify-bridge (hardening) | **oba=no** | no NixOS test exists; change is a hardcoded systemd value, not option-shaped | n/a | — |
 | #561399 | llama-cpp (CLI flag fix) | **oba=no** | no NixOS test exists for llama-cpp | n/a | — |
-| #562066 | suricata (reload after ruleset update) | oba=yes | `reloadOnRulesetUpdate`→**real Finding→PASS transition (resolved_inconclusive), substance correct, but presented under the heading "EXISTING UNCOVERED BRANCH BECAME OBSERVABLE" for an option genuinely BORN IN THIS EXACT PR** — 2nd confirmed instance of the causality/framing bug found on #516128 (S3-B) | 1 finding, **causality/framing error** | 2-10min |
+| #562066 | suricata (reload after ruleset update) | oba=yes | `reloadOnRulesetUpdate`→**real Finding→PASS transition (resolved_inconclusive), substance correct, but the raw JSON's own `transition_origin` field reads `analysis_became_possible` for an option genuinely BORN IN THIS EXACT PR** — 2nd confirmed instance of the causality/framing bug found on #516128, at the field level (**correction, S3-R**: the rendered markdown heading for this PR was actually the origin-agnostic "RESOLVED INCONCLUSIVE", not "EXISTING UNCOVERED BRANCH BECAME OBSERVABLE" as an earlier draft of this table claimed — that heading override was only ever wired for the `new_finding`/`new_inconclusive` buckets, never `resolved_inconclusive`; the JSON field bug itself is real and independently re-confirmed, see `results-regression.md`) | 1 finding, **causality/framing error (JSON field)** | 2-10min |
 | #563907 | nordvpn (maintainers-only change) | oba=yes | `enable`→consistent honest Inconclusive. Root cause: `lib.recursiveUpdate {literal} (functionCall)` — a function-call config wrapper distinct from both the fixed `//`-merge and `with lib;` | none | 2-10min |
 
 ### S3-B — stress cohort (19 PRs)
@@ -273,12 +286,22 @@ turned out to be correct, not a 3rd bug — see below.
    just became visible, when the option and its predicates are new.
    Raw JSON confirmed: `"transition_origin": "analysis_became_
    possible"`, `oba_verdict_transitions: {"option_not_found->oba001": 1}`.
-2. `#562066` (suricata): identical bug shape — `reloadOnRulesetUpdate`
-   born in this exact PR (both `default.nix` and `suricata.nix` are
-   `MODIFIED`, not `ADDED`; base has no such option), same
-   "EXISTING..." framing. Raw JSON confirmed:
-   `"transition_origin": "analysis_became_possible"`,
-   `oba_verdict_transitions: {"option_not_found->pass": 1}`.
+2. `#562066` (suricata): identical bug shape at the raw JSON field
+   level — `reloadOnRulesetUpdate` born in this exact PR (both
+   `default.nix` and `suricata.nix` are `MODIFIED`, not `ADDED`; base
+   has no such option). Raw JSON confirmed: `"transition_origin":
+   "analysis_became_possible"`, `oba_verdict_transitions: {"option_not_
+   found->pass": 1}`. **Correction (S3-R)**: unlike `#516128`, this
+   PR's own bucket is `resolved_inconclusive`, and the pre-fix rendered
+   markdown heading for that bucket was already the origin-agnostic
+   "RESOLVED INCONCLUSIVE" — `render_github_summary`'s heading override
+   was never wired for `resolved_inconclusive` at all, only `new_
+   finding`/`new_inconclusive`. An earlier draft of this document
+   claimed the same misleading "EXISTING..." heading rendered for this
+   PR too; independently re-verified and found false. The underlying
+   JSON field bug is real and confirmed regardless of what the heading
+   showed — this correction narrows the claim to the field, not the
+   rendered text.
    Root cause (traced from #516128): `transition_origin_for_change`
    maps *any* Inconclusive-class `from` verdict — including genuine
    `OptionNotFound` ("this literally didn't exist before") — to
