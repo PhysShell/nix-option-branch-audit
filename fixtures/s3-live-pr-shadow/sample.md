@@ -4,6 +4,22 @@ Drawn mechanically per `protocol.md`, frozen here **before any of the
 50 PRs below is individually inspected**. Nothing past this point
 (adjudication) may change cohort membership.
 
+**Amendment, before any PR was inspected (discovered while preparing
+per-PR data for dispatch, not after seeing any real result — the same
+"disclose, don't silently fix" precedent as S1's own seed-mechanism
+correction)**: the 253-name exclusion list this draw actually used
+was missing `sstorytime` — S2-A's own real `#556729` (a later
+`sstorytime` version-bump PR) should have excluded it. `#548837`
+(`sstorytime: init at 0-unstable-2026-08-12`, the package's own
+original creation PR) survived the screen as drawn above and slipped
+into S3-A as a result. The name list here
+(`exclusion-name-list-253.txt`, now 254 entries) has been corrected
+for any future round; a re-check of the corrected list against all 50
+already-drawn S3 PRs found no other matches. `#548837` is **excluded
+from S3-A's own effective cohort and headline metric** (S3-A's real N
+is 29, not 30, honestly reported as such) — not silently backfilled
+with a replacement draw, and not adjudicated at all.
+
 ## Population funnel
 
 ```

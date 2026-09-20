@@ -209,6 +209,7 @@ soft-serve
 spacecookie
 speedtest
 sql
+sstorytime
 statsd
 storagebox
 strichliste
