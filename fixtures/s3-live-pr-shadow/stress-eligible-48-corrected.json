@@ -1,0 +1,398 @@
+[
+  {
+    "number": 375846,
+    "title": "nixos/rundeck: init",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 438001,
+    "title": "nixos/mealie: add openFirewall option",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 451958,
+    "title": "nixos/neo4j: add ssl.policies.<name>.enable",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 483921,
+    "title": "nixos/adguardhome: Fix protection_disabled_until value; nixos/adguardhome: Use lib.recursiveUpdate",
+    "categories": [
+      "generated_config"
+    ]
+  },
+  {
+    "number": 504200,
+    "title": "bulwark: init at 1.9.0, nixos/bulwark: init, nixos/tests/bulwark: add bulwark test",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 508608,
+    "title": "nixos/userborn: manage /etc/sub{u,g}id",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 510342,
+    "title": "nixos/userborn: import legacy /var/lib/nixos state on first run",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 511660,
+    "title": "nixos/prometheus-exporters/kvrocks: init",
+    "categories": [
+      "execstart_script_cmdline",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 512162,
+    "title": "{hister,nixos/hister,nixosTests.hister}: init at 0.17.0",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 516128,
+    "title": "nixos/tinyauth: add enableUnixSocket option",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 529621,
+    "title": "nixos/forgejo-runner: init",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 533377,
+    "title": "nixos/github-runners: GitHub App authentication and multi-org runners",
+    "categories": [
+      "option_declaration",
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 537675,
+    "title": "nixos/softether: fix ExecStart failing on read-only /nix/store",
+    "categories": [
+      "execstart_script_cmdline"
+    ]
+  },
+  {
+    "number": 544393,
+    "title": "nixos/moonshine: init",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config"
+    ]
+  },
+  {
+    "number": 546700,
+    "title": "nixos/tests: fix networking eval outside the test framework",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 547607,
+    "title": "romm: init at 5.1.0; nixos/romm: init",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 548734,
+    "title": "nixosTests.opencloud: fix LDAPS and aarch64 WebDriver setup",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 548856,
+    "title": "nixos/dnscrypt-proxy: fix `.settings` type",
+    "categories": [
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 550647,
+    "title": "nixos/tpm2: register pkcs11 module with p11-kit",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 550993,
+    "title": "rustical: 0.14.1 -> 0.15.0",
+    "categories": [
+      "execstart_script_cmdline",
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 551107,
+    "title": "metabase: fix tests",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 551186,
+    "title": "llama-swap: 240 -> 249",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552704,
+    "title": "perses: 0.53.1 -> 0.54.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 552777,
+    "title": "mediawiki: 1.45.4 -> 1.46.0",
+    "categories": [
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 553136,
+    "title": "nixos/fwupd, fwupd: move efi to and populate /run/fwupd-efi",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 553268,
+    "title": "nixos/tests/printing: migrate to remove PCRE usage",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 553645,
+    "title": "taskwarrior3: 3.4.2 -> 3.5.0",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 553699,
+    "title": "nixos/nebula: Add user & group settings, and assertions for truncated TUN device names",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 554062,
+    "title": "nixos/adguardhome: preserve HTTP settings",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 554171,
+    "title": "nixos/atuin: fix documentation link",
+    "categories": [
+      "environment"
+    ]
+  },
+  {
+    "number": 555067,
+    "title": "matrix-synapse: 1.158.0 -> 1.159.0, fix test",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555212,
+    "title": "jool: 4.1.14 -> 4.1.15",
+    "categories": [
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555531,
+    "title": "nixos/chromadb: fix double dot in option description",
+    "categories": [
+      "option_declaration"
+    ]
+  },
+  {
+    "number": 555615,
+    "title": "nixosTests.hitch: migrate to runTest",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555616,
+    "title": "nixosTests.hostname: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555628,
+    "title": "nixosTests.lorri: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555630,
+    "title": "nixosTests.mattermost: migrate to runTest",
+    "categories": [
+      "environment",
+      "generated_config",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555632,
+    "title": "nixosTests.wine: migrate to runTest",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555643,
+    "title": "nixosTests.actual: migrate to systemd-nspawn",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 555650,
+    "title": "nixosTests.cloudlog: migrate to systemd-nspawn",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 556069,
+    "title": "ocamlPackages.kapla: init at 0.4.0",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "environment",
+      "package_version_source_dep",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 556558,
+    "title": "vxwm: init at 2.3-unstable-2026-08-08",
+    "categories": [
+      "option_declaration",
+      "environment",
+      "package_version_source_dep"
+    ]
+  },
+  {
+    "number": 557131,
+    "title": "gnome-photos: drop",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 560031,
+    "title": "nixos/throttled: restart service when configuration changes",
+    "categories": [
+      "environment"
+    ]
+  },
+  {
+    "number": 560155,
+    "title": "nixos.prefect: module fixes",
+    "categories": [
+      "execstart_script_cmdline",
+      "environment",
+      "generated_config",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 562066,
+    "title": "nixos/suricata: reload suricata after ruleset update",
+    "categories": [
+      "option_declaration",
+      "execstart_script_cmdline",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 562127,
+    "title": "nixos/tests/duplicity: init",
+    "categories": [
+      "environment",
+      "nixos_tests_touched"
+    ]
+  },
+  {
+    "number": 563084,
+    "title": "nixos/tests/docuum: init",
+    "categories": [
+      "nixos_tests_touched"
+    ]
+  }
+]
