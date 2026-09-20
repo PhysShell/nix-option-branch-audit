@@ -4833,3 +4833,71 @@ internal/dogfood shadow use, by people who already know the specific
 gaps, pending a fix round. The concrete next step is a fix round
 targeting the three confirmed correctness/causality bugs, then a
 regression rerun on this same 48-PR corpus — not yet authorized.
+
+## S3-F1/F2/F3: the three confirmed correctness/causality bugs, fixed
+
+Authorized as a narrow, sequential fix round targeting exactly the
+three bugs S3 found — no other capability gap, no `exporters.nix`, no
+app/option special-casing. Each landed as its own commit, independently
+CI-green before the next began.
+
+- **S3-F1** (`27a1be3`): `specialisation.<literal-name>.configuration`
+  test-config blocks are a real, generic NixOS option
+  (`nixos/modules/system/boot/specialisation.nix`) whose own value is
+  exactly another whole module config tree for the same instance —
+  `strip_specialisation_configuration_markers` recognizes this literal
+  three-segment marker anywhere in an accumulated test-config path
+  (flat-dotted, fully-nested, and partially-dotted forms all
+  normalize identically) and strips it, so real evidence underneath
+  resolves to its real option path instead of a path no watched option
+  can ever match. A dynamic name or a non-literal `configuration`
+  value stays fail-closed via the walker's existing opacity handling,
+  untouched. Fixes `#510342`'s real false finding. Caught and fixed a
+  second real bug while re-verifying against the actual PR (4 sibling
+  specialisations, not just 1): the first version's `path.truncate`-based
+  restore could corrupt a shared prefix across siblings; fixed with a
+  full clone-and-restore.
+- **S3-F2** (`cfc9e88`): a single flat-dotted attrpath spanning
+  `option_prefix` and the watched leaf in one hop (the real vxwm
+  shape: `options = { services.x.y.z.enable = mkEnableOption "..."; };`)
+  used to skip past `walk_options_block`'s own intermediate-equality
+  checkpoint entirely. `option_prefix_relative_path` normalizes every
+  recorded declaration at its own record site instead — a strict
+  superset of the pre-existing mechanism, checked regardless of how
+  many hops the path took to get there. Fixes `#556558`'s real false
+  abstention (a real declaration reported as not-found).
+- **S3-F3** (`87028d8`): `transition_origin_for_oba_change`, a richer
+  replacement used at OBA's own call site, distinguishes `OptionNotFound`
+  (genuinely ambiguous — could be new, could be an existing declaration
+  the scanner still can't see, per S3-F2's own proof that happens) from
+  the other four `Inconclusive`-class kinds (declaration was found,
+  confidently `AnalysisBecamePossible`) before classifying a
+  same-subject transition's origin. A new, honest `OriginUnclear`
+  variant replaces the previous overclaiming for the ambiguous case,
+  rather than inventing certainty either direction. Fixes `#516128`'s
+  and `#562066`'s real causality errors.
+
+All three independently re-verified end-to-end against real,
+freshly-fetched PR content (not just unit tests) before each commit.
+Full account: `fixtures/s3-live-pr-shadow/results-regression.md`.
+
+## S3-R: regression rerun, all three fixes confirmed, zero regressions
+
+Same 48 PRs, re-run against the post-S3-F build via 4 parallel forks
+independently re-fetching real content. All three fixes confirmed on
+their real reproducers, plus one real, unanticipated second-order
+S3-F1 benefit (`#511659`'s `socketActivation`, a second real
+specialisation-shaped PR). Zero regressions across the rest of the
+corpus, including real negative controls (true module births and
+still-open, out-of-scope capability gaps both correctly untouched).
+**Recomputed actionable precision, honest, not forced to the old
+denominator**: S3-A 3/3 = 100% (was 2/4), S3-B 9/9 = 100% (was 8/9),
+reported separately, never blended. While compiling this report, two
+more inaccuracies in the original `results.md` prose were independently
+found and corrected in place (neither a tool defect — one PR wrongly
+described as a "true module birth," one PR's pre-fix rendered heading
+text overstated; both disclosed, full account in
+`results-regression.md`).
+
+Per the same S1-R/S2-R precedent, this confirms the fixes work on data
+the code has now seen twice — not a fresh generalization claim.
