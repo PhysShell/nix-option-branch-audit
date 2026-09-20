@@ -4811,10 +4811,25 @@ then applied as the same narrow single-PR exclusion pattern already
 used elsewhere in the round); see `results.md` for the complete
 account. It never changed which PRs were actually examined.
 
+Among the 13 total actionable presentations across both cohorts, 3
+are errors (1 false finding + 2 causality errors) — **3/13 ≈ 23.1%**,
+reference only, never the deciding number (the deciding metrics stay
+S3-A 2/4 and S3-B 8/9, separate). An earlier draft of both this
+section and `results.md` reported this combined figure as "~8%" and
+left one PR's `transition_origin` as an unverified open item; both
+were caught on independent review, checked directly against the
+tool's own raw `audit-diff` JSON (not just the dispatched forks' own
+prose), and corrected — see `results.md` for the full account,
+including which PR turned out correct on re-verification and which
+two are confirmed real bugs.
+
 **Recommendation** (evidence-based, not a decision — per the mandate,
 the acceptance criterion was fixed before results were seen and
-nothing was fixed mid-round): ready for a human-reviewed advisory
-stage, not yet an unreviewed/autonomous one. The concrete next step
-the evidence points to is a fix round targeting the four named
-correctness/causality bugs, then a regression rerun on this same
-48-PR corpus — not yet authorized.
+nothing was fixed mid-round): at a real ~23% actionable-presentation
+error rate, **not** ready for a public, maintainer-facing advisory
+stage — that would ask real nixpkgs maintainers to catch roughly
+1-in-4 wrong presentations themselves. Evidence supports continued
+internal/dogfood shadow use, by people who already know the specific
+gaps, pending a fix round. The concrete next step is a fix round
+targeting the three confirmed correctness/causality bugs, then a
+regression rerun on this same 48-PR corpus — not yet authorized.

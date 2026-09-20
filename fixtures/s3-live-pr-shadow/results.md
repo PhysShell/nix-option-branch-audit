@@ -1,13 +1,26 @@
 # S3: fresh random (A) + stress (B) cohort results
 
-Frozen `v0.4.2` (commit `e05e841`), `src/` untouched for the entire
-round (confirmed per-group via `git diff e05e841 -- src/`). Real
-shadow-audits against the published binary at
-`/home/tandem/.cargo/bin/oba`, executed by 9 parallel forks, each
-confined to its own scratch directory, zero repo writes during
-adjudication. Per the user's own mandate: **actionable precision**,
+Frozen `v0.4.2` (commit `e05e841`), **`src/` untouched for the entire
+round** (confirmed per-group via `git diff e05e841 -- src/`, and true
+for the whole round despite the incident below). Real shadow-audits
+against the published binary at `/home/tandem/.cargo/bin/oba`,
+executed by 9 parallel forks, each confined to its own scratch
+directory. **One unauthorized write to the repository itself did
+occur during adjudication and was reverted — see "Incident" below;
+"zero repo writes" was true of 8 of the 9 forks, not the round as a
+whole.** Per the user's own mandate: **actionable precision**,
 computed separately per cohort, is the deciding metric — never
 blended into one number.
+
+**Correction, applied after independent re-review**: an earlier
+version of this document reported the round's own real error rate as
+"~8%" in §11 and left `#504200`'s `transition_origin` as an
+unverified open item. Both were checked directly against the tool's
+raw `audit-diff` JSON output (not the dispatched forks' own prose)
+before finalizing this version. `#504200` is confirmed correct
+(`subject_added` on all 4 findings — the open item is resolved, see
+§7); the "~8%" figure was a real arithmetic error, corrected to the
+actual count below (§11).
 
 **A process incident occurred mid-round and is fully disclosed here
 before the results, since it bears directly on how much to trust
@@ -17,6 +30,22 @@ described next; every PR adjudicated below was adjudicated against
 the corrected, stable cohort.
 
 ## 1. The frozen cohort and selection method
+
+**Framing, stated precisely rather than implying a cleaner process
+than actually happened**: this is the frozen *original* draw, drawn
+from a 254-name exclusion list now known to have been incomplete at
+draw time (it never captured S1's own drawn PRs' subject names, only
+S1's PR numbers), with two disclosed, narrow, single-PR exclusions
+applied post-draw for the resulting contamination once it was found.
+The population that would have resulted from a fully-correct
+254→~281-name list at draw time is 91, not 94 — not a difference this
+round chose to re-derive after the fact (see "Incident" below for why
+a wholesale redraw was rejected even though the underlying finding
+was real). This is a frozen original draw with two disclosed
+contamination exclusions, not a pristine population drawn from a
+perfectly-specified exclusion list — the measurement is still valid
+(neither excluded PR was ever adjudicated under any cohort), but it
+should not be described as sterile.
 
 Population/exclusion/draw mechanics: `protocol.md` (pre-registered,
 committed `57a657e`, before any PR was drawn or inspected). Real
@@ -131,7 +160,7 @@ examined.
 | PR | subject | applicable | verdict summary | notable | effort |
 |---|---|---|---|---|---|
 | #438001 | mealie (new `openFirewall` option) | oba=yes | `openFirewall`→OptionNotFound(base)→TestConfigUnresolved(head), sub-reason changed only, no verdict-class transition, correctly presented as abstention not finding. Root cause: test node's `imports = [ sqlite ]` (a local let-binding) treated opaque even though fully visible in-file | none (abstention) | <2min |
-| #504200 | bulwark (true module birth) | oba=yes | `enable`→PASS; `admin`, `settingsSyncEnabled`, `telemetry.enabled`, `updateCheck.enabled`→**4 real Findings, all confirmed true positives** by hand-checking test.nix's only 2 real assignments against all 5 predicates. `updateCheck.enabled` is default-ON and completely untested — likely the most consequential single finding in the round | **4 findings, correct** (see open item below) | 5-10min |
+| #504200 | bulwark (true module birth) | oba=yes | `enable`→PASS; `admin`, `settingsSyncEnabled`, `telemetry.enabled`, `updateCheck.enabled`→**4 real Findings, all confirmed true positives** by hand-checking test.nix's only 2 real assignments against all 5 predicates. `updateCheck.enabled` is default-ON and completely untested — likely the most consequential single finding in the round. `transition_origin`: **independently re-run against the frozen v0.4.2 binary from the real PR content and re-checked in the raw JSON — confirmed `subject_added` on all 4, correctly framed** (this document's first draft reported `analysis_became_possible` here from the dispatched fork's own prose summary, without checking the raw JSON; that was a transcription error, now corrected) | **4 findings, correct, verified** | 5-10min |
 | #511659 | kvrocks module (true module birth) | oba=yes | `enable`→PASS; `group`,`user`→**2 real Findings, true positives**; `openFirewall`→Inconclusive (PredicateNotFound). Root cause, confirmed via isolated synthetic probe: compound `mkIf (cfg.X && localVar)` never decomposed — only a bare/Eq/Not condition is recognized as the whole `mkIf` predicate; `socketActivation`→Inconclusive (TestValueUnresolved). Root cause: real test exercises this via `specialisation."socketActivation".configuration.services.kvrocks.socketActivation = true;` — walker finds the assignment but can't classify a literal inside a `specialisation.*.configuration` block, fails closed correctly (contrast with #510342 above, where the same root gap produced a **false finding** instead) | 2 findings, correct | >10min |
 | #511660 | kvrocks exporter (true module birth) | oba=yes struct. blind | all 4 watched→OptionNotFound. Exact, expected reproduction of the pre-declared S2-F3 `exporters.nix` limitation on genuinely fresh data (kvrocks is not among the 93 already-censused names) | none (known limitation) | <2min |
 | #516128 | tinyauth (new `enableUnixSocket` option) | oba=yes | `enable`→PASS; `enableUnixSocket`→**real Finding, true positive substance, but causality/framing error**: heading reads "EXISTING UNCOVERED BRANCH BECAME OBSERVABLE" for an option born in this exact PR. Cross-validated against #545183 (below), a true module birth in the same group, which correctly renders as neutral "NEW FINDING" | 1 finding, **causality/framing error** | 2-10min |
@@ -186,14 +215,14 @@ bug), not noise.
 S3-B actionable precision: 8/9 ≈ 88.9%
 ```
 
-One open item affecting this count: `#504200`'s 4 findings are all
-independently confirmed correct in substance (hand-verified against
-the real test file), but their reported `transition_origin`
-(`analysis_became_possible`) is not yet independently re-verified
-against the tool's own raw JSON to confirm it should not instead have
-been `subject_added` (true module birth). Not asserted as an error
-here — flagged as an unresolved verification item, listed again under
-item 7.
+**Resolved, not an open item**: `#504200`'s 4 findings were
+independently re-run from the real PR content against the frozen
+`v0.4.2` binary and checked directly in the raw `audit-diff` JSON —
+`transition_origin` is confirmed `subject_added` on all 4 (true module
+birth, correctly framed). An earlier draft of this document reported
+`analysis_became_possible` here, taken from the dispatched fork's own
+prose summary rather than the raw JSON; that was a transcription
+error in this document, not a tool defect, and is corrected throughout.
 
 **Per the mandate, these two numbers are not combined.** Read
 together: the stress cohort — deliberately selected for
@@ -228,15 +257,28 @@ false finding, because it failed closed instead) on `#511659`
 
 ## 7. `transition_origin`/causality errors
 
-**Two confirmed, one open verification item.**
+**Two confirmed, both independently re-verified against the tool's own
+raw JSON output (not just the dispatched forks' own prose) by
+reconstructing each PR's real base/head content and re-running the
+frozen `v0.4.2` binary directly.** A third candidate, initially
+reported as an unresolved open item, was checked the same way and
+turned out to be correct, not a 3rd bug — see below.
 
 1. `#516128` (tinyauth): brand-new option `enableUnixSocket`, born in
-   this exact PR, renders under the heading "EXISTING UNCOVERED
-   BRANCH BECAME OBSERVABLE" (`AnalysisBecamePossible`) — implying
-   pre-existing code just became visible, when the option and its
-   predicates are new.
+   this exact PR (base module 246 lines, head 254 — confirmed via
+   `gh pr view` that only `tinyauth.nix` was `MODIFIED`, and the base
+   SHA's own module content has no `enableUnixSocket` declaration),
+   renders under the heading "EXISTING UNCOVERED BRANCH BECAME
+   OBSERVABLE" (`AnalysisBecamePossible`) — implying pre-existing code
+   just became visible, when the option and its predicates are new.
+   Raw JSON confirmed: `"transition_origin": "analysis_became_
+   possible"`, `oba_verdict_transitions: {"option_not_found->oba001": 1}`.
 2. `#562066` (suricata): identical bug shape — `reloadOnRulesetUpdate`
-   born in this exact PR, same "EXISTING..." framing.
+   born in this exact PR (both `default.nix` and `suricata.nix` are
+   `MODIFIED`, not `ADDED`; base has no such option), same
+   "EXISTING..." framing. Raw JSON confirmed:
+   `"transition_origin": "analysis_became_possible"`,
+   `oba_verdict_transitions: {"option_not_found->pass": 1}`.
    Root cause (traced from #516128): `transition_origin_for_change`
    maps *any* Inconclusive-class `from` verdict — including genuine
    `OptionNotFound` ("this literally didn't exist before") — to
@@ -249,18 +291,19 @@ false finding, because it failed closed instead) on `#511659`
    neutral "NEW FINDING" via the separate `SubjectAdded` path — so the
    bug is specifically in the new-option-inside-existing-module path,
    not the whole `transition_origin` mechanism.
-3. **Open, not asserted as an error**: `#504200` (bulwark)'s 4
-   findings are reported with `transition_origin: analysis_became_
-   possible`, but this PR is a true module birth (`bulwark: init`).
-   If the fork's fixture genuinely represented "base" as a
-   file-absent state, `SubjectAdded` (not `AnalysisBecamePossible`)
-   is what the code should emit via the hardcoded `added_bucket`
-   path — a 3rd instance of the same bug. If the fixture instead used
-   a same-file, option-absent "base" (not a literal missing file),
-   `AnalysisBecamePossible` is correct by the code's own current
-   logic. This was not independently re-verified against the raw
-   `audit-diff` JSON before this report was compiled and should be
-   checked before treating it as a 3rd confirmed instance.
+3. **Checked and resolved, not a 3rd instance**: `#504200` (bulwark)
+   was independently reconstructed from the real PR content (base:
+   the module and test genuinely absent, matching `gh pr view`'s own
+   confirmation that both `bulwark.nix` and `nixos/tests/bulwark.nix`
+   are `ADDED`, not `MODIFIED`) and re-run against the frozen
+   `v0.4.2` binary. Raw JSON confirms `"transition_origin":
+   "subject_added"` on all 4 findings — correctly framed, via the
+   `added_bucket` path, exactly as the code's own logic should produce
+   for a true module birth. The dispatched fork's own prose summary
+   had reported `analysis_became_possible` for this PR; that was a
+   transcription error in this document's first draft, not a 4th
+   instance of the bug, and is corrected everywhere else in this
+   report (items 4 and the per-PR table).
 
 ## 8. `INCONCLUSIVE`/`TOOL_ERROR` breakdown by root cause
 
@@ -361,23 +404,44 @@ wrapping, function-form submodules, `mkPackageOption`, compound
 already-known, already-bounded limitations (`exporters.nix`,
 `optionalString`-class predicates).
 
+**Corrected arithmetic** (an earlier draft of this document reported
+this figure as "~8%," which was a real error, caught on independent
+review — not a rounding choice): among the 13 total actionable
+presentations across both cohorts (S3-A: 4, S3-B: 9), 3 are errors (1
+false finding + 2 causality/framing errors) — **3/13 ≈ 23.1%**, not
+8%. 8% would require counting only the false finding and silently
+dropping the two causality errors from the count, which the mandate's
+own definition of actionable precision (scanner-correct AND
+PR-relevant AND *correctly-framed*) does not permit. Per the mandate
+this combined figure is reference only, never the deciding number —
+the actual deciding metrics remain **S3-A 2/4 = 50%** and **S3-B
+8/9 ≈ 88.9%**, reported separately.
+
 Based on this evidence: **oba is not ready for an unreviewed,
 autonomous deployment stage** (e.g., an unattended PR-comment bot or
-a merge gate) — an ~8% false-finding-or-framing-error rate among
-notable presentations (S3-A: 2/4; S3-B: 8/9; combined but not
-blended, 10/13 non-error across both) means it would occasionally
-present confidently wrong information to a real maintainer without a
-human in the loop. It **is** ready for a human-reviewed advisory
-stage — a report a maintainer reads and can freely dismiss, matching
-what `audit-diff`'s own GitHub Action already produces — since every
-error found this round is a "the tool said X, a human would need
-under 10 minutes to see X is wrong" case, never a subtle or
-expensive-to-catch one.
+a merge gate) — a real ~23% error rate among notable presentations
+means it would occasionally present confidently wrong information to
+a real maintainer without a human in the loop. Given that rate, this
+document's earlier recommendation of a **public, maintainer-facing
+human-reviewed advisory stage** was also too optimistic for where the
+tool actually is right now: `audit-diff`'s own GitHub Action produces
+a report a maintainer reads and can dismiss, but asking real nixpkgs
+maintainers to be the ones catching a ~1-in-4 error rate is not an
+appropriate way to introduce the tool. The evidence instead supports
+**continued internal/dogfood shadow use** — by people who already
+know these four specific gaps and are evaluating the tool itself, not
+relying on its verdicts — pending a fix round. Every error found this
+round is a "the tool said X, a human would need under 10 minutes to
+see X is wrong" case, never a subtle or expensive-to-catch one, which
+is why a fix round is a reasonable next step rather than a reason to
+reconsider the tool's positioning entirely — but it is a precondition
+for any external-facing advisory stage, not a nice-to-have alongside it.
 
 The concrete next step this evidence points to is a fix round
-targeting the four correctness/causality bugs specifically (the
-`specialisation.*` blind spot, the vxwm dotted-key mislabeling, and
-the `transition_origin` new-option-vs-opacity-lifted conflation),
+targeting the three confirmed correctness/causality bugs specifically
+(the `specialisation.*` blind spot behind the one false finding, the
+vxwm dotted-key mislabeling, and the `transition_origin`
+new-option-vs-opacity-lifted conflation behind both causality errors),
 followed by a regression rerun on this same 48-PR corpus — mirroring
 S1-F/S2-F's own precedent — before any further generalization claim
 is made. This is a recommendation, not an authorization to proceed;
