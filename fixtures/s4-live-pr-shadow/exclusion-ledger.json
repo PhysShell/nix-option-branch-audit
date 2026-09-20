@@ -1,0 +1,3083 @@
+{
+  "generated_by": "fixtures/s4-live-pr-shadow/build-exclusion-ledger.py",
+  "sources": {
+    "s1_sample_pr_count": 30,
+    "s2_sample_pr_count": 50,
+    "s3_sample_pr_count": 50,
+    "s1_population_rows": 196,
+    "s2_population_rows": 134,
+    "s3_population_rows": 94,
+    "exporter_census_names": 93,
+    "repo_fixture_subject_hits": 5,
+    "old_list_names_not_independently_reproduced": 121
+  },
+  "excluded_pr_numbers": [
+    295514,
+    347823,
+    438001,
+    452303,
+    452850,
+    461073,
+    469112,
+    479381,
+    481112,
+    483921,
+    485251,
+    492803,
+    496303,
+    503263,
+    504200,
+    510342,
+    511659,
+    511660,
+    516128,
+    519494,
+    525702,
+    527821,
+    528118,
+    529621,
+    532540,
+    533377,
+    534100,
+    537675,
+    539076,
+    543675,
+    544393,
+    545002,
+    545183,
+    545231,
+    546700,
+    547038,
+    548734,
+    548837,
+    549506,
+    549553,
+    549618,
+    550492,
+    550647,
+    550960,
+    550993,
+    551107,
+    551640,
+    551955,
+    552038,
+    552640,
+    552704,
+    552737,
+    552774,
+    552777,
+    553136,
+    553268,
+    553349,
+    553474,
+    553682,
+    553699,
+    553770,
+    554062,
+    554171,
+    554495,
+    554703,
+    554779,
+    554949,
+    555067,
+    555377,
+    555531,
+    555612,
+    555621,
+    555625,
+    555630,
+    555635,
+    555643,
+    555805,
+    556069,
+    556119,
+    556253,
+    556413,
+    556461,
+    556558,
+    556710,
+    556729,
+    556989,
+    557131,
+    557327,
+    557545,
+    557729,
+    558091,
+    558121,
+    558149,
+    558283,
+    558400,
+    558600,
+    558854,
+    558981,
+    559009,
+    559055,
+    559239,
+    559344,
+    559393,
+    559588,
+    559627,
+    559798,
+    559860,
+    560031,
+    560443,
+    560647,
+    560664,
+    560892,
+    560968,
+    561051,
+    561130,
+    561399,
+    561424,
+    561557,
+    561669,
+    561845,
+    562066,
+    562104,
+    562703,
+    563010,
+    563778,
+    563907,
+    563958,
+    564021,
+    564257,
+    564357
+  ],
+  "excluded_pr_numbers_provenance": {
+    "295514": [
+      "S2 sample.md"
+    ],
+    "347823": [
+      "S1 sample.md"
+    ],
+    "438001": [
+      "S3 sample.md"
+    ],
+    "452303": [
+      "S2 sample.md"
+    ],
+    "452850": [
+      "S3 sample.md"
+    ],
+    "461073": [
+      "S3 sample.md"
+    ],
+    "469112": [
+      "S2 sample.md"
+    ],
+    "479381": [
+      "S2 sample.md"
+    ],
+    "481112": [
+      "S3 sample.md"
+    ],
+    "483921": [
+      "S3 sample.md"
+    ],
+    "485251": [
+      "S2 sample.md"
+    ],
+    "492803": [
+      "S1 sample.md"
+    ],
+    "496303": [
+      "S1 sample.md"
+    ],
+    "503263": [
+      "S2 sample.md"
+    ],
+    "504200": [
+      "S3 sample.md"
+    ],
+    "510342": [
+      "S3 sample.md"
+    ],
+    "511659": [
+      "S3 sample.md"
+    ],
+    "511660": [
+      "S3 sample.md"
+    ],
+    "516128": [
+      "S3 sample.md"
+    ],
+    "519494": [
+      "S1 sample.md"
+    ],
+    "525702": [
+      "S1 sample.md"
+    ],
+    "527821": [
+      "S1 sample.md"
+    ],
+    "528118": [
+      "S2 sample.md"
+    ],
+    "529621": [
+      "S3 sample.md"
+    ],
+    "532540": [
+      "S2 sample.md"
+    ],
+    "533377": [
+      "S3 sample.md"
+    ],
+    "534100": [
+      "S2 sample.md"
+    ],
+    "537675": [
+      "S3 sample.md"
+    ],
+    "539076": [
+      "S1 sample.md"
+    ],
+    "543675": [
+      "S1 sample.md"
+    ],
+    "544393": [
+      "S3 sample.md"
+    ],
+    "545002": [
+      "S3 sample.md"
+    ],
+    "545183": [
+      "S3 sample.md"
+    ],
+    "545231": [
+      "S2 sample.md"
+    ],
+    "546700": [
+      "S3 sample.md"
+    ],
+    "547038": [
+      "S2 sample.md"
+    ],
+    "548734": [
+      "S3 sample.md"
+    ],
+    "548837": [
+      "S3 sample.md"
+    ],
+    "549506": [
+      "S1 sample.md"
+    ],
+    "549553": [
+      "S2 sample.md"
+    ],
+    "549618": [
+      "S2 sample.md"
+    ],
+    "550492": [
+      "S3 sample.md"
+    ],
+    "550647": [
+      "S3 sample.md"
+    ],
+    "550960": [
+      "S1 sample.md"
+    ],
+    "550993": [
+      "S3 sample.md"
+    ],
+    "551107": [
+      "S3 sample.md"
+    ],
+    "551640": [
+      "S3 sample.md"
+    ],
+    "551955": [
+      "S1 sample.md"
+    ],
+    "552038": [
+      "S2 sample.md"
+    ],
+    "552640": [
+      "S2 sample.md"
+    ],
+    "552704": [
+      "S3 sample.md"
+    ],
+    "552737": [
+      "S2 sample.md"
+    ],
+    "552774": [
+      "S2 sample.md"
+    ],
+    "552777": [
+      "S3 sample.md"
+    ],
+    "553136": [
+      "S3 sample.md"
+    ],
+    "553268": [
+      "S3 sample.md"
+    ],
+    "553349": [
+      "S1 sample.md"
+    ],
+    "553474": [
+      "S2 sample.md"
+    ],
+    "553682": [
+      "S3 sample.md"
+    ],
+    "553699": [
+      "S3 sample.md"
+    ],
+    "553770": [
+      "S1 sample.md"
+    ],
+    "554062": [
+      "S3 sample.md"
+    ],
+    "554171": [
+      "S3 sample.md"
+    ],
+    "554495": [
+      "S2 sample.md"
+    ],
+    "554703": [
+      "S2 sample.md"
+    ],
+    "554779": [
+      "S1 sample.md"
+    ],
+    "554949": [
+      "S2 sample.md"
+    ],
+    "555067": [
+      "S3 sample.md"
+    ],
+    "555377": [
+      "S2 sample.md"
+    ],
+    "555531": [
+      "S3 sample.md"
+    ],
+    "555612": [
+      "S2 sample.md"
+    ],
+    "555621": [
+      "S3 sample.md"
+    ],
+    "555625": [
+      "S2 sample.md"
+    ],
+    "555630": [
+      "S3 sample.md"
+    ],
+    "555635": [
+      "S2 sample.md"
+    ],
+    "555643": [
+      "S3 sample.md"
+    ],
+    "555805": [
+      "S1 sample.md"
+    ],
+    "556069": [
+      "S3 sample.md"
+    ],
+    "556119": [
+      "S2 sample.md"
+    ],
+    "556253": [
+      "S2 sample.md"
+    ],
+    "556413": [
+      "S2 sample.md"
+    ],
+    "556461": [
+      "S3 sample.md"
+    ],
+    "556558": [
+      "S3 sample.md"
+    ],
+    "556710": [
+      "S1 sample.md"
+    ],
+    "556729": [
+      "S1 sample.md"
+    ],
+    "556989": [
+      "S2 sample.md"
+    ],
+    "557131": [
+      "S3 sample.md"
+    ],
+    "557327": [
+      "S2 sample.md"
+    ],
+    "557545": [
+      "S1 sample.md"
+    ],
+    "557729": [
+      "S3 sample.md"
+    ],
+    "558091": [
+      "S2 sample.md"
+    ],
+    "558121": [
+      "S1 sample.md"
+    ],
+    "558149": [
+      "S2 sample.md"
+    ],
+    "558283": [
+      "S2 sample.md"
+    ],
+    "558400": [
+      "S2 sample.md"
+    ],
+    "558600": [
+      "S3 sample.md"
+    ],
+    "558854": [
+      "S1 sample.md"
+    ],
+    "558981": [
+      "S3 sample.md"
+    ],
+    "559009": [
+      "S2 sample.md"
+    ],
+    "559055": [
+      "S1 sample.md"
+    ],
+    "559239": [
+      "S2 sample.md"
+    ],
+    "559344": [
+      "S2 sample.md"
+    ],
+    "559393": [
+      "S2 sample.md"
+    ],
+    "559588": [
+      "S1 sample.md"
+    ],
+    "559627": [
+      "S1 sample.md"
+    ],
+    "559798": [
+      "S2 sample.md"
+    ],
+    "559860": [
+      "S2 sample.md"
+    ],
+    "560031": [
+      "S3 sample.md"
+    ],
+    "560443": [
+      "S3 sample.md"
+    ],
+    "560647": [
+      "S1 sample.md"
+    ],
+    "560664": [
+      "S2 sample.md"
+    ],
+    "560892": [
+      "S2 sample.md"
+    ],
+    "560968": [
+      "S2 sample.md"
+    ],
+    "561051": [
+      "S2 sample.md"
+    ],
+    "561130": [
+      "S2 sample.md"
+    ],
+    "561399": [
+      "S3 sample.md"
+    ],
+    "561424": [
+      "S2 sample.md"
+    ],
+    "561557": [
+      "S1 sample.md"
+    ],
+    "561669": [
+      "S1 sample.md"
+    ],
+    "561845": [
+      "S1 sample.md"
+    ],
+    "562066": [
+      "S3 sample.md"
+    ],
+    "562104": [
+      "S2 sample.md"
+    ],
+    "562703": [
+      "S2 sample.md"
+    ],
+    "563010": [
+      "S3 sample.md"
+    ],
+    "563778": [
+      "S2 sample.md"
+    ],
+    "563907": [
+      "S3 sample.md"
+    ],
+    "563958": [
+      "S1 sample.md"
+    ],
+    "564021": [
+      "S1 sample.md"
+    ],
+    "564257": [
+      "S2 sample.md"
+    ],
+    "564357": [
+      "S1 sample.md"
+    ]
+  },
+  "excluded_subject_names": [
+    "acme",
+    "actual",
+    "adguardhome",
+    "agorakit",
+    "akkoma",
+    "alertmanager-gotify-bridge",
+    "aliases",
+    "all-packages",
+    "all-tests",
+    "anubis",
+    "apcupsd",
+    "appliance-repart-image",
+    "appliance-repart-image-verity-store",
+    "artalk",
+    "artifactory",
+    "atticd",
+    "authelia",
+    "autobrr",
+    "baikal",
+    "base",
+    "bees",
+    "bind",
+    "bird",
+    "bitcoin",
+    "blackbox",
+    "blocky",
+    "bookorbit",
+    "bookstack",
+    "borgbackup",
+    "borgmatic",
+    "btrfs",
+    "btrfs-autoscrub",
+    "buildkite-agent",
+    "cadvisor",
+    "cage",
+    "calibre-web",
+    "cassandra",
+    "chrony",
+    "ci-broker",
+    "cinnamon",
+    "civicrm",
+    "clatd",
+    "cliproxyapi",
+    "cloudflare-warp",
+    "cocoon",
+    "collectd",
+    "continuwuity",
+    "convos",
+    "coredns",
+    "cosmic",
+    "coturn",
+    "crab-hole",
+    "davis",
+    "dawarich",
+    "decoy",
+    "deluge",
+    "dgraph",
+    "dmarc",
+    "dms-greeter",
+    "dns01",
+    "dnsmasq",
+    "dnssec",
+    "docuseal",
+    "domain",
+    "dovecot",
+    "draupnir",
+    "ebpf",
+    "ecoflow",
+    "elasticsearch",
+    "endlessh",
+    "engelsystem",
+    "esphome",
+    "exllamav3",
+    "exporters",
+    "extensions",
+    "fail2ban",
+    "fastly",
+    "fcitx",
+    "fcitx5",
+    "ferretdb",
+    "fider",
+    "firefox-syncserver",
+    "firewall",
+    "flame",
+    "flarum",
+    "flow",
+    "forgejo",
+    "forgejo-runner",
+    "freenet",
+    "freshrss",
+    "fritz",
+    "fritzbox",
+    "frontend",
+    "frr",
+    "fwupd",
+    "gancio",
+    "gemset",
+    "geph",
+    "gitea",
+    "gitea-actions-runner",
+    "github-runner",
+    "glance",
+    "glitchtip",
+    "gnome-photos",
+    "go-neb",
+    "gocron",
+    "grafana",
+    "graphite",
+    "grocy",
+    "grub2",
+    "hatsu",
+    "hddtemp",
+    "headscale",
+    "heimdal",
+    "hibernate",
+    "hickory-dns",
+    "home-assistant",
+    "home-mount",
+    "hostapd",
+    "http01-builtin",
+    "hyphanet",
+    "i2pd",
+    "idrac",
+    "ids",
+    "ifm-test",
+    "ifstate",
+    "image-upgrade",
+    "imap-mailstat",
+    "immich",
+    "influxdb",
+    "installed-tests",
+    "invoiceplane",
+    "iocaine",
+    "ipmi",
+    "jellyfin",
+    "jitsi",
+    "jitsi-meet",
+    "json",
+    "junit",
+    "junos-czerwonk",
+    "k3s",
+    "kafka",
+    "karma",
+    "kavita",
+    "kea",
+    "kener",
+    "kerberos",
+    "keylight",
+    "keymap",
+    "kimai",
+    "klipper",
+    "kmscon",
+    "knot",
+    "komodo-periphery",
+    "krill",
+    "kthxbye",
+    "kubernetes",
+    "ldap",
+    "lemmy",
+    "libinput",
+    "librechat",
+    "librenms",
+    "librespeed",
+    "libvirt",
+    "limine",
+    "linkwarden",
+    "listmonk",
+    "llama-cpp",
+    "lldap",
+    "lnd",
+    "location-options",
+    "loki",
+    "lomiri",
+    "mail",
+    "mail-tlsa-check",
+    "mailman3",
+    "maintainer-list",
+    "matter-server",
+    "matterjs-server",
+    "mattermost",
+    "mediamtx",
+    "meilisearch",
+    "meta",
+    "metabase",
+    "mikrotik",
+    "mimir",
+    "miniflux",
+    "mintotp",
+    "misskey",
+    "mit",
+    "mobilizon",
+    "modemmanager",
+    "modular-services",
+    "module-list",
+    "monado",
+    "mongodb",
+    "moonshine",
+    "movim",
+    "mqtt",
+    "mysqld",
+    "nats",
+    "nebula-lighthouse-service",
+    "netbird-relay",
+    "networkmanager",
+    "nextcloud",
+    "nextcloud-notify_push",
+    "nftables",
+    "nginx",
+    "nginx-compression",
+    "nginx-grpc-error-pages",
+    "nginxlog",
+    "nimdow",
+    "nmtrust",
+    "noctalia-greeter",
+    "node",
+    "node-cert",
+    "nohang",
+    "nomad",
+    "none-auth",
+    "nordvpn",
+    "ntfy-sh",
+    "nullmailer",
+    "nut",
+    "nvidia-gpu",
+    "omada",
+    "open-webui",
+    "opensearch-dashboards",
+    "opentelemetry-collector",
+    "opentelemetry-collector-validate",
+    "openvswitch",
+    "opnsense",
+    "options",
+    "orbit",
+    "os-prober",
+    "outline",
+    "package",
+    "pam",
+    "papra",
+    "part-db",
+    "pdfding",
+    "pdns-recursor",
+    "peerflix",
+    "pgbouncer",
+    "pghero",
+    "php-fpm",
+    "pihole",
+    "ping",
+    "plausible",
+    "plikd",
+    "pocket-id",
+    "pomerium",
+    "portunus",
+    "postfix",
+    "postfixadmin",
+    "postgres",
+    "printers",
+    "printing",
+    "privoxy",
+    "process",
+    "prometheus-exporters",
+    "pufferpanel",
+    "pve",
+    "py-air-control",
+    "python-packages",
+    "qemu-vm",
+    "qemu-vm-store",
+    "radicle",
+    "rancher",
+    "rasdaemon",
+    "realm",
+    "rebuilderd",
+    "redis",
+    "redmine",
+    "rename",
+    "repart",
+    "repart-image",
+    "restic",
+    "retroarch",
+    "ringboard",
+    "rke2",
+    "rosec",
+    "rtl_433",
+    "s3-backups",
+    "sabnzbd",
+    "script",
+    "searxng",
+    "secure-boot",
+    "selfoss",
+    "send",
+    "server",
+    "service",
+    "shelly",
+    "shiori",
+    "silverbullet",
+    "sing-box",
+    "smartctl",
+    "smokeping",
+    "snipe-it",
+    "snmp",
+    "snowflake",
+    "soft-serve",
+    "spacecookie",
+    "speedtest",
+    "sql",
+    "sstorytime",
+    "statsd",
+    "storagebox",
+    "strichliste",
+    "strongswan",
+    "surfboard",
+    "suricata",
+    "svnserve",
+    "swanctl",
+    "swanctl-params",
+    "syncoid",
+    "systemd",
+    "systemd-networkd-vrf",
+    "systemd-timesyncd-nscd-dnssec",
+    "szurubooru",
+    "tabbyapi",
+    "tailscale",
+    "tap",
+    "tempo",
+    "test-cross-instance",
+    "test-no-transition",
+    "test-opaque-other-operand",
+    "thelounge",
+    "throttled",
+    "tibber",
+    "tor",
+    "tpm2",
+    "tpm2-abrmd",
+    "tpm2-tpmrm",
+    "trailbase",
+    "transmission",
+    "turn-rs",
+    "udp514-journal",
+    "umami",
+    "unbound",
+    "unpackerr",
+    "unpoller",
+    "update",
+    "userborn",
+    "userborn-migration",
+    "v2ray",
+    "valkey",
+    "varnish",
+    "vault",
+    "vaultwarden",
+    "vector",
+    "vxwm",
+    "warpgate",
+    "windmill",
+    "wireguard",
+    "wivrn",
+    "wordpress",
+    "wpa_supplicant",
+    "xandikos",
+    "xepub",
+    "xray",
+    "xrdp",
+    "xreader",
+    "yace",
+    "zerobyte",
+    "zfs",
+    "zfs-siebenmann",
+    "zipline"
+  ],
+  "excluded_subject_names_provenance": {
+    "acme": [
+      "S1 PR #539076 (nixos/modules/security/acme/default.nix)"
+    ],
+    "actual": [
+      "S3 PR #555643 (nixos/tests/actual.nix)"
+    ],
+    "adguardhome": [
+      "S3 PR #554062 (nixos/modules/services/networking/adguardhome.nix)",
+      "S3 PR #554062 (nixos/tests/adguardhome.nix)",
+      "S3 PR #483921 (nixos/modules/services/networking/adguardhome.nix)"
+    ],
+    "agorakit": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "akkoma": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "alertmanager-gotify-bridge": [
+      "S3 PR #560443 (nixos/modules/services/monitoring/prometheus/alertmanager-gotify-bridge.nix)"
+    ],
+    "aliases": [
+      "S2 PR #559393 (pkgs/top-level/aliases.nix)",
+      "S2 PR #563778 (pkgs/top-level/aliases.nix)",
+      "S2 PR #554703 (pkgs/top-level/aliases.nix)",
+      "S2 PR #554495 (pkgs/top-level/aliases.nix)",
+      "S3 PR #557131 (pkgs/top-level/aliases.nix)"
+    ],
+    "all-packages": [
+      "S1 PR #519494 (pkgs/top-level/all-packages.nix)",
+      "S2 PR #554703 (pkgs/top-level/all-packages.nix)"
+    ],
+    "all-tests": [
+      "S1 PR #549506 (nixos/tests/all-tests.nix)",
+      "S1 PR #525702 (nixos/tests/all-tests.nix)",
+      "S1 PR #559627 (nixos/tests/all-tests.nix)",
+      "S1 PR #496303 (nixos/tests/all-tests.nix)",
+      "S1 PR #519494 (nixos/tests/all-tests.nix)",
+      "S1 PR #527821 (nixos/tests/all-tests.nix)",
+      "S1 PR #559055 (nixos/tests/all-tests.nix)",
+      "S1 PR #559588 (nixos/tests/all-tests.nix)",
+      "S2 PR #553474 (nixos/tests/all-tests.nix)",
+      "S2 PR #559239 (nixos/tests/all-tests.nix)",
+      "S2 PR #552737 (nixos/tests/all-tests.nix)",
+      "S2 PR #559009 (nixos/tests/all-tests.nix)",
+      "S2 PR #559393 (nixos/tests/all-tests.nix)",
+      "S2 PR #549553 (nixos/tests/all-tests.nix)",
+      "S2 PR #562104 (nixos/tests/all-tests.nix)",
+      "S2 PR #532540 (nixos/tests/all-tests.nix)",
+      "S2 PR #563778 (nixos/tests/all-tests.nix)",
+      "S2 PR #552774 (nixos/tests/all-tests.nix)",
+      "S2 PR #555612 (nixos/tests/all-tests.nix)",
+      "S2 PR #547038 (nixos/tests/all-tests.nix)",
+      "S2 PR #555625 (nixos/tests/all-tests.nix)",
+      "S2 PR #555635 (nixos/tests/all-tests.nix)",
+      "S2 PR #469112 (nixos/tests/all-tests.nix)",
+      "S2 PR #556413 (nixos/tests/all-tests.nix)",
+      "S2 PR #554495 (nixos/tests/all-tests.nix)",
+      "S3 PR #510342 (nixos/tests/all-tests.nix)",
+      "S3 PR #461073 (nixos/tests/all-tests.nix)",
+      "S3 PR #548837 (nixos/tests/all-tests.nix)",
+      "S3 PR #555621 (nixos/tests/all-tests.nix)",
+      "S3 PR #555630 (nixos/tests/all-tests.nix)",
+      "S3 PR #452850 (nixos/tests/all-tests.nix)"
+    ],
+    "anubis": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "apcupsd": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "appliance-repart-image": [
+      "S1 PR #561557 (nixos/tests/appliance-repart-image.nix)",
+      "S2 PR #561424 (nixos/tests/appliance-repart-image.nix)"
+    ],
+    "appliance-repart-image-verity-store": [
+      "S1 PR #561557 (nixos/tests/appliance-repart-image-verity-store.nix)"
+    ],
+    "artalk": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "artifactory": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "atticd": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "authelia": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "autobrr": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "baikal": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "base": [
+      "S2 PR #556989 (nixos/tests/kubernetes/base.nix)"
+    ],
+    "bees": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "bind": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "bird": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "bitcoin": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "blackbox": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "blocky": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "bookorbit": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "bookstack": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "borgbackup": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "borgmatic": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "btrfs": [
+      "S1 PR #559627 (nixos/modules/tasks/filesystems/btrfs.nix)"
+    ],
+    "btrfs-autoscrub": [
+      "S1 PR #559627 (nixos/tests/btrfs-autoscrub.nix)"
+    ],
+    "buildkite-agent": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "cadvisor": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "cage": [
+      "S2 PR #479381 (nixos/modules/services/wayland/cage.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "calibre-web": [
+      "S2 PR #503263 (nixos/modules/services/web-apps/calibre-web.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "cassandra": [
+      "S1 PR #553349 (nixos/modules/services/databases/cassandra.nix)"
+    ],
+    "chrony": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "ci-broker": [
+      "S2 PR #559798 (nixos/modules/services/continuous-integration/radicle/ci-broker.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "cinnamon": [
+      "S2 PR #564257 (nixos/modules/services/x11/desktop-managers/cinnamon.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "civicrm": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "clatd": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "cliproxyapi": [
+      "S2 PR #532540 (nixos/modules/services/misc/cliproxyapi.nix)",
+      "S2 PR #532540 (nixos/tests/cliproxyapi.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "cloudflare-warp": [
+      "S2 PR #555377 (nixos/modules/services/networking/cloudflare-warp.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "cocoon": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "collectd": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "continuwuity": [
+      "S3 PR #551640 (nixos/tests/matrix/continuwuity.nix)"
+    ],
+    "convos": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "coredns": [
+      "S1 PR #564357 (nixos/tests/coredns.nix)"
+    ],
+    "cosmic": [
+      "S2 PR #562703 (nixos/modules/services/desktop-managers/cosmic.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "coturn": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "crab-hole": [
+      "S3 PR #545002 (nixos/modules/services/networking/crab-hole.nix)"
+    ],
+    "davis": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "dawarich": [
+      "S1 PR #558854 (nixos/tests/web-apps/dawarich.nix)"
+    ],
+    "decoy": [
+      "repo fixture (fixtures/synthetic/root-escape/decoy.nix)"
+    ],
+    "deluge": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "dgraph": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "dmarc": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "dms-greeter": [
+      "S2 PR #545231 (nixos/modules/services/display-managers/dms-greeter.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "dns01": [
+      "S1 PR #539076 (nixos/tests/acme/dns01.nix)"
+    ],
+    "dnsmasq": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "dnssec": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "docuseal": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "domain": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "dovecot": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "draupnir": [
+      "S2 PR #558283 (nixos/tests/matrix/draupnir.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "ebpf": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "ecoflow": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "elasticsearch": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "endlessh": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "engelsystem": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "esphome": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "exllamav3": [
+      "S2 PR #560664 (pkgs/development/python-modules/exllamav3/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "exporters": [
+      "S1 PR #551955 (nixos/modules/services/monitoring/prometheus/exporters.nix)",
+      "S1 PR #556710 (nixos/modules/services/monitoring/prometheus/exporters.nix)",
+      "S2 PR #552038 (nixos/modules/services/monitoring/prometheus/exporters.nix)"
+    ],
+    "extensions": [
+      "S1 PR #564021 (nixos/tests/freshrss/extensions.nix)"
+    ],
+    "fail2ban": [
+      "S1 PR #556710 (nixos/modules/services/monitoring/prometheus/exporters/fail2ban.nix)",
+      "S1 PR #556710 (nixos/modules/services/security/fail2ban.nix)",
+      "S1 PR #556710 (nixos/tests/fail2ban.nix)",
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "fastly": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "fcitx": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "fcitx5": [
+      "S2 PR #295514 (nixos/modules/i18n/input-method/fcitx5.nix)",
+      "S2 PR #295514 (nixos/tests/fcitx5/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "ferretdb": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "fider": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "firefox-syncserver": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "firewall": [
+      "S2 PR #558149 (nixos/tests/firewall.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "flame": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "flarum": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "flow": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "forgejo": [
+      "S3 PR #529621 (nixos/tests/forgejo.nix)"
+    ],
+    "forgejo-runner": [
+      "S3 PR #529621 (nixos/modules/services/continuous-integration/forgejo-runner.nix)"
+    ],
+    "freenet": [
+      "S2 PR #554495 (nixos/modules/services/networking/freenet.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "freshrss": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "fritz": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "fritzbox": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "frontend": [
+      "S2 PR #559860 (pkgs/by-name/pd/pdfding/frontend.nix)"
+    ],
+    "frr": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "fwupd": [
+      "S3 PR #553136 (nixos/modules/services/hardware/fwupd.nix)"
+    ],
+    "gancio": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "gemset": [
+      "S1 PR #558854 (pkgs/by-name/da/dawarich/gemset.nix)",
+      "S2 PR #563778 (pkgs/by-name/pg/pghero/gemset.nix)"
+    ],
+    "geph": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "gitea": [
+      "S2 PR #559009 (nixos/tests/gitea.nix)",
+      "S2 PR #556119 (nixos/tests/gitea.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "gitea-actions-runner": [
+      "S2 PR #559009 (nixos/tests/gitea-actions-runner.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "github-runner": [
+      "S3 PR #533377 (nixos/tests/github-runner.nix)"
+    ],
+    "glance": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "glitchtip": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "gnome-photos": [
+      "S3 PR #557131 (nixos/tests/installed-tests/gnome-photos.nix)"
+    ],
+    "go-neb": [
+      "S2 PR #559393 (nixos/modules/services/networking/go-neb.nix)",
+      "S2 PR #559393 (nixos/tests/go-neb.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "gocron": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "grafana": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "graphite": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "grocy": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "grub2": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "hatsu": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "hddtemp": [
+      "S2 PR #469112 (nixos/modules/hardware/sensor/hddtemp.nix)",
+      "S2 PR #469112 (nixos/tests/hddtemp.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "headscale": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "heimdal": [
+      "S3 PR #555621 (nixos/tests/kerberos/heimdal.nix)"
+    ],
+    "hibernate": [
+      "S2 PR #552774 (nixos/tests/hibernate.nix)"
+    ],
+    "hickory-dns": [
+      "S2 PR #562104 (nixos/tests/hickory-dns.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "home-assistant": [
+      "S2 PR #559344 (nixos/modules/services/home-automation/home-assistant.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "home-mount": [
+      "S2 PR #557327 (nixos/tests/nextcloud/home-mount.nix)"
+    ],
+    "hostapd": [
+      "S3 PR #550492 (nixos/modules/services/networking/hostapd.nix)"
+    ],
+    "http01-builtin": [
+      "S1 PR #539076 (nixos/tests/acme/http01-builtin.nix)"
+    ],
+    "hyphanet": [
+      "S2 PR #554495 (nixos/modules/services/networking/hyphanet.nix)",
+      "S2 PR #554495 (nixos/tests/hyphanet.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "i2pd": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "idrac": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "ids": [
+      "S2 PR #554495 (nixos/modules/misc/ids.nix)"
+    ],
+    "ifm-test": [
+      "repo fixture (fixtures/real/ifm-test.nix)"
+    ],
+    "ifstate": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "image-upgrade": [
+      "S2 PR #552640 (nixos/tests/rancher/image-upgrade.nix)"
+    ],
+    "imap-mailstat": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "immich": [
+      "S1 PR #347823 (nixos/modules/services/web-apps/immich.nix)",
+      "S1 PR #347823 (nixos/tests/web-apps/immich.nix)",
+      "S2 PR #549618 (nixos/modules/services/web-apps/immich.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "influxdb": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "installed-tests": [
+      "S3 PR #557131 (nixos/tests/installed-tests/default.nix)"
+    ],
+    "invoiceplane": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "iocaine": [
+      "S1 PR #527821 (nixos/modules/services/networking/iocaine.nix)",
+      "S1 PR #527821 (nixos/tests/iocaine.nix)"
+    ],
+    "ipmi": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "jellyfin": [
+      "S2 PR #561130 (nixos/tests/jellyfin.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "jitsi": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "jitsi-meet": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "json": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "junit": [
+      "S2 PR #556413 (nixos/tests/nixos-test-driver/junit.nix)"
+    ],
+    "junos-czerwonk": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "k3s": [
+      "S2 PR #552640 (nixos/modules/services/cluster/rancher/k3s.nix)"
+    ],
+    "kafka": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "karma": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "kavita": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "kea": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "kener": [
+      "S1 PR #549506 (nixos/modules/services/monitoring/kener.nix)",
+      "S1 PR #549506 (nixos/tests/kener.nix)"
+    ],
+    "kerberos": [
+      "S3 PR #555621 (nixos/tests/kerberos/default.nix)"
+    ],
+    "keylight": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "keymap": [
+      "S2 PR #555625 (nixos/tests/keymap.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "kimai": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "klipper": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "kmscon": [
+      "S2 PR #528118 (nixos/modules/services/ttys/kmscon.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "knot": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "komodo-periphery": [
+      "S1 PR #561845 (nixos/modules/services/admin/komodo-periphery.nix)",
+      "S1 PR #561845 (nixos/tests/komodo-periphery.nix)"
+    ],
+    "krill": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "kthxbye": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "kubernetes": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "ldap": [
+      "S3 PR #555621 (nixos/tests/kerberos/ldap/default.nix)"
+    ],
+    "lemmy": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "libinput": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "librechat": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "librenms": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "librespeed": [
+      "S1 PR #561669 (nixos/modules/services/web-apps/librespeed.nix)"
+    ],
+    "libvirt": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "limine": [
+      "S3 PR #553136 (nixos/modules/system/boot/loader/limine/limine.nix)"
+    ],
+    "linkwarden": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "listmonk": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "llama-cpp": [
+      "S3 PR #561399 (nixos/modules/services/misc/llama-cpp.nix)"
+    ],
+    "lldap": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "lnd": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "location-options": [
+      "S2 PR #549553 (nixos/modules/services/web-servers/nginx/location-options.nix)"
+    ],
+    "loki": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "lomiri": [
+      "S2 PR #534100 (nixos/tests/lomiri.nix)",
+      "S2 PR #534100 (pkgs/desktops/lomiri/applications/lomiri/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "mail": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "mail-tlsa-check": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "mailman3": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "maintainer-list": [
+      "S1 PR #519494 (maintainers/maintainer-list.nix)",
+      "S3 PR #544393 (maintainers/maintainer-list.nix)"
+    ],
+    "matter-server": [
+      "S3 PR #556461 (nixos/modules/services/home-automation/matter-server.nix)"
+    ],
+    "matterjs-server": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "mattermost": [
+      "S3 PR #555630 (nixos/tests/mattermost/default.nix)"
+    ],
+    "mediamtx": [
+      "S1 PR #557545 (nixos/modules/services/video/mediamtx.nix)"
+    ],
+    "meilisearch": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "meta": [
+      "S2 PR #553474 (nixos/lib/testing/meta.nix)"
+    ],
+    "metabase": [
+      "S3 PR #551107 (nixos/tests/metabase.nix)"
+    ],
+    "mikrotik": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "mimir": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "miniflux": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "mintotp": [
+      "S2 PR #552737 (pkgs/development/python-modules/mintotp/default.nix)"
+    ],
+    "misskey": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "mit": [
+      "S3 PR #555621 (nixos/tests/kerberos/ldap/mit.nix)",
+      "S3 PR #555621 (nixos/tests/kerberos/mit.nix)"
+    ],
+    "mobilizon": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "modemmanager": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "modular-services": [
+      "S2 PR #552737 (nixos/modules/misc/documentation/modular-services.nix)"
+    ],
+    "module-list": [
+      "S1 PR #549506 (nixos/modules/module-list.nix)",
+      "S1 PR #525702 (nixos/modules/module-list.nix)",
+      "S1 PR #496303 (nixos/modules/module-list.nix)",
+      "S1 PR #519494 (nixos/modules/module-list.nix)",
+      "S1 PR #527821 (nixos/modules/module-list.nix)",
+      "S1 PR #559588 (nixos/modules/module-list.nix)",
+      "S2 PR #532540 (nixos/modules/module-list.nix)",
+      "S2 PR #563778 (nixos/modules/module-list.nix)",
+      "S2 PR #554495 (nixos/modules/module-list.nix)",
+      "S3 PR #544393 (nixos/modules/module-list.nix)",
+      "S3 PR #556558 (nixos/modules/module-list.nix)",
+      "S3 PR #461073 (nixos/modules/module-list.nix)",
+      "S3 PR #529621 (nixos/modules/module-list.nix)",
+      "S3 PR #548837 (nixos/modules/module-list.nix)"
+    ],
+    "monado": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "mongodb": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "moonshine": [
+      "S3 PR #544393 (nixos/modules/services/networking/moonshine.nix)"
+    ],
+    "movim": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "mqtt": [
+      "S2 PR #485251 (nixos/modules/services/monitoring/prometheus/exporters/mqtt.nix)",
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "mysqld": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "nats": [
+      "S2-F3 exporter census",
+      "(also in S1 113-name list)",
+      "(also in S3 254-name list)"
+    ],
+    "nebula-lighthouse-service": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "netbird-relay": [
+      "S1 PR #559588 (nixos/modules/services/networking/netbird/netbird-relay.nix)",
+      "S1 PR #559588 (nixos/tests/netbird-relay.nix)"
+    ],
+    "networkmanager": [
+      "S1 PR #560647 (nixos/tests/networking/networkmanager.nix)"
+    ],
+    "nextcloud": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "nextcloud-notify_push": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "nftables": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "nginx": [
+      "S2 PR #549553 (nixos/modules/services/web-servers/nginx/default.nix)",
+      "S2 PR #547038 (nixos/modules/services/web-servers/nginx/default.nix)",
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "nginx-compression": [
+      "S2 PR #547038 (nixos/tests/nginx-compression.nix)"
+    ],
+    "nginx-grpc-error-pages": [
+      "S2 PR #549553 (nixos/tests/nginx-grpc-error-pages.nix)"
+    ],
+    "nginxlog": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "nimdow": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "nmtrust": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "noctalia-greeter": [
+      "S1 PR #563958 (nixos/modules/services/display-managers/noctalia-greeter.nix)"
+    ],
+    "node": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "node-cert": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "nohang": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "nomad": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "none-auth": [
+      "S2 PR #560968 (nixos/tests/freshrss/none-auth.nix)"
+    ],
+    "nordvpn": [
+      "S3 PR #563907 (nixos/modules/services/networking/nordvpn.nix)",
+      "S3 PR #563907 (nixos/tests/nordvpn.nix)"
+    ],
+    "ntfy-sh": [
+      "S1 PR #492803 (nixos/modules/services/misc/ntfy-sh.nix)"
+    ],
+    "nullmailer": [
+      "S3 PR #452850 (nixos/tests/nullmailer.nix)"
+    ],
+    "nut": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "nvidia-gpu": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "omada": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "open-webui": [
+      "S3 PR #557729 (nixos/modules/services/misc/open-webui.nix)"
+    ],
+    "opensearch-dashboards": [
+      "S1 PR #496303 (nixos/modules/services/search/opensearch-dashboards.nix)",
+      "S1 PR #496303 (nixos/tests/opensearch-dashboards.nix)"
+    ],
+    "opentelemetry-collector": [
+      "S1 PR #559055 (nixos/modules/services/monitoring/opentelemetry-collector.nix)"
+    ],
+    "opentelemetry-collector-validate": [
+      "S1 PR #559055 (nixos/tests/opentelemetry-collector-validate.nix)"
+    ],
+    "openvswitch": [
+      "S1 PR #543675 (nixos/modules/virtualisation/openvswitch.nix)",
+      "S1 PR #543675 (nixos/tests/openvswitch.nix)"
+    ],
+    "opnsense": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "options": [
+      "S3 PR #533377 (nixos/modules/services/continuous-integration/github-runner/options.nix)"
+    ],
+    "orbit": [
+      "S1 PR #525702 (nixos/modules/services/monitoring/orbit.nix)",
+      "S1 PR #525702 (nixos/tests/orbit.nix)"
+    ],
+    "os-prober": [
+      "S1 PR #554779 (nixos/tests/os-prober.nix)"
+    ],
+    "outline": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "package": [
+      "S1 PR #549506 (pkgs/by-name/ke/kener/package.nix)",
+      "S1 PR #525702 (pkgs/by-name/fl/fleet-desktop/package.nix)",
+      "S1 PR #525702 (pkgs/by-name/fl/fleet-orbit/package.nix)",
+      "S1 PR #560647 (pkgs/by-name/li/libp11/package.nix)",
+      "S1 PR #564357 (pkgs/by-name/co/coredns/package.nix)",
+      "S1 PR #554779 (pkgs/by-name/os/os-prober/package.nix)",
+      "S1 PR #555805 (pkgs/by-name/si/silverbullet/package.nix)",
+      "S1 PR #496303 (pkgs/by-name/op/opensearch-dashboards/package.nix)",
+      "S1 PR #550960 (pkgs/by-name/wi/wivrn/package.nix)",
+      "S1 PR #556729 (pkgs/by-name/ss/sstorytime/package.nix)",
+      "S1 PR #539076 (pkgs/by-name/le/lego/package.nix)",
+      "S1 PR #519494 (pkgs/by-name/ro/rosec-bitwarden-pm/package.nix)",
+      "S1 PR #519494 (pkgs/by-name/ro/rosec-bitwarden-sm/package.nix)",
+      "S1 PR #519494 (pkgs/by-name/ro/rosec-gnome-keyring/package.nix)",
+      "S1 PR #519494 (pkgs/by-name/ro/rosec/package.nix)",
+      "S1 PR #527821 (pkgs/by-name/io/iocaine/package.nix)",
+      "S1 PR #559588 (pkgs/by-name/ne/netbird/package.nix)",
+      "S2 PR #559239 (pkgs/by-name/se/selfoss/package.nix)",
+      "S2 PR #560664 (pkgs/by-name/ta/tabbyapi/package.nix)",
+      "S2 PR #552737 (pkgs/by-name/tr/trailbase/package.nix)",
+      "S2 PR #559009 (pkgs/by-name/gi/gitea-actions-runner/package.nix)",
+      "S2 PR #559009 (pkgs/by-name/gi/gitea/package.nix)",
+      "S2 PR #564257 (pkgs/by-name/xe/xepub/package.nix)",
+      "S2 PR #564257 (pkgs/by-name/xr/xreader/package.nix)",
+      "S2 PR #559393 (pkgs/by-name/go/go-neb/package.nix)",
+      "S2 PR #562104 (pkgs/by-name/hi/hickory-dns/package.nix)",
+      "S2 PR #532540 (pkgs/by-name/cl/cliproxyapi/package.nix)",
+      "S2 PR #556989 (pkgs/by-name/ku/kubernetes/package.nix)",
+      "S2 PR #558400 (pkgs/by-name/cr/cronet-go/package.nix)",
+      "S2 PR #558400 (pkgs/by-name/si/sing-box/package.nix)",
+      "S2 PR #563778 (pkgs/by-name/pg/pghero/package.nix)",
+      "S2 PR #558283 (pkgs/by-name/dr/draupnir/package.nix)",
+      "S2 PR #545231 (pkgs/by-name/dm/dms-greeter/package.nix)",
+      "S2 PR #555612 (pkgs/by-name/va/valkey/package.nix)",
+      "S2 PR #561130 (pkgs/by-name/je/jellyfin-ffmpeg/package.nix)",
+      "S2 PR #561130 (pkgs/by-name/je/jellyfin-web/package.nix)",
+      "S2 PR #561130 (pkgs/by-name/je/jellyfin/package.nix)",
+      "S2 PR #555377 (pkgs/by-name/cl/cloudflare-warp/package.nix)",
+      "S2 PR #559860 (pkgs/by-name/pd/pdfding/package.nix)",
+      "S2 PR #528118 (pkgs/by-name/km/kmscon/package.nix)",
+      "S2 PR #469112 (pkgs/by-name/hd/hddtemp/package.nix)",
+      "S2 PR #560892 (pkgs/by-name/st/strongswan/package.nix)",
+      "S2 PR #554495 (pkgs/by-name/hy/hyphanet/package.nix)",
+      "S3 PR #510342 (pkgs/by-name/us/userborn-import-legacy/package.nix)",
+      "S3 PR #510342 (pkgs/by-name/us/userborn/package.nix)",
+      "S3 PR #556558 (pkgs/by-name/vx/vxwm/package.nix)",
+      "S3 PR #461073 (pkgs/by-name/ud/udp514-journal/package.nix)",
+      "S3 PR #553136 (pkgs/by-name/fw/fwupd/package.nix)",
+      "S3 PR #557131 (pkgs/by-name/gn/gnome-photos/package.nix)",
+      "S3 PR #551640 (pkgs/by-name/ma/matrix-continuwuity/package.nix)",
+      "S3 PR #548837 (pkgs/by-name/ss/sstorytime/package.nix)",
+      "S3 PR #452850 (pkgs/by-name/nu/nullmailer/package.nix)"
+    ],
+    "pam": [
+      "S1 PR #519494 (nixos/modules/security/pam.nix)"
+    ],
+    "papra": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "part-db": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "pdfding": [
+      "S2 PR #559860 (nixos/modules/services/web-apps/pdfding.nix)",
+      "S2 PR #559860 (nixos/tests/web-apps/pdfding/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "pdns-recursor": [
+      "S2 PR #556253 (nixos/modules/services/networking/pdns-recursor.nix)",
+      "S2 PR #556253 (nixos/tests/pdns-recursor.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "peerflix": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "pgbouncer": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "pghero": [
+      "S2 PR #563778 (nixos/modules/services/misc/pghero.nix)",
+      "S2 PR #563778 (nixos/tests/pghero.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "php-fpm": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "pihole": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "ping": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "plausible": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "plikd": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "pocket-id": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "pomerium": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "portunus": [
+      "S1 PR #553770 (nixos/modules/services/misc/portunus.nix)",
+      "S2 PR #561051 (nixos/tests/portunus.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "postfix": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "postfixadmin": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "postgres": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "printers": [
+      "S3 PR #558981 (nixos/modules/hardware/printers.nix)"
+    ],
+    "printing": [
+      "S3 PR #558981 (nixos/tests/printing.nix)"
+    ],
+    "privoxy": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "process": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "prometheus-exporters": [
+      "S1 PR #551955 (nixos/tests/prometheus-exporters.nix)",
+      "S1 PR #556710 (nixos/tests/prometheus-exporters.nix)",
+      "S2 PR #552038 (nixos/tests/prometheus-exporters.nix)"
+    ],
+    "pufferpanel": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "pve": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "py-air-control": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "python-packages": [
+      "S2 PR #552737 (pkgs/top-level/python-packages.nix)"
+    ],
+    "qemu-vm": [
+      "S2 PR #552774 (nixos/modules/virtualisation/qemu-vm.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "qemu-vm-store": [
+      "S2 PR #552774 (nixos/tests/qemu-vm-store.nix)"
+    ],
+    "radicle": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "rancher": [
+      "S2 PR #552640 (nixos/modules/services/cluster/rancher/default.nix)",
+      "S2 PR #552640 (nixos/tests/rancher/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "rasdaemon": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "realm": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "rebuilderd": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "redis": [
+      "S2 PR #555612 (nixos/tests/redis.nix)",
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "redmine": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "rename": [
+      "S2 PR #563778 (nixos/modules/rename.nix)"
+    ],
+    "repart": [
+      "S1 PR #561557 (nixos/modules/image/repart.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "repart-image": [
+      "S2 PR #561424 (nixos/modules/image/repart-image.nix)"
+    ],
+    "restic": [
+      "S2-F3 exporter census",
+      "(also in S1 113-name list)",
+      "(also in S3 254-name list)"
+    ],
+    "retroarch": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "ringboard": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "rke2": [
+      "S2 PR #552640 (nixos/modules/services/cluster/rancher/rke2.nix)"
+    ],
+    "rosec": [
+      "S1 PR #519494 (nixos/modules/services/security/rosec.nix)",
+      "S1 PR #519494 (nixos/tests/rosec.nix)"
+    ],
+    "rtl_433": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "s3-backups": [
+      "S2 PR #559860 (nixos/tests/web-apps/pdfding/s3-backups.nix)"
+    ],
+    "sabnzbd": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "script": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "searxng": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "secure-boot": [
+      "S3 PR #553136 (nixos/tests/limine/secure-boot.nix)"
+    ],
+    "selfoss": [
+      "S2 PR #559239 (nixos/modules/services/web-apps/selfoss.nix)",
+      "S2 PR #559239 (nixos/tests/selfoss.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "send": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "server": [
+      "S2 PR #554949 (pkgs/servers/web-apps/szurubooru/server.nix)"
+    ],
+    "service": [
+      "S2 PR #552737 (pkgs/by-name/tr/trailbase/service.nix)",
+      "S3 PR #533377 (nixos/modules/services/continuous-integration/github-runner/service.nix)"
+    ],
+    "shelly": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "shiori": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "silverbullet": [
+      "S1 PR #555805 (nixos/modules/services/web-apps/silverbullet.nix)",
+      "S1 PR #555805 (nixos/tests/silverbullet.nix)"
+    ],
+    "sing-box": [
+      "S2 PR #558400 (nixos/tests/sing-box.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "smartctl": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "smokeping": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "snipe-it": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "snmp": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "snowflake": [
+      "S2 PR #552038 (nixos/modules/services/monitoring/prometheus/exporters/snowflake.nix)",
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "soft-serve": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "spacecookie": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "speedtest": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "sql": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "sstorytime": [
+      "S1 PR #556729 (nixos/modules/services/web-apps/sstorytime.nix)",
+      "S1 PR #556729 (nixos/tests/sstorytime.nix)",
+      "S3 PR #548837 (nixos/modules/services/web-apps/sstorytime.nix)",
+      "S3 PR #548837 (nixos/tests/sstorytime.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "statsd": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "storagebox": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "strichliste": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "strongswan": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "surfboard": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "suricata": [
+      "S3 PR #562066 (nixos/modules/services/networking/suricata/default.nix)",
+      "S3 PR #562066 (nixos/tests/suricata.nix)",
+      "S3 PR #553682 (nixos/modules/services/networking/suricata/default.nix)"
+    ],
+    "svnserve": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "swanctl": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "swanctl-params": [
+      "S2 PR #560892 (nixos/modules/services/networking/strongswan-swanctl/swanctl-params.nix)"
+    ],
+    "syncoid": [
+      "S3 PR #558600 (nixos/modules/services/backup/syncoid.nix)"
+    ],
+    "systemd": [
+      "S2 PR #552774 (nixos/tests/systemd.nix)",
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "systemd-networkd-vrf": [
+      "S1 PR #558121 (nixos/tests/systemd-networkd-vrf.nix)"
+    ],
+    "systemd-timesyncd-nscd-dnssec": [
+      "S2 PR #558091 (nixos/tests/systemd-timesyncd-nscd-dnssec.nix)"
+    ],
+    "szurubooru": [
+      "S2 PR #554949 (nixos/modules/services/web-apps/szurubooru.nix)",
+      "S2 PR #554949 (pkgs/servers/web-apps/szurubooru/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "tabbyapi": [
+      "S2 PR #560664 (nixos/modules/services/web-apps/tabbyapi.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "tailscale": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "tap": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "tempo": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "test-cross-instance": [
+      "repo fixture (fixtures/synthetic/h2-compound/test-cross-instance.nix)"
+    ],
+    "test-no-transition": [
+      "repo fixture (fixtures/synthetic/h2-scope-shadowed-h1-only/test-no-transition.nix)"
+    ],
+    "test-opaque-other-operand": [
+      "repo fixture (fixtures/synthetic/h2-compound/test-opaque-other-operand.nix)"
+    ],
+    "thelounge": [
+      "S2 PR #555635 (nixos/tests/thelounge.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "throttled": [
+      "S3 PR #560031 (nixos/modules/services/hardware/throttled.nix)"
+    ],
+    "tibber": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "tor": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "tpm2": [
+      "S3 PR #550647 (nixos/modules/security/tpm2.nix)"
+    ],
+    "tpm2-abrmd": [
+      "S3 PR #550647 (nixos/tests/tpm2/tpm2-abrmd.nix)"
+    ],
+    "tpm2-tpmrm": [
+      "S3 PR #550647 (nixos/tests/tpm2/tpm2-tpmrm.nix)"
+    ],
+    "trailbase": [
+      "S2 PR #552737 (nixos/tests/trailbase/default.nix)",
+      "S2 PR #552737 (pkgs/development/python-modules/trailbase/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "transmission": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "turn-rs": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "udp514-journal": [
+      "S3 PR #461073 (nixos/modules/services/logging/udp514-journal.nix)",
+      "S3 PR #461073 (nixos/tests/udp514-journal.nix)"
+    ],
+    "umami": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "unbound": [
+      "S2-F3 exporter census",
+      "(also in S1 113-name list)",
+      "(also in S3 254-name list)"
+    ],
+    "unpackerr": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "unpoller": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "update": [
+      "S2 PR #563778 (pkgs/by-name/pg/pghero/update.nix)"
+    ],
+    "userborn": [
+      "S3 PR #510342 (nixos/modules/services/system/userborn.nix)"
+    ],
+    "userborn-migration": [
+      "S3 PR #510342 (nixos/tests/userborn-migration.nix)"
+    ],
+    "v2ray": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "valkey": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "varnish": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "vault": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "vaultwarden": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "vector": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "vxwm": [
+      "S3 PR #556558 (nixos/modules/services/x11/window-managers/vxwm.nix)"
+    ],
+    "warpgate": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "windmill": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "wireguard": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "wivrn": [
+      "S1 PR #550960 (nixos/modules/services/video/wivrn.nix)"
+    ],
+    "wordpress": [
+      "S2 PR #554703 (nixos/tests/wordpress.nix)",
+      "S2 PR #554703 (pkgs/servers/web-apps/wordpress/default.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "wpa_supplicant": [
+      "S3 PR #550492 (nixos/tests/wpa_supplicant.nix)"
+    ],
+    "xandikos": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "xepub": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "xray": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "xrdp": [
+      "S2 PR #452303 (nixos/modules/services/networking/xrdp.nix)",
+      "(also in S3 254-name list)"
+    ],
+    "xreader": [
+      "S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "yace": [
+      "S1 PR #551955 (nixos/modules/services/monitoring/prometheus/exporters/yace.nix)"
+    ],
+    "zerobyte": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ],
+    "zfs": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "zfs-siebenmann": [
+      "S2-F3 exporter census",
+      "(also in S3 254-name list)"
+    ],
+    "zipline": [
+      "S1 113-name list; S3 254-name list (present in an earlier round's hand-compiled list, NOT independently reproduced by this round's own mechanical extraction from real file paths -- kept for continuity, flagged here)"
+    ]
+  },
+  "excluded_module_paths": [
+    "nixos/modules/hardware/printers.nix",
+    "nixos/modules/hardware/sensor/hddtemp.nix",
+    "nixos/modules/i18n/input-method/fcitx5.nix",
+    "nixos/modules/image/repart-image.nix",
+    "nixos/modules/image/repart.nix",
+    "nixos/modules/misc/documentation/modular-services.nix",
+    "nixos/modules/misc/ids.nix",
+    "nixos/modules/module-list.nix",
+    "nixos/modules/rename.nix",
+    "nixos/modules/security/acme/default.nix",
+    "nixos/modules/security/pam.nix",
+    "nixos/modules/security/tpm2.nix",
+    "nixos/modules/services/admin/komodo-periphery.nix",
+    "nixos/modules/services/backup/syncoid.nix",
+    "nixos/modules/services/cluster/rancher/default.nix",
+    "nixos/modules/services/cluster/rancher/k3s.nix",
+    "nixos/modules/services/cluster/rancher/rke2.nix",
+    "nixos/modules/services/continuous-integration/forgejo-runner.nix",
+    "nixos/modules/services/continuous-integration/github-runner/app-token.sh",
+    "nixos/modules/services/continuous-integration/github-runner/options.nix",
+    "nixos/modules/services/continuous-integration/github-runner/registration-token.sh",
+    "nixos/modules/services/continuous-integration/github-runner/remove-runner.sh",
+    "nixos/modules/services/continuous-integration/github-runner/service.nix",
+    "nixos/modules/services/continuous-integration/radicle/ci-broker.nix",
+    "nixos/modules/services/databases/cassandra.nix",
+    "nixos/modules/services/desktop-managers/cosmic.nix",
+    "nixos/modules/services/display-managers/dms-greeter.nix",
+    "nixos/modules/services/display-managers/noctalia-greeter.nix",
+    "nixos/modules/services/hardware/fwupd.nix",
+    "nixos/modules/services/hardware/throttled.nix",
+    "nixos/modules/services/home-automation/home-assistant.nix",
+    "nixos/modules/services/home-automation/matter-server.nix",
+    "nixos/modules/services/logging/udp514-journal.nix",
+    "nixos/modules/services/misc/cliproxyapi.md",
+    "nixos/modules/services/misc/cliproxyapi.nix",
+    "nixos/modules/services/misc/llama-cpp.nix",
+    "nixos/modules/services/misc/ntfy-sh.nix",
+    "nixos/modules/services/misc/open-webui.nix",
+    "nixos/modules/services/misc/pghero.nix",
+    "nixos/modules/services/misc/portunus.nix",
+    "nixos/modules/services/monitoring/kener.nix",
+    "nixos/modules/services/monitoring/opentelemetry-collector.nix",
+    "nixos/modules/services/monitoring/orbit.nix",
+    "nixos/modules/services/monitoring/prometheus/alertmanager-gotify-bridge.nix",
+    "nixos/modules/services/monitoring/prometheus/exporters.nix",
+    "nixos/modules/services/monitoring/prometheus/exporters/fail2ban.nix",
+    "nixos/modules/services/monitoring/prometheus/exporters/mqtt.nix",
+    "nixos/modules/services/monitoring/prometheus/exporters/snowflake.nix",
+    "nixos/modules/services/monitoring/prometheus/exporters/yace.nix",
+    "nixos/modules/services/networking/adguardhome.nix",
+    "nixos/modules/services/networking/cloudflare-warp.nix",
+    "nixos/modules/services/networking/crab-hole.nix",
+    "nixos/modules/services/networking/freenet.nix",
+    "nixos/modules/services/networking/go-neb.nix",
+    "nixos/modules/services/networking/hostapd.nix",
+    "nixos/modules/services/networking/hyphanet.nix",
+    "nixos/modules/services/networking/iocaine.nix",
+    "nixos/modules/services/networking/moonshine.nix",
+    "nixos/modules/services/networking/netbird.md",
+    "nixos/modules/services/networking/netbird/netbird-relay.md",
+    "nixos/modules/services/networking/netbird/netbird-relay.nix",
+    "nixos/modules/services/networking/nordvpn.nix",
+    "nixos/modules/services/networking/pdns-recursor.nix",
+    "nixos/modules/services/networking/strongswan-swanctl/swanctl-params.nix",
+    "nixos/modules/services/networking/suricata/default.nix",
+    "nixos/modules/services/networking/xrdp.nix",
+    "nixos/modules/services/search/opensearch-dashboards.nix",
+    "nixos/modules/services/security/fail2ban.nix",
+    "nixos/modules/services/security/rosec.nix",
+    "nixos/modules/services/system/userborn.nix",
+    "nixos/modules/services/ttys/kmscon.nix",
+    "nixos/modules/services/video/mediamtx.nix",
+    "nixos/modules/services/video/wivrn.nix",
+    "nixos/modules/services/wayland/cage.nix",
+    "nixos/modules/services/web-apps/calibre-web.nix",
+    "nixos/modules/services/web-apps/immich.nix",
+    "nixos/modules/services/web-apps/librespeed.nix",
+    "nixos/modules/services/web-apps/pdfding.nix",
+    "nixos/modules/services/web-apps/selfoss.nix",
+    "nixos/modules/services/web-apps/silverbullet.nix",
+    "nixos/modules/services/web-apps/sstorytime.nix",
+    "nixos/modules/services/web-apps/szurubooru.nix",
+    "nixos/modules/services/web-apps/tabbyapi.nix",
+    "nixos/modules/services/web-servers/nginx/default.nix",
+    "nixos/modules/services/web-servers/nginx/grpc-error-pages.conf",
+    "nixos/modules/services/web-servers/nginx/grpc-locations.conf",
+    "nixos/modules/services/web-servers/nginx/location-options.nix",
+    "nixos/modules/services/x11/desktop-managers/cinnamon.nix",
+    "nixos/modules/services/x11/window-managers/vxwm.nix",
+    "nixos/modules/system/boot/loader/limine/limine.nix",
+    "nixos/modules/tasks/filesystems/btrfs.nix",
+    "nixos/modules/virtualisation/openvswitch.nix",
+    "nixos/modules/virtualisation/qemu-vm.nix"
+  ],
+  "excluded_module_paths_provenance": {
+    "nixos/modules/hardware/printers.nix": [
+      "S3 PR #558981"
+    ],
+    "nixos/modules/hardware/sensor/hddtemp.nix": [
+      "S2 PR #469112"
+    ],
+    "nixos/modules/i18n/input-method/fcitx5.nix": [
+      "S2 PR #295514"
+    ],
+    "nixos/modules/image/repart-image.nix": [
+      "S2 PR #561424"
+    ],
+    "nixos/modules/image/repart.nix": [
+      "S1 PR #561557"
+    ],
+    "nixos/modules/misc/documentation/modular-services.nix": [
+      "S2 PR #552737"
+    ],
+    "nixos/modules/misc/ids.nix": [
+      "S2 PR #554495"
+    ],
+    "nixos/modules/module-list.nix": [
+      "S1 PR #549506",
+      "S1 PR #525702",
+      "S1 PR #496303",
+      "S1 PR #519494",
+      "S1 PR #527821",
+      "S1 PR #559588",
+      "S2 PR #532540",
+      "S2 PR #563778",
+      "S2 PR #554495",
+      "S3 PR #544393",
+      "S3 PR #556558",
+      "S3 PR #461073",
+      "S3 PR #529621",
+      "S3 PR #548837"
+    ],
+    "nixos/modules/rename.nix": [
+      "S2 PR #563778"
+    ],
+    "nixos/modules/security/acme/default.nix": [
+      "S1 PR #539076"
+    ],
+    "nixos/modules/security/pam.nix": [
+      "S1 PR #519494"
+    ],
+    "nixos/modules/security/tpm2.nix": [
+      "S3 PR #550647"
+    ],
+    "nixos/modules/services/admin/komodo-periphery.nix": [
+      "S1 PR #561845"
+    ],
+    "nixos/modules/services/backup/syncoid.nix": [
+      "S3 PR #558600"
+    ],
+    "nixos/modules/services/cluster/rancher/default.nix": [
+      "S2 PR #552640"
+    ],
+    "nixos/modules/services/cluster/rancher/k3s.nix": [
+      "S2 PR #552640"
+    ],
+    "nixos/modules/services/cluster/rancher/rke2.nix": [
+      "S2 PR #552640"
+    ],
+    "nixos/modules/services/continuous-integration/forgejo-runner.nix": [
+      "S3 PR #529621"
+    ],
+    "nixos/modules/services/continuous-integration/github-runner/app-token.sh": [
+      "S3 PR #533377"
+    ],
+    "nixos/modules/services/continuous-integration/github-runner/options.nix": [
+      "S3 PR #533377"
+    ],
+    "nixos/modules/services/continuous-integration/github-runner/registration-token.sh": [
+      "S3 PR #533377"
+    ],
+    "nixos/modules/services/continuous-integration/github-runner/remove-runner.sh": [
+      "S3 PR #533377"
+    ],
+    "nixos/modules/services/continuous-integration/github-runner/service.nix": [
+      "S3 PR #533377"
+    ],
+    "nixos/modules/services/continuous-integration/radicle/ci-broker.nix": [
+      "S2 PR #559798"
+    ],
+    "nixos/modules/services/databases/cassandra.nix": [
+      "S1 PR #553349"
+    ],
+    "nixos/modules/services/desktop-managers/cosmic.nix": [
+      "S2 PR #562703"
+    ],
+    "nixos/modules/services/display-managers/dms-greeter.nix": [
+      "S2 PR #545231"
+    ],
+    "nixos/modules/services/display-managers/noctalia-greeter.nix": [
+      "S1 PR #563958"
+    ],
+    "nixos/modules/services/hardware/fwupd.nix": [
+      "S3 PR #553136"
+    ],
+    "nixos/modules/services/hardware/throttled.nix": [
+      "S3 PR #560031"
+    ],
+    "nixos/modules/services/home-automation/home-assistant.nix": [
+      "S2 PR #559344"
+    ],
+    "nixos/modules/services/home-automation/matter-server.nix": [
+      "S3 PR #556461"
+    ],
+    "nixos/modules/services/logging/udp514-journal.nix": [
+      "S3 PR #461073"
+    ],
+    "nixos/modules/services/misc/cliproxyapi.md": [
+      "S2 PR #532540"
+    ],
+    "nixos/modules/services/misc/cliproxyapi.nix": [
+      "S2 PR #532540"
+    ],
+    "nixos/modules/services/misc/llama-cpp.nix": [
+      "S3 PR #561399"
+    ],
+    "nixos/modules/services/misc/ntfy-sh.nix": [
+      "S1 PR #492803"
+    ],
+    "nixos/modules/services/misc/open-webui.nix": [
+      "S3 PR #557729"
+    ],
+    "nixos/modules/services/misc/pghero.nix": [
+      "S2 PR #563778"
+    ],
+    "nixos/modules/services/misc/portunus.nix": [
+      "S1 PR #553770"
+    ],
+    "nixos/modules/services/monitoring/kener.nix": [
+      "S1 PR #549506"
+    ],
+    "nixos/modules/services/monitoring/opentelemetry-collector.nix": [
+      "S1 PR #559055"
+    ],
+    "nixos/modules/services/monitoring/orbit.nix": [
+      "S1 PR #525702"
+    ],
+    "nixos/modules/services/monitoring/prometheus/alertmanager-gotify-bridge.nix": [
+      "S3 PR #560443"
+    ],
+    "nixos/modules/services/monitoring/prometheus/exporters.nix": [
+      "S1 PR #551955",
+      "S1 PR #556710",
+      "S2 PR #552038"
+    ],
+    "nixos/modules/services/monitoring/prometheus/exporters/fail2ban.nix": [
+      "S1 PR #556710"
+    ],
+    "nixos/modules/services/monitoring/prometheus/exporters/mqtt.nix": [
+      "S2 PR #485251"
+    ],
+    "nixos/modules/services/monitoring/prometheus/exporters/snowflake.nix": [
+      "S2 PR #552038"
+    ],
+    "nixos/modules/services/monitoring/prometheus/exporters/yace.nix": [
+      "S1 PR #551955"
+    ],
+    "nixos/modules/services/networking/adguardhome.nix": [
+      "S3 PR #554062",
+      "S3 PR #483921"
+    ],
+    "nixos/modules/services/networking/cloudflare-warp.nix": [
+      "S2 PR #555377"
+    ],
+    "nixos/modules/services/networking/crab-hole.nix": [
+      "S3 PR #545002"
+    ],
+    "nixos/modules/services/networking/freenet.nix": [
+      "S2 PR #554495"
+    ],
+    "nixos/modules/services/networking/go-neb.nix": [
+      "S2 PR #559393"
+    ],
+    "nixos/modules/services/networking/hostapd.nix": [
+      "S3 PR #550492"
+    ],
+    "nixos/modules/services/networking/hyphanet.nix": [
+      "S2 PR #554495"
+    ],
+    "nixos/modules/services/networking/iocaine.nix": [
+      "S1 PR #527821"
+    ],
+    "nixos/modules/services/networking/moonshine.nix": [
+      "S3 PR #544393"
+    ],
+    "nixos/modules/services/networking/netbird.md": [
+      "S1 PR #559588"
+    ],
+    "nixos/modules/services/networking/netbird/netbird-relay.md": [
+      "S1 PR #559588"
+    ],
+    "nixos/modules/services/networking/netbird/netbird-relay.nix": [
+      "S1 PR #559588"
+    ],
+    "nixos/modules/services/networking/nordvpn.nix": [
+      "S3 PR #563907"
+    ],
+    "nixos/modules/services/networking/pdns-recursor.nix": [
+      "S2 PR #556253"
+    ],
+    "nixos/modules/services/networking/strongswan-swanctl/swanctl-params.nix": [
+      "S2 PR #560892"
+    ],
+    "nixos/modules/services/networking/suricata/default.nix": [
+      "S3 PR #562066",
+      "S3 PR #553682"
+    ],
+    "nixos/modules/services/networking/xrdp.nix": [
+      "S2 PR #452303"
+    ],
+    "nixos/modules/services/search/opensearch-dashboards.nix": [
+      "S1 PR #496303"
+    ],
+    "nixos/modules/services/security/fail2ban.nix": [
+      "S1 PR #556710"
+    ],
+    "nixos/modules/services/security/rosec.nix": [
+      "S1 PR #519494"
+    ],
+    "nixos/modules/services/system/userborn.nix": [
+      "S3 PR #510342"
+    ],
+    "nixos/modules/services/ttys/kmscon.nix": [
+      "S2 PR #528118"
+    ],
+    "nixos/modules/services/video/mediamtx.nix": [
+      "S1 PR #557545"
+    ],
+    "nixos/modules/services/video/wivrn.nix": [
+      "S1 PR #550960"
+    ],
+    "nixos/modules/services/wayland/cage.nix": [
+      "S2 PR #479381"
+    ],
+    "nixos/modules/services/web-apps/calibre-web.nix": [
+      "S2 PR #503263"
+    ],
+    "nixos/modules/services/web-apps/immich.nix": [
+      "S1 PR #347823",
+      "S2 PR #549618"
+    ],
+    "nixos/modules/services/web-apps/librespeed.nix": [
+      "S1 PR #561669"
+    ],
+    "nixos/modules/services/web-apps/pdfding.nix": [
+      "S2 PR #559860"
+    ],
+    "nixos/modules/services/web-apps/selfoss.nix": [
+      "S2 PR #559239"
+    ],
+    "nixos/modules/services/web-apps/silverbullet.nix": [
+      "S1 PR #555805"
+    ],
+    "nixos/modules/services/web-apps/sstorytime.nix": [
+      "S1 PR #556729",
+      "S3 PR #548837"
+    ],
+    "nixos/modules/services/web-apps/szurubooru.nix": [
+      "S2 PR #554949"
+    ],
+    "nixos/modules/services/web-apps/tabbyapi.nix": [
+      "S2 PR #560664"
+    ],
+    "nixos/modules/services/web-servers/nginx/default.nix": [
+      "S2 PR #549553",
+      "S2 PR #547038"
+    ],
+    "nixos/modules/services/web-servers/nginx/grpc-error-pages.conf": [
+      "S2 PR #549553"
+    ],
+    "nixos/modules/services/web-servers/nginx/grpc-locations.conf": [
+      "S2 PR #549553"
+    ],
+    "nixos/modules/services/web-servers/nginx/location-options.nix": [
+      "S2 PR #549553"
+    ],
+    "nixos/modules/services/x11/desktop-managers/cinnamon.nix": [
+      "S2 PR #564257"
+    ],
+    "nixos/modules/services/x11/window-managers/vxwm.nix": [
+      "S3 PR #556558"
+    ],
+    "nixos/modules/system/boot/loader/limine/limine.nix": [
+      "S3 PR #553136"
+    ],
+    "nixos/modules/tasks/filesystems/btrfs.nix": [
+      "S1 PR #559627"
+    ],
+    "nixos/modules/virtualisation/openvswitch.nix": [
+      "S1 PR #543675"
+    ],
+    "nixos/modules/virtualisation/qemu-vm.nix": [
+      "S2 PR #552774"
+    ]
+  },
+  "excluded_test_paths": [
+    "nixos/tests/acme/dns01.nix",
+    "nixos/tests/acme/http01-builtin.nix",
+    "nixos/tests/actual.nix",
+    "nixos/tests/adguardhome.nix",
+    "nixos/tests/all-tests.nix",
+    "nixos/tests/appliance-repart-image-verity-store.nix",
+    "nixos/tests/appliance-repart-image.nix",
+    "nixos/tests/btrfs-autoscrub.nix",
+    "nixos/tests/cliproxyapi.nix",
+    "nixos/tests/coredns.nix",
+    "nixos/tests/fail2ban.nix",
+    "nixos/tests/fcitx5/default.nix",
+    "nixos/tests/firewall.nix",
+    "nixos/tests/forgejo.nix",
+    "nixos/tests/freshrss/extensions.nix",
+    "nixos/tests/freshrss/none-auth.nix",
+    "nixos/tests/gitea-actions-runner.nix",
+    "nixos/tests/gitea.nix",
+    "nixos/tests/github-runner.nix",
+    "nixos/tests/go-neb.nix",
+    "nixos/tests/hddtemp.nix",
+    "nixos/tests/hibernate.nix",
+    "nixos/tests/hickory-dns.nix",
+    "nixos/tests/hyphanet.nix",
+    "nixos/tests/installed-tests/default.nix",
+    "nixos/tests/installed-tests/gnome-photos.nix",
+    "nixos/tests/iocaine.nix",
+    "nixos/tests/jellyfin.nix",
+    "nixos/tests/kener.nix",
+    "nixos/tests/kerberos/default.nix",
+    "nixos/tests/kerberos/heimdal.nix",
+    "nixos/tests/kerberos/ldap/default.nix",
+    "nixos/tests/kerberos/ldap/mit.nix",
+    "nixos/tests/kerberos/mit.nix",
+    "nixos/tests/keymap.nix",
+    "nixos/tests/komodo-periphery.nix",
+    "nixos/tests/kubernetes/base.nix",
+    "nixos/tests/limine/secure-boot.nix",
+    "nixos/tests/lomiri.nix",
+    "nixos/tests/matrix/continuwuity.nix",
+    "nixos/tests/matrix/draupnir.nix",
+    "nixos/tests/mattermost/default.nix",
+    "nixos/tests/metabase.nix",
+    "nixos/tests/netbird-relay.nix",
+    "nixos/tests/networking/networkmanager.nix",
+    "nixos/tests/nextcloud/home-mount.nix",
+    "nixos/tests/nginx-compression.nix",
+    "nixos/tests/nginx-grpc-error-pages.nix",
+    "nixos/tests/nixos-test-driver/junit.nix",
+    "nixos/tests/nordvpn.nix",
+    "nixos/tests/nullmailer.nix",
+    "nixos/tests/opensearch-dashboards.nix",
+    "nixos/tests/opentelemetry-collector-validate.nix",
+    "nixos/tests/openvswitch.nix",
+    "nixos/tests/orbit.nix",
+    "nixos/tests/os-prober.nix",
+    "nixos/tests/pdns-recursor.nix",
+    "nixos/tests/pghero.nix",
+    "nixos/tests/portunus.nix",
+    "nixos/tests/printing.nix",
+    "nixos/tests/prometheus-exporters.nix",
+    "nixos/tests/qemu-vm-store.nix",
+    "nixos/tests/rancher/default.nix",
+    "nixos/tests/rancher/image-upgrade.nix",
+    "nixos/tests/redis.nix",
+    "nixos/tests/rosec.nix",
+    "nixos/tests/selfoss.nix",
+    "nixos/tests/silverbullet.nix",
+    "nixos/tests/sing-box.nix",
+    "nixos/tests/sstorytime.nix",
+    "nixos/tests/suricata.nix",
+    "nixos/tests/systemd-networkd-vrf.nix",
+    "nixos/tests/systemd-timesyncd-nscd-dnssec.nix",
+    "nixos/tests/systemd.nix",
+    "nixos/tests/thelounge.nix",
+    "nixos/tests/tpm2/tpm2-abrmd.nix",
+    "nixos/tests/tpm2/tpm2-tpmrm.nix",
+    "nixos/tests/trailbase/api.py",
+    "nixos/tests/trailbase/default.nix",
+    "nixos/tests/udp514-journal.nix",
+    "nixos/tests/userborn-migration.nix",
+    "nixos/tests/web-apps/dawarich.nix",
+    "nixos/tests/web-apps/immich.nix",
+    "nixos/tests/web-apps/pdfding/default.nix",
+    "nixos/tests/web-apps/pdfding/s3-backups.nix",
+    "nixos/tests/wordpress.nix",
+    "nixos/tests/wpa_supplicant.nix"
+  ],
+  "excluded_test_paths_provenance": {
+    "nixos/tests/acme/dns01.nix": [
+      "S1 PR #539076"
+    ],
+    "nixos/tests/acme/http01-builtin.nix": [
+      "S1 PR #539076"
+    ],
+    "nixos/tests/actual.nix": [
+      "S3 PR #555643"
+    ],
+    "nixos/tests/adguardhome.nix": [
+      "S3 PR #554062"
+    ],
+    "nixos/tests/all-tests.nix": [
+      "S1 PR #549506",
+      "S1 PR #525702",
+      "S1 PR #559627",
+      "S1 PR #496303",
+      "S1 PR #519494",
+      "S1 PR #527821",
+      "S1 PR #559055",
+      "S1 PR #559588",
+      "S2 PR #553474",
+      "S2 PR #559239",
+      "S2 PR #552737",
+      "S2 PR #559009",
+      "S2 PR #559393",
+      "S2 PR #549553",
+      "S2 PR #562104",
+      "S2 PR #532540",
+      "S2 PR #563778",
+      "S2 PR #552774",
+      "S2 PR #555612",
+      "S2 PR #547038",
+      "S2 PR #555625",
+      "S2 PR #555635",
+      "S2 PR #469112",
+      "S2 PR #556413",
+      "S2 PR #554495",
+      "S3 PR #510342",
+      "S3 PR #461073",
+      "S3 PR #548837",
+      "S3 PR #555621",
+      "S3 PR #555630",
+      "S3 PR #452850"
+    ],
+    "nixos/tests/appliance-repart-image-verity-store.nix": [
+      "S1 PR #561557"
+    ],
+    "nixos/tests/appliance-repart-image.nix": [
+      "S1 PR #561557",
+      "S2 PR #561424"
+    ],
+    "nixos/tests/btrfs-autoscrub.nix": [
+      "S1 PR #559627"
+    ],
+    "nixos/tests/cliproxyapi.nix": [
+      "S2 PR #532540"
+    ],
+    "nixos/tests/coredns.nix": [
+      "S1 PR #564357"
+    ],
+    "nixos/tests/fail2ban.nix": [
+      "S1 PR #556710"
+    ],
+    "nixos/tests/fcitx5/default.nix": [
+      "S2 PR #295514"
+    ],
+    "nixos/tests/firewall.nix": [
+      "S2 PR #558149"
+    ],
+    "nixos/tests/forgejo.nix": [
+      "S3 PR #529621"
+    ],
+    "nixos/tests/freshrss/extensions.nix": [
+      "S1 PR #564021"
+    ],
+    "nixos/tests/freshrss/none-auth.nix": [
+      "S2 PR #560968"
+    ],
+    "nixos/tests/gitea-actions-runner.nix": [
+      "S2 PR #559009"
+    ],
+    "nixos/tests/gitea.nix": [
+      "S2 PR #559009",
+      "S2 PR #556119"
+    ],
+    "nixos/tests/github-runner.nix": [
+      "S3 PR #533377"
+    ],
+    "nixos/tests/go-neb.nix": [
+      "S2 PR #559393"
+    ],
+    "nixos/tests/hddtemp.nix": [
+      "S2 PR #469112"
+    ],
+    "nixos/tests/hibernate.nix": [
+      "S2 PR #552774"
+    ],
+    "nixos/tests/hickory-dns.nix": [
+      "S2 PR #562104"
+    ],
+    "nixos/tests/hyphanet.nix": [
+      "S2 PR #554495"
+    ],
+    "nixos/tests/installed-tests/default.nix": [
+      "S3 PR #557131"
+    ],
+    "nixos/tests/installed-tests/gnome-photos.nix": [
+      "S3 PR #557131"
+    ],
+    "nixos/tests/iocaine.nix": [
+      "S1 PR #527821"
+    ],
+    "nixos/tests/jellyfin.nix": [
+      "S2 PR #561130"
+    ],
+    "nixos/tests/kener.nix": [
+      "S1 PR #549506"
+    ],
+    "nixos/tests/kerberos/default.nix": [
+      "S3 PR #555621"
+    ],
+    "nixos/tests/kerberos/heimdal.nix": [
+      "S3 PR #555621"
+    ],
+    "nixos/tests/kerberos/ldap/default.nix": [
+      "S3 PR #555621"
+    ],
+    "nixos/tests/kerberos/ldap/mit.nix": [
+      "S3 PR #555621"
+    ],
+    "nixos/tests/kerberos/mit.nix": [
+      "S3 PR #555621"
+    ],
+    "nixos/tests/keymap.nix": [
+      "S2 PR #555625"
+    ],
+    "nixos/tests/komodo-periphery.nix": [
+      "S1 PR #561845"
+    ],
+    "nixos/tests/kubernetes/base.nix": [
+      "S2 PR #556989"
+    ],
+    "nixos/tests/limine/secure-boot.nix": [
+      "S3 PR #553136"
+    ],
+    "nixos/tests/lomiri.nix": [
+      "S2 PR #534100"
+    ],
+    "nixos/tests/matrix/continuwuity.nix": [
+      "S3 PR #551640"
+    ],
+    "nixos/tests/matrix/draupnir.nix": [
+      "S2 PR #558283"
+    ],
+    "nixos/tests/mattermost/default.nix": [
+      "S3 PR #555630"
+    ],
+    "nixos/tests/metabase.nix": [
+      "S3 PR #551107"
+    ],
+    "nixos/tests/netbird-relay.nix": [
+      "S1 PR #559588"
+    ],
+    "nixos/tests/networking/networkmanager.nix": [
+      "S1 PR #560647"
+    ],
+    "nixos/tests/nextcloud/home-mount.nix": [
+      "S2 PR #557327"
+    ],
+    "nixos/tests/nginx-compression.nix": [
+      "S2 PR #547038"
+    ],
+    "nixos/tests/nginx-grpc-error-pages.nix": [
+      "S2 PR #549553"
+    ],
+    "nixos/tests/nixos-test-driver/junit.nix": [
+      "S2 PR #556413"
+    ],
+    "nixos/tests/nordvpn.nix": [
+      "S3 PR #563907"
+    ],
+    "nixos/tests/nullmailer.nix": [
+      "S3 PR #452850"
+    ],
+    "nixos/tests/opensearch-dashboards.nix": [
+      "S1 PR #496303"
+    ],
+    "nixos/tests/opentelemetry-collector-validate.nix": [
+      "S1 PR #559055"
+    ],
+    "nixos/tests/openvswitch.nix": [
+      "S1 PR #543675"
+    ],
+    "nixos/tests/orbit.nix": [
+      "S1 PR #525702"
+    ],
+    "nixos/tests/os-prober.nix": [
+      "S1 PR #554779"
+    ],
+    "nixos/tests/pdns-recursor.nix": [
+      "S2 PR #556253"
+    ],
+    "nixos/tests/pghero.nix": [
+      "S2 PR #563778"
+    ],
+    "nixos/tests/portunus.nix": [
+      "S2 PR #561051"
+    ],
+    "nixos/tests/printing.nix": [
+      "S3 PR #558981"
+    ],
+    "nixos/tests/prometheus-exporters.nix": [
+      "S1 PR #551955",
+      "S1 PR #556710",
+      "S2 PR #552038"
+    ],
+    "nixos/tests/qemu-vm-store.nix": [
+      "S2 PR #552774"
+    ],
+    "nixos/tests/rancher/default.nix": [
+      "S2 PR #552640"
+    ],
+    "nixos/tests/rancher/image-upgrade.nix": [
+      "S2 PR #552640"
+    ],
+    "nixos/tests/redis.nix": [
+      "S2 PR #555612"
+    ],
+    "nixos/tests/rosec.nix": [
+      "S1 PR #519494"
+    ],
+    "nixos/tests/selfoss.nix": [
+      "S2 PR #559239"
+    ],
+    "nixos/tests/silverbullet.nix": [
+      "S1 PR #555805"
+    ],
+    "nixos/tests/sing-box.nix": [
+      "S2 PR #558400"
+    ],
+    "nixos/tests/sstorytime.nix": [
+      "S1 PR #556729",
+      "S3 PR #548837"
+    ],
+    "nixos/tests/suricata.nix": [
+      "S3 PR #562066"
+    ],
+    "nixos/tests/systemd-networkd-vrf.nix": [
+      "S1 PR #558121"
+    ],
+    "nixos/tests/systemd-timesyncd-nscd-dnssec.nix": [
+      "S2 PR #558091"
+    ],
+    "nixos/tests/systemd.nix": [
+      "S2 PR #552774"
+    ],
+    "nixos/tests/thelounge.nix": [
+      "S2 PR #555635"
+    ],
+    "nixos/tests/tpm2/tpm2-abrmd.nix": [
+      "S3 PR #550647"
+    ],
+    "nixos/tests/tpm2/tpm2-tpmrm.nix": [
+      "S3 PR #550647"
+    ],
+    "nixos/tests/trailbase/api.py": [
+      "S2 PR #552737"
+    ],
+    "nixos/tests/trailbase/default.nix": [
+      "S2 PR #552737"
+    ],
+    "nixos/tests/udp514-journal.nix": [
+      "S3 PR #461073"
+    ],
+    "nixos/tests/userborn-migration.nix": [
+      "S3 PR #510342"
+    ],
+    "nixos/tests/web-apps/dawarich.nix": [
+      "S1 PR #558854"
+    ],
+    "nixos/tests/web-apps/immich.nix": [
+      "S1 PR #347823"
+    ],
+    "nixos/tests/web-apps/pdfding/default.nix": [
+      "S2 PR #559860"
+    ],
+    "nixos/tests/web-apps/pdfding/s3-backups.nix": [
+      "S2 PR #559860"
+    ],
+    "nixos/tests/wordpress.nix": [
+      "S2 PR #554703"
+    ],
+    "nixos/tests/wpa_supplicant.nix": [
+      "S3 PR #550492"
+    ]
+  }
+}
