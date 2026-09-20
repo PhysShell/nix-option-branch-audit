@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "oba001->option_not_found": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 1,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 1,
+    "notable": [
+      {
+        "bucket": "finding_became_inconclusive",
+        "engine": "oba",
+        "subject": "useLlamaCppCacheDir",
+        "message": "no mkOption declaration found for this watched option",
+        "detail": "declaration: not found",
+        "transition_origin": "verdict_changed"
+      }
+    ]
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/llama-swap.nix",
+        "test": "nixos/tests/web-servers/llama-swap.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "llama-swap"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/llama-swap.nix",
+        "test": "nixos/tests/web-servers/llama-swap.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "llama-swap"
+        ],
+        "watched_path": "useLlamaCppCacheDir"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "useLlamaCppCacheDir",
+            "predicate": {
+              "path": [
+                "useLlamaCppCacheDir"
+              ],
+              "kind": {
+                "Truthy": "if"
+              },
+              "span": {
+                "file": "nixos/modules/services/networking/llama-swap.nix",
+                "line": 147,
+                "col": 11
+              },
+              "source": "if cfg.useLlamaCppCacheDir then"
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "useLlamaCppCacheDir"
+                  ],
+                  "kind": {
+                    "Truthy": "if"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/networking/llama-swap.nix",
+                    "line": 147,
+                    "col": 11
+                  },
+                  "source": "if cfg.useLlamaCppCacheDir then"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "useLlamaCppCacheDir"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "useLlamaCppCacheDir"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/networking/llama-swap.nix",
+                    "line": 147,
+                    "col": 11
+                  },
+                  "source": "if cfg.useLlamaCppCacheDir then"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "useLlamaCppCacheDir"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}
