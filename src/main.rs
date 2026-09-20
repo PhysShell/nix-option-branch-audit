@@ -802,6 +802,49 @@ fn scan_options(
     out
 }
 
+/// S3-F2: a real `OptionDecl`'s own recorded path must be
+/// `option_prefix`-relative, matching the contract `run_target`'s watch
+/// lookup already expects everywhere else (`watch` is documented as
+/// relative to `cfg_ident`/`option_prefix`). `walk_options_block`'s own
+/// pre-existing `at_prefix_root`-reset mechanism already gets this right
+/// whenever the accumulated path passes through an EXACT intermediate
+/// equality with `option_prefix` -- but a single dotted attrpath that
+/// spans `option_prefix` and (at least) the watched leaf in one
+/// `path.extend` never produces that exact intermediate state, since
+/// path jumps straight past `option_prefix`'s own length in one step
+/// (the real #556558/vxwm shape: `option_prefix` + `enable` in a single
+/// flat-dotted key; also reachable via a partially-dotted mix, e.g. a
+/// 3-segment nested hop followed by a 2-segment dotted key that
+/// overshoots the same way).
+///
+/// This is checked at every declaration's own record site instead,
+/// independent of how many hops the accumulated path took to get there:
+/// whenever `path` genuinely STARTS WITH a concrete `option_prefix` and
+/// extends beyond it, the recorded path is normalized to the suffix
+/// past `option_prefix`. Strictly a superset of the existing
+/// reset-based mechanism for `option_prefix`-EXACT paths (a path that
+/// equals `option_prefix` exactly is left unchanged here, since there is
+/// no leaf-relative suffix to strip -- e.g. a submodule-typed option
+/// declared directly at `option_prefix` itself). A path that is merely a
+/// similar-looking but genuinely different, longer sibling scope (not a
+/// real prefix match) or a path shorter than `option_prefix` is left
+/// untouched, exactly as before.
+fn option_prefix_relative_path(
+    path: &[String],
+    option_prefix: &[String],
+    prefix_is_concrete: bool,
+) -> Vec<String> {
+    if prefix_is_concrete
+        && !option_prefix.is_empty()
+        && path.len() > option_prefix.len()
+        && &path[..option_prefix.len()] == option_prefix
+    {
+        path[option_prefix.len()..].to_vec()
+    } else {
+        path.to_vec()
+    }
+}
+
 fn walk_options_block(
     file: &str,
     src: &str,
@@ -861,7 +904,7 @@ fn walk_options_block(
             let (default_source, default_class, default_known_value) =
                 option_helper_default(&helper, &value);
             out.push(OptionDecl {
-                path: path.clone(),
+                path: option_prefix_relative_path(path, option_prefix, prefix_is_concrete),
                 default_source,
                 default_class,
                 default_known_value,
@@ -7018,6 +7061,262 @@ mod tests {
             opts.is_empty(),
             "cfg binds to a different scope than option_prefix claims -- must not correlate; \
              got {opts:?}"
+        );
+    }
+
+    // --- S3-F2: flat dotted-key option declaration resolution --------
+    //
+    // Root reproducer: real S3 PR #556558 (vxwm) -- `discovered_options`
+    // correctly parses `options = { services.xserver.windowManager.
+    // vxwm.enable = mkEnableOption "vxwm"; };`, but watch resolution
+    // still reports `OptionNotFound`. Root cause: `walk_options_block`'s
+    // `at_prefix_root` checkpoint only fires when the ACCUMULATED path,
+    // at some intermediate point, exactly equals `option_prefix` -- a
+    // single flat-dotted attrpath spanning `option_prefix` AND the
+    // watched leaf in one hop (`path.extend(segs)` with all 5 segments
+    // at once) skips straight past that checkpoint, since path is
+    // already 5 elements (`option_prefix` + `enable`) the very first
+    // time it's checked, never having been exactly 4. The declaration
+    // gets recorded at the over-qualified absolute path instead of the
+    // `option_prefix`-relative one `run_target`'s own watch lookup
+    // expects.
+    //
+    // Fixed generically at the point an `OptionDecl` is actually
+    // recorded in `walk_options_block`'s helper-call branch: whenever
+    // the accumulated path genuinely starts with a concrete
+    // `option_prefix` and extends beyond it, the recorded path is
+    // normalized to the suffix past `option_prefix` -- regardless of
+    // how many hops it took to get there. This is a strict superset of
+    // the existing `at_prefix_root`-reset mechanism (which already
+    // correctly handles nested attrsets and partially-dotted forms that
+    // land EXACTLY on `option_prefix` before a further hop) -- it only
+    // changes behavior for the one shape that reset could never reach:
+    // a single hop that overshoots `option_prefix` directly onto a
+    // helper-call leaf (or deeper).
+
+    /// The real #556558 shape, exactly as it appears in nixpkgs: one
+    /// fully dotted key spanning `option_prefix` (4 segments) + the
+    /// leaf (1 segment) in a single `NODE_ATTRPATH_VALUE`.
+    #[test]
+    fn scan_options_resolves_a_fully_dotted_option_prefix_plus_leaf_in_one_hop() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.xserver.windowManager.vxwm;
+            in
+            {
+              options = {
+                services.xserver.windowManager.vxwm.enable = lib.mkEnableOption "vxwm";
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let prefix = vec![
+            "services".to_string(),
+            "xserver".to_string(),
+            "windowManager".to_string(),
+            "vxwm".to_string(),
+        ];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["enable"])),
+            "a single flat-dotted key spanning option_prefix + leaf must resolve to the option_prefix-relative path [\"enable\"], got {opts:?}"
+        );
+        assert!(
+            !opts.iter().any(|o| path_eq(
+                &o.path,
+                &[
+                    "services",
+                    "xserver",
+                    "windowManager",
+                    "vxwm",
+                    "enable"
+                ]
+            )),
+            "must not ALSO be recorded at the raw over-qualified absolute path, got {opts:?}"
+        );
+    }
+
+    /// A deeper mixed form: the flat-dotted key extends past
+    /// `option_prefix` by MORE than just the immediate leaf (an extra
+    /// intermediate segment before the real leaf) -- confirms
+    /// normalization strips exactly `option_prefix`'s own length,
+    /// leaving the REST as the declaration's own relative path, not
+    /// just the last segment.
+    #[test]
+    fn scan_options_resolves_a_fully_dotted_prefix_plus_multi_segment_relative_path() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.xserver.windowManager.vxwm;
+            in
+            {
+              options = {
+                services.xserver.windowManager.vxwm.keybindings.enable = lib.mkEnableOption "kb";
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let prefix = vec![
+            "services".to_string(),
+            "xserver".to_string(),
+            "windowManager".to_string(),
+            "vxwm".to_string(),
+        ];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter()
+                .any(|o| path_eq(&o.path, &["keybindings", "enable"])),
+            "must normalize to the full option_prefix-relative suffix, not just the last segment, got {opts:?}"
+        );
+    }
+
+    /// The nested-attrset equivalent of the same real shape (`services.
+    /// xserver.windowManager.vxwm = { enable = mkEnableOption "x"; };`)
+    /// -- per the mandate, "must work consistently for equivalent mixed
+    /// forms". This form already worked before S3-F2 (it lands EXACTLY
+    /// on `option_prefix` before a further hop, so the pre-existing
+    /// `at_prefix_root` reset already caught it) -- kept here as an
+    /// explicit consistency control so a future change can't silently
+    /// regress one form while "fixing" the other.
+    #[test]
+    fn scan_options_resolves_the_equivalent_nested_attrset_form() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.xserver.windowManager.vxwm;
+            in
+            {
+              options = {
+                services.xserver.windowManager.vxwm = {
+                  enable = lib.mkEnableOption "vxwm";
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let prefix = vec![
+            "services".to_string(),
+            "xserver".to_string(),
+            "windowManager".to_string(),
+            "vxwm".to_string(),
+        ];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["enable"])),
+            "the nested-attrset equivalent must resolve identically, got {opts:?}"
+        );
+    }
+
+    /// A third, partially-dotted mixed form (`services.xserver.
+    /// windowManager = { vxwm.enable = ...; };`) -- the third point on
+    /// "equivalent mixed forms" the mandate names, split across a
+    /// nested-attrset hop AND a 2-segment dotted key.
+    #[test]
+    fn scan_options_resolves_a_partially_dotted_mixed_form() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.xserver.windowManager.vxwm;
+            in
+            {
+              options = {
+                services.xserver.windowManager = {
+                  vxwm.enable = lib.mkEnableOption "vxwm";
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let prefix = vec![
+            "services".to_string(),
+            "xserver".to_string(),
+            "windowManager".to_string(),
+            "vxwm".to_string(),
+        ];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["enable"])),
+            "the partially-dotted mixed form must resolve identically, got {opts:?}"
+        );
+    }
+
+    /// Negative control 1/2: a prefix COLLISION -- a sibling declaration
+    /// whose own path merely SHARES A STRING PREFIX with `option_prefix`
+    /// as characters (`"vxwm"` is a literal prefix of `"vxwmPro"`) but is
+    /// a genuinely different segment (`"vxwmPro" != "vxwm"` as a real
+    /// attrpath segment), must NOT be stripped as if it matched
+    /// `option_prefix` -- proven here by the declaration surviving at
+    /// its own real, UNSTRIPPED path, not a falsely-normalized one.
+    #[test]
+    fn scan_options_does_not_strip_a_merely_similar_longer_sibling_path() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.xserver.windowManager.vxwmPro;
+            in
+            {
+              options = {
+                services.xserver.windowManager.vxwmPro.enable = lib.mkEnableOption "vxwmPro";
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let prefix = vec![
+            "services".to_string(),
+            "xserver".to_string(),
+            "windowManager".to_string(),
+            "vxwm".to_string(),
+        ];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(
+                &o.path,
+                &[
+                    "services",
+                    "xserver",
+                    "windowManager",
+                    "vxwmPro",
+                    "enable"
+                ]
+            )),
+            "a genuinely different sibling segment (\"vxwmPro\") must be recorded at its own real, unstripped path -- if it were ever recorded as [\"enable\"] instead, that would mean it was wrongly treated as an option_prefix match, got {opts:?}"
+        );
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["enable"])),
+            "must NOT also be recorded at the stripped, option_prefix-relative path -- that would mean the sibling collision was wrongly normalized as if it matched, got {opts:?}"
+        );
+    }
+
+    /// Negative control 2/2: stripping must not fire when path is
+    /// SHORTER than `option_prefix` (an unrelated, shallower
+    /// declaration must be recorded as-is, not corrupted by a partial
+    /// prefix comparison).
+    #[test]
+    fn scan_options_does_not_strip_a_path_shorter_than_option_prefix() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.xserver;
+            in
+            {
+              options.services.xserver = {
+                enable = lib.mkEnableOption "xserver";
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let prefix = vec!["services".to_string(), "xserver".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["enable"])),
+            "an ordinary, already-correct shallower case must be unaffected, got {opts:?}"
         );
     }
 
