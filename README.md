@@ -4841,22 +4841,35 @@ three bugs S3 found — no other capability gap, no `exporters.nix`, no
 app/option special-casing. Each landed as its own commit, independently
 CI-green before the next began.
 
-- **S3-F1** (`27a1be3`): `specialisation.<literal-name>.configuration`
-  test-config blocks are a real, generic NixOS option
+- **S3-F1** (`27a1be3`, narrowed by **S3-F1.1** `5e7fd71`):
+  `specialisation.<literal-name>.configuration` test-config blocks are
+  a real, generic NixOS option
   (`nixos/modules/system/boot/specialisation.nix`) whose own value is
   exactly another whole module config tree for the same instance —
   `strip_specialisation_configuration_markers` recognizes this literal
-  three-segment marker anywhere in an accumulated test-config path
-  (flat-dotted, fully-nested, and partially-dotted forms all
-  normalize identically) and strips it, so real evidence underneath
-  resolves to its real option path instead of a path no watched option
-  can ever match. A dynamic name or a non-literal `configuration`
-  value stays fail-closed via the walker's existing opacity handling,
-  untouched. Fixes `#510342`'s real false finding. Caught and fixed a
-  second real bug while re-verifying against the actual PR (4 sibling
-  specialisations, not just 1): the first version's `path.truncate`-based
-  restore could corrupt a shared prefix across siblings; fixed with a
-  full clone-and-restore.
+  three-segment marker at the real top-level position of an
+  accumulated test-config path (flat-dotted, fully-nested, and
+  partially-dotted forms all normalize identically) and strips it, so
+  real evidence underneath resolves to its real option path instead of
+  a path no watched option can ever match. A dynamic name or a
+  non-literal `configuration` value stays fail-closed via the walker's
+  existing opacity handling, untouched. Fixes `#510342`'s real false
+  finding. Caught and fixed a second real bug while re-verifying
+  against the actual PR (4 sibling specialisations, not just 1): the
+  first version's `path.truncate`-based restore could corrupt a shared
+  prefix across siblings; fixed with a full clone-and-restore.
+  **S3-F1.1** then narrowed the marker itself, found on independent
+  review before any release: the original version scanned the WHOLE
+  accumulated path for the marker anywhere, which would wrongly
+  collapse a merely similar-looking but unrelated option path (e.g.
+  `services.foo.specialisation.bar.configuration.enable`, a real if
+  unusually named submodule option) into `services.foo.enable`,
+  manufacturing false evidence for a different option — exactly the
+  "syntax pattern mistaken for semantics" failure mode this project
+  exists to avoid. Narrowed to the real top-level position only,
+  matching nixpkgs's own documented "nested specialisations are
+  ignored" semantics; confirmed via a dedicated hostile regression test
+  and re-verified unaffected on both real reproducers.
 - **S3-F2** (`cfc9e88`): a single flat-dotted attrpath spanning
   `option_prefix` and the watched leaf in one hop (the real vxwm
   shape: `options = { services.x.y.z.enable = mkEnableOption "..."; };`)
@@ -4881,14 +4894,17 @@ All three independently re-verified end-to-end against real,
 freshly-fetched PR content (not just unit tests) before each commit.
 Full account: `fixtures/s3-live-pr-shadow/results-regression.md`.
 
-## S3-R: regression rerun, all three fixes confirmed, zero regressions
+## S3-R: regression rerun, all 48 PRs fully re-run, zero regressions
 
-Same 48 PRs, re-run against the post-S3-F build via 4 parallel forks
-independently re-fetching real content. All three fixes confirmed on
-their real reproducers, plus one real, unanticipated second-order
-S3-F1 benefit (`#511659`'s `socketActivation`, a second real
-specialisation-shaped PR). Zero regressions across the rest of the
-corpus, including real negative controls (true module births and
+Same 48 PRs, **every one independently re-run against both binaries**
+(4 parallel forks re-fetching real content; a disclosed 6-PR shortcut
+in one group — a lighter structural triage instead of a full
+dual-binary rebuild — was found and closed directly before this round
+was considered finished, not left as an accepted gap). All three fixes
+confirmed on their real reproducers, plus one real, unanticipated
+second-order S3-F1 benefit (`#511659`'s `socketActivation`, a second
+real specialisation-shaped PR). Zero regressions across the rest of
+the corpus, including real negative controls (true module births and
 still-open, out-of-scope capability gaps both correctly untouched).
 **Recomputed actionable precision, honest, not forced to the old
 denominator**: S3-A 3/3 = 100% (was 2/4), S3-B 9/9 = 100% (was 8/9),
@@ -4900,4 +4916,6 @@ text overstated; both disclosed, full account in
 `results-regression.md`).
 
 Per the same S1-R/S2-R precedent, this confirms the fixes work on data
-the code has now seen twice — not a fresh generalization claim.
+the code has now seen twice — **not a fresh generalization claim**.
+100% actionable precision on a twice-debugged corpus is an answer key,
+not evidence the tool generalizes; that question is S4's own job.

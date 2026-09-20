@@ -1,12 +1,37 @@
-# S3-R: regression rerun of S3's own 48 PRs, after S3-F1/F2/F3
+# S3-R: regression rerun of S3's own 48 PRs, after S3-F1/F1.1/F2/F3
 
 Same 48 PRs as `results.md` (29 S3-A + 19 S3-B), re-run against a dev
-build of `main` (commit `87028d8`) containing S3-F1 (`specialisation.*`
-visibility), S3-F2 (flat dotted-key declaration resolution), and S3-F3
+build of `main` (commit `5e7fd71`, the final S3-F head — see
+"S3-F1.1" below) containing S3-F1 (`specialisation.*` visibility),
+S3-F1.1 (narrowing S3-F1 to the real top-level marker position only),
+S3-F2 (flat dotted-key declaration resolution), and S3-F3
 (`transition_origin` honesty for `OptionNotFound`), against the frozen,
 unchanged `v0.4.2` binary as the baseline. **Explicitly a regression
 corpus, not a fresh generalization claim** — the code has now seen
 these exact 48 PRs, matching S1-R/S2-R's own precedent exactly.
+
+## S3-F1.1: a real correctness gap in S3-F1, found on independent review, fixed before this document was finalized
+
+S3-F1's original version scanned the WHOLE accumulated test-config
+path for the literal `"specialisation"`/*/`"configuration"` token
+sequence anywhere, not just at the real NixOS semantic position (a
+top-level-only option, per `nixos/modules/system/boot/
+specialisation.nix` — nixpkgs's own module documents nested
+specialisations as ignored). A hostile but entirely legitimate
+counterexample — `services.foo.specialisation.bar.configuration.enable`,
+an ordinary submodule option that merely contains the same three
+tokens in sequence, not at the real top-level position — was wrongly
+collapsed into `services.foo.enable`, manufacturing false evidence for
+a completely different, unrelated option. Confirmed as a real,
+reproducible bug (a dedicated hostile regression test failed against
+the pre-fix code, `commit 87028d8`), fixed by narrowing the check to
+the root of the accumulated path only, stripped at most once, never
+recursively (`commit 5e7fd71`). All 8 pre-existing S3-F1 tests, plus
+the real `#510342`/`#511659` reproducers, independently re-verified
+unaffected by the narrowing (both genuinely have their real
+specialisation blocks at the top-level position). Full account in the
+commit itself; every result in this document reflects the narrowed,
+corrected fix, not the original overly-broad version.
 
 ## Method
 
@@ -19,15 +44,23 @@ dev build) against each. Zero repository writes across all four groups
 (`git status --short` confirmed clean throughout, per each group's own
 report).
 
-**One disclosed methodology gap**: group 2 used a lighter structural
-triage (scanning real `gh pr diff` output for new `mkOption`/
-`mkEnableOption`/`specialisation` additions, rather than a full
-dual-binary fixture rebuild) for 5 of its 12 PRs, citing time budget.
-None of those 5 PRs contributed any Finding-class actionable
-presentation in the original S3 adjudication (all were `unchanged`/
-0-notable or `oba=no`), so this does not affect the actionable-precision
-recomputation below, but it means those 5 PRs' "zero delta" status is
-reasoned, not independently re-run byte-for-byte like the other 43.
+**A disclosed methodology gap, since closed.** Group 2 initially used a
+lighter structural triage (scanning real `gh pr diff` output for new
+`mkOption`/`mkEnableOption`/`specialisation` additions, rather than a
+full dual-binary fixture rebuild) for 6 of its 12 PRs (`#554062`,
+`#555621`, `#555643`, `#556461`, `#557729`, `#558600`), citing time
+budget — a real gap against the mandate's own explicit requirement to
+re-run the exact same 48 PRs, not a subset, since `#511659` (S3-B) had
+already independently demonstrated that a PR with no original
+actionable presentation can still be materially affected by S3-F1.
+**Closed directly**, not left as an accepted shortcut: all 6 were
+independently re-fetched and re-run against both binaries. Two
+(`#555621`/kerberos, `#555643`/actual) have real modules confirmed
+byte-identical at base/head via blob-SHA comparison (both are pure
+test-migration PRs); all 6 reproduced byte-for-byte identical
+`audit-diff` summaries between the frozen and dev binaries, real
+evidence, not reasoning. **All 48 PRs now have a genuine, independent
+dual-binary rerun — zero remaining reasoned-only entries.**
 
 ## Headline: every real delta matches an expected fix; zero regressions
 
@@ -168,13 +201,21 @@ could introduce either).
 
 Both real bugs (the false finding, the two causality errors) and the
 one real scanner-correctness bug are confirmed fixed, on the exact
-real PRs that found them, with zero regressions across the rest of the
-48-PR corpus — including deliberate negative controls (true module
-births, still-open unrelated capability gaps) that confirm each fix's
-own boundaries held. Per the same S1-R/S2-R precedent, this confirms
-the fixes work on data the code has now seen twice; it is not a fresh
-generalization claim (that is S4's own job, on a genuinely new sample).
+real PRs that found them, with zero regressions across **all 48 PRs,
+every one independently re-run against both binaries** — including
+deliberate negative controls (true module births, still-open unrelated
+capability gaps) that confirm each fix's own boundaries held, and
+including a real, independently-found correctness gap in S3-F1 itself
+(S3-F1.1) caught and closed before this document was finalized, not
+discovered after the fact by someone else. Per the same S1-R/S2-R
+precedent, this confirms the fixes work on data the code has now seen
+twice; it is **not** a fresh generalization claim — 100% actionable
+precision on a corpus the code has now been debugged against twice is
+an answer key, not evidence of generalization. That question is S4's
+own job, on a genuinely new sample the code has never seen.
 
-Per the mandate: cutting the next patch release and verifying the
-actual published artifact from a clean scratch install, then stopping.
-S4 is not authorized by this document.
+v0.4.3 (commit `43dd651`) was cut before S3-F1.1 was found and does
+**not** contain that fix — a real, disclosed gap in the published
+artifact. `v0.4.4` supersedes it, containing S3-F1.1, cut and
+independently verified from a clean scratch install after this
+document was finalized. S4 is not authorized by this document.
