@@ -4660,3 +4660,93 @@ go**: fixing `#558149`'s anomaly, a product-level answer for the
 priority by breadth, though not undertaken here — scanner work on the
 `exporters.nix extraOpts` pattern. A fresh S2-style re-run after those
 fixes, reusing the same cohort machinery, is the natural next check.
+
+## S2-F1/F2/F3: fix the concrete issues, in priority order
+
+The user's own explicit ordering for closing what S2 found: root-cause
+the one real anomaly first (don't touch `exporters.nix` while an
+unexplained bug might share its own root cause), then the
+actionable-precision framing gap, then — research only — a census of
+`exporters.nix`'s real scale, before any decision to build generic
+support.
+
+**S2-F1 — `#558149` root-caused and fixed.** A minimal reproducer
+(`fixtures/synthetic/`, isolating the exact real shape) found the real
+cause directly: `nixos/modules/services/networking/firewall.nix`
+declares its options as `networking.firewall = { enable = lib.mkOption
+{...}; ... } // commonOptions;` — a `//`-merge, not a literal attrset,
+as a nested options block's own value. Both `walk_options_block`'s own
+nested-block handling and `scan_options`'s own top-level entry point
+required `value.kind() == NODE_ATTR_SET` directly, silently skipping
+the whole subtree — including declarations with zero indirection at
+all — whenever the value was a merge expression instead. Classified as
+a **generic coverage gap** (always fail-closed, never a false `PASS`;
+not a fixture/manifest problem — the real file and manifest are both
+genuinely valid). Confirmed to be the SAME general mechanism behind
+PART of the `exporters.nix` gap S2 also found (`mkExporterOpts {...}
+// extraOpts`) — though only part, since `extraOpts` there is a bare
+identifier reference, not a literal attrset, and stays correctly
+opaque even after this fix. Fixed with a new, deliberately bounded
+`walk_merge_operands` (reusing the existing `rnix::ast::BinOp`/
+`BinOpKind::Update` pattern this file already uses elsewhere) that
+unwraps ONLY literal attrsets and further `//`-merges, recursively —
+any other operand (an identifier, a function call, ...) stays opaque
+exactly as before, no general Nix evaluator creeping in.
+
+**S2-F2 — `transition_origin`, a second independent axis.** S2's own
+real actionable-precision gap: `#547038`'s real `new_finding` on
+`recommendedBrotliSettings` was technically correct (the branch
+genuinely is untested) but read as "this PR introduced a problem" when
+the true event was "this PR's own brand-new test file made an
+already-untested, pre-existing option observable for the first time."
+`bucket` still answers "what changed" (completely unchanged semantics,
+same counts as before); a new `transition_origin` answers "why does
+this look new" — `SubjectAdded` (the whole subject is genuinely brand
+new), `AnalysisBecamePossible` (the subject already existed, only its
+own analyzability changed — a same-subject `Inconclusive → X`
+transition, or a module that already existed gaining its first test),
+or `VerdictChanged` (the same, already-analyzable subject's real prior
+`Pass`/`Finding` verdict genuinely changed). For OBA's own `Added`
+entries specifically, a genuine module birth (`module.nix` itself
+absent at base) is distinguished from a test-birth on an
+already-existing module (module present, only `test.nix` absent) via
+the same target-partitioning pass S1-F1 already runs.
+`render_github_summary` now prints "EXISTING UNCOVERED BRANCH BECAME
+OBSERVABLE" instead of "NEW FINDING" exactly when the origin calls for
+it — the bucket, the count, and every other classification decision
+stay completely unchanged; only the displayed framing does.
+
+**S2-F3 — the `exporters.nix` census, research only, zero `src/`
+changes.** Per the user's own explicit staging: a census before any
+support decision, not "add support and see." Real population: 93
+real Prometheus exporter modules, all registered through one shared
+`genAttrs`+dynamic-per-file-`import` mechanism; 87/93 (94%) define a
+real, non-empty `extraOpts`; 92/93 (99%) contain at least one real
+`mkOption` of their own — real, decisive scale, clearing the "dozens
+of modules, same architecture" bar the user themselves set. The real
+architecture, mapped from two real files read in full, turned out to
+have **three** real crossings, not one — including a larger finding
+than S2's own original: the exporters' shared, common `openFirewall`
+option (a real, security-relevant predicate common to all 93 modules)
+lives inside a **function call** (`mkExporterOpts { inherit name
+port; }`), not a literal attrset, so it stays invisible even after
+S2-F1's fix (which only ever unwraps literal attrsets and further
+`//`-merges, never evaluates a call). Real generic support would need
+two genuinely new capability classes — bounded resolution of a literal
+name list into real file paths, and bounded single-level function
+application — both real, both individually boundable in principle, but
+neither a simple extension of S2-F1's own much narrower fix.
+**Recommendation: justified by scale, but not undertaken during
+S2-R** — a real candidate for its own dedicated, carefully-scoped
+round with its own pre-registered bound, matching how every other
+capability here was ever added. All 93 exporter modules stay honestly
+`INCONCLUSIVE` through S2-R.
+
+**Not started, per the user's own explicit staging, awaiting explicit
+go**: S2-R (a regression rerun on the SAME 50 PRs S2 itself used,
+expecting `#558149` to now resolve and the two PR-irrelevant findings
+to now carry the right `transition_origin`, explicitly NOT a new
+validation sample), then a fresh, non-overlapping S3 sample under its
+own new frozen release, with actionable precision — not correctness —
+as the metric that actually decides whether an advisory beta is
+earned.
