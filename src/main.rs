@@ -2583,37 +2583,45 @@ fn walk_config_tree(
     }
 }
 
-/// S3-F1: `specialisation.<literal-name>.configuration` is a real,
-/// generic NixOS option (`nixos/modules/system/boot/specialisation.nix`)
-/// whose own value is exactly another whole NixOS module config tree for
-/// the SAME instance -- structurally identical to an explicit `config =
-/// {...};` block one level deeper, not a different namespace. Strips the
-/// first such literal, three-segment marker found anywhere in the
-/// accumulated path so real evidence underneath normalizes to its real
-/// option path, instead of being filed under a path no watched option
-/// can ever match (the real #510342 false-finding shape: `specialisation.
-/// userborn.configuration.services.userborn.enable` never matched the
-/// watched `services.userborn.enable`, silently, with no opacity either).
-/// Scans the WHOLE accumulated path, not just this call's own new
-/// segments, because the three markers can be split across nested calls
-/// depending on how dotted the source was (flat-dotted in one key,
-/// fully nested, or a partially-dotted mix) -- per the S3-F1 mandate,
-/// "must work consistently for equivalent mixed forms". Only ever
-/// strips a fully LITERAL run: a dynamic specialisation name
-/// (`specialisation.${name}.configuration`) or a non-literal
-/// `configuration` value (a function call / alias) never reaches here as
-/// a clean three-segment run in the first place -- both already produce
-/// their own `Opacity` via the existing dynamic-attrpath/non-literal-
-/// value handling this same walker already has everywhere else, so this
-/// never turns opaque syntax into guessed evidence.
+/// S3-F1 (narrowed by S3-F1.1, a real correctness gap found on
+/// independent review): `specialisation.<literal-name>.configuration`
+/// is a real, generic NixOS option
+/// (`nixos/modules/system/boot/specialisation.nix`) whose own value is
+/// exactly another whole NixOS module config tree for the SAME
+/// instance -- structurally identical to an explicit `config = {...};`
+/// block one level deeper. But it is specifically a TOP-LEVEL-only
+/// option: nixpkgs's own module documents nested specialisations as
+/// ignored, and there is no real NixOS mechanism where this token
+/// sequence carries this meaning anywhere OTHER than the root of a
+/// node's own config tree. S3-F1's original version scanned the WHOLE
+/// accumulated path for this three-segment sequence ANYWHERE, which
+/// would wrongly collapse a merely-similar-looking but semantically
+/// unrelated option path -- e.g. a real (if unusually named) submodule
+/// option `services.foo.specialisation.bar.configuration.enable` --
+/// into `services.foo.enable`, manufacturing false evidence for a
+/// completely different option. Exactly the "syntax pattern mistaken
+/// for semantics regardless of context" failure mode this project
+/// exists to avoid.
+///
+/// Narrowed to check ONLY the root of the current accumulated path
+/// (index 0..3), never a later position, and to strip AT MOST ONCE,
+/// never recursively -- matching nixpkgs's own documented "nested
+/// specialisations are ignored" semantics (there is no real shape this
+/// walker needs to recognize a SECOND marker for). This still handles
+/// every mixed form the original fix targeted (flat-dotted in one key,
+/// fully nested, partially dotted): since `walk_config_entry` always
+/// starts a NEW top-level entry from a freshly-emptied `path` (either
+/// via `walk_module_root`'s own `&mut Vec::new()` for module-root
+/// shorthand, or via the `config = {...}` branch's own `&mut
+/// Vec::new()`), a REAL `specialisation.<name>.configuration` always
+/// ends up occupying exactly the first three elements of SOME such
+/// fresh accumulation, however many hops it took to get there --
+/// while `services.foo.specialisation.bar.configuration.enable`
+/// starts with `"services"`, never `"specialisation"`, at position 0,
+/// and is correctly left untouched.
 fn strip_specialisation_configuration_markers(path: &mut Vec<String>) {
-    let mut i = 0;
-    while i + 2 < path.len() {
-        if path[i] == "specialisation" && path[i + 2] == "configuration" {
-            path.drain(i..i + 3);
-        } else {
-            i += 1;
-        }
+    if path.len() >= 3 && path[0] == "specialisation" && path[2] == "configuration" {
+        path.drain(0..3);
     }
 }
 
@@ -6730,6 +6738,53 @@ mod tests {
                 .iter()
                 .any(|a| path_eq(&a.path, &["services", "somethingElse", "enable"])),
             "evidence for one option must never match an unrelated watched option, got {assignments:?}"
+        );
+    }
+
+    /// S3-F1.1, a real correctness gap found on independent review: the
+    /// literal token sequence "specialisation"/*/"configuration" is NOT
+    /// on its own proof of the real NixOS `specialisation.<name>.
+    /// configuration` mechanism -- that is specifically a TOP-LEVEL
+    /// option (`nixos/modules/system/boot/specialisation.nix`), never a
+    /// nested one. A perfectly ordinary, unrelated option path that
+    /// merely CONTAINS the same three literal segments in sequence --
+    /// e.g. a real (if unusually named) submodule option `services.foo.
+    /// specialisation.bar.configuration.enable` -- must stay exactly
+    /// itself. The original S3-F1 fix scanned the WHOLE accumulated
+    /// path for this token sequence ANYWHERE, which would silently
+    /// collapse this into `services.foo.enable`, manufacturing false
+    /// evidence for a completely different, unrelated option -- exactly
+    /// the "syntax pattern mistaken for semantics regardless of context"
+    /// failure this project exists to avoid. This is the real, hostile
+    /// case S3-F1's own original negative controls never exercised (they
+    /// only checked collisions AFTER a genuine root-level specialisation,
+    /// never a specialisation-shaped token sequence inside an ordinary
+    /// option namespace).
+    #[test]
+    fn specialisation_marker_inside_an_ordinary_option_namespace_is_not_stripped() {
+        let src = r#"
+        {
+          nodes.machine = {
+            services.foo.specialisation.bar.configuration.enable = true;
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, _opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            assignments.iter().any(|a| path_eq(
+                &a.path,
+                &["services", "foo", "specialisation", "bar", "configuration", "enable"]
+            )),
+            "an ordinary option path that merely CONTAINS the specialisation/*/configuration token sequence, not at the real top-level position, must stay exactly itself, got {assignments:?}"
+        );
+        assert!(
+            !assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "foo", "enable"])),
+            "must NEVER be collapsed into services.foo.enable -- that would manufacture false evidence for a completely different, unrelated option, got {assignments:?}"
         );
     }
 
