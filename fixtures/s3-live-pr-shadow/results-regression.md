@@ -44,6 +44,17 @@ dev build) against each. Zero repository writes across all four groups
 (`git status --short` confirmed clean throughout, per each group's own
 report).
 
+**Correction to the first S3-R draft**: it stated that 5 Group-2 PRs
+received structural-only triage. Re-checking the original group
+assignment shows the actual count was 6: `#554062`, `#555621`,
+`#555643`, `#556461`, `#557729`, `#558600`. This was a report-counting
+error, not a tool result — the same class of mistake as the "~8%"
+arithmetic error and the `#551640`/`#562066` inaccuracies found
+earlier in this same document's own history, all human transcription
+errors in Markdown, never a scanner defect. All six have since
+received full independent dual-binary reruns (see below), so the
+final 48/48 parity claim is unaffected.
+
 **A disclosed methodology gap, since closed.** Group 2 initially used a
 lighter structural triage (scanning real `gh pr diff` output for new
 `mkOption`/`mkEnableOption`/`specialisation` additions, rather than a
