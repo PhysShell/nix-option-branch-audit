@@ -1,0 +1,1597 @@
+[
+  [
+    164100,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nixos/nginx: Always symlink nginx configuration to /etc/nginx/nginx.conf"
+  ],
+  [
+    225601,
+    "path:nixos/modules/misc/ids.nix",
+    "nixos/i2pd: refactor with freeformed submodule (RFC42)"
+  ],
+  [
+    345652,
+    "path:nixos/modules/module-list.nix",
+    "omada-software-controller: init at 6.3.0.45"
+  ],
+  [
+    362733,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nixos/nginx: setup logrotate to send kill USR1 signal only once"
+  ],
+  [
+    364156,
+    "path:nixos/modules/module-list.nix",
+    "nixos/nezha: init"
+  ],
+  [
+    375846,
+    "path:nixos/modules/module-list.nix",
+    "nixos/rundeck: init"
+  ],
+  [
+    400845,
+    "path:nixos/modules/module-list.nix",
+    "nixos/synapse: implement more advanced integration test"
+  ],
+  [
+    427723,
+    "path:nixos/modules/module-list.nix",
+    "nixos/p2pool: init module"
+  ],
+  [
+    438722,
+    "path:nixos/modules/module-list.nix",
+    "stash-clipboard: init at 0.4.0; init module"
+  ],
+  [
+    442904,
+    "path:nixos/modules/module-list.nix",
+    "portmaster: init at 2.2.1; nixos/portmaster: init"
+  ],
+  [
+    450096,
+    "path:nixos/modules/module-list.nix",
+    "overseerr: migrate overseerr to seerr"
+  ],
+  [
+    450232,
+    "path:nixos/modules/services/web-apps/selfoss.nix",
+    "various: replace `mkdir` in systemd units with `*Directory` equivalents"
+  ],
+  [
+    452014,
+    "mechanical",
+    "nixos/tests: set proper derivation names for various tests"
+  ],
+  [
+    453557,
+    "path:nixos/modules/module-list.nix",
+    "account-utils: init at 1.3.0, nixos/account-utils: init"
+  ],
+  [
+    456099,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/test-driver: add utils to manipulate efi variables"
+  ],
+  [
+    457027,
+    "mechanical",
+    "stardust-xr-*: <many> -> 0.51.1 & various improvements"
+  ],
+  [
+    457523,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/keepalived: support nftables for openFirewall"
+  ],
+  [
+    459862,
+    "name:bees",
+    "nixos/bees: add missing verbosity level 8"
+  ],
+  [
+    464111,
+    "name:jitsi",
+    "jitsi-meet: make excalidraw and secureDomain usable independently of each other"
+  ],
+  [
+    469813,
+    "name:matrix",
+    "nixos/mautrix-discord: refactor"
+  ],
+  [
+    473182,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nixos/nginx: not using reuseport for unix domain listens"
+  ],
+  [
+    476861,
+    "path:nixos/tests/all-tests.nix",
+    "easytier.services.default: init"
+  ],
+  [
+    478616,
+    "path:nixos/modules/services/networking/hostapd.nix",
+    "nixos/hostapd: set ieee80211w to 2 for wpa3-sae"
+  ],
+  [
+    481639,
+    "mechanical",
+    "(Part 3) various: replace `systemd.services.<name>.{script,preStart}` with `ExecStart{,Pre}`"
+  ],
+  [
+    481641,
+    "mechanical",
+    "(Part 5) various: replace `systemd.services.<name>.{script,preStart}` with `ExecStart{,Pre}`"
+  ],
+  [
+    482922,
+    "path:nixos/modules/services/admin/komodo-periphery.nix",
+    "nixos/komodo-periphery: v2.0.0+ support"
+  ],
+  [
+    485643,
+    "name:grafana",
+    "nixos/grafana: wait for `network-online.target`"
+  ],
+  [
+    489588,
+    "path:nixos/modules/services/monitoring/prometheus/exporters/bind.nix",
+    "prometheus-bind-exporter: 0.7.0 -> 0.8.0, bind: add json_c support"
+  ],
+  [
+    494338,
+    "window",
+    "nixos/taskchampion-sync-server: use DynamicUser after 26.05"
+  ],
+  [
+    495731,
+    "path:nixos/modules/module-list.nix",
+    "nixos/qbit-manage: init module"
+  ],
+  [
+    498536,
+    "path:nixos/tests/all-tests.nix",
+    "holo-daemon: 0.8.0 -> 0.9.0; init modular service"
+  ],
+  [
+    499802,
+    "name:tor",
+    "nixos/zeronet: Update TOR settings"
+  ],
+  [
+    499988,
+    "path:nixos/modules/module-list.nix",
+    "framework-control: init at 0.5.2"
+  ],
+  [
+    501943,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/firefox-syncserver: add PostgreSQL backend support"
+  ],
+  [
+    505127,
+    "path:nixos/modules/module-list.nix",
+    "gs1200-exporter: init at 2.11.12"
+  ],
+  [
+    506504,
+    "path:nixos/modules/module-list.nix",
+    "geoserver: add service"
+  ],
+  [
+    506939,
+    "path:nixos/tests/sing-box.nix",
+    "sing-box: allow empty settings"
+  ],
+  [
+    508608,
+    "path:nixos/modules/services/system/userborn.nix",
+    "nixos/userborn: manage /etc/sub{u,g}id"
+  ],
+  [
+    508844,
+    "path:nixos/modules/module-list.nix",
+    "nixos/inventree: add module services and test"
+  ],
+  [
+    509450,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/seerr: use lib.mkStateRevisionOption"
+  ],
+  [
+    509675,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/test-driver: add defaultText to pythonTestDriverPackage"
+  ],
+  [
+    509812,
+    "path:nixos/tests/firewall.nix",
+    "firewalld: 2.4.0 -> 2.4.2 & clean up"
+  ],
+  [
+    509954,
+    "path:nixos/modules/module-list.nix",
+    "nixos/unpackerr: init module"
+  ],
+  [
+    512162,
+    "path:nixos/modules/module-list.nix",
+    "{hister,nixos/hister,nixosTests.hister}: init at 0.17.0"
+  ],
+  [
+    512297,
+    "path:nixos/modules/module-list.nix",
+    "nixos/zapret2: init module"
+  ],
+  [
+    514050,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/vnstat: add RFC-42 settings and NixOS test"
+  ],
+  [
+    514097,
+    "name:authelia",
+    "nixos/authelia: Make secrets available to the service even if not readable by the authelia user"
+  ],
+  [
+    514547,
+    "name:varnish",
+    "nixos/varnish: set `LimitMEMLOCK` systemd service process property to `infinity`"
+  ],
+  [
+    515744,
+    "mechanical",
+    "comfyui: init at 0.29.0; nixos/comfyui: init"
+  ],
+  [
+    515814,
+    "name:vaultwarden",
+    "nixos/vaultwarden: add example for .domain option"
+  ],
+  [
+    516318,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/timesyncd: migrate to RFC 42-style settings"
+  ],
+  [
+    516329,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/systemd/user: migrate to RFC 42-style settings"
+  ],
+  [
+    517703,
+    "path:nixos/modules/services/display-managers/dms-greeter.nix",
+    "nixos/dms-greeter: added mango and miracle-wm as supported compositor\u2026"
+  ],
+  [
+    517731,
+    "name:zfs",
+    "zfs: support zfs-mount-generator"
+  ],
+  [
+    517991,
+    "path:nixos/modules/module-list.nix",
+    "nixos/tzpfms: init"
+  ],
+  [
+    518425,
+    "name:vaultwarden",
+    "nixos/vaultwarden: respect DATA_FOLDER override in backup service"
+  ],
+  [
+    519044,
+    "path:nixos/tests/all-tests.nix",
+    "shadow: enable upstream system tests"
+  ],
+  [
+    519182,
+    "path:nixos/modules/module-list.nix",
+    "gocron: init at 0.9.14"
+  ],
+  [
+    519447,
+    "path:nixos/modules/services/desktop-managers/cosmic.nix",
+    "nixos/cosmic: remove unnecessary dependency of cosmic-session.target on xdg-desktop-autostart.target"
+  ],
+  [
+    519448,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests/cosmic: move core logic into a dedicated script"
+  ],
+  [
+    520045,
+    "path:nixos/tests/jellyfin.nix",
+    "nixos/jellyfin: fix hevc10bit decoding toggle being silently ignored"
+  ],
+  [
+    521006,
+    "path:nixos/modules/module-list.nix",
+    "netplan: 0.106.1 -> 1.2.2"
+  ],
+  [
+    521089,
+    "path:nixos/tests/all-tests.nix",
+    "e57inspector, cloudcompare: VLM based screenshot checks"
+  ],
+  [
+    521402,
+    "name:matrix",
+    "nixos/tuwunel: added environmentFile option"
+  ],
+  [
+    521850,
+    "path:nixos/tests/lomiri.nix",
+    "lomiri.qtmir: 0.8.0-unstable-2025-05-20 -> 0.8.0-unstable-2026-03-11"
+  ],
+  [
+    522265,
+    "name:anubis",
+    "nixos/anubis: make all instances part of a system slice"
+  ],
+  [
+    522410,
+    "path:nixos/modules/module-list.nix",
+    "wealthfolio-server: init at 3.5.2, nixos/wealthfolio: init"
+  ],
+  [
+    522931,
+    "path:nixos/modules/module-list.nix",
+    "adw-bluetooth: 1.0.0 -> 1.1.0, init NixOS module"
+  ],
+  [
+    523127,
+    "path:nixos/tests/wordpress.nix",
+    "wordpress: add new release, drop unmaintained version, upgrade packages"
+  ],
+  [
+    523313,
+    "path:nixos/tests/systemd.nix",
+    "nixos-test-driver: drop unneeded qemu dep"
+  ],
+  [
+    523462,
+    "path:nixos/modules/module-list.nix",
+    "scx-loader: init at 1.1.1, add nixos module and test"
+  ],
+  [
+    523840,
+    "path:nixos/modules/module-list.nix",
+    "rustfs: init at 1.0.0-beta.9"
+  ],
+  [
+    524434,
+    "name:klipper",
+    "klipper-flash: support can bus flashing, support flashing avr mcus"
+  ],
+  [
+    524652,
+    "path:nixos/modules/module-list.nix",
+    "flap-alerted: init at 4.5.0; nixos/flap-alerted: init module"
+  ],
+  [
+    525499,
+    "path:nixos/tests/all-tests.nix",
+    "varnish60: drop"
+  ],
+  [
+    525622,
+    "path:nixos/modules/services/monitoring/prometheus/exporters.nix",
+    "nixos/prometheus-elasticsearch-exporter: init"
+  ],
+  [
+    525889,
+    "path:nixos/modules/module-list.nix",
+    "stump: init at 0.1.5, nixos/stump: init module, nixos/tests/stump: init tests"
+  ],
+  [
+    526068,
+    "name:dovecot",
+    "nixos/dovecot: place globals first in rendered config"
+  ],
+  [
+    526154,
+    "name:pam",
+    "nixos/{greetd, ly}: substack login in PAM"
+  ],
+  [
+    526430,
+    "path:nixos/modules/services/networking/adguardhome.nix",
+    "nixos/adguardhome: fix shellcheck error in pre-start script"
+  ],
+  [
+    526476,
+    "path:nixos/modules/services/hardware/fwupd.nix",
+    "nixos/fwupd: allow fwupd-refresh user to refresh metadata via polkit"
+  ],
+  [
+    526624,
+    "path:nixos/modules/module-list.nix",
+    "nixos/oo7-service: init"
+  ],
+  [
+    526774,
+    "mechanical",
+    "staging-nixos merge for 2026-06-01"
+  ],
+  [
+    526791,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.gocryptfs: init"
+  ],
+  [
+    526952,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/test-driver: rework timeout for wait_for_console_text"
+  ],
+  [
+    527135,
+    "name:wpa_supplicant",
+    "nixos/wireless: restrict chown /etc/wpa_supplicant scope"
+  ],
+  [
+    527170,
+    "name:strichliste",
+    "strichliste: fix config keys, fix config reload, optimize autoloader"
+  ],
+  [
+    527621,
+    "path:nixos/modules/module-list.nix",
+    "nixos/matrix-authentication-service: init"
+  ],
+  [
+    527659,
+    "mechanical",
+    "maintainers: add jade"
+  ],
+  [
+    527698,
+    "path:nixos/modules/services/monitoring/prometheus/exporters.nix",
+    "mail-tlsa-check-exporter: init at 0-unstable-2025-06-12, nixos/prometheus-exporters/mail-tlsa-check: init"
+  ],
+  [
+    527924,
+    "mechanical",
+    "treewide: drop some unnecessary toString calls"
+  ],
+  [
+    528188,
+    "mechanical",
+    "libsForQt5.qt5: remove attribute"
+  ],
+  [
+    528376,
+    "name:wpa_supplicant",
+    "nixos/wpa_supplicant: use lib.warn for warnings"
+  ],
+  [
+    528626,
+    "path:nixos/modules/services/misc/llama-cpp.nix",
+    "nixos/llama-cpp: switch to RFC42-style settings"
+  ],
+  [
+    528858,
+    "name:matterjs-server",
+    "matterjs-server: add myself as a maintainer"
+  ],
+  [
+    529038,
+    "path:nixos/modules/services/home-automation/home-assistant.nix",
+    "nixos/home-assistant: open firewall ports for homekit component"
+  ],
+  [
+    529299,
+    "path:nixos/modules/module-list.nix",
+    "nixos/matrix-appservice-discord: drop"
+  ],
+  [
+    529576,
+    "path:nixos/modules/module-list.nix",
+    "koito: init at 0.3.2, nixos/koito: init module"
+  ],
+  [
+    529590,
+    "path:nixos/tests/all-tests.nix",
+    "scanservjs: fix NixOS config not having an effect"
+  ],
+  [
+    529607,
+    "path:nixos/tests/redis.nix",
+    "teams/redis: init"
+  ],
+  [
+    529881,
+    "mechanical",
+    "staging-nixos merge for 2026-06-09"
+  ],
+  [
+    530025,
+    "mechanical",
+    "netbox_4_6: init at 4.6.8"
+  ],
+  [
+    530032,
+    "name:restic",
+    "restic: 0.18.1 -> 0.19.0"
+  ],
+  [
+    530054,
+    "name:mqtt",
+    "nixosTests.zenohd: fix test flakiness by adding QoS1 to mqtt pub"
+  ],
+  [
+    530106,
+    "mechanical",
+    "nixos/polkit: modernize, make pkexec wrapper opt-in"
+  ],
+  [
+    530237,
+    "path:nixos/tests/wpa_supplicant.nix",
+    "nixos/wireless: fix for multiple interfaces"
+  ],
+  [
+    530406,
+    "path:nixos/modules/module-list.nix",
+    "nixos/rnsd: init"
+  ],
+  [
+    530879,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.accountsservice: init"
+  ],
+  [
+    530895,
+    "path:nixos/modules/module-list.nix",
+    "watt: init at 1.2.0"
+  ],
+  [
+    530920,
+    "docs",
+    "pulseaudio-module-xrdp: fix typo"
+  ],
+  [
+    531062,
+    "path:nixos/tests/all-tests.nix",
+    "testers.modularServiceCompliance: init"
+  ],
+  [
+    531079,
+    "name:papra",
+    "papra: 26.4.0 -> 26.5.0"
+  ],
+  [
+    531127,
+    "path:nixos/modules/services/misc/llama-cpp.nix",
+    "nixos/llama-cpp: fix obsolete port option warning"
+  ],
+  [
+    531324,
+    "name:plausible",
+    "plausible: drop xanderio and e1mo as maintainers"
+  ],
+  [
+    531375,
+    "path:nixos/modules/module-list.nix",
+    "bookorbit: init at 2.8.1, nixos/bookorbit: init module"
+  ],
+  [
+    531477,
+    "mechanical",
+    "treewide: fix leftover docbook links"
+  ],
+  [
+    531604,
+    "name:kea",
+    "nixos/tests: migrate some to nspawn"
+  ],
+  [
+    531782,
+    "name:bind",
+    "nixos/bind: print invalid config with lines"
+  ],
+  [
+    531808,
+    "mechanical",
+    "staging-nixos merge for 2026-06-14"
+  ],
+  [
+    532000,
+    "mechanical",
+    "maintainers/lucasew: disown some packages"
+  ],
+  [
+    532008,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/systemd-initrd: skip activation when init= is not a NixOS system"
+  ],
+  [
+    532167,
+    "docs",
+    "lemmy: update documentation"
+  ],
+  [
+    532445,
+    "path:nixos/modules/module-list.nix",
+    "tap: init at 0.1.10, nixos/tap: init"
+  ],
+  [
+    532499,
+    "path:nixos/tests/all-tests.nix",
+    "Add integration test for verifying that cryptsetup luksSuspend correctly wipes the volume key from memory"
+  ],
+  [
+    532516,
+    "path:nixos/tests/all-tests.nix",
+    "ceph: 20.2.1 -> 20.2.2"
+  ],
+  [
+    532600,
+    "name:outline",
+    "nixos/outline: allow DATABASE_URL override from environment"
+  ],
+  [
+    532722,
+    "name:sabnzbd",
+    "nixos/sabnzbd: offload config format to pkgs.formats.configobj"
+  ],
+  [
+    533333,
+    "name:headscale",
+    "headscale: make headscale module compatible with headplane"
+  ],
+  [
+    533429,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/test-driver: keep nspawn notify socket drained after boot "
+  ],
+  [
+    533604,
+    "path:nixos/modules/services/x11/desktop-managers/cinnamon.nix",
+    "cinnamon-session: 6.6.3 -> 6.6.4"
+  ],
+  [
+    533713,
+    "mechanical",
+    "maintainers: remove f4814n"
+  ],
+  [
+    533730,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/systemd: add many Varlink APIs since v260"
+  ],
+  [
+    533966,
+    "name:pocket-id",
+    "nixos/pocket-id: clarify 'secrets' option"
+  ],
+  [
+    534088,
+    "name:lomiri",
+    "lomiri.lomiri-system-settings: 1.3.2 -> 1.4.0"
+  ],
+  [
+    534089,
+    "name:netbird",
+    "netbird: fix GUI application's XDG desktop file"
+  ],
+  [
+    534220,
+    "name:netbird",
+    "netbird: 0.74.3 -> 0.75.0"
+  ],
+  [
+    534254,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/mysql: fix default MySQL/Percona Server insecure authentication"
+  ],
+  [
+    534265,
+    "path:nixos/modules/module-list.nix",
+    "Allow to pass extra initrd archives to the bootloader"
+  ],
+  [
+    534571,
+    "name:repart",
+    "nixos/tests/systemd-repart: fix factory-reset test for systemd 261"
+  ],
+  [
+    534694,
+    "mechanical",
+    "cosmic: sort and refactor package attrs, fix libcosmicAppHook wrapping"
+  ],
+  [
+    534786,
+    "path:nixos/modules/services/video/wivrn.nix",
+    "nixos/wivrn: Fix application starter"
+  ],
+  [
+    534864,
+    "path:nixos/tests/all-tests.nix",
+    "Revert \"staging-nixos merge for 2026-06-19\""
+  ],
+  [
+    534979,
+    "name:matrix",
+    "teams.matrix: reform"
+  ],
+  [
+    535075,
+    "name:sql",
+    "provide client packages for all mysql-ish database flavours"
+  ],
+  [
+    535081,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nixos/nginx: add lua option for Lua scripting support"
+  ],
+  [
+    535082,
+    "name:kea",
+    "kea: 3.0.3 -> 3.2.0"
+  ],
+  [
+    535221,
+    "name:chrony",
+    "nixos/chrony: restart service"
+  ],
+  [
+    535258,
+    "path:nixos/modules/virtualisation/qemu-vm.nix",
+    "nixos/virtualisation/nspawn-container: add virtualisation.credentials support"
+  ],
+  [
+    535307,
+    "path:nixos/modules/module-list.nix",
+    "freescout: init at 1.8.225"
+  ],
+  [
+    535402,
+    "path:nixos/modules/services/ttys/kmscon.nix",
+    "nixos/treewide: use security.pam.pam_unixModulePath everywhere"
+  ],
+  [
+    535511,
+    "path:nixos/modules/virtualisation/qemu-vm.nix",
+    "nixos: drop `x86_64-darwin` support"
+  ],
+  [
+    535595,
+    "mechanical",
+    "gitlab: 18.11.7 -> 19.0.4"
+  ],
+  [
+    535985,
+    "mechanical",
+    "staging-nixos merge of 2026-06-27"
+  ],
+  [
+    536021,
+    "path:nixos/modules/services/web-apps/tabbyapi.nix",
+    "tabbyapi: unstable-2026-06-13 -> unstable-2026-06-27; nixos/tabbyapi: add writable HOME and cache "
+  ],
+  [
+    536063,
+    "name:outline",
+    "nixos/outline: fix crash at startup from \"Failed to parse\" on database URL"
+  ],
+  [
+    536167,
+    "path:nixos/modules/services/backup/syncoid.nix",
+    "nixos/syncoid: allow `@timer` syscalls"
+  ],
+  [
+    536534,
+    "path:nixos/modules/services/misc/ntfy-sh.nix",
+    "nixos/ntfy-sh: add RuntimeDirectory to systemd unit"
+  ],
+  [
+    536538,
+    "path:nixos/tests/systemd.nix",
+    "nixos/journald: migrate to RFC 42-style settings"
+  ],
+  [
+    536585,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nginx: add ma27 and leona to maintainers, remove inactive maintainers"
+  ],
+  [
+    536704,
+    "mechanical",
+    " music-assistant: 2.8.7 -> 2.9.4"
+  ],
+  [
+    536719,
+    "name:nextcloud",
+    "Nextcloud34 & package updates"
+  ],
+  [
+    536721,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/nix: Support local-only store"
+  ],
+  [
+    536821,
+    "path:nixos/tests/mattermost/default.nix",
+    "mattermostLatest: 11.8.1 -> 11.8.2"
+  ],
+  [
+    536915,
+    "name:matrix",
+    "matrix-authentication-service: add matrix team to maintainers"
+  ],
+  [
+    536936,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/tests/flarum: init"
+  ],
+  [
+    537190,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nginx: support dynamic modules"
+  ],
+  [
+    537191,
+    "name:printing",
+    "nixos/printing: preserve ssl certs even when stateless"
+  ],
+  [
+    537261,
+    "name:matrix",
+    "nixos/matrix-authentication-service: fix extra config file loading"
+  ],
+  [
+    537550,
+    "name:rename",
+    "nixos/ollama: rename services.ollama.models to modelsDir"
+  ],
+  [
+    537882,
+    "path:nixos/modules/module-list.nix",
+    "nixos/moonlight-qt: add module"
+  ],
+  [
+    538174,
+    "path:nixos/modules/module-list.nix",
+    "nixos/nginx/gitweb: move into gitweb module"
+  ],
+  [
+    538189,
+    "name:sabnzbd",
+    "nixos/sabnzbd: add secretValues option"
+  ],
+  [
+    538304,
+    "name:unbound",
+    "unbound: add DNS-over-QUIC support"
+  ],
+  [
+    538341,
+    "path:nixos/modules/services/video/wivrn.nix",
+    "nixos/wivrn: Don't run service for system users"
+  ],
+  [
+    538371,
+    "path:nixos/tests/web-apps/immich.nix",
+    "immich: 2.7.5 -> 3.0.1"
+  ],
+  [
+    538448,
+    "mechanical",
+    "treewide: largely remove danth from maintainers"
+  ],
+  [
+    538576,
+    "name:authelia",
+    "nixos/authelia: use lib.types.externalPath"
+  ],
+  [
+    538589,
+    "name:kerberos",
+    "nixos/nfsd: allow exports to be an attrset"
+  ],
+  [
+    538639,
+    "name:misskey",
+    "nixos/misskey: fixes for attrTag submodule docs"
+  ],
+  [
+    538772,
+    "docs",
+    "doc/akkoma: fix mistake in manual"
+  ],
+  [
+    538782,
+    "name:postfix",
+    "postfix-tlspol: 1.10.0 -> 1.11.0"
+  ],
+  [
+    538790,
+    "name:dnssec",
+    "technitium-dns-server: 15.2.0 -> 15.3.0"
+  ],
+  [
+    538983,
+    "path:nixos/modules/module-list.nix",
+    "nixos/qemu-firmware: init"
+  ],
+  [
+    539034,
+    "path:nixos/modules/services/monitoring/prometheus/exporters/imap-mailstat.nix",
+    "prometheus-imap-mailstat-exporter: 0.0.1 to 0.7.1"
+  ],
+  [
+    539117,
+    "name:grafana",
+    "nixos/nspawn-container: hash name, remove assertion "
+  ],
+  [
+    539197,
+    "name:part-db",
+    "part-db: 2.4.0 -> 2.13.1"
+  ],
+  [
+    539368,
+    "name:limine",
+    "nixos/limine: fix location for boot.loader.limine.additionalFiles"
+  ],
+  [
+    539917,
+    "path:nixos/modules/services/desktop-managers/cosmic.nix",
+    "nixos/cosmic: add package cosmic-monitor"
+  ],
+  [
+    539991,
+    "name:unbound",
+    "nixos/unbound: resolveLocalQueries with resolved"
+  ],
+  [
+    540128,
+    "path:nixos/modules/services/x11/desktop-managers/cinnamon.nix",
+    "nixos/cinnamon: add system-config-printer to PATH"
+  ],
+  [
+    540147,
+    "name:nginx",
+    "bentopdf: 1.11.2 -> 2.8.6"
+  ],
+  [
+    540184,
+    "path:nixos/tests/web-apps/pdfding/s3-backups.nix",
+    "pdfding: 1.9.0 -> 1.10.0"
+  ],
+  [
+    540351,
+    "mechanical",
+    "weblate: 2026.6.1 -> 2026.9"
+  ],
+  [
+    540449,
+    "path:nixos/tests/matrix/continuwuity.nix",
+    "matrix-continuwuity: 0.5.10 -> 26.6.1"
+  ],
+  [
+    540530,
+    "path:nixos/modules/module-list.nix",
+    "nixos/noctalia-greeter: init"
+  ],
+  [
+    540563,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "nixos/nginx: disable MemoryDenyWriteExecute when lua with luajit is enabled"
+  ],
+  [
+    540905,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    " nixos/nginx: do not match pkgs.openresty as some modules like brotli add buildInputs"
+  ],
+  [
+    540906,
+    "name:redmine",
+    "nixos/redmine: Add option for pandoc support allowing document preview"
+  ],
+  [
+    540934,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/graphical-desktop: avoid writing empty Option values to 00-keyboard.conf"
+  ],
+  [
+    540984,
+    "name:matrix",
+    "nixos/matrix-authentication-service: use env var instead of %d"
+  ],
+  [
+    540989,
+    "name:matrix",
+    "nixos/dendrite: add package option"
+  ],
+  [
+    541027,
+    "name:llama-cpp",
+    "llama-swap: 224 -> 240; nixos/llama-swap: share model cache with llama-cpp"
+  ],
+  [
+    541061,
+    "name:after",
+    "nixos/nsd: After/Want network-online.target"
+  ],
+  [
+    541226,
+    "name:matter-server",
+    "nixos/tests/matter-server: use default python3Packages"
+  ],
+  [
+    541270,
+    "path:nixos/tests/all-tests.nix",
+    "various: replace os.system with subprocess.run"
+  ],
+  [
+    541354,
+    "path:nixos/tests/all-tests.nix",
+    "qemu_test: Remove hostCpuOnly flag"
+  ],
+  [
+    541548,
+    "path:nixos/modules/security/pam.nix",
+    "nixos/pam: remove explicit hardcoded yescrypt"
+  ],
+  [
+    542171,
+    "name:dawarich",
+    "dawarich: 1.9.2 -> 1.10.1"
+  ],
+  [
+    542222,
+    "mechanical",
+    "Skaware summer 2026"
+  ],
+  [
+    542416,
+    "path:nixos/modules/module-list.nix",
+    "bosun: drop"
+  ],
+  [
+    542469,
+    "name:redmine",
+    "nixos/redmine: Drop pidfile"
+  ],
+  [
+    542492,
+    "path:nixos/tests/coredns.nix",
+    "coredns: 1.14.3 -> 1.14.6"
+  ],
+  [
+    542581,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/tests/grub: add test cases"
+  ],
+  [
+    543561,
+    "mechanical",
+    "gnomeExtensions: bump 2026-07-19"
+  ],
+  [
+    543724,
+    "name:flarum",
+    "nixos/flarum: add `initialAdminPasswordFile` and `databasePasswordFile` options"
+  ],
+  [
+    543869,
+    "mechanical",
+    "various: partially apply prefix/suffix/infix checks"
+  ],
+  [
+    544239,
+    "name:headscale",
+    "nixos/headscale: align settings with upstream config schema"
+  ],
+  [
+    544750,
+    "mechanical",
+    "Cosmic stable 1.4.0"
+  ],
+  [
+    545089,
+    "path:nixos/modules/rename.nix",
+    "afterstep: drop"
+  ],
+  [
+    545340,
+    "name:vaultwarden",
+    "vaultwarden: 1.36.0 -> 1.37.0"
+  ],
+  [
+    545362,
+    "path:nixos/modules/module-list.nix",
+    "nixos/feishin: init module"
+  ],
+  [
+    545427,
+    "path:nixos/tests/prometheus-exporters.nix",
+    "prometheus-storagebox-exporter: 1.0.0 -> 1.1.0"
+  ],
+  [
+    545439,
+    "path:nixos/modules/services/home-automation/home-assistant.nix",
+    "home-assistant: 2026.7.3 -> 2026.7.4"
+  ],
+  [
+    545504,
+    "path:nixos/modules/module-list.nix",
+    "nixos/regreet: move to services.displayManager"
+  ],
+  [
+    545514,
+    "name:grafana",
+    "nixos/grafana: remove obsolete tools symlink"
+  ],
+  [
+    545577,
+    "name:nginx",
+    "nixos/roundcube: nginx config for max attachment size"
+  ],
+  [
+    545930,
+    "name:gitea",
+    "nixos/gitea: handle secrets for `email.incoming`"
+  ],
+  [
+    547212,
+    "name:knot",
+    "formats.yaml_1_1: use remarshal v2"
+  ],
+  [
+    547508,
+    "name:librechat",
+    "nixos/librechat: fix undefined cfg.port in openFirewall option"
+  ],
+  [
+    547607,
+    "path:nixos/modules/module-list.nix",
+    "romm: init at 5.1.0; nixos/romm: init"
+  ],
+  [
+    547702,
+    "mechanical",
+    "music-assistant: 2.9.13 -> 2.10.3"
+  ],
+  [
+    547720,
+    "name:mobilizon",
+    "mobilizon: 5.2.3 -> 5.2.4"
+  ],
+  [
+    547726,
+    "name:ifstate",
+    "nixos/*: Fix some pkgs.systemd references"
+  ],
+  [
+    548052,
+    "name:modular-services",
+    "modular-services: only emit ExecReload when there is a reload command"
+  ],
+  [
+    548280,
+    "path:nixos/tests/networking/networkmanager.nix",
+    "networkmanager: 1.56.0 -> 1.58.0"
+  ],
+  [
+    548403,
+    "path:nixos/tests/nextcloud/home-mount.nix",
+    "nixos/nextcloud: add test verifying that bind-mounts and special places of /var/lib/nextcloud are OK"
+  ],
+  [
+    548675,
+    "mechanical",
+    "discourse: 2026.1.4 -> 2026.7.1"
+  ],
+  [
+    548739,
+    "name:flarum",
+    "nixos/flarum: manage `config.php` declaratively, guard reinstall with marker file"
+  ],
+  [
+    548841,
+    "path:nixos/modules/rename.nix",
+    "sawfish,rep-gtk: drop"
+  ],
+  [
+    548850,
+    "path:nixos/modules/services/web-servers/nginx/default.nix",
+    "tengine: drop"
+  ],
+  [
+    548863,
+    "path:nixos/modules/services/web-apps/tabbyapi.nix",
+    "python3Packages.exllamav3: 1.2.1 -> 1.3.0; tabbyapi: 0-unstable-2026-07-18 -> 0-unstable-2026-07-31"
+  ],
+  [
+    548957,
+    "path:nixos/modules/services/networking/suricata/default.nix",
+    "pcre2: remove withJitSealloc"
+  ],
+  [
+    549465,
+    "name:meta",
+    "nixos/mautrix-meta: add new instagram mode, fix tests"
+  ],
+  [
+    549487,
+    "name:meilisearch",
+    "nixos/karakeep: remove meilisearch workaround for dumpless upgrade"
+  ],
+  [
+    549589,
+    "name:transmission",
+    "nixos/transmission: wait for network-online.target"
+  ],
+  [
+    549961,
+    "path:nixos/tests/all-tests.nix",
+    "staging-nixos merge for 2026-08-06"
+  ],
+  [
+    549974,
+    "mechanical",
+    "k3s: update all packages"
+  ],
+  [
+    550199,
+    "mechanical",
+    "staging-next 2026-08-07"
+  ],
+  [
+    550234,
+    "mechanical",
+    "treewide: remove minijackson maintenanceship of some pkgs & modules"
+  ],
+  [
+    550650,
+    "path:nixos/modules/security/tpm2.nix",
+    "nixos/wireless: add pkcs11 option for smartcard/TPM EAP-TLS"
+  ],
+  [
+    550771,
+    "name:papra",
+    "nixos/papra: Improve module definition; Harden systemd service"
+  ],
+  [
+    551137,
+    "name:lemmy",
+    "lemmy: add NGI maintainers and follow packaging guidelines"
+  ],
+  [
+    551186,
+    "path:nixos/tests/all-tests.nix",
+    "llama-swap: 240 -> 249"
+  ],
+  [
+    551448,
+    "path:nixos/modules/module-list.nix",
+    "flame: init at 2.4.0, add NixOS module"
+  ],
+  [
+    551579,
+    "path:nixos/tests/appliance-repart-image-verity-store.nix",
+    "nixos/tests/verity-store: fix"
+  ],
+  [
+    551799,
+    "mechanical",
+    "nixos/tests: support a few more running on darwin + hygiene"
+  ],
+  [
+    551979,
+    "name:pihole",
+    "nixos/pihole-ftl: make list setup idempotent"
+  ],
+  [
+    552258,
+    "path:nixos/modules/module-list.nix",
+    "nixos/krill: init"
+  ],
+  [
+    552312,
+    "name:docuseal",
+    "docuseal: 2.5.3 -> 3.2.0"
+  ],
+  [
+    552324,
+    "name:miniflux",
+    "nixos/miniflux: fix AppArmor profile"
+  ],
+  [
+    552462,
+    "path:nixos/modules/virtualisation/qemu-vm.nix",
+    "nixos/qemu-vm: drop useSecureBoot, always use OVMFFull"
+  ],
+  [
+    552823,
+    "name:before",
+    "healthchecks: django compress before collectstatic"
+  ],
+  [
+    552984,
+    "path:nixos/modules/module-list.nix",
+    "aurral: init at 2.8.0"
+  ],
+  [
+    553058,
+    "name:node",
+    "ceph.tests: Fix dashboard test timeout, move it to bluestore test"
+  ],
+  [
+    553098,
+    "path:nixos/modules/module-list.nix",
+    "pfixtools: remove"
+  ],
+  [
+    553266,
+    "name:kubernetes",
+    "nixos/kubernetes: disambiguate kubelet cluster DNS options"
+  ],
+  [
+    553492,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/tests/papra: init"
+  ],
+  [
+    553626,
+    "mechanical",
+    "staging-nixos merge for 2026-08-17"
+  ],
+  [
+    553728,
+    "mechanical",
+    "nixosTests: do not depend on nix by default"
+  ],
+  [
+    553874,
+    "name:postgres",
+    "mediawiki: fix postgres external database host address"
+  ],
+  [
+    553900,
+    "path:nixos/modules/services/ttys/kmscon.nix",
+    "nixos/kmscon: remove dash usage"
+  ],
+  [
+    554366,
+    "path:nixos/modules/misc/documentation/modular-services.nix",
+    "git-pages.services.default: init"
+  ],
+  [
+    554625,
+    "name:i2pd",
+    "nixos/i2pd: fix config check for yggdrasil-only setups"
+  ],
+  [
+    555116,
+    "name:warpgate",
+    "warpgate: 0.26.1 -> 0.28.4"
+  ],
+  [
+    555338,
+    "name:modemmanager",
+    "nixos/modemmanager: fix missing awk and xxd in FCC unlock script PATH"
+  ],
+  [
+    555476,
+    "path:nixos/modules/services/ttys/kmscon.nix",
+    "nixos/kmscon: enforce that at least one monospace font exists"
+  ],
+  [
+    555614,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.grafana: migrate to runTest"
+  ],
+  [
+    555615,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.hitch: migrate to runTest"
+  ],
+  [
+    555616,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.hostname: migrate to runTest"
+  ],
+  [
+    555620,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.kafka: migrate to runTest"
+  ],
+  [
+    555628,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.lorri: migrate to runTest"
+  ],
+  [
+    555632,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.wine: migrate to runTest"
+  ],
+  [
+    555646,
+    "name:blocky",
+    "nixosTests.blocky: migrate to systemd-nspawn"
+  ],
+  [
+    555849,
+    "name:kimai",
+    "nixosTests.kimai: migrate to systemd-nspawn"
+  ],
+  [
+    555948,
+    "docs",
+    "treewide: fix typos"
+  ],
+  [
+    556418,
+    "mechanical",
+    "nixos: pkgs.systemd -> config.systemd.package"
+  ],
+  [
+    556683,
+    "path:nixos/modules/services/web-apps/selfoss.nix",
+    "nixos/selfoss: Port to RFC42-style settings"
+  ],
+  [
+    556767,
+    "name:snipe-it",
+    "snipe-it: 8.4.1 -> 8.7.2"
+  ],
+  [
+    557289,
+    "name:flarum",
+    "nixos/flarum: don't overwrite `config.php` on installs not managed by this module"
+  ],
+  [
+    557328,
+    "name:tor",
+    "nixos/tests/tor: replace activation script with ExecStartPre"
+  ],
+  [
+    557374,
+    "name:invoiceplane",
+    "invoiceplane: 1.7.1 -> 1.7.2"
+  ],
+  [
+    557383,
+    "name:linkwarden",
+    "linkwarden: 2.14.0 -> 2.16.1"
+  ],
+  [
+    557715,
+    "path:nixos/tests/all-tests.nix",
+    "nixosTests.switchTest: split into parts to bound evaluation memory"
+  ],
+  [
+    557765,
+    "path:nixos/modules/module-list.nix",
+    "zerobyte: init at 0.42.0 and add module"
+  ],
+  [
+    557835,
+    "name:grocy",
+    "grocy: 4.6.0 -> 4.7.1"
+  ],
+  [
+    558041,
+    "name:pihole",
+    "nixos/pihole-ftl: rotate all configured log files"
+  ],
+  [
+    558164,
+    "path:nixos/tests/prometheus-exporters.nix",
+    "nixos/tests/prometheus-exporters: Fix ping"
+  ],
+  [
+    558384,
+    "name:karma",
+    "repath-studio: fix flaky tests in sandbox"
+  ],
+  [
+    558390,
+    "docs",
+    "nixos/forgejo-runner: fix typo in migration instructions"
+  ],
+  [
+    558973,
+    "path:nixos/modules/virtualisation/openvswitch.nix",
+    "openvswitch: 3.7.1 -> 4.0.0"
+  ],
+  [
+    559141,
+    "mechanical",
+    "staging-nixos merge for 2026-09-02"
+  ],
+  [
+    559662,
+    "mechanical",
+    "gcr*: add explicit version suffix to attr, enable structuredAttrs"
+  ],
+  [
+    560097,
+    "mechanical",
+    "treewide: remove `optional cond [...]`"
+  ],
+  [
+    560212,
+    "name:i2pd",
+    "nixos/i2pd: add option for tunnel type"
+  ],
+  [
+    560324,
+    "path:nixos/modules/services/networking/suricata/default.nix",
+    "nixos/suricata: ProtectProc = true -> \"invisible\""
+  ],
+  [
+    560349,
+    "name:gocron",
+    "gocron: 0.9.14 -> 0.11.0"
+  ],
+  [
+    560469,
+    "mechanical",
+    "staging-next 2026-09-05"
+  ],
+  [
+    561035,
+    "mechanical",
+    "staging-nixos merge for 2026-09-07"
+  ],
+  [
+    561289,
+    "name:spacecookie",
+    "nixos/tests/spacecookie: fix"
+  ],
+  [
+    562003,
+    "mechanical",
+    "COSMIC stable 1.8.0"
+  ],
+  [
+    562044,
+    "path:nixos/modules/services/networking/suricata/default.nix",
+    "nixos/suricata: add support for --drop-conf rules"
+  ],
+  [
+    562127,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/tests/duplicity: init"
+  ],
+  [
+    562592,
+    "path:nixos/modules/services/networking/nordvpn.nix",
+    "nordvpn: add novalkun as maintainer"
+  ],
+  [
+    562805,
+    "path:nixos/tests/redis.nix",
+    "nixosTests.redis: drop version suffix from test name"
+  ],
+  [
+    563084,
+    "path:nixos/tests/all-tests.nix",
+    "nixos/tests/docuum: init"
+  ],
+  [
+    563194,
+    "name:ifstate",
+    "nixos/ifstate: use structuredAttrs instead of passAsFile"
+  ],
+  [
+    564265,
+    "name:nextcloud",
+    "nextcloud35: init at 35.0.0"
+  ],
+  [
+    564742,
+    "path:nixos/tests/all-tests.nix",
+    "harmonia: 3.2.0 -> 3.3.0; nixos/harmonia: add services.harmonia.gc"
+  ],
+  [
+    564936,
+    "name:nextcloud",
+    "nextcloud32: drop, nextcloud32Packages: drop"
+  ]
+]
