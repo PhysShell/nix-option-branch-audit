@@ -51,23 +51,131 @@ def load_population(path: Path) -> dict[int, dict]:
     return {row["number"]: row for row in rows}
 
 
+
+# A blocklist of specific known-generic filenames can never be
+# complete -- found on review after the first version's blocklist
+# (default/index only) let "base", "server", "service" through as
+# spurious, dangerously generic subject names (real examples:
+# `pkgs/servers/web-apps/szurubooru/server.nix`,
+# `nixos/tests/kubernetes/base.nix`,
+# `.../github-runner/service.nix` -- none of these files' own STEM is
+# the real subject, the real subject is the directory they live in).
+# Widening the blocklist only fixed the specific names already found
+# by inspection (a second pass immediately turned up more: "json",
+# "package", "process", "update", "script", "systemd", "aliases" --
+# see the git history of this function). A blocklist approach doesn't
+# converge. Replaced with a STRUCTURAL rule instead: for the two path
+# shapes this ledger actually cares about (a service module under
+# nixos/modules/services/<category>/, or a test under nixos/tests/),
+# the subject is the directory immediately following that category
+# root whenever the file is nested inside one -- regardless of what
+# the leaf filename happens to be called -- and only the bare file
+# stem for the canonical single-file form
+# (nixos/modules/services/<category>/<name>.nix,
+# nixos/tests/<name>.nix). A small blocklist is kept only as a
+# fallback for paths outside these two shapes (e.g. pkgs/**), where
+# the structural rule doesn't apply and the risk surface is smaller.
+_GENERIC_FALLBACK = {
+    "default",
+    "index",
+    "base",
+    "server",
+    "service",
+    "client",
+    "common",
+    "shared",
+    "core",
+    "main",
+    "config",
+    "module",
+    "test",
+    "tests",
+    "types",
+    "options",
+    "lib",
+    "utils",
+    "settings",
+    "json",
+    "package",
+    "process",
+    "update",
+    "script",
+    "systemd",
+    "aliases",
+    "networking",
+    "firewall",
+    "domain",
+    "mail",
+    "port",
+    "socket",
+    "user",
+    "users",
+    "group",
+    "backup",
+    "database",
+    "storage",
+    "logging",
+    "monitoring",
+    "security",
+    "auth",
+    "session",
+    "cli",
+    "daemon",
+    "agent",
+    "worker",
+    "queue",
+    "cache",
+    "state",
+}
+
+
 def subject_from_path(path: str) -> str | None:
-    """Best-effort real-subject extraction from a real nixpkgs file path:
-    the basename of a nixos/modules/services/**/<name>.nix or
-    nixos/tests/<name>.nix path, stripping the .nix extension and any
-    default/index-style filename that doesn't itself carry a subject
-    name (default.nix, index.nix)."""
+    """Real-subject extraction from a real nixpkgs file path. See the
+    module-level comment above for why this is structural, not a
+    filename blocklist.
+
+    nixos/modules/services/<category>/<rest...> -- <category> (e.g.
+    "networking", "web-apps") is ALWAYS present and is never itself
+    the subject; skip it explicitly, then apply the single-file-vs-
+    nested rule to whatever remains.
+    nixos/tests/<rest...> -- no category segment to skip.
+    pkgs/by-name/<2-char-prefix>/<name>/<rest...> -- the same nested-
+    generic-filename problem showed up here too on review
+    (pkgs/by-name/pd/pdfding/frontend.nix, pkgs/by-name/da/dawarich/
+    gemset.nix -- "frontend"/"gemset" are common package-internal
+    filenames, never the real subject); same treatment.
+    """
     p = Path(path)
     if p.suffix != ".nix":
         return None
-    stem = p.stem
-    if stem in ("default", "index"):
-        # the real subject is usually the PARENT directory name for
-        # these (e.g. nixos/modules/services/networking/kea/default.nix)
-        stem = p.parent.name
-    if not stem or stem in ("default", "index"):
+    parts = p.parts
+
+    def subject_from_rest(rest: tuple[str, ...]) -> str | None:
+        if not rest:
+            return None
+        if len(rest) == 1:
+            return Path(rest[0]).stem  # canonical single-file form
+        return rest[0]  # nested: directory right after the category root
+
+    subj = None
+    if len(parts) >= 4 and parts[0] == "nixos" and parts[1] == "modules" and parts[2] == "services":
+        subj = subject_from_rest(parts[4:])  # skip nixos/modules/services/<category>
+    elif len(parts) >= 2 and parts[0] == "nixos" and parts[1] == "tests":
+        subj = subject_from_rest(parts[2:])  # skip nixos/tests
+    elif len(parts) >= 3 and parts[0] == "pkgs" and parts[1] == "by-name":
+        subj = subject_from_rest(parts[3:])  # skip pkgs/by-name/<2-char-prefix>
+
+    if subj is None:
+        # outside the three structural shapes this ledger cares about
+        # -- fall back to the bounded blocklist.
+        stem = p.stem
+        if stem in _GENERIC_FALLBACK:
+            stem = p.parent.name
+        subj = stem
+
+    if not subj or subj in _GENERIC_FALLBACK:
         return None
-    return stem.lower()
+    return subj.lower()
 
 
 def main() -> None:
@@ -140,13 +248,27 @@ def main() -> None:
                 if subj:
                     record(subj, f"{label} PR #{n} ({path})")
 
-    # 3. S2-F3's own real exporter census (93 real module names).
+    # 3. S2-F3's own real exporter census (93 real module names). A
+    # real, empirical check found several exporter names are
+    # themselves generic-sounding English/vocabulary words ("domain",
+    # "json", "mail", "process", "script", "systemd" -- real exporter
+    # subjects, e.g. a genuine json-exporter module, not extraction
+    # noise) -- broad title-substring/path-segment matching against
+    # them (the same matcher ordinary subject names use) collaterally
+    # excluded 43 of 554 real, entirely unrelated fresh candidates
+    # (e.g. "nixos/rustical: fix unix domain socket support" matching
+    # "domain"). Excluded via their own REAL, EXACT module path only
+    # (nixos/modules/services/monitoring/prometheus/exporters/<name>.nix)
+    # instead of the generic subject-name matcher -- correctly excludes
+    # a PR that touches the actual censused exporter module, without
+    # the collateral damage of a bare-word title match.
     exporter_file = ROOT / "fixtures/s2-f3-exporters-census/exporter-names-93.txt"
     exporter_names = [
         line.strip() for line in exporter_file.read_text().splitlines() if line.strip()
     ]
     for name in exporter_names:
-        record(name, "S2-F3 exporter census")
+        exporter_path = f"nixos/modules/services/monitoring/prometheus/exporters/{name}.nix"
+        record_path(module_paths, exporter_path, "S2-F3 exporter census")
 
     # 4. This repo's own golden/synthetic fixture subjects -- real
     # subject names already baked into the test suite itself.
@@ -170,15 +292,30 @@ def main() -> None:
     # from a prior round's own hand-compiled list). Any name in the old
     # lists NOT independently reproduced by the mechanical extraction
     # above is flagged separately below, for disclosure, not silently
-    # dropped or silently trusted.
+    # dropped or silently trusted -- EXCEPT a name that is itself in
+    # `_GENERIC_FALLBACK`: a real, empirical check found the old lists
+    # contain their OWN generic-term false positives ("systemd",
+    # "networking", "firewall", "script", "domain", "mail", ...),
+    # apparently from the same subject-extraction imprecision this
+    # round's own mechanical extraction was JUST fixed for (see
+    # subject_from_path's own history). Blindly unioning those into a
+    # fresh 554-candidate population would silently reintroduce the
+    # exact over-exclusion bug this ledger's whole redesign exists to
+    # avoid, through the old lists as a back door. These are DROPPED,
+    # not flagged-but-kept, and recorded in their own separate,
+    # disclosed bucket below.
     old_lists = {
         "S1 113-name list": s1_dir / "exclusion-name-list.txt",
         "S3 254-name list": s3_dir / "exclusion-name-list-253.txt",
     }
     old_only: dict[str, list[str]] = {}
+    old_dropped_as_generic: dict[str, list[str]] = {}
     for label, path in old_lists.items():
         names = {n.strip().lower() for n in path.read_text().splitlines() if n.strip()}
         for n in names:
+            if n in _GENERIC_FALLBACK:
+                old_dropped_as_generic.setdefault(n, []).append(label)
+                continue
             if n not in provenance:
                 old_only.setdefault(n, []).append(label)
             else:
@@ -199,6 +336,7 @@ def main() -> None:
             "exporter_census_names": len(exporter_names),
             "repo_fixture_subject_hits": len(fixture_subject_hits),
             "old_list_names_not_independently_reproduced": len(old_only),
+            "old_list_names_dropped_as_generic": len(old_dropped_as_generic),
         },
         "excluded_pr_numbers": sorted(pr_numbers.keys()),
         "excluded_pr_numbers_provenance": {str(k): v for k, v in sorted(pr_numbers.items())},
@@ -208,6 +346,7 @@ def main() -> None:
         "excluded_module_paths_provenance": {k: v for k, v in sorted(module_paths.items())},
         "excluded_test_paths": sorted(test_paths.keys()),
         "excluded_test_paths_provenance": {k: v for k, v in sorted(test_paths.items())},
+        "old_list_names_dropped_as_generic": sorted(old_dropped_as_generic.keys()),
     }
 
     out_path = ROOT / "fixtures/s4-live-pr-shadow/exclusion-ledger.json"
@@ -220,6 +359,9 @@ def main() -> None:
     print(f"Names present in an old hand-compiled list but NOT independently reproduced: {len(old_only)}")
     if old_only:
         print("  ->", ", ".join(sorted(old_only)[:30]), "..." if len(old_only) > 30 else "")
+    print(f"Names from an old list DROPPED as too generic (never included): {len(old_dropped_as_generic)}")
+    if old_dropped_as_generic:
+        print("  ->", ", ".join(sorted(old_dropped_as_generic)))
 
 
 if __name__ == "__main__":
