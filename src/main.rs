@@ -5152,14 +5152,49 @@ fn oba_kind_class(kind: VerdictKind) -> ResultVerdict {
     }
 }
 
+/// S2-F2 (a real nixpkgs PR shadow audit): a second, INDEPENDENT axis
+/// from `bucket` -- deliberately NOT a new bucket, NOT a rename, and
+/// NOT a change to any existing count (see the S2 results this closes:
+/// `#547038`'s real `new_finding` on `recommendedBrotliSettings` was
+/// technically correct, but reads as "this PR introduced a problem"
+/// when the true event was "this PR's own brand-new test file made an
+/// ALREADY-untested, pre-existing option observable for the first
+/// time"). `bucket` still answers "what changed"; `transition_origin`
+/// answers "why does this look new" -- a maintainer-facing framing
+/// question, never a re-derivation of correctness.
+///
+/// - `SubjectAdded`: the whole subject (an OBA module, a CDC candidate)
+///   is genuinely brand new -- absent on `--base-root` because it did
+///   not exist there at all. A real "this PR introduced this."
+/// - `AnalysisBecamePossible`: the subject already existed, but this
+///   result was previously impossible to determine and now is --
+///   either because the SAME subject's own analysis went from
+///   `Inconclusive` to a real verdict (a same-subject `Changed`
+///   transition where `from` was `Inconclusive`), or because only the
+///   TEST needed to exercise an already-existing module was missing
+///   and this PR is the first to add one. A real "this existing gap
+///   just became visible", never "this PR created it."
+/// - `VerdictChanged`: the same subject, already analyzable on BOTH
+///   sides, whose real prior verdict (`Pass` or `Finding`, never
+///   `Inconclusive`) genuinely changed. The one case that really does
+///   mean "something about this PR's own code changed the outcome."
+#[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+enum TransitionOrigin {
+    SubjectAdded,
+    AnalysisBecamePossible,
+    VerdictChanged,
+}
+
 /// A bounded, already-classified transition worth a maintainer's
 /// immediate attention -- P3c's own real requirement: a consuming
 /// GitHub Action must never re-derive "is this a new finding" from raw
 /// JSON itself (that would smuggle real analysis logic into YAML/jq).
 /// Every field here is either a bare fact already decided elsewhere
-/// (`bucket`/`engine`/`code`) or existing text this analysis already
-/// produced verbatim (`message`/`detail`, the single most specific
-/// existing provenance line) -- nothing here is new judgment.
+/// (`bucket`/`engine`/`code`/`transition_origin`) or existing text this
+/// analysis already produced verbatim (`message`/`detail`, the single
+/// most specific existing provenance line) -- nothing here is new
+/// judgment made by a consumer.
 #[derive(Serialize, Debug, Clone, PartialEq)]
 struct NotableChange {
     bucket: &'static str,
@@ -5170,6 +5205,10 @@ struct NotableChange {
     message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     detail: Option<String>,
+    /// `None` only for `removed_subject_with_finding` -- a removal has
+    /// no "why does this look new" question to answer.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    transition_origin: Option<TransitionOrigin>,
 }
 
 /// Per invariant-adjacent P3c requirement: the summary stays bounded
@@ -5258,6 +5297,7 @@ fn push_notable(
     engine: &'static str,
     subject: String,
     result: &AuditResult,
+    transition_origin: Option<TransitionOrigin>,
 ) {
     *notable_total += 1;
     if notable.len() < NOTABLE_LIMIT {
@@ -5268,6 +5308,7 @@ fn push_notable(
             code: result.code,
             message: result.message.clone(),
             detail: result.provenance.last().cloned(),
+            transition_origin,
         });
     }
 }
@@ -5306,10 +5347,25 @@ fn record_bucket(
     engine: &'static str,
     subject: String,
     result: &AuditResult,
+    transition_origin: Option<TransitionOrigin>,
 ) {
     bump_summary_bucket(summary, bucket);
     if bucket != "resolved_finding" {
-        push_notable(&mut summary.notable, notable_total, bucket, engine, subject, result);
+        push_notable(&mut summary.notable, notable_total, bucket, engine, subject, result, transition_origin);
+    }
+}
+
+/// S2-F2: classifies a same-subject `Changed` transition's own
+/// `transition_origin` -- `AnalysisBecamePossible` when the PRIOR
+/// verdict (`from`) was `Inconclusive` (we gained the ability to say
+/// something for the first time, regardless of what we can now say);
+/// `VerdictChanged` otherwise (`from` was a real `Pass` or `Finding`,
+/// a determinate prior verdict that genuinely changed).
+fn transition_origin_for_change(from: ResultVerdict) -> TransitionOrigin {
+    if from == ResultVerdict::Inconclusive {
+        TransitionOrigin::AnalysisBecamePossible
+    } else {
+        TransitionOrigin::VerdictChanged
     }
 }
 
@@ -5425,18 +5481,34 @@ fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
     out.push('\n');
 
     for n in &summary.notable {
-        let heading = match n.bucket {
-            "new_finding" => "NEW FINDING",
-            "new_inconclusive" => "NEW INCONCLUSIVE",
-            "finding_became_inconclusive" => "FINDING BECAME INCONCLUSIVE",
-            "resolved_inconclusive" => "RESOLVED INCONCLUSIVE",
-            "removed_subject_with_finding" => "REMOVED SUBJECT (HAD A FINDING)",
+        // S2-F2: `transition_origin` overrides the DEFAULT bucket
+        // heading specifically when the real reason this looks new is
+        // "an already-existing branch just became analyzable", never
+        // "this PR introduced a problem" -- the exact real framing gap
+        // a live shadow audit found (`#547038`'s real `new_finding` on
+        // an option the PR never touched, surfaced only because the PR
+        // happened to add that module's FIRST test file). The bucket
+        // itself, and every count derived from it, is completely
+        // unchanged -- this only ever affects which heading text a
+        // consuming Action prints, never what's counted as what.
+        let heading = match (n.bucket, n.transition_origin) {
+            ("new_finding", Some(TransitionOrigin::AnalysisBecamePossible)) => {
+                "EXISTING UNCOVERED BRANCH BECAME OBSERVABLE"
+            }
+            ("new_inconclusive", Some(TransitionOrigin::AnalysisBecamePossible)) => {
+                "EXISTING BRANCH BECAME OBSERVABLE (STILL INCONCLUSIVE)"
+            }
+            ("new_finding", _) => "NEW FINDING",
+            ("new_inconclusive", _) => "NEW INCONCLUSIVE",
+            ("finding_became_inconclusive", _) => "FINDING BECAME INCONCLUSIVE",
+            ("resolved_inconclusive", _) => "RESOLVED INCONCLUSIVE",
+            ("removed_subject_with_finding", _) => "REMOVED SUBJECT (HAD A FINDING)",
             // Defensive: `record_bucket` never calls this with
             // "resolved_finding" (the one bucket that stays count-only,
             // see its own doc comment) or an unrecognized label, but this
             // function never assumes that silently -- either still
             // renders, just without a specially-cased heading.
-            other => other,
+            (other, _) => other,
         };
         let _ = writeln!(out, "### {heading}");
         let _ = writeln!(out, "**{}** `{}` ({})", n.code.unwrap_or("-"), n.subject, n.engine);
@@ -5487,6 +5559,18 @@ fn run_audit_diff(
             .iter()
             .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
     };
+    // S2-F2 (a real nixpkgs PR shadow audit): S2 found technically
+    // correct findings that read as "this PR introduced a problem" when
+    // the real event was "this PR merely made an already-existing
+    // branch analyzable for the first time" (e.g. a brand-new test file
+    // added for a module that already existed, or a declaration
+    // refactor the scanner now recognizes). `module_birth_paths` tracks
+    // which `Added` targets are absent on `--base-root` because the
+    // MODULE ITSELF is new (a real "this PR created this"), as opposed
+    // to the module already existing there with only its TEST missing
+    // (a real "this PR only made it observable") -- the distinction
+    // `transition_origin` (below) needs to tell the two apart honestly.
+    let mut module_birth_paths: std::collections::HashSet<PathBuf> = std::collections::HashSet::new();
     let (oba_entries, base_oba_inconclusive, head_oba_inconclusive) = if manifest.target.is_empty() {
         (Vec::new(), false, false)
     } else {
@@ -5502,7 +5586,12 @@ fn run_audit_diff(
             let on_head = head_module.is_some() && head_test.is_some();
             match (on_base, on_head) {
                 (true, true) => both_present.push(t.clone()),
-                (false, true) => only_on_head.push(t.clone()),
+                (false, true) => {
+                    if base_module.is_none() {
+                        module_birth_paths.insert(t.module.clone());
+                    }
+                    only_on_head.push(t.clone());
+                }
                 (true, false) => only_on_base.push(t.clone()),
                 (false, false) => anyhow::bail!(
                     "target {}: module/test present under NEITHER --base-root nor --head-root -- a real manifest/input error, not a PR-introduced module addition or removal",
@@ -5603,6 +5692,11 @@ fn run_audit_diff(
                 summary.added += 1;
                 if let Some(bucket) = added_bucket(oba_kind_class(head.verdict.kind())) {
                     let result = oba_verdict_to_result(&entry.identity.watched_path, &head.verdict);
+                    let origin = if module_birth_paths.contains(&entry.identity.module) {
+                        TransitionOrigin::SubjectAdded
+                    } else {
+                        TransitionOrigin::AnalysisBecamePossible
+                    };
                     record_bucket(
                         &mut summary,
                         &mut notable_total,
@@ -5610,6 +5704,7 @@ fn run_audit_diff(
                         "oba",
                         entry.identity.watched_path.clone(),
                         &result,
+                        Some(origin),
                     );
                 }
             }
@@ -5624,6 +5719,7 @@ fn run_audit_diff(
                         "oba",
                         entry.identity.watched_path.clone(),
                         &result,
+                        None,
                     );
                 }
             }
@@ -5648,6 +5744,7 @@ fn run_audit_diff(
                     "oba",
                     entry.identity.watched_path.clone(),
                     &result,
+                    Some(transition_origin_for_change(from_class)),
                 );
             }
         }
@@ -5658,13 +5755,27 @@ fn run_audit_diff(
             CdcDiff::AddedSubject { head } => {
                 summary.cdc_added_subject += 1;
                 if let Some(bucket) = added_bucket(head.verdict) {
-                    record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), head);
+                    // No finer distinction available for CDC: a
+                    // candidate becoming analyzable for the first time
+                    // always means it wasn't before -- unlike OBA's own
+                    // module-vs-test-birth split, there's no equivalent
+                    // "the candidate existed but only its test was
+                    // missing" shape in CDC's own model.
+                    record_bucket(
+                        &mut summary,
+                        &mut notable_total,
+                        bucket,
+                        "cdc",
+                        entry.candidate.clone(),
+                        head,
+                        Some(TransitionOrigin::SubjectAdded),
+                    );
                 }
             }
             CdcDiff::RemovedSubject { base } => {
                 summary.cdc_removed_subject += 1;
                 if let Some(bucket) = removed_with_finding_bucket(base.verdict) {
-                    record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), base);
+                    record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), base, None);
                 }
             }
             CdcDiff::Changed { .. } => summary.changed += 1,
@@ -5679,7 +5790,15 @@ fn run_audit_diff(
                 unreachable!("verdict_transition() is only Some for CdcDiff::Changed")
             };
             if let Some(bucket) = classify_transition_bucket(from, to) {
-                record_bucket(&mut summary, &mut notable_total, bucket, "cdc", entry.candidate.clone(), head);
+                record_bucket(
+                    &mut summary,
+                    &mut notable_total,
+                    bucket,
+                    "cdc",
+                    entry.candidate.clone(),
+                    head,
+                    Some(transition_origin_for_change(from)),
+                );
             }
         } else if matches!(entry.diff, CdcDiff::Changed { .. }) {
             summary.evidence_changed += 1;
@@ -7860,7 +7979,15 @@ mod tests {
 
         let mut notable = Vec::new();
         let mut total = 0usize;
-        push_notable(&mut notable, &mut total, "new_finding", "cdc", "akkoma".to_string(), boxed_head);
+        push_notable(
+            &mut notable,
+            &mut total,
+            "new_finding",
+            "cdc",
+            "akkoma".to_string(),
+            boxed_head,
+            Some(TransitionOrigin::VerdictChanged),
+        );
         assert_eq!(total, 1);
         assert_eq!(notable.len(), 1);
         assert_eq!(notable[0].bucket, "new_finding");
@@ -7881,7 +8008,15 @@ mod tests {
         let mut notable = Vec::new();
         let mut total = 0usize;
         for i in 0..(NOTABLE_LIMIT + 5) {
-            push_notable(&mut notable, &mut total, "new_finding", "cdc", format!("candidate-{i}"), &result);
+            push_notable(
+                &mut notable,
+                &mut total,
+                "new_finding",
+                "cdc",
+                format!("candidate-{i}"),
+                &result,
+                Some(TransitionOrigin::SubjectAdded),
+            );
         }
         assert_eq!(total, NOTABLE_LIMIT + 5);
         assert_eq!(notable.len(), NOTABLE_LIMIT);
@@ -7931,6 +8066,7 @@ mod tests {
                 code: Some("CDC001"),
                 message: "emitted path is not in the accepted contract".to_string(),
                 detail: Some("mismatch: :instance.upload_dir".to_string()),
+                transition_origin: Some(TransitionOrigin::SubjectAdded),
             }],
             ..Default::default()
         };
@@ -7953,6 +8089,7 @@ mod tests {
                 code: Some("CDC002"),
                 message: "consumer binding could not be proven".to_string(),
                 detail: None,
+                transition_origin: Some(TransitionOrigin::VerdictChanged),
             }],
             ..Default::default()
         };
@@ -7971,6 +8108,7 @@ mod tests {
             code: None,
             message: "m".to_string(),
             detail: None,
+            transition_origin: Some(TransitionOrigin::SubjectAdded),
         });
         assert!(!render_github_summary(&summary, 0).contains("more in the full artifact"));
 
@@ -8044,7 +8182,15 @@ mod tests {
         let mut summary = AuditDiffSummary::default();
         let mut total = 0usize;
         let result = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
-        record_bucket(&mut summary, &mut total, "resolved_finding", "cdc", "unpackerr".to_string(), &result);
+        record_bucket(
+            &mut summary,
+            &mut total,
+            "resolved_finding",
+            "cdc",
+            "unpackerr".to_string(),
+            &result,
+            Some(TransitionOrigin::VerdictChanged),
+        );
         assert_eq!(summary.resolved_findings, 1);
         assert_eq!(total, 0);
         assert!(summary.notable.is_empty());
@@ -8055,7 +8201,15 @@ mod tests {
         let mut summary = AuditDiffSummary::default();
         let mut total = 0usize;
         let result = cdc_result("unpackerr", ResultVerdict::Pass, &["debug"]);
-        record_bucket(&mut summary, &mut total, "resolved_inconclusive", "cdc", "unpackerr".to_string(), &result);
+        record_bucket(
+            &mut summary,
+            &mut total,
+            "resolved_inconclusive",
+            "cdc",
+            "unpackerr".to_string(),
+            &result,
+            Some(TransitionOrigin::AnalysisBecamePossible),
+        );
         assert_eq!(summary.resolved_inconclusives, 1);
         assert_eq!(total, 1);
         assert_eq!(summary.notable.len(), 1);
@@ -8074,6 +8228,7 @@ mod tests {
             "cdc",
             "unpackerr".to_string(),
             &result,
+            None,
         );
         assert_eq!(summary.removed_subjects_with_finding, 1);
         assert_eq!(total, 1);

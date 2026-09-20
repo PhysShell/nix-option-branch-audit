@@ -612,3 +612,61 @@ fn audit_diff_module_missing_on_both_sides_is_a_real_tool_error_at_the_cli() {
     assert_eq!(exit_code(&out), 3, "stderr: {}", String::from_utf8_lossy(&out.stderr));
     assert!(String::from_utf8_lossy(&out.stderr).contains("present under NEITHER"));
 }
+
+// =======================================================================
+// S2-F2: `transition_origin` -- a real nixpkgs PR shadow audit (S2)
+// found technically-correct findings reading as "this PR introduced a
+// problem" when the real event was "this PR merely made an
+// already-existing branch analyzable". These pin down the two real
+// `Added`-shaped cases the distinction depends on: a genuinely NEW
+// module (both files absent at base -> subject_added) versus an
+// already-existing module gaining its FIRST real test (module present,
+// only the test absent at base -> analysis_became_possible).
+// =======================================================================
+
+#[test]
+fn audit_diff_true_module_birth_has_subject_added_origin() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/before-empty",
+        "--head-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/after-with-module",
+        "--targets",
+        "fixtures/synthetic/audit-diff-module-lifecycle/targets.toml",
+        "--format",
+        "json",
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    assert_eq!(v["summary"]["notable"][0]["transition_origin"], "subject_added");
+}
+
+#[test]
+fn audit_diff_test_birth_on_a_pre_existing_module_has_analysis_became_possible_origin() {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/before-module-only",
+        "--head-root",
+        "fixtures/synthetic/audit-diff-module-lifecycle/after-with-module",
+        "--targets",
+        "fixtures/synthetic/audit-diff-module-lifecycle/targets.toml",
+        "--format",
+        "json",
+        "--summary-path",
+        std::env::temp_dir().join("oba-test-s2f2-summary.md").to_str().unwrap(),
+    ]);
+    assert_eq!(exit_code(&out), 0, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    assert_eq!(v["summary"]["notable"][0]["bucket"], "new_finding");
+    assert_eq!(v["summary"]["notable"][0]["transition_origin"], "analysis_became_possible");
+
+    // and the real rendered markdown must use the reframed heading, not
+    // the default "NEW FINDING" one -- the whole point of this fix.
+    let summary_path = std::env::temp_dir().join("oba-test-s2f2-summary.md");
+    let markdown = std::fs::read_to_string(&summary_path).expect("summary file was written");
+    assert!(markdown.contains("### EXISTING UNCOVERED BRANCH BECAME OBSERVABLE"));
+    assert!(!markdown.contains("### NEW FINDING"));
+    let _ = std::fs::remove_file(&summary_path);
+}
