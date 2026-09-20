@@ -1,6 +1,6 @@
 [package]
 name = "oba"
-version = "0.4.3"
+version = "0.4.4"
 edition = "2021"
 description = "Layer-1 spike: option branch activation evidence for NixOS modules"
 repository = "https://github.com/PhysShell/nix-option-branch-audit"
