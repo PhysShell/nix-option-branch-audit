@@ -2540,6 +2540,40 @@ fn walk_config_tree(
     }
 }
 
+/// S3-F1: `specialisation.<literal-name>.configuration` is a real,
+/// generic NixOS option (`nixos/modules/system/boot/specialisation.nix`)
+/// whose own value is exactly another whole NixOS module config tree for
+/// the SAME instance -- structurally identical to an explicit `config =
+/// {...};` block one level deeper, not a different namespace. Strips the
+/// first such literal, three-segment marker found anywhere in the
+/// accumulated path so real evidence underneath normalizes to its real
+/// option path, instead of being filed under a path no watched option
+/// can ever match (the real #510342 false-finding shape: `specialisation.
+/// userborn.configuration.services.userborn.enable` never matched the
+/// watched `services.userborn.enable`, silently, with no opacity either).
+/// Scans the WHOLE accumulated path, not just this call's own new
+/// segments, because the three markers can be split across nested calls
+/// depending on how dotted the source was (flat-dotted in one key,
+/// fully nested, or a partially-dotted mix) -- per the S3-F1 mandate,
+/// "must work consistently for equivalent mixed forms". Only ever
+/// strips a fully LITERAL run: a dynamic specialisation name
+/// (`specialisation.${name}.configuration`) or a non-literal
+/// `configuration` value (a function call / alias) never reaches here as
+/// a clean three-segment run in the first place -- both already produce
+/// their own `Opacity` via the existing dynamic-attrpath/non-literal-
+/// value handling this same walker already has everywhere else, so this
+/// never turns opaque syntax into guessed evidence.
+fn strip_specialisation_configuration_markers(path: &mut Vec<String>) {
+    let mut i = 0;
+    while i + 2 < path.len() {
+        if path[i] == "specialisation" && path[i + 2] == "configuration" {
+            path.drain(i..i + 3);
+        } else {
+            i += 1;
+        }
+    }
+}
+
 /// Shared by ModuleRoot's shorthand branch and ConfigTree's recursive
 /// descent: extends `path` by `segs`, recurses into a nested attrset, or
 /// records a leaf `TestAssignment` (plus opacity if the leaf's value
@@ -2555,7 +2589,21 @@ fn walk_config_entry(
     out: &mut Vec<TestAssignment>,
     opacity: &mut Vec<Opacity>,
 ) {
+    // A full clone-and-restore, not a length-based truncate: the
+    // specialisation-marker strip below can remove elements that were
+    // appended by an OUTER caller (not just this call's own `segs`),
+    // e.g. when several sibling `specialisation.<name>.configuration`
+    // entries share one `specialisation = {...}` parent -- the first
+    // sibling's strip can eat into the shared `"specialisation"` prefix
+    // itself. After that, `path.len()` can end up SHORTER than
+    // `original_len`, and `Vec::truncate` only ever shrinks, so it could
+    // never restore the lost prefix for the next sibling. A real bug
+    // caught by re-running this fix against #510342's actual real test
+    // file (4 sibling specialisations, not just 1) after the
+    // single-specialisation unit tests already passed.
+    let original: Vec<String> = path.clone();
     path.extend(segs.iter().cloned());
+    strip_specialisation_configuration_markers(path);
     let body = unwrap_lambda_chain(value.clone());
 
     if body.kind() == NODE_ATTR_SET {
@@ -2579,9 +2627,7 @@ fn walk_config_entry(
         });
     }
 
-    for _ in 0..segs.len() {
-        path.pop();
-    }
+    *path = original;
 }
 
 // ---------------------------------------------------------------------
@@ -6350,6 +6396,310 @@ mod tests {
                 .iter()
                 .any(|o| path_eq(&o.path, &["systemd", "tmpfiles", "settings", "ifm-data-dir"])),
             "the dynamic ${{config...}} key must be recorded as opacity, not silently skipped; got {opacity:?}"
+        );
+    }
+
+    // --- S3-F1: specialisation.<name>.configuration visibility ---------
+    //
+    // Root reproducer: real S3 PR #510342 (userborn) produced a FALSE
+    // FINDING on `enable` -- the real test genuinely flips
+    // `cfg.enable` via `specialisation.userborn.configuration.services.
+    // userborn.enable = lib.mkForce true;`, but the walker filed this
+    // real assignment under the literal, unnormalized path
+    // `["specialisation","userborn","configuration","services",
+    // "userborn","enable"]`, which never matches the real watched path
+    // `["services","userborn","enable"]` -- not opacity, not a match,
+    // just silently useless evidence. `specialisation.<name>.
+    // configuration` is a real, generic NixOS option (nixos/modules/
+    // system/boot/specialisation.nix): its own value is exactly another
+    // whole NixOS module config tree for the SAME instance, structurally
+    // no different from an explicit `config = {...};` block one level
+    // deeper. Per the S3-F1 mandate, this must be fixed at the
+    // structural test-config walker (treating a literal `specialisation.
+    // <literal-name>.configuration` prefix as transparent, exactly like
+    // `config` already is at module root), not by recognizing
+    // `switch()`/parsing the Python test script (that would be
+    // runtime-observability, out of this scanner's Layer-1 contract) and
+    // not by special-casing "userborn" or "enable".
+
+    /// The real #510342 shape, flat-dotted-in-one-key -- the actual form
+    /// found in nixpkgs.
+    #[test]
+    fn specialisation_configuration_flat_dotted_is_visible_as_real_evidence() {
+        let src = r#"
+        {
+          nodes.machine = { config, ... }: {
+            services.userborn.enable = false;
+            specialisation.userborn.configuration.services.userborn.enable = true;
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+
+        let hits: Vec<_> = assignments
+            .iter()
+            .filter(|a| path_eq(&a.path, &["services", "userborn", "enable"]))
+            .collect();
+        assert_eq!(
+            hits.len(),
+            2,
+            "expected the ordinary top-level assignment AND the specialisation's own assignment to both be found under the SAME normalized path, got {assignments:?}"
+        );
+        assert!(
+            hits.iter().any(|a| a.value_class == ValueClass::Bool(true)),
+            "the specialisation's own real `true` assignment must be one of the matches, got {hits:?}"
+        );
+        assert!(
+            hits.iter().all(|a| a.instance.as_deref() == Some("machine")),
+            "evidence must stay attributed to the instance it was found under, got {hits:?}"
+        );
+        // A plain boolean literal is not itself opaque -- this assertion
+        // is specifically about the specialisation-marker STRIP not
+        // manufacturing opacity on its own. A `lib.mkForce`-wrapped value
+        // legitimately produces its own, unrelated opacity (a pre-existing,
+        // correct behavior for any function-call-wrapped leaf, everywhere
+        // in this walker, not specific to specialisations) -- exercised
+        // separately by the fully-nested/partially-dotted variants below,
+        // which don't assert opacity.is_empty().
+        assert!(
+            opacity.is_empty(),
+            "a literal, fully-resolved specialisation shape must not itself produce opacity, got {opacity:?}"
+        );
+    }
+
+    /// The same real shape, but written fully nested (`specialisation =
+    /// { userborn = { configuration = { ... }; }; };`) -- per the
+    /// mandate, "must work consistently for equivalent mixed forms".
+    #[test]
+    fn specialisation_configuration_fully_nested_is_visible_as_real_evidence() {
+        let src = r#"
+        {
+          nodes.machine = {
+            specialisation = {
+              userborn = {
+                configuration = {
+                  services.userborn.enable = lib.mkForce true;
+                };
+              };
+            };
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, _opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "userborn", "enable"])
+                    && a.value_source.contains("mkForce true")),
+            "the fully-nested form must normalize to the same real option path as the flat-dotted form, got {assignments:?}"
+        );
+    }
+
+    /// A third, partially-dotted mixed form (`specialisation.userborn =
+    /// { configuration.services.userborn.enable = ...; };`) -- the third
+    /// point on "equivalent mixed forms" the mandate names.
+    #[test]
+    fn specialisation_configuration_partially_dotted_is_visible_as_real_evidence() {
+        let src = r#"
+        {
+          nodes.machine = {
+            specialisation.userborn = {
+              configuration.services.userborn.enable = lib.mkForce true;
+            };
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, _opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "userborn", "enable"])
+                    && a.value_source.contains("mkForce true")),
+            "the partially-dotted form must normalize identically, got {assignments:?}"
+        );
+    }
+
+    /// Negative control 1/4: a DYNAMIC specialisation name
+    /// (`specialisation.${name}.configuration = ...`) must stay opaque,
+    /// never guessed at -- "preserve fail-closed behavior for dynamic or
+    /// genuinely unresolved specialization structure" from the mandate.
+    #[test]
+    fn specialisation_with_dynamic_name_stays_opaque_not_guessed() {
+        let src = r#"
+        {
+          nodes.machine = { name, ... }: {
+            specialisation.${name}.configuration.services.userborn.enable = true;
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            !assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "userborn", "enable"])),
+            "a dynamically-named specialisation must never be silently resolved into a real option path, got {assignments:?}"
+        );
+        assert!(
+            !opacity.is_empty(),
+            "a dynamically-named specialisation must surface as opacity rather than vanish silently"
+        );
+    }
+
+    /// Negative control 2/4: a specialisation whose `configuration` value
+    /// is not a literal attrset (a function call / alias) must stay
+    /// opaque, never treated as guessed evidence.
+    #[test]
+    fn specialisation_with_non_literal_configuration_value_stays_opaque() {
+        let src = r#"
+        {
+          nodes.machine = {
+            specialisation.userborn.configuration = someSharedConfig;
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            !assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "userborn", "enable"])),
+            "a non-literal configuration value must never be silently resolved, got {assignments:?}"
+        );
+        assert!(
+            !opacity.is_empty(),
+            "a non-literal specialisation configuration must surface as opacity, got none"
+        );
+    }
+
+    /// Negative control 3/4: evidence inside a specialisation must not
+    /// leak into a DIFFERENT, unrelated watched option in the same
+    /// instance.
+    #[test]
+    fn specialisation_evidence_does_not_leak_into_an_unrelated_option() {
+        let src = r#"
+        {
+          nodes.machine = {
+            specialisation.userborn.configuration.services.userborn.enable = lib.mkForce true;
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, _opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            !assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "somethingElse", "enable"])),
+            "evidence for one option must never match an unrelated watched option, got {assignments:?}"
+        );
+    }
+
+    /// Negative control 4/4: evidence inside one instance's specialisation
+    /// must not leak into a DIFFERENT node instance.
+    #[test]
+    fn specialisation_evidence_does_not_leak_into_a_different_instance() {
+        let src = r#"
+        {
+          nodes.machine = {
+            specialisation.userborn.configuration.services.userborn.enable = lib.mkForce true;
+          };
+          nodes.other = {
+            services.userborn.enable = false;
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, _opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        let other_hits: Vec<_> = assignments
+            .iter()
+            .filter(|a| {
+                path_eq(&a.path, &["services", "userborn", "enable"])
+                    && a.instance.as_deref() == Some("other")
+            })
+            .collect();
+        assert_eq!(
+            other_hits.len(),
+            1,
+            "the `other` instance must see only its own real assignment, not the machine instance's specialisation evidence, got {assignments:?}"
+        );
+        assert_eq!(
+            other_hits[0].value_source.trim(),
+            "false",
+            "the `other` instance's own real value must be unaffected, got {other_hits:?}"
+        );
+    }
+
+    /// Regression for a real bug caught while re-verifying this fix
+    /// against the actual #510342 fixture (which has FOUR sibling
+    /// specialisations under one shared `specialisation = {...};` block,
+    /// not just one): stripping the marker for the FIRST sibling must
+    /// not corrupt the shared `path` prefix for the SECOND and later
+    /// siblings. An earlier version of this fix used
+    /// `path.truncate(original_len)` to restore `path` after each call,
+    /// which only ever shrinks a `Vec` -- when the strip ate into a
+    /// prefix element contributed by an OUTER caller (the shared
+    /// `"specialisation"` segment here), `path` ended up permanently
+    /// shorter than `original_len`, and `truncate` could never grow it
+    /// back for the next sibling to see.
+    #[test]
+    fn specialisation_multiple_siblings_under_one_shared_block_all_resolve_correctly() {
+        let src = r#"
+        {
+          nodes.machine = {
+            specialisation = {
+              first.configuration = {
+                users.users.ghost.enable = lib.mkForce false;
+              };
+              second.configuration = {
+                services.userborn.enable = lib.mkForce true;
+              };
+              third.configuration = {
+                services.userborn.importLegacyState = false;
+              };
+            };
+          };
+        }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty(), "fixture must parse cleanly");
+        let (assignments, _opacity) =
+            scan_test_assignments("spec-test.nix", src, root.tree().syntax());
+        assert!(
+            assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["services", "userborn", "enable"])
+                    && a.value_source.contains("mkForce true")),
+            "the SECOND sibling's real evidence must resolve to its real option path, not be lost after the first sibling's own strip, got {assignments:?}"
+        );
+        assert!(
+            assignments.iter().any(|a| path_eq(
+                &a.path,
+                &["services", "userborn", "importLegacyState"]
+            )),
+            "the THIRD sibling's real evidence must also resolve correctly, got {assignments:?}"
+        );
+        assert!(
+            assignments
+                .iter()
+                .any(|a| path_eq(&a.path, &["users", "users", "ghost", "enable"])),
+            "the FIRST sibling's own evidence must resolve too, got {assignments:?}"
         );
     }
 
