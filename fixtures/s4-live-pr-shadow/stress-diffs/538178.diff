@@ -1,0 +1,336 @@
+diff --git a/nixos/modules/services/web-apps/lasuite-meet.nix b/nixos/modules/services/web-apps/lasuite-meet.nix
+index 421af15964834..b2a3c4fe60d8c 100644
+--- a/nixos/modules/services/web-apps/lasuite-meet.nix
++++ b/nixos/modules/services/web-apps/lasuite-meet.nix
+@@ -36,48 +36,62 @@ let
+       toString value
+   ) cfg.settings;
+ 
+-  commonServiceConfig = {
+-    RuntimeDirectory = "lasuite-meet";
+-    StateDirectory = "lasuite-meet";
+-    WorkingDirectory = "/var/lib/lasuite-meet";
+-
+-    User = "lasuite-meet";
+-    DynamicUser = true;
+-    SupplementaryGroups = mkIf cfg.redis.createLocally [
+-      config.services.redis.servers.lasuite-meet.group
+-    ];
+-    # hardening
+-    AmbientCapabilities = "";
+-    CapabilityBoundingSet = [ "" ];
+-    DevicePolicy = "closed";
+-    LockPersonality = true;
+-    NoNewPrivileges = true;
+-    PrivateDevices = true;
+-    PrivateTmp = true;
+-    PrivateUsers = true;
+-    ProcSubset = "pid";
+-    ProtectClock = true;
+-    ProtectControlGroups = true;
+-    ProtectHome = true;
+-    ProtectHostname = true;
+-    ProtectKernelLogs = true;
+-    ProtectKernelModules = true;
+-    ProtectKernelTunables = true;
+-    ProtectProc = "invisible";
+-    ProtectSystem = "strict";
+-    RemoveIPC = true;
+-    RestrictAddressFamilies = [
+-      "AF_INET"
+-      "AF_INET6"
+-      "AF_UNIX"
+-    ];
+-    RestrictNamespaces = true;
+-    RestrictRealtime = true;
+-    RestrictSUIDSGID = true;
+-    SystemCallArchitectures = "native";
+-    MemoryDenyWriteExecute = true;
+-    EnvironmentFile = optional (cfg.environmentFile != null) cfg.environmentFile;
+-    UMask = "0077";
++  commonSystemdConfig = {
++    after = [
++      "network.target"
++    ]
++    ++ (optional cfg.postgresql.createLocally "postgresql.service")
++    ++ (optional cfg.redis.createLocally "redis-lasuite-meet.service");
++
++    wants =
++      (optional cfg.postgresql.createLocally "postgresql.service")
++      ++ (optional cfg.redis.createLocally "redis-lasuite-meet.service");
++
++    environment = pythonEnvironment;
++
++    serviceConfig = {
++      RuntimeDirectory = "lasuite-meet";
++      StateDirectory = "lasuite-meet";
++      WorkingDirectory = "/var/lib/lasuite-meet";
++
++      User = "lasuite-meet";
++      DynamicUser = true;
++      SupplementaryGroups = mkIf cfg.redis.createLocally [
++        config.services.redis.servers.lasuite-meet.group
++      ];
++      # hardening
++      AmbientCapabilities = "";
++      CapabilityBoundingSet = [ "" ];
++      DevicePolicy = "closed";
++      LockPersonality = true;
++      NoNewPrivileges = true;
++      PrivateDevices = true;
++      PrivateTmp = true;
++      PrivateUsers = true;
++      ProcSubset = "pid";
++      ProtectClock = true;
++      ProtectControlGroups = true;
++      ProtectHome = true;
++      ProtectHostname = true;
++      ProtectKernelLogs = true;
++      ProtectKernelModules = true;
++      ProtectKernelTunables = true;
++      ProtectProc = "invisible";
++      ProtectSystem = "strict";
++      RemoveIPC = true;
++      RestrictAddressFamilies = [
++        "AF_INET"
++        "AF_INET6"
++        "AF_UNIX"
++      ];
++      RestrictNamespaces = true;
++      RestrictRealtime = true;
++      RestrictSUIDSGID = true;
++      SystemCallArchitectures = "native";
++      MemoryDenyWriteExecute = true;
++      EnvironmentFile = optional (cfg.environmentFile != null) cfg.environmentFile;
++      UMask = "0077";
++    };
+   };
+ in
+ {
+@@ -342,74 +356,54 @@ in
+   };
+ 
+   config = mkIf cfg.enable {
+-    systemd.services.lasuite-meet = {
+-      description = "Meet from SuiteNumérique";
+-      after = [
+-        "network.target"
+-      ]
+-      ++ (optional cfg.postgresql.createLocally "postgresql.service")
+-      ++ (optional cfg.redis.createLocally "redis-lasuite-meet.service");
+-
+-      wants =
+-        (optional cfg.postgresql.createLocally "postgresql.service")
+-        ++ (optional cfg.redis.createLocally "redis-lasuite-meet.service");
+-
+-      wantedBy = [ "multi-user.target" ];
++    systemd.services.lasuite-meet = lib.mkMerge [
++      {
++        description = "Meet from SuiteNumérique";
+ 
+-      preStart = ''
+-        if [ ! -f .version ]; then
+-          touch .version
+-        fi
++        wantedBy = [ "multi-user.target" ];
+ 
+-        ${optionalString (cfg.secretKeyPath == null) ''
+-          if [[ ! -f /var/lib/lasuite-meet/django_secret_key ]]; then
+-            (
+-              umask 0377
+-              tr -dc A-Za-z0-9 < /dev/urandom | head -c64 | ${pkgs.moreutils}/bin/sponge /var/lib/lasuite-meet/django_secret_key
+-            )
++        preStart = ''
++          if [ ! -f .version ]; then
++            touch .version
+           fi
+-        ''}
+-        if [ "${cfg.package.version}" != "$(cat .version)" ]; then
+-          ${getExe cfg.package} migrate
+-          echo -n "${cfg.package.version}" > .version
+-        fi
+-      '';
+ 
+-      environment = pythonEnvironment;
++          ${optionalString (cfg.secretKeyPath == null) ''
++            if [[ ! -f /var/lib/lasuite-meet/django_secret_key ]]; then
++              (
++                umask 0377
++                tr -dc A-Za-z0-9 < /dev/urandom | head -c64 | ${pkgs.moreutils}/bin/sponge /var/lib/lasuite-meet/django_secret_key
++              )
++            fi
++          ''}
++          if [ "${cfg.package.version}" != "$(cat .version)" ]; then
++            ${getExe cfg.package} migrate
++            echo -n "${cfg.package.version}" > .version
++          fi
++        '';
+ 
+-      serviceConfig = {
+-        BindReadOnlyPaths = "${cfg.package}/share/static:/var/lib/lasuite-meet/static";
++        serviceConfig = {
++          BindReadOnlyPaths = "${cfg.package}/share/static:/var/lib/lasuite-meet/static";
+ 
+-        ExecStart = utils.escapeSystemdExecArgs (
+-          [
+-            (lib.getExe' cfg.package "gunicorn")
+-            "--bind=${cfg.bind}"
+-          ]
+-          ++ cfg.gunicorn.extraArgs
+-          ++ [ "meet.wsgi:application" ]
+-        );
++          ExecStart = utils.escapeSystemdExecArgs (
++            [
++              (lib.getExe' cfg.package "gunicorn")
++              "--bind=${cfg.bind}"
++            ]
++            ++ cfg.gunicorn.extraArgs
++            ++ [ "meet.wsgi:application" ]
++          );
++        };
+       }
+-      // commonServiceConfig;
+-    };
+-
+-    systemd.services.lasuite-meet-celery = {
+-      description = "Meet Celery broker from SuiteNumérique";
+-      after = [
+-        "network.target"
+-      ]
+-      ++ (optional cfg.postgresql.createLocally "postgresql.service")
+-      ++ (optional cfg.redis.createLocally "redis-lasuite-meet.service");
+-
+-      wants =
+-        (optional cfg.postgresql.createLocally "postgresql.service")
+-        ++ (optional cfg.redis.createLocally "redis-lasuite-meet.service");
++      commonSystemdConfig
++    ];
+ 
+-      wantedBy = [ "multi-user.target" ];
++    systemd.services.lasuite-meet-celery = lib.mkMerge [
++      {
++        description = "Meet Celery broker from SuiteNumérique";
+ 
+-      environment = pythonEnvironment;
++        wantedBy = [ "multi-user.target" ];
+ 
+-      serviceConfig = {
+-        ExecStart = utils.escapeSystemdExecArgs (
++        serviceConfig.ExecStart = utils.escapeSystemdExecArgs (
+           [ (lib.getExe' cfg.package "celery") ]
+           ++ cfg.celery.extraArgs
+           ++ [
+@@ -418,8 +412,26 @@ in
+           ]
+         );
+       }
+-      // commonServiceConfig;
+-    };
++      commonSystemdConfig
++    ];
++
++    systemd.services.lasuite-meet-clean-pending-files = lib.mkMerge [
++      {
++        description = "Scheduled job to clean up pending uploads from LaSuite Meet";
++        startAt = "daily";
++        serviceConfig.ExecStart = "${getExe cfg.package} clean_pending_files";
++      }
++      commonSystemdConfig
++    ];
++
++    systemd.services.lasuite-meet-purge-deleted-files = lib.mkMerge [
++      {
++        description = "Scheduled job to purge deleted files from LaSuite Meet";
++        startAt = "daily";
++        serviceConfig.ExecStart = "${getExe cfg.package} purge_deleted_files";
++      }
++      commonSystemdConfig
++    ];
+ 
+     services.postgresql = mkIf cfg.postgresql.createLocally {
+       enable = true;
+diff --git a/pkgs/by-name/la/lasuite-meet/frontend.nix b/pkgs/by-name/la/lasuite-meet/frontend.nix
+index a6ff5debfd6e5..4afde016f6438 100644
+--- a/pkgs/by-name/la/lasuite-meet/frontend.nix
++++ b/pkgs/by-name/la/lasuite-meet/frontend.nix
+@@ -3,17 +3,37 @@
+   version,
+   meta,
+   fetchNpmDeps,
++  fetchpatch,
+   buildNpmPackage,
+ }:
+ buildNpmPackage (finalAttrs: {
+   pname = "lasuite-meet-frontend";
+   inherit src version;
+ 
++  patches = [
++    # backport build fix
++    # FIXME: remove in next release
++    (fetchpatch {
++      url = "https://github.com/suitenumerique/meet/commit/df1495c97bc913866169ee8875a9a3169fcfc87e.diff";
++      stripLen = 2;
++      includes = [
++        "package.json"
++        "package-lock.json"
++      ];
++      hash = "sha256-1A26T6LtFlOiJNVGD/fZs562feoQXY37A2ecUfvDGpk=";
++    })
++  ];
++
+   sourceRoot = "${finalAttrs.src.name}/src/frontend";
+ 
+   npmDeps = fetchNpmDeps {
+-    inherit (finalAttrs) version src sourceRoot;
+-    hash = "sha256-YnHjuwDp293KVNTYTd4KcZqMamZNeccOdpSGgJ9a3G8=";
++    inherit (finalAttrs)
++      version
++      src
++      patches
++      sourceRoot
++      ;
++    hash = "sha256-uiD5pcpmka43uraMFo7lRuQFx/4aq1BEhQvyCAzo8fg=";
+   };
+   npmBuildScript = "build";
+ 
+diff --git a/pkgs/by-name/la/lasuite-meet/mail.nix b/pkgs/by-name/la/lasuite-meet/mail.nix
+index 128b5f6e8deed..9cdc0bbc74e3b 100644
+--- a/pkgs/by-name/la/lasuite-meet/mail.nix
++++ b/pkgs/by-name/la/lasuite-meet/mail.nix
+@@ -22,7 +22,7 @@ buildNpmPackage (finalAttrs: {
+     pname = "${finalAttrs.pname}-npm-deps";
+     inherit version src;
+     inherit (finalAttrs) sourceRoot;
+-    hash = "sha256-yq88kbrKn9HMwvxcWNXm7zonAqTs8T2i7iQAsD0TtnU=";
++    hash = "sha256-EPVkSzhecDZpvz+uOW0GZnmWl9KfE3UpkTCnhVnJ7dg=";
+   };
+   npmBuildScript = "build";
+ 
+diff --git a/pkgs/by-name/la/lasuite-meet/package.nix b/pkgs/by-name/la/lasuite-meet/package.nix
+index ee61defe5c5ed..efb0ab1e6b5e1 100644
+--- a/pkgs/by-name/la/lasuite-meet/package.nix
++++ b/pkgs/by-name/la/lasuite-meet/package.nix
+@@ -6,13 +6,13 @@
+   python3,
+ }:
+ let
+-  version = "1.21.0";
++  version = "1.22.0";
+ 
+   src = fetchFromGitHub {
+     owner = "suitenumerique";
+     repo = "meet";
+     tag = "v${version}";
+-    hash = "sha256-pUCSdnTBj/qwc0cya3P96r89r2K1GNSGg4DeIhxUKwI=";
++    hash = "sha256-w2Lw5K62Iaqzqa/ckxK36o5ZHFLXUpHnGGGl5PYGjaI=";
+   };
+ 
+   meta = {
+@@ -86,6 +86,7 @@ python.pkgs.buildPythonApplication (finalAttrs: {
+       mozilla-django-oidc
+       nested-multipart-parser
+       phonenumbers
++      posthog
+       psycopg
+       pydantic
+       pyjwt

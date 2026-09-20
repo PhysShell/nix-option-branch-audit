@@ -1,0 +1,36 @@
+diff --git a/maintainers/maintainer-list.nix b/maintainers/maintainer-list.nix
+index 63ef1e025c0d2..b4c0fbce895cc 100644
+--- a/maintainers/maintainer-list.nix
++++ b/maintainers/maintainer-list.nix
+@@ -20782,8 +20782,9 @@
+     github = "numinit";
+     githubId = 369111;
+     keys = [
+-      # SSH
++      # SSH, per-machine yubikey ecdsa-sk keys
+       { fingerprint = "XX/0lMz82MpucPqf0KG+5EJoozzNRi8i/t59byD2kNo"; }
++      { fingerprint = "dye2C1N4RQaf+8ht5Ipd52BbnnuwBtdXxocPzk8b2mw"; }
+       # GPG, >=2025, stays in one place
+       { fingerprint = "FD28 F9C9 81C5 D78E 56E8  8311 5C3E B94D 198F 1491"; }
+       # GPG, >=2025, travels with me
+diff --git a/nixos/tests/web-apps/immichframe.nix b/nixos/tests/web-apps/immichframe.nix
+index dff57b5c27c22..810fe24b796de 100644
+--- a/nixos/tests/web-apps/immichframe.nix
++++ b/nixos/tests/web-apps/immichframe.nix
+@@ -31,9 +31,14 @@ in
+         ../common/x11.nix
+       ];
+ 
+-      # When setting this to 2500 I got "Kernel panic - not syncing: Out of
++      # When setting memory to 2500 I got "Kernel panic - not syncing: Out of
+       # memory: compulsory panic_on_oom is enabled".
+-      virtualisation.memorySize = 3000;
++      # Setting cores to 1 (the default) also makes immich take a long time to start up.
++      # If this breaks, keep synced with the immich test.
++      virtualisation = {
++        memorySize = 4096;
++        cores = 2;
++      };
+       hardware.graphics.enable = true;
+       environment.variables.XAUTHORITY = "/home/${user}/.Xauthority";
+       test-support.displayManager.auto.user = user;

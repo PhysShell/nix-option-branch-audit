@@ -1,0 +1,24 @@
+diff --git a/nixos/modules/services/web-apps/wakapi.nix b/nixos/modules/services/web-apps/wakapi.nix
+index 7d3f06db98540..e3861f889e19f 100644
+--- a/nixos/modules/services/web-apps/wakapi.nix
++++ b/nixos/modules/services/web-apps/wakapi.nix
+@@ -196,14 +196,12 @@ in
+       }
+     ];
+ 
+-    warnings = [
+-      (lib.optionalString (cfg.database.createLocally && cfg.settings.db.dialect != "postgres") ''
+-        You have enabled automatic database configuration, but the database dialect is not set to "posgres".
++    warnings = lib.optional (cfg.database.createLocally && cfg.settings.db.dialect != "postgres") ''
++      You have enabled automatic database configuration, but the database dialect is not set to "postgres".
+ 
+-        The Wakapi module only supports PostgreSQL. Please set `services.wakapi.database.createLocally`
+-        to `false`, or switch to "postgres" as your database dialect.
+-      '')
+-    ];
++      The Wakapi module only supports PostgreSQL. Please set `services.wakapi.database.createLocally`
++      to `false`, or switch to "postgres" as your database dialect.
++    '';
+ 
+     users = {
+       users.wakapi = {

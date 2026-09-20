@@ -1,0 +1,12 @@
+diff --git a/nixos/tests/installer.nix b/nixos/tests/installer.nix
+index d90fbafd93e8e..af8feebd1a1bc 100644
+--- a/nixos/tests/installer.nix
++++ b/nixos/tests/installer.nix
+@@ -748,6 +748,7 @@ let
+                   kbd.dev
+                   kmod.dev
+                   libarchive.dev
++                  libcap-text-verifier
+                   libxml2.bin
+                   libxslt.bin
+                   nixos-artwork.wallpapers.simple-dark-gray-bottom

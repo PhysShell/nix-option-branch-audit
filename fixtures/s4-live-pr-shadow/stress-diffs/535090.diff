@@ -1,0 +1,13 @@
+diff --git a/nixos/tests/slipshow.nix b/nixos/tests/slipshow.nix
+index abbbc6361e881..c8bd4158af5be 100644
+--- a/nixos/tests/slipshow.nix
++++ b/nixos/tests/slipshow.nix
+@@ -8,7 +8,7 @@
+ 
+   meta.maintainers = with lib.maintainers; [ ethancedwards8 ];
+ 
+-  nodes.machine = {
++  containers.machine = {
+     environment.systemPackages = with pkgs; [ slipshow ];
+ 
+     environment.etc."slipshow".source = pkgs.fetchFromGitHub {

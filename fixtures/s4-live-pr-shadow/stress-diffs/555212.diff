@@ -1,0 +1,78 @@
+diff --git a/nixos/tests/jool.nix b/nixos/tests/jool.nix
+index 06e8547a1ce87..dc7c20252dfb7 100644
+--- a/nixos/tests/jool.nix
++++ b/nixos/tests/jool.nix
+@@ -71,6 +71,7 @@ in
+         ];
+       };
+ 
++      boot.kernelPackages = pkgs.linuxPackages_latest;
+       networking.jool.enable = true;
+       networking.jool.siit.default.global.pool6 = "fd::/96";
+     };
+@@ -191,6 +192,7 @@ in
+         ];
+       };
+ 
++      boot.kernelPackages = pkgs.linuxPackages_latest;
+       networking.jool.enable = true;
+       networking.jool.nat64.default = {
+         bib = [
+@@ -206,17 +208,17 @@ in
+           {
+             protocol = "TCP";
+             prefix = "203.0.113.1/32";
+-            "port range" = "40001-65535";
++            "port range" = "20000-29999";
+           }
+           {
+             protocol = "UDP";
+             prefix = "203.0.113.1/32";
+-            "port range" = "40001-65535";
++            "port range" = "20000-29999";
+           }
+           {
+             protocol = "ICMP";
+             prefix = "203.0.113.1/32";
+-            "port range" = "40001-65535";
++            "port range" = "20000-29999";
+           }
+           # Ports for static BIB entries
+           {
+diff --git a/pkgs/os-specific/linux/jool/default.nix b/pkgs/os-specific/linux/jool/default.nix
+index bd705872a474d..ce51323cffe4e 100644
+--- a/pkgs/os-specific/linux/jool/default.nix
++++ b/pkgs/os-specific/linux/jool/default.nix
+@@ -19,10 +19,11 @@ stdenv.mkDerivation (finalAttrs: {
+ 
+   src = sourceAttrs.src;
+ 
+-  patches = lib.optionals (lib.versionAtLeast kernel.version "6.18.0") [
++  patches = lib.optionals (lib.versionAtLeast kernel.version "7.2") [
++    # https://github.com/NICMx/Jool/pull/456
+     (fetchpatch {
+-      url = "https://gitlab.alpinelinux.org/alpine/aports/-/raw/3.23-stable/community/jool-modules-lts/kernel-6.18.patch";
+-      hash = "sha256-EtV95YaOzPU3e/8NQvUtAH/RWiV16djeKrnvSgYybCQ=";
++      url = "https://github.com/NICMx/Jool/commit/47a8c7426f08e50505e69eef7ff607a04fbab52e.diff";
++      hash = "sha256-EcfBwFKOSFQOBWl8s5Pa2/RJg9lH1ziGzvV4ap2505M=";
+     })
+   ];
+ 
+diff --git a/pkgs/os-specific/linux/jool/source.nix b/pkgs/os-specific/linux/jool/source.nix
+index abd866dc060e4..1f11b0e5a1c3c 100644
+--- a/pkgs/os-specific/linux/jool/source.nix
++++ b/pkgs/os-specific/linux/jool/source.nix
+@@ -1,11 +1,11 @@
+ { fetchFromGitHub }:
+ 
+ rec {
+-  version = "4.1.14";
++  version = "4.1.15";
+   src = fetchFromGitHub {
+     owner = "NICMx";
+     repo = "Jool";
+     tag = "v${version}";
+-    hash = "sha256-fAs289FFdUnddkikm4ceA9d/w1qqqaWuPXmAiq3cIA8=";
++    hash = "sha256-I+cgxOONq8LZWlpVaqXW+MmEKts/dQAr7Hs8uC6N8/w=";
+   };
+ }

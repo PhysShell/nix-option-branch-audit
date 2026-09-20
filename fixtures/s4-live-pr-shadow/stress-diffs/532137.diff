@@ -1,0 +1,216 @@
+diff --git a/nixos/modules/programs/miriway.nix b/nixos/modules/programs/miriway.nix
+index b9a6288c4c2a8..bfe6acb338da4 100644
+--- a/nixos/modules/programs/miriway.nix
++++ b/nixos/modules/programs/miriway.nix
+@@ -14,56 +14,93 @@ in
+       Miriway, a Mir based Wayland compositor. You can manually launch Miriway by
+       executing "exec miriway" on a TTY, or launch it from a display manager. Copy
+       /etc/xdg/xdg-miriway/miriway-shell.config to ~/.config/miriway-shell.config
++      and /etc/xdg/xdg-miriway/miriway-shell.settings to ~/.config/miriway-shell.settings
+       to modify the system-wide configuration on a per-user basis. See <https://github.com/Miriway/Miriway>,
+       and "miriway --help" for more information'';
+ 
+     config = lib.mkOption {
++      description = ''
++        Contents of system-wide miriway-shell.config. See Miriway's configuration documentation for details.
++      '';
+       type = lib.types.lines;
+       default = ''
+         x11-window-title=Miriway (Mir-on-X)
+         idle-timeout=600
+-        ctrl-alt=t:miriway-terminal # Default "terminal emulator finder"
+-
+-        shell-component=dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY
+-
+-        meta=Left:@dock-left
+-        meta=Right:@dock-right
+-        meta=Space:@toggle-maximized
+-        meta=Home:@workspace-begin
+-        meta=End:@workspace-end
+-        meta=Page_Up:@workspace-up
+-        meta=Page_Down:@workspace-down
+-        ctrl-alt=BackSpace:@exit
+       '';
+       example = ''
+         idle-timeout=300
+-        ctrl-alt=t:weston-terminal
+         add-wayland-extensions=all
+ 
+-        shell-components=dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY
+-
+         shell-component=waybar
+         shell-component=wbg Pictures/wallpaper
++      '';
++    };
+ 
+-        shell-meta=a:synapse
++    settings = lib.mkOption {
++      description = ''
++        Contents of system-wide miriway-shell.settings. See Miriway's configuration documentation for details.
++      '';
++      type = lib.types.lines;
++      default = ''
++        command_ctrl_alt=t:miriway-terminal # Default "terminal emulator finder"
+ 
+-        meta=Left:@dock-left
+-        meta=Right:@dock-right
+-        meta=Space:@toggle-maximized
+-        meta=Home:@workspace-begin
+-        meta=End:@workspace-end
+-        meta=Page_Up:@workspace-up
+-        meta=Page_Down:@workspace-down
+-        ctrl-alt=BackSpace:@exit
++        command_meta=Left:@dock-left
++        command_meta=Right:@dock-right
++        command_meta=Space:@toggle-maximized
++        command_meta=Home:@workspace-begin
++        command_meta=End:@workspace-end
++        command_meta=Page_Up:@workspace-up
++        command_meta=Page_Down:@workspace-down
++        command_ctrl_alt=BackSpace:@exit
+       '';
+-      description = ''
+-        Miriway's config. This will be installed system-wide.
+-        The default will install the miriway package's barebones example config.
++      example = ''
++        command_ctrl_alt=t:weston-terminal
++        command_shell_meta=a:synapse
++
++        command_meta=Left:@dock-left
++        command_meta=Right:@dock-right
++        command_meta=Space:@toggle-maximized
++        command_meta=Home:@workspace-begin
++        command_meta=End:@workspace-end
++        command_meta=Page_Up:@workspace-up
++        command_meta=Page_Down:@workspace-down
++        command_ctrl_alt=BackSpace:@exit
+       '';
+     };
+   };
+ 
+   config = lib.mkIf cfg.enable {
++    warnings =
++      let
++        optionsNoLongerInConfig = [
++          "ctrl-alt"
++          "meta"
++          "shell-ctrl-alt"
++          "shell-meta"
++          "shell-plain"
++
++          "command_ctrl_alt"
++          "command_meta"
++          "command_shell_ctrl_alt"
++          "command_shell_meta"
++          "command_plain"
++        ];
++      in
++      # Added 2026-07-17
++      lib.optional
++        (builtins.foldl' (
++          acc: option: acc || (lib.strings.hasInfix "${option}=" cfg.config)
++        ) false optionsNoLongerInConfig)
++        ''
++          Since Miriway 26.06, configuration options got partially renamed and split across different files.
++          A new option `programs.miriway.settings` got introduced for options that belong into miriway-shell.settings
++          instead of miriway-shell.config.
++
++          You appear to have one of the following options in `programs.miriway.config` that should now go into
++          `programs.miriway.settings`, and may need to be renamed:
++          ${lib.strings.concatStringsSep ", " optionsNoLongerInConfig}
++        '';
++
+     environment = {
+       systemPackages = with pkgs; [
+         miriway
+@@ -71,6 +108,7 @@ in
+       ];
+       etc = {
+         "xdg/xdg-miriway/miriway-shell.config".text = cfg.config;
++        "xdg/xdg-miriway/miriway-shell.settings".text = cfg.settings;
+       };
+     };
+ 
+diff --git a/nixos/tests/miriway.nix b/nixos/tests/miriway.nix
+index bb450bf4ca0ad..d5b146ed6dc51 100644
+--- a/nixos/tests/miriway.nix
++++ b/nixos/tests/miriway.nix
+@@ -33,13 +33,12 @@
+           add-wayland-extensions=all
+           enable-x11=
+ 
+-          ctrl-alt=t:foot --maximized
+-          ctrl-alt=a:env WINIT_UNIX_BACKEND=x11 WAYLAND_DISPLAY= alacritty --option window.startup_mode=\"maximized\"
+-
+-          shell-component=dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY
+-
+           shell-component=foot --maximized
+         '';
++        settings = ''
++          command_ctrl_alt=t:foot --maximized
++          command_ctrl_alt=a:env WINIT_UNIX_BACKEND=x11 WAYLAND_DISPLAY= alacritty --option window.startup_mode=\"maximized\"
++        '';
+       };
+ 
+       environment = {
+@@ -59,8 +58,9 @@
+         etc."xdg/foot/foot.ini".source = (pkgs.formats.ini { }).generate "foot.ini" {
+           main = {
+             font = "inconsolata:size=16";
++            initial-color-theme = "light";
+           };
+-          colors = rec {
++          colors-light = rec {
+             foreground = "000000";
+             background = "ffffff";
+             regular2 = foreground;
+diff --git a/pkgs/by-name/mi/miriway/package.nix b/pkgs/by-name/mi/miriway/package.nix
+index b2e45f5acde5a..46a42e22bd320 100644
+--- a/pkgs/by-name/mi/miriway/package.nix
++++ b/pkgs/by-name/mi/miriway/package.nix
+@@ -7,23 +7,25 @@
+   bash,
+   boost,
+   cmake,
++  dbus,
+   inotify-tools,
+   pkg-config,
+   mir,
+   libxkbcommon,
+   swaybg,
++  systemd,
+   wayland,
+ }:
+ 
+ stdenv.mkDerivation (finalAttrs: {
+   pname = "miriway";
+-  version = "26.01";
++  version = "26.06.3";
+ 
+   src = fetchFromGitHub {
+     owner = "Miriway";
+     repo = "Miriway";
+     tag = "v${finalAttrs.version}";
+-    hash = "sha256-JHLP5M9uBS4CmTGx3xgNq7YN1Tj8FZyKo1C8aGTtG9E=";
++    hash = "sha256-q1CYySy5lB1bMZYdakHintRH2ZAinThm9rk7WkyY39U=";
+   };
+ 
+   postPatch = ''
+@@ -41,6 +43,7 @@ stdenv.mkDerivation (finalAttrs: {
+   buildInputs = [
+     bash
+     boost
++    dbus
+     mir
+     libxkbcommon
+     wayland # wayland-server.pc, for mirwayland.pc
+@@ -52,6 +55,9 @@ stdenv.mkDerivation (finalAttrs: {
+ 
+     substituteInPlace $out/bin/miriway-run \
+       --replace-fail 'inotifywait -qq' '${lib.getExe' inotify-tools "inotifywait"} -qq'
++
++    substituteInPlace $out/libexec/miriway-session-startup \
++      --replace-fail 'dbus-update-activation-environment' '${lib.getExe' dbus "dbus-update-activation-environment"}'
+   '';
+ 
+   passthru = {

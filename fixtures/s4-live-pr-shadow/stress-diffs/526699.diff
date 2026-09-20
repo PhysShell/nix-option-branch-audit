@@ -1,0 +1,49 @@
+diff --git a/nixos/tests/uptermd.nix b/nixos/tests/uptermd.nix
+index a034fd60d8e44..a471c9274adf4 100644
+--- a/nixos/tests/uptermd.nix
++++ b/nixos/tests/uptermd.nix
+@@ -21,6 +21,11 @@ in
+           enable = true;
+           openFirewall = true;
+           port = 1337;
++          # required to match certificate principals
++          extraFlags = [
++            "--hostname"
++            "server"
++          ];
+         };
+       };
+     client1 = client;
+@@ -58,7 +63,7 @@ in
+     client2.execute("ssh-keygen -t ed25519 -N \"\" -f /root/.ssh/id_ed25519")
+ 
+     # Grep the ssh connect command from the output of 'upterm host'
+-    ssh_command = client1.succeed("grep 'SSH Command' /tmp/session-details | awk -F'│' '{print $3}'").strip()
++    ssh_command = client1.succeed("grep -m1 '^[[:space:]]*ssh' /tmp/session-details").strip()
+ 
+     # Connect with client2. Because we used '--force-command hostname' we should get "client1" as the output
+     output = client2.succeed(ssh_command)
+diff --git a/pkgs/by-name/up/upterm/package.nix b/pkgs/by-name/up/upterm/package.nix
+index 8e33f8ac47a47..aec66d1b2cd73 100644
+--- a/pkgs/by-name/up/upterm/package.nix
++++ b/pkgs/by-name/up/upterm/package.nix
+@@ -10,16 +10,16 @@
+ 
+ buildGoModule (finalAttrs: {
+   pname = "upterm";
+-  version = "0.20.0";
++  version = "0.24.0";
+ 
+   src = fetchFromGitHub {
+     owner = "owenthereal";
+     repo = "upterm";
+     rev = "v${finalAttrs.version}";
+-    hash = "sha256-qTw8bYROAAB7FwKCCQamIbWGbqSexXl87DdvSNsFZ/I=";
++    hash = "sha256-b52Rny6mYkmfF6Umn2tzlnUhNkENHPFpCzp55OWj92w=";
+   };
+ 
+-  vendorHash = "sha256-5OAS7s9A95h5LihXgOwkOXAMylS7g+lqjaI3MKTvlW0=";
++  vendorHash = "sha256-UkZnLbxn0dPT43ycuevcwMw0dXnX1OPHLh5F1XMHWDI=";
+ 
+   subPackages = [
+     "cmd/upterm"

@@ -1,0 +1,159 @@
+diff --git a/nixos/tests/scion/freestanding-deployment/default.nix b/nixos/tests/scion/freestanding-deployment/default.nix
+index f90ec65cc9cd4..e49887ddcb476 100644
+--- a/nixos/tests/scion/freestanding-deployment/default.nix
++++ b/nixos/tests/scion/freestanding-deployment/default.nix
+@@ -122,7 +122,7 @@ in
+           ret=0
+           for as in "$@"
+           do
+-            scion ping "$as,127.0.0.1" -c 3
++            scion ping --sciond default "$as,127.0.0.1" -c 3
+             ret=$?
+             if [ "$ret" -ne "0" ]; then
+               break
+diff --git a/nixos/tests/scion/freestanding-deployment/topology1.json b/nixos/tests/scion/freestanding-deployment/topology1.json
+index 9494121421a05..3f16eef3ac44a 100644
+--- a/nixos/tests/scion/freestanding-deployment/topology1.json
++++ b/nixos/tests/scion/freestanding-deployment/topology1.json
+@@ -21,7 +21,7 @@
+       "interfaces": {
+         "1": {
+           "underlay": {
+-            "public": "192.168.1.1:50014",
++            "local": "192.168.1.1:50014",
+             "remote": "192.168.1.4:50014"
+           },
+           "isd_as": "42-ffaa:1:4",
+@@ -30,7 +30,7 @@
+         },
+         "2": {
+           "underlay": {
+-            "public": "192.168.1.1:50012",
++            "local": "192.168.1.1:50012",
+             "remote": "192.168.1.2:50012"
+           },
+           "isd_as": "42-ffaa:1:2",
+@@ -39,7 +39,7 @@
+         },
+         "3": {
+           "underlay": {
+-            "public": "192.168.1.1:50013",
++            "local": "192.168.1.1:50013",
+             "remote": "192.168.1.3:50013"
+           },
+           "isd_as": "42-ffaa:1:3",
+diff --git a/nixos/tests/scion/freestanding-deployment/topology2.json b/nixos/tests/scion/freestanding-deployment/topology2.json
+index d576ea6ed3079..666b18ce72756 100644
+--- a/nixos/tests/scion/freestanding-deployment/topology2.json
++++ b/nixos/tests/scion/freestanding-deployment/topology2.json
+@@ -21,7 +21,7 @@
+       "interfaces": {
+         "1": {
+           "underlay": {
+-            "public": "192.168.1.2:50012",
++            "local": "192.168.1.2:50012",
+             "remote": "192.168.1.1:50012"
+           },
+           "isd_as": "42-ffaa:1:1",
+@@ -30,7 +30,7 @@
+         },
+         "2": {
+           "underlay": {
+-            "public": "192.168.1.2:50023",
++            "local": "192.168.1.2:50023",
+             "remote": "192.168.1.3:50023"
+           },
+           "isd_as": "42-ffaa:1:3",
+@@ -39,7 +39,7 @@
+         },
+         "3": {
+           "underlay": {
+-            "public": "192.168.1.2:50025",
++            "local": "192.168.1.2:50025",
+             "remote": "192.168.1.5:50025"
+           },
+           "isd_as": "42-ffaa:1:5",
+diff --git a/nixos/tests/scion/freestanding-deployment/topology3.json b/nixos/tests/scion/freestanding-deployment/topology3.json
+index 8f9a8bd260a99..762be95bb8bf6 100644
+--- a/nixos/tests/scion/freestanding-deployment/topology3.json
++++ b/nixos/tests/scion/freestanding-deployment/topology3.json
+@@ -21,7 +21,7 @@
+       "interfaces": {
+         "1": {
+           "underlay": {
+-            "public": "192.168.1.3:50013",
++            "local": "192.168.1.3:50013",
+             "remote": "192.168.1.1:50013"
+           },
+           "isd_as": "42-ffaa:1:1",
+@@ -30,7 +30,7 @@
+         },
+         "2": {
+           "underlay": {
+-            "public": "192.168.1.3:50023",
++            "local": "192.168.1.3:50023",
+             "remote": "192.168.1.2:50023"
+           },
+           "isd_as": "42-ffaa:1:2",
+@@ -39,7 +39,7 @@
+         },
+         "3": {
+           "underlay": {
+-            "public": "192.168.1.3:50034",
++            "local": "192.168.1.3:50034",
+             "remote": "192.168.1.4:50034"
+           },
+           "isd_as": "42-ffaa:1:4",
+@@ -48,7 +48,7 @@
+         },
+         "4": {
+           "underlay": {
+-            "public": "192.168.1.3:50035",
++            "local": "192.168.1.3:50035",
+             "remote": "192.168.1.5:50035"
+           },
+           "isd_as": "42-ffaa:1:5",
+diff --git a/nixos/tests/scion/freestanding-deployment/topology4.json b/nixos/tests/scion/freestanding-deployment/topology4.json
+index 6dc847b1711d6..7a66f0ba57861 100644
+--- a/nixos/tests/scion/freestanding-deployment/topology4.json
++++ b/nixos/tests/scion/freestanding-deployment/topology4.json
+@@ -19,7 +19,7 @@
+       "interfaces": {
+         "1": {
+           "underlay": {
+-            "public": "192.168.1.4:50014",
++            "local": "192.168.1.4:50014",
+             "remote": "192.168.1.1:50014"
+           },
+           "isd_as": "42-ffaa:1:1",
+@@ -28,7 +28,7 @@
+         },
+         "2": {
+           "underlay": {
+-            "public": "192.168.1.4:50034",
++            "local": "192.168.1.4:50034",
+             "remote": "192.168.1.3:50034"
+           },
+           "isd_as": "42-ffaa:1:3",
+diff --git a/nixos/tests/scion/freestanding-deployment/topology5.json b/nixos/tests/scion/freestanding-deployment/topology5.json
+index 8bbb2eac72fc6..cdddf50fbf520 100644
+--- a/nixos/tests/scion/freestanding-deployment/topology5.json
++++ b/nixos/tests/scion/freestanding-deployment/topology5.json
+@@ -19,7 +19,7 @@
+       "interfaces": {
+         "1": {
+           "underlay": {
+-            "public": "192.168.1.5:50025",
++            "local": "192.168.1.5:50025",
+             "remote": "192.168.1.2:50025"
+           },
+           "isd_as": "42-ffaa:1:2",
+@@ -28,7 +28,7 @@
+         },
+         "2": {
+           "underlay": {
+-            "public": "192.168.1.5:50035",
++            "local": "192.168.1.5:50035",
+             "remote": "192.168.1.3:50035"
+           },
+           "isd_as": "42-ffaa:1:3",

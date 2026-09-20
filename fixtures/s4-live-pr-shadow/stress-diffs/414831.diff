@@ -1,0 +1,601 @@
+diff --git a/nixos/doc/manual/release-notes/rl-2611.section.md b/nixos/doc/manual/release-notes/rl-2611.section.md
+index d4b6c2ce9a164..5622617baf9ed 100644
+--- a/nixos/doc/manual/release-notes/rl-2611.section.md
++++ b/nixos/doc/manual/release-notes/rl-2611.section.md
+@@ -75,6 +75,8 @@
+ 
+ - Rustical migrates from `settings.http.host` and `settings.http.port` to `settings.http.bind` to support UNIX domain sockets as well as TCP sockets in one setting.
+ 
++- The Mullvad VPN service now has a separate toggle to enable the Mullvad VPN graphical user interface. If you have previously used Mullvad on a desktop by setting `services.mullvad-vpn.package` to `pkgs.mullvad-vpn`, you should now **unset that option**, and enable `services.mullvad-vpn.gui.enable`. The VPN will not work if `services.mullvad-vpn.package` is set to `pkgs.mullvad-vpn`, as `pkgs.mullvad-vpn` no longer contains the Mullvad Daemon; please ensure that `services.mullvad-vpn.package` is set to `pkgs.mullvad`, regardless if you plan to enable the graphical user interface or not.
++
+ - A number of options for `services.llama-cpp` have been removed in favor of the structured [](#opt-services.llama-cpp.settings) option, attributes from which are used as arguments to `llama-server` executable, you can see all available options by running `llama-server --help`. Configuring model presets using Nix attribute set via `services.llama-cpp.modelsPreset` is no longer supported, please use `services.llama-cpp.settings.models-preset` with a path to an INI file containing desired options.
+ 
+ - The `NIX_XDG_DESKTOP_PORTAL_DIR` environment variable is no longer used in the `xdg-desktop-portal` package and is therefore no longer set in `xdg.portal` module.
+diff --git a/nixos/modules/services/networking/mullvad-vpn.nix b/nixos/modules/services/networking/mullvad-vpn.nix
+index 895fc21bb610f..c904dd28aa17f 100644
+--- a/nixos/modules/services/networking/mullvad-vpn.nix
++++ b/nixos/modules/services/networking/mullvad-vpn.nix
+@@ -5,103 +5,118 @@
+   ...
+ }:
+ let
++  inherit (lib)
++    mkEnableOption
++    mkPackageOption
++    mkIf
++    maintainers
++    optional
++    singleton
++    getExe'
++    ;
++
+   cfg = config.services.mullvad-vpn;
+ in
+-with lib;
+ {
+   options.services.mullvad-vpn = {
+-    enable = mkOption {
+-      type = types.bool;
+-      default = false;
+-      description = ''
+-        This option enables Mullvad VPN daemon.
+-      '';
+-    };
++    enable = mkEnableOption "the Mullvad VPN service";
++    package = mkPackageOption pkgs "mullvad" { };
+ 
+-    enableExcludeWrapper = mkOption {
+-      type = types.bool;
+-      default = true;
+-      description = ''
+-        This option activates the wrapper that allows the use of mullvad-exclude.
+-        Might have minor security impact, so consider disabling if you do not use the feature.
+-      '';
+-    };
++    enableExcludeWrapper =
++      (mkEnableOption "the security wrapper the allows the use of `mullvad-exclude`, a command that tunnels a single command directly to the clearnet, bypassing the system-wide VPN. It is recommended to disable this option for security models where privileged (`setuid`) binaries are a concern")
++      // {
++        default = true;
++      };
+ 
+-    enableEarlyBootBlocking = mkOption {
+-      type = types.bool;
+-      default = false;
+-      description = ''
+-        This option activates an additional oneshot systemd service to ensure that the mullvad daemon
+-        will start and block traffic before any network configuration will be applied.
+-        This matches what upstream Mullvad distributes for their supported distros, but is disabled by
+-        default in NixOS as it may conflict with non-Mullvad network configuration.
+-      '';
+-    };
++    enableEarlyBootBlocking = mkEnableOption "an additional systemd service that ensures that the Mullvad VPN daemon will block all traffic early in the boot process, as opposed to blocking traffic after the network has been set up. Enabling this option matches what upstream Mullvad distributes for their supported distros, but is disabled by default in NixOS as it may conflict with non-Mullvad network configurations. If you do not have a custom network configuration, it is recommended to enable this option in order to prevent network leaks during the boot process";
+ 
+-    package = mkPackageOption pkgs "mullvad" {
+-      example = "pkgs.mullvad-vpn";
+-      extraDescription = ''
+-        `pkgs.mullvad` only provides the CLI tool, `pkgs.mullvad-vpn` provides both the CLI and the GUI.
+-      '';
++    gui = {
++      enable = mkEnableOption "the Mullvad VPN graphical user interface";
++      package = mkPackageOption pkgs "mullvad-vpn" { };
+     };
+   };
+ 
+   config = mkIf cfg.enable {
++    assertions = [
++      {
++        assertion = cfg.package.hasMullvadDaemon or false;
++        message = "'services.mullvad-vpn.package' is using '${
++          cfg.package.name or "unknown-package"
++        }', but this package has indicated that it does not contain a Mullvad VPN Daemon. This may be due to the fact that you have configured 'services.mullvad-vpn.package' to point to 'pkgs.mullvad-vpn', which no longer contains the Mullvad Daemon. Please unset 'services.mullvad-vpn.package' and enable 'services.mullvad-vpn.gui.enable' if you wish to use Mullvad VPN's graphical user interface.";
++      }
++    ];
++
++    warnings =
++      optional (cfg.gui.enable && !(cfg.gui.package.hasMullvadGUI or false))
++        "'services.mullvad-vpn.gui.package' reports that it does not contain a Mullvad VPN graphical user interface. The Mullvad VPN desktop app may be unavailable.";
++
+     boot.kernelModules = [ "tun" ];
+ 
+-    environment.systemPackages = [ cfg.package ];
++    environment.systemPackages = singleton cfg.package ++ optional cfg.gui.enable cfg.gui.package;
+ 
+     # See https://github.com/NixOS/nixpkgs/issues/176603
+     security.wrappers.mullvad-exclude = mkIf cfg.enableExcludeWrapper {
+       setuid = true;
+       owner = "root";
+       group = "root";
+-      source = "${cfg.package}/bin/mullvad-exclude";
++      source = getExe' cfg.package "mullvad-exclude";
+     };
+ 
+-    # see https://github.com/mullvad/mullvadvpn-app/blob/2025.14/dist-assets/linux/mullvad-early-boot-blocking.service
+-    systemd.services.mullvad-early-boot-blocking = mkIf cfg.enableEarlyBootBlocking {
+-      description = "Mullvad early boot network blocker";
+-      wantedBy = [ "mullvad-daemon.service" ];
+-      before = [
+-        "basic.target"
+-        "mullvad-daemon.service"
+-      ];
+-      unitConfig = {
+-        DefaultDependencies = "no";
+-      };
+-      serviceConfig = {
+-        Type = "oneshot";
+-        ExecStart = "${cfg.package}/bin/mullvad-daemon --initialize-early-boot-firewall";
++    # Mullvad prefers systemd-resolved for setting up their DNS servers.
++    services.resolved.enable = lib.mkDefault true;
++
++    # See https://github.com/mullvad/mullvadvpn-app/blob/2025.14/dist-assets/linux/mullvad-early-boot-blocking.service.
++    systemd.services = {
++      mullvad-early-boot-blocking = mkIf cfg.enableEarlyBootBlocking {
++        description = "Mullvad early boot network blocker";
++        wantedBy = [ "mullvad-daemon.service" ];
++        before = [
++          "basic.target"
++          "mullvad-daemon.service"
++        ];
++        unitConfig = {
++          DefaultDependencies = "no";
++        };
++        serviceConfig = {
++          Type = "oneshot";
++          ExecStart = "${getExe' cfg.package "mullvad-daemon"} --initialize-early-boot-firewall";
++        };
+       };
+-    };
+ 
+-    systemd.services.mullvad-daemon = {
+-      description = "Mullvad VPN daemon";
+-      wantedBy = [ "multi-user.target" ];
+-      wants = [
+-        "network.target"
+-        "network-online.target"
+-      ];
+-      after = [
+-        "network-online.target"
+-        "NetworkManager.service"
+-        "systemd-resolved.service"
+-      ]
+-      ++ lib.optional cfg.enableEarlyBootBlocking "mullvad-early-boot-blocking.service";
+-      # See https://github.com/NixOS/nixpkgs/issues/262681
+-      path = lib.optional config.networking.resolvconf.enable config.networking.resolvconf.package;
+-      startLimitBurst = 5;
+-      startLimitIntervalSec = 20;
+-      serviceConfig = {
+-        ExecStart = "${cfg.package}/bin/mullvad-daemon -v --disable-stdout-timestamps";
+-        Restart = "always";
+-        RestartSec = 1;
++      mullvad-daemon = {
++        description = "Mullvad VPN daemon";
++        wantedBy = [ "multi-user.target" ];
++        wants = [
++          "network.target"
++          "network-online.target"
++        ];
++        after = [
++          "network-online.target"
++          "NetworkManager.service"
++          "systemd-resolved.service"
++        ]
++        ++ optional cfg.enableEarlyBootBlocking "mullvad-early-boot-blocking.service";
++
++        path =
++          # Necessary for certain obfuscation types (pre-v2026.4) and DAITA.
++          # TODO: Drop iproute2 once the dependency on the `ip` command is dropped upstream.
++          singleton pkgs.iproute2
++          # See https://github.com/NixOS/nixpkgs/issues/262681
++          ++ optional config.networking.resolvconf.enable config.networking.resolvconf.package;
++        startLimitBurst = 5;
++        startLimitIntervalSec = 20;
++        serviceConfig = {
++          ExecStart = "${getExe' cfg.package "mullvad-daemon"} -v --disable-stdout-timestamps";
++          Restart = "always";
++          RestartSec = 1;
++        };
+       };
+     };
+   };
+ 
+   meta.maintainers = with maintainers; [
+     arcuru
++    sigmasquadron
++    jackr
+   ];
+ }
+diff --git a/pkgs/by-name/mu/mullvad-vpn/0001-distribution-configuration.patch b/pkgs/by-name/mu/mullvad-vpn/0001-distribution-configuration.patch
+new file mode 100644
+index 0000000000000..4c900f7838866
+--- /dev/null
++++ b/pkgs/by-name/mu/mullvad-vpn/0001-distribution-configuration.patch
+@@ -0,0 +1,51 @@
++diff --git a/desktop/packages/mullvad-vpn/tasks/distribution.cjs b/desktop/packages/mullvad-vpn/tasks/distribution.cjs
++index 7b2bc36e08..ec027454a2 100644
++--- a/desktop/packages/mullvad-vpn/tasks/distribution.cjs
+++++ b/desktop/packages/mullvad-vpn/tasks/distribution.cjs
++@@ -28,6 +28,7 @@ function newConfig() {
++     publish: null,
++     asar: true,
++     compression: noCompression ? 'store' : 'normal',
+++    electronDist: '@electron-dist@',
++     extraResources: [
++       { from: distAssets('ca.crt'), to: '.' },
++       { from: distAssets('relays/relays.json'), to: '.' },
++@@ -180,11 +181,7 @@
++     linux: {
++       target: [
++         {
++-          target: 'deb',
++-          arch: getLinuxTargetArch(),
++-        },
++-        {
++-          target: 'rpm',
+++          target: 'dir',
++           arch: getLinuxTargetArch(),
++         },
++       ],
++@@ -185,9 +181,6 @@ function newConfig() {
++       icon: distAssets('icon.icns'),
++       extraFiles: [{ from: distAssets('linux/mullvad-gui-launcher.sh'), to: '.' }],
++       extraResources: [
++-        { from: distAssets(path.join(getLinuxTargetSubdir(), 'mullvad-problem-report')), to: '.' },
++-        { from: distAssets(path.join(getLinuxTargetSubdir(), 'mullvad-setup')), to: '.' },
++-        { from: distAssets(path.join('linux', 'apparmor_mullvad')), to: '.' },
++       ],
++     },
++ 
++@@ -494,6 +487,7 @@ function getMacArch() {
++ // than a non-tilde version component
++ // https://docs.fedoraproject.org/en-US/packaging-guidelines/Versioning/#_complex_versioning
++ function getLinuxVersion() {
+++  return "@version@";
++   const [version, ...prereleaseParts] = productVersion([]).split('-');
++   const [major, minor] = version.split('.');
++   const prerelease = prereleaseParts.join('-');
++@@ -509,6 +503,7 @@ function getLinuxVersion() {
++ // Returns the product version. The `args` argument is optional. Set it to `'semver'`
++ // to get the version in semver format.
++ function productVersion(extraArgs) {
+++  return "@version@";
++   const args = ['run', '-q', '--bin', 'mullvad-version', ...extraArgs];
++   return execFileSync('cargo', args, { encoding: 'utf-8' }).trim();
++ }
+diff --git a/pkgs/by-name/mu/mullvad-vpn/package.nix b/pkgs/by-name/mu/mullvad-vpn/package.nix
+index c7115f9bfb27c..78002cb4e443c 100644
+--- a/pkgs/by-name/mu/mullvad-vpn/package.nix
++++ b/pkgs/by-name/mu/mullvad-vpn/package.nix
+@@ -1,188 +1,127 @@
+ {
+-  stdenv,
+   lib,
+-  fetchurl,
+-  dpkg,
+-  alsa-lib,
+-  atk,
+-  cairo,
+-  cups,
+-  dbus,
+-  expat,
+-  fontconfig,
+-  freetype,
+-  gdk-pixbuf,
+-  glib,
+-  pango,
+-  nspr,
+-  nss,
+-  gtk3,
+-  libgbm,
+-  libGL,
+-  wayland,
+-  libxtst,
+-  libxscrnsaver,
+-  libxrender,
+-  libxrandr,
+-  libxi,
+-  libxfixes,
+-  libxext,
+-  libxdamage,
+-  libxcursor,
+-  libxcomposite,
+-  libx11,
+-  libxshmfence,
+-  libxcb,
+-  autoPatchelfHook,
+-  systemd,
+-  libnotify,
+-  libappindicator,
+-  makeWrapper,
+-  coreutils,
+-  gnugrep,
+-  iproute2,
+-
++  buildNpmPackage,
++  mullvad,
++  nodejs_22,
++  replaceVars,
++  electron,
++  copyDesktopItems,
++  grpc-tools,
++  makeBinaryWrapper,
+   versionCheckHook,
++  makeDesktopItem,
+ }:
+ 
+-let
+-  deps = [
+-    alsa-lib
+-    atk
+-    cairo
+-    cups
+-    dbus
+-    expat
+-    fontconfig
+-    freetype
+-    gdk-pixbuf
+-    glib
+-    pango
+-    gtk3
+-    libappindicator
+-    libnotify
+-    libgbm
+-    libx11
+-    libxscrnsaver
+-    libxcomposite
+-    libxcursor
+-    libxdamage
+-    libxext
+-    libxfixes
+-    libxi
+-    libxrandr
+-    libxrender
+-    libxtst
+-    libxcb
+-    libxshmfence
+-    nspr
+-    nss
+-    systemd
+-  ];
+-
+-  selectSystem =
+-    attrs:
+-    attrs.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+-
+-  platform = selectSystem {
+-    x86_64-linux = "amd64";
+-    aarch64-linux = "arm64";
+-  };
+-
+-  hash = selectSystem {
+-    x86_64-linux = "sha256-OMbuc66AhwaIVgkiooUlttDazGLC5BCTiGPXA46TGso=";
+-    aarch64-linux = "sha256-pEzb21CSPn/ZflzZGTSJI5Hz3Q+ERFILg8q7V89AN1Q=";
+-  };
+-in
+-
+-stdenv.mkDerivation (finalAttrs: {
++buildNpmPackage (finalAttrs: {
+   pname = "mullvad-vpn";
+-  version = "2026.3";
++  inherit (mullvad) src version;
++
++  nodejs = nodejs_22;
++  npmDepsHash = "sha256-DWLMf+fHCm3hqKt25vmoZ+uEL90/hEpQS+5k8sBFo/c=";
+ 
+   __structuredAttrs = true;
+   strictDeps = true;
++  enableParallelBuilding = true;
+ 
+-  src = fetchurl {
+-    url = "https://github.com/mullvad/mullvadvpn-app/releases/download/${finalAttrs.version}/MullvadVPN-${finalAttrs.version}_${platform}.deb";
+-    inherit hash;
+-  };
++  patches = [
++    (replaceVars ./0001-distribution-configuration.patch {
++      inherit (finalAttrs) version;
++      electron-dist = electron.dist;
++    })
++  ];
+ 
+   nativeBuildInputs = [
+-    autoPatchelfHook
+-    dpkg
+-    makeWrapper
++    copyDesktopItems
++    grpc-tools
++    makeBinaryWrapper
+   ];
+ 
+-  buildInputs = deps;
+-
+-  dontBuild = true;
+-  dontConfigure = true;
+-
+-  runtimeDependencies = [
+-    (lib.getLib systemd)
+-    iproute2
+-    libGL
+-    libnotify
+-    libappindicator
+-    wayland
++  buildInputs = [
++    electron
+   ];
+ 
++  env.ELECTRON_OVERRIDE_DIST_PATH = electron.dist;
++
++  # We cannot use 'sourceRoot' as the build script needs access
++  # to 'desktop/../dist'.
+   postPatch = ''
+-    patchShebangs opt/Mullvad\ VPN/mullvad-vpn
++    cd desktop/
++  '';
++
++  # The npmConfigHook only patches executables from the main
++  # 'node_modules/' directory, but Mullvad uses a workspace.
++  postConfigure = ''
++    patchShebangs --build packages/mullvad-vpn/node_modules
++  '';
++
++  # Dependencies used by the main workspace.
++  preBuild = ''
++    npm -w windows-utils run build-typescript
++    npm -w nseventforwarder run build-typescript
+   '';
+ 
++  npmWorkspace = "mullvad-vpn";
++  npmBuildScript = "pack:linux";
++
++  # Mullvad currently depends on iproute2 being available at runtime to
++  # set the userspace routing for certain obfuscation types.
+   installPhase = ''
+     runHook preInstall
+ 
+-    mkdir -p $out/share/mullvad $out/bin
++    mkdir -p $out/share/mullvad-vpn/
++    cp -r ../dist/*-unpacked/{locales,resources{,.pak}} $out/share/mullvad-vpn/
++    cp ../graphics/icon{-square.svg,.svg} $out/share/mullvad-vpn/resources/
+ 
+-    mv usr/share/* $out/share
+-    mv usr/bin/* $out/bin
+-    mv opt/Mullvad\ VPN/* $out/share/mullvad
++    makeWrapper ${lib.getExe electron} $out/bin/mullvad-vpn \
++        --add-flags $out/share/mullvad-vpn/resources/app.asar \
++        --set MULLVAD_DISABLE_UPDATE_NOTIFICATION 1 \
++        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}" \
++        --inherit-argv0
+ 
+-    ln -s $out/share/mullvad/mullvad-{gui,vpn} $out/bin/
+-    ln -sf $out/share/mullvad/resources/mullvad-problem-report $out/bin/mullvad-problem-report
+-
+-    wrapProgram $out/bin/mullvad-vpn \
+-      --set MULLVAD_DISABLE_UPDATE_NOTIFICATION 1 \
+-      --prefix PATH : ${
+-        lib.makeBinPath [
+-          coreutils
+-          gnugrep
+-        ]
+-      }
++    runHook postInstall
++  '';
+ 
+-    wrapProgram $out/bin/mullvad-daemon \
+-        --set-default MULLVAD_RESOURCE_DIR "$out/share/mullvad/resources"
++  doCheck = true;
+ 
+-    wrapProgram $out/bin/mullvad-gui \
+-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime=true}}"
++  checkPhase = ''
++    runHook preCheck
+ 
+-    sed -i "s|Exec.*$|Exec=$out/bin/mullvad-vpn $U|" $out/share/applications/mullvad-vpn.desktop
++    npm test
+ 
+-    runHook postInstall
++    runHook postCheck
+   '';
+ 
+-  nativeInstallCheckInputs = [
+-    versionCheckHook
+-  ];
+   doInstallCheck = true;
+ 
+-  passthru.updateScript = ./update.sh;
++  nativeInstallCheckInputs = [ versionCheckHook ];
++
++  desktopItems = [
++    (makeDesktopItem {
++      name = "mullvad-vpn";
++      categories = [ "Network" ];
++      comment = "Mullvad VPN client";
++      desktopName = "Mullvad VPN";
++      exec = "mullvad-vpn";
++      icon = "mullvad-vpn";
++      startupWMClass = "Mullvad VPN";
++      terminal = false;
++    })
++  ];
++
++  passthru.hasMullvadGUI = true;
+ 
+   meta = {
+-    homepage = "https://github.com/mullvad/mullvadvpn-app";
+-    description = "Client for Mullvad VPN";
++    homepage = "https://mullvad.net/";
++    description = "Graphical user interface for Mullvad VPN";
++    longDescription = "**NOTE:** This package does not contain the Mullvad VPN Daemon. The actual VPN service is available on `pkgs.mullvad`, and it must be used in conjunction with this package.";
+     changelog = "https://github.com/mullvad/mullvadvpn-app/blob/${finalAttrs.version}/CHANGELOG.md";
+-    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
+     license = lib.licenses.gpl3Only;
+-    mainProgram = "mullvad-vpn";
+-    platforms = lib.platforms.unix;
+-    badPlatforms = [ lib.systems.inspect.patterns.isDarwin ];
++    inherit (electron.meta) platforms;
+     maintainers = with lib.maintainers; [
+-      jackr
+       airone01
++      jackr
+       sigmasquadron
+     ];
++    mainProgram = "mullvad-vpn";
+   };
+ })
+diff --git a/pkgs/by-name/mu/mullvad-vpn/update.sh b/pkgs/by-name/mu/mullvad-vpn/update.sh
+deleted file mode 100755
+index 9a38d8465b637..0000000000000
+--- a/pkgs/by-name/mu/mullvad-vpn/update.sh
++++ /dev/null
+@@ -1,31 +0,0 @@
+-#!/usr/bin/env nix-shell
+-#!nix-shell -i bash -p curl gnused gawk jq nix-prefetch-scripts
+-
+-set -euo pipefail
+-
+-ROOT="$(dirname "$(readlink -f "$0")")"
+-NIX_DRV="$ROOT/package.nix"
+-if [ ! -f "$NIX_DRV" ]; then
+-  echo "ERROR: cannot find package.nix in $ROOT"
+-  exit 1
+-fi
+-
+-fetch_arch() {
+-  VER="$1"; ARCH="$2"
+-  URL="https://github.com/mullvad/mullvadvpn-app/releases/download/${VER}/MullvadVPN-${VER}_${ARCH}.deb"
+-  nix-prefetch-url --type sha256 "$URL" | xargs nix-hash --type sha256 --to-sri
+-}
+-
+-replace_sha() {
+-  sed -i "s#$1 = \"sha256-.\{44\}\"#$1 = \"$2\"#" "$NIX_DRV"
+-}
+-
+-MULLVAD_VER=$(curl -s https://api.mullvad.net/app/v1/releases/linux/2022.5 | jq -r '.latest_stable')
+-
+-MULLVAD_LINUX_X64_SHA256=$(fetch_arch "$MULLVAD_VER" "amd64")
+-MULLVAD_LINUX_AARCH64_SHA256=$(fetch_arch "$MULLVAD_VER" "arm64")
+-
+-sed -i "s/version = \".*\"/version = \"$MULLVAD_VER\"/" "$NIX_DRV"
+-
+-replace_sha "x86_64-linux" "$MULLVAD_LINUX_X64_SHA256"
+-replace_sha "aarch64-linux" "$MULLVAD_LINUX_AARCH64_SHA256"
+diff --git a/pkgs/by-name/mu/mullvad/package.nix b/pkgs/by-name/mu/mullvad/package.nix
+index 7af2cf1fe0446..abb0d78c57033 100644
+--- a/pkgs/by-name/mu/mullvad/package.nix
++++ b/pkgs/by-name/mu/mullvad/package.nix
+@@ -63,11 +63,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
+       "tunnel-obfuscation"
+     ];
+ 
+-  checkFlags = [
+-    "--skip=version_check"
+-    "--skip=config_resolver::test"
+-  ];
+-
+   nativeBuildInputs = [
+     git
+     installShellFiles
+@@ -112,6 +107,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
+     homepage = "https://mullvad.net/";
+     changelog = "https://github.com/mullvad/mullvadvpn-app/blob/${finalAttrs.version}/CHANGELOG.md";
+     license = lib.licenses.gpl3Only;
++    platforms = lib.platforms.unix;
+     maintainers = with lib.maintainers; [
+       cole-h
+       jackr

@@ -1,0 +1,73 @@
+diff --git a/nixos/modules/services/desktop-managers/pantheon.nix b/nixos/modules/services/desktop-managers/pantheon.nix
+index 9fb10221e4187..9ff9d1a025393 100644
+--- a/nixos/modules/services/desktop-managers/pantheon.nix
++++ b/nixos/modules/services/desktop-managers/pantheon.nix
+@@ -197,6 +197,7 @@ in
+         pantheon.gnome-settings-daemon
+         pantheon.elementary-session-settings
+         pantheon.elementary-settings-daemon
++        pantheon.pantheon-agent-polkit
+       ];
+       programs.dconf.enable = true;
+       networking.networkmanager.enable = mkDefault true;
+@@ -215,6 +216,12 @@ in
+         environment.PATH = lib.mkForce null;
+       };
+ 
++      systemd.user.services."io.elementary.desktop.agent-polkit" = {
++        # Same as above.
++        wantedBy = [ "gnome-session-initialized.target" ];
++        environment.PATH = lib.mkForce null;
++      };
++
+       # Global environment
+       environment.systemPackages =
+         (with pkgs.pantheon; [
+diff --git a/pkgs/desktops/pantheon/services/pantheon-agent-polkit/default.nix b/pkgs/desktops/pantheon/services/pantheon-agent-polkit/default.nix
+index 3127c95225ece..51e61bb1d429f 100644
+--- a/pkgs/desktops/pantheon/services/pantheon-agent-polkit/default.nix
++++ b/pkgs/desktops/pantheon/services/pantheon-agent-polkit/default.nix
+@@ -7,24 +7,26 @@
+   meson,
+   ninja,
+   vala,
++  gcr_4,
+   gtk4,
+   libadwaita,
+   libgee,
+   granite7,
+   pantheon-wayland,
+   polkit,
++  systemd,
+   wrapGAppsHook4,
+ }:
+ 
+ stdenv.mkDerivation rec {
+   pname = "pantheon-agent-polkit";
+-  version = "8.0.2";
++  version = "8.1.0";
+ 
+   src = fetchFromGitHub {
+     owner = "elementary";
+     repo = "pantheon-agent-polkit";
+     rev = version;
+-    hash = "sha256-tuugtrnamY9QMlF/ju5+4gwcEESFqH4jDH/kz790v5Y=";
++    hash = "sha256-ge/RZhzujI++ye7Gka/28W9CQjbmy+/5NstjqcVDUXw=";
+   };
+ 
+   nativeBuildInputs = [
+@@ -36,12 +38,14 @@ stdenv.mkDerivation rec {
+   ];
+ 
+   buildInputs = [
++    gcr_4
+     granite7
+     gtk4
+     libadwaita
+     libgee
+     pantheon-wayland
+     polkit
++    systemd
+   ];
+ 
+   passthru = {

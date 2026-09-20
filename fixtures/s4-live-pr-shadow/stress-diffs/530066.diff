@@ -1,0 +1,195 @@
+diff --git a/nixos/modules/system/activation/bootspec.nix b/nixos/modules/system/activation/bootspec.nix
+index c625b91ec1e26..6f0653e1c44b4 100644
+--- a/nixos/modules/system/activation/bootspec.nix
++++ b/nixos/modules/system/activation/bootspec.nix
+@@ -97,13 +97,13 @@ let
+   };
+ in
+ {
++  imports = [
++    (lib.mkRemovedOptionModule [ "boot" "bootspec" "enable" ] ''
++      Bootspec is now always generated and can no longer be disabled.
++    '')
++  ];
++
+   options.boot.bootspec = {
+-    enable =
+-      lib.mkEnableOption "the generation of RFC-0125 bootspec in $system/boot.json, e.g. /run/current-system/boot.json"
+-      // {
+-        default = true;
+-        internal = true;
+-      };
+     enableValidation = lib.mkEnableOption ''
+       the validation of bootspec documents for each build.
+             This will introduce Go in the build-time closure as we are relying on [Cuelang](https://cuelang.org/) for schema validation.
+diff --git a/nixos/modules/system/activation/top-level.nix b/nixos/modules/system/activation/top-level.nix
+index e7f569fd78e5d..4c4763b111a60 100644
+--- a/nixos/modules/system/activation/top-level.nix
++++ b/nixos/modules/system/activation/top-level.nix
+@@ -44,7 +44,7 @@ let
+ 
+     printf "%s " "''${extraDependencies[@]}" > "$out/extra-dependencies"
+ 
+-    ${optionalString (!config.boot.isContainer && config.boot.bootspec.enable) ''
++    ${optionalString (!config.boot.isContainer) ''
+       ${config.boot.bootspec.writer}
+       ${optionalString config.boot.bootspec.enableValidation ''${config.boot.bootspec.validator} "$out/${config.boot.bootspec.filename}"''}
+     ''}
+diff --git a/nixos/modules/system/boot/loader/systemd-boot/systemd-boot-builder.py b/nixos/modules/system/boot/loader/systemd-boot/systemd-boot-builder.py
+index a0d4256c3c0fc..06c15ee6674b9 100644
+--- a/nixos/modules/system/boot/loader/systemd-boot/systemd-boot-builder.py
++++ b/nixos/modules/system/boot/loader/systemd-boot/systemd-boot-builder.py
+@@ -27,7 +27,6 @@
+ TIMEOUT = "@timeout@"
+ EDITOR = "@editor@" == "1"  # noqa: PLR0133
+ CONSOLE_MODE = "@consoleMode@"
+-BOOTSPEC_TOOLS = "@bootspecTools@"
+ DISTRO_NAME = "@distroName@"
+ NIX = "@nix@"
+ SYSTEMD = "@systemd@"
+@@ -291,31 +290,26 @@ def write_loader_conf(default_entry_id: str | None) -> None:
+     os.rename(tmp, LOADER_CONF)
+ 
+ 
+-def get_bootspec(profile: str | None, generation: int) -> BootSpec:
++def get_bootspec(profile: str | None, generation: int) -> BootSpec | None:
+     system_directory = system_dir(profile, generation, None)
+     boot_json_path = (system_directory / "boot.json").resolve()
+-    if boot_json_path.is_file():
+-        with boot_json_path.open("r") as f:
+-            # check if json is well-formed, else throw error with filepath
+-            try:
+-                bootspec_json = json.load(f)
+-            except ValueError as e:
+-                print(
+-                    f"error: Malformed Json: {e}, in {boot_json_path}", file=sys.stderr
+-                )
+-                sys.exit(1)
+-    else:
+-        boot_json_str = run(
+-            [
+-                f"{BOOTSPEC_TOOLS}/bin/synthesize",
+-                "--version",
+-                "1",
+-                system_directory,
+-                "/dev/stdout",
+-            ],
+-            stdout=subprocess.PIPE,
+-        ).stdout
+-        bootspec_json = json.loads(boot_json_str)
++    if not boot_json_path.is_file():
++        print(
++            f"warning: skipping generation {generation}"
++            + (f" of profile {profile}" if profile else "")
++            + f": {boot_json_path} does not exist",
++            file=sys.stderr,
++        )
++        return None
++    with boot_json_path.open("r") as f:
++        # check if json is well-formed, else throw error with filepath
++        try:
++            bootspec_json = json.load(f)
++        except ValueError as e:
++            print(
++                f"error: Malformed Json: {e}, in {boot_json_path}", file=sys.stderr
++            )
++            sys.exit(1)
+     return bootspec_from_json(bootspec_json)
+ 
+ 
+@@ -551,6 +545,8 @@ def install_bootloader(args: argparse.Namespace) -> None:
+ 
+     for gen in gens:
+         bootspec = get_bootspec(gen.profile, gen.generation)
++        if bootspec is None:
++            continue
+         is_default = Path(bootspec.init).parent == default_config
+         new_boot_files, new_bootctl_id = boot_file(*gen, machine_id, bootspec)
+         boot_files.extend(new_boot_files)
+diff --git a/nixos/modules/system/boot/loader/systemd-boot/systemd-boot.nix b/nixos/modules/system/boot/loader/systemd-boot/systemd-boot.nix
+index 4c3c28b11e901..31590bb1101ba 100644
+--- a/nixos/modules/system/boot/loader/systemd-boot/systemd-boot.nix
++++ b/nixos/modules/system/boot/loader/systemd-boot/systemd-boot.nix
+@@ -47,8 +47,6 @@ let
+ 
+       systemd = config.systemd.package;
+ 
+-      bootspecTools = config.boot.bootspec.package;
+-
+       nix = config.nix.package.out;
+ 
+       timeout = if config.boot.loader.timeout == null then "menu-force" else config.boot.loader.timeout;
+diff --git a/nixos/tests/bootspec.nix b/nixos/tests/bootspec.nix
+index 83a39d94d7e7a..6b8dea9790085 100644
+--- a/nixos/tests/bootspec.nix
++++ b/nixos/tests/bootspec.nix
+@@ -24,8 +24,6 @@ let
+     environment.systemPackages = [ pkgs.efibootmgr ];
+   };
+   standard = {
+-    boot.bootspec.enable = true;
+-
+     imports = [
+       baseline
+       systemd-boot
+@@ -53,8 +51,6 @@ in
+     meta.maintainers = with pkgs.lib.maintainers; [ raitobezarius ];
+ 
+     nodes.machine = {
+-      boot.bootspec.enable = true;
+-
+       imports = [
+         baseline
+         grub
+@@ -75,8 +71,6 @@ in
+     meta.maintainers = with pkgs.lib.maintainers; [ raitobezarius ];
+ 
+     nodes.machine = {
+-      boot.bootspec.enable = true;
+-
+       imports = [
+         baseline
+         grub
+diff --git a/nixos/tests/installer.nix b/nixos/tests/installer.nix
+index b8f2fad735036..76b3b62c03899 100644
+--- a/nixos/tests/installer.nix
++++ b/nixos/tests/installer.nix
+@@ -793,7 +793,6 @@ let
+                 ++ optionals (bootLoader == "systemd-boot") [
+                   pkgs.zstd.bin
+                   pkgs.mypy
+-                  config.boot.bootspec.package
+                 ]
+                 ++ optionals clevisTest [ pkgs.klibc ]
+                 ++ optional systemdStage1 config.system.nixos-init.package;
+diff --git a/nixos/tests/systemd-boot.nix b/nixos/tests/systemd-boot.nix
+index eb2384a11f030..c2d9131f1974e 100644
+--- a/nixos/tests/systemd-boot.nix
++++ b/nixos/tests/systemd-boot.nix
+@@ -772,26 +772,6 @@ in
+     }
+   );
+ 
+-  no-bootspec = runTest (
+-    { lib, ... }:
+-    {
+-      name = "systemd-boot-no-bootspec";
+-      meta.maintainers = with lib.maintainers; [ julienmalka ];
+-
+-      nodes.machine = {
+-        imports = [ common ];
+-        boot.bootspec.enable = false;
+-      };
+-
+-      testScript =
+-        # python
+-        ''
+-          machine.start()
+-          machine.wait_for_unit("multi-user.target")
+-        '';
+-    }
+-  );
+-
+   bootCounting =
+     let
+       baseConfig = {

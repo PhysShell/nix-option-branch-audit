@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/continuous-integration/jenkins/default.nix b/nixos/modules/services/continuous-integration/jenkins/default.nix
+index d4657fcab8aa2..97f1f037546d0 100644
+--- a/nixos/modules/services/continuous-integration/jenkins/default.nix
++++ b/nixos/modules/services/continuous-integration/jenkins/default.nix
+@@ -269,6 +269,7 @@ in
+         PrivateMounts = true;
+         PrivateTmp = true;
+         PrivateUsers = true;
++        ProcSubset = "pid";
+         ProtectClock = true;
+         ProtectControlGroups = "strict";
+         ProtectHome = true;

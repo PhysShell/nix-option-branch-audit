@@ -1,0 +1,27 @@
+diff --git a/nixos/tests/systemd-boot.nix b/nixos/tests/systemd-boot.nix
+index 2fd9adc7d9b97..2d24c5a12555d 100644
+--- a/nixos/tests/systemd-boot.nix
++++ b/nixos/tests/systemd-boot.nix
+@@ -932,6 +932,8 @@ in
+               "test -e /sys/firmware/efi/efivars/LoaderBootCountPath-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f"
+           )
+ 
++          # systemd-bless-boot should have already removed the "+2" suffix from the boot entry
++          machine.wait_for_unit("systemd-bless-boot.service")
+           check_generation(1)
+           check_current_system(orig)
+ 
+diff --git a/nixos/tests/systemd-confinement/checkperms.py b/nixos/tests/systemd-confinement/checkperms.py
+index 3c7ba279a3d20..3fecc9f2e8848 100644
+--- a/nixos/tests/systemd-confinement/checkperms.py
++++ b/nixos/tests/systemd-confinement/checkperms.py
+@@ -45,7 +45,8 @@ def assert_on(self, path: Path) -> None:
+         elif path.is_dir():
+             writable = True
+ 
+-            dummy_file = path / 'can_i_write'
++            # Concurrent probes collide in shared mounts like /dev/hugepages.
++            dummy_file = path / f'can_i_write.{os.getpid()}'
+             try:
+                 dummy_file.touch()
+             except OSError as e:

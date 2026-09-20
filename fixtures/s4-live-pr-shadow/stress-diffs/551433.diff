@@ -1,0 +1,17 @@
+diff --git a/nixos/modules/services/x11/desktop-managers/phosh.nix b/nixos/modules/services/x11/desktop-managers/phosh.nix
+index 36d8a63318078..a7b655d3877b8 100644
+--- a/nixos/modules/services/x11/desktop-managers/phosh.nix
++++ b/nixos/modules/services/x11/desktop-managers/phosh.nix
+@@ -233,6 +233,12 @@ in
+ 
+     programs.feedbackd.enable = true;
+ 
++    # Without this, the stevia OSK does not function when selecting text fields.
++    i18n.inputMethod = {
++      type = "ibus";
++      ibus.waylandFrontend = true;
++    };
++
+     security.pam.services.phosh = { };
+ 
+     services.graphical-desktop.enable = true;

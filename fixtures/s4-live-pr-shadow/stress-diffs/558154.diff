@@ -1,0 +1,23 @@
+diff --git a/nixos/modules/services/misc/paperless.nix b/nixos/modules/services/misc/paperless.nix
+index 3d365d3d6e9ee..db2406603c390 100644
+--- a/nixos/modules/services/misc/paperless.nix
++++ b/nixos/modules/services/misc/paperless.nix
+@@ -70,9 +70,7 @@ let
+     if [[ "$USER" != ${cfg.user} ]]; then
+       ${
+         if config.security.sudo.enable then
+-          "sudo='exec ${config.security.wrapperDir}/sudo -u ${cfg.user} -g ${cfg.group} ${
+-            lib.optionalString enableRedis " -g " + redisServer.group
+-          } -E'"
++          "sudo='exec ${config.security.wrapperDir}/sudo -u ${cfg.user} -E'"
+         else
+           ">&2 echo 'Aborting, paperless-manage must be run as user `${cfg.user}`!'; exit 2"
+       }
+@@ -123,7 +121,6 @@ let
+     RestrictNamespaces = true;
+     RestrictRealtime = true;
+     RestrictSUIDSGID = true;
+-    SupplementaryGroups = lib.optional enableRedis redisServer.group;
+     SystemCallArchitectures = "native";
+     SystemCallFilter = [
+       "@system-service"

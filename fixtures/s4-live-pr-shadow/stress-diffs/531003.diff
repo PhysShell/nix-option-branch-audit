@@ -1,0 +1,137 @@
+diff --git a/nixos/doc/manual/release-notes/rl-2611.section.md b/nixos/doc/manual/release-notes/rl-2611.section.md
+index 3697b3bb2e3e7..6723c7ed3ed8b 100644
+--- a/nixos/doc/manual/release-notes/rl-2611.section.md
++++ b/nixos/doc/manual/release-notes/rl-2611.section.md
+@@ -24,6 +24,8 @@
+ 
+ - Support for the legacy U‐Boot image format has been removed from the initrd generators, as it is deprecated upstream and no longer used by any platform in Nixpkgs.
+ 
++- Rustical migrates from `settings.http.host` and `settings.http.port` to `settings.http.bind` to support UNIX domain sockets as well as TCP sockets in one setting.
++
+ - `services.llama-cpp` is now configured using structured `services.llama-cpp.settings` attribute.
+ 
+ - Python 2 has been removed from the top-level package set, as it is long past end-of-life. The `python2`, `python27`, `python2Full`, `python27Full`, `python2Packages`, and `python27Packages` attributes, along with the legacy `python`, `pythonFull`, and `pythonPackages` aliases, now throw an error directing you to `python3`. The `isPy2` and `isPy27` package flags have been removed accordingly. The only remaining Python 2 interpreter is vendored inside the `resholve` package for its `oil` dependency and is not exposed for general use.
+diff --git a/nixos/modules/services/web-apps/rustical.nix b/nixos/modules/services/web-apps/rustical.nix
+index 0764f384ab0d3..a92daf8c07b4e 100644
+--- a/nixos/modules/services/web-apps/rustical.nix
++++ b/nixos/modules/services/web-apps/rustical.nix
+@@ -55,12 +55,12 @@ in
+           };
+ 
+           http = {
+-            host = mkOption {
++            bind = mkOption {
+               type = types.str;
+-              default = "[::1]";
+-              example = "[::]";
++              default = "unix:/run/rustical/sock";
++              example = "[::]:4000";
+               description = ''
+-                Host address to bind the HTTP service to.
++                Address and port or UNIX socket path to bind the HTTP service to.
+ 
+                 :::{.note}
+                 Rustical expects to be hosted behind a reverse proxy that
+@@ -69,14 +69,6 @@ in
+                 :::
+               '';
+             };
+-
+-            port = mkOption {
+-              type = types.port;
+-              default = 4000;
+-              description = ''
+-                Port to bind the HTTP service to.
+-              '';
+-            };
+           };
+ 
+           dav_push.enabled = mkOption {
+@@ -126,6 +118,19 @@ in
+   };
+ 
+   config = mkIf cfg.enable {
++    warnings = lib.optionals (cfg.settings.http ? host || cfg.settings.http ? port) [
++      ''
++        Rustical 0.13 deprecations
++
++        The following options are now deprecated and will be removed in a
++        future release:
++        - `services.rustical.settings.http.host`
++        - `services.rustical.settings.http.port`
++
++        Migrate to `services.rustical.settings.http.bind` instead.
++      ''
++    ];
++
+     # install the config at a path where the cli will find it
+     environment.etc."rustical/config.toml".source = configFile;
+ 
+diff --git a/nixos/tests/web-apps/rustical.nix b/nixos/tests/web-apps/rustical.nix
+index 86b0e95afa20c..15a718e877029 100644
+--- a/nixos/tests/web-apps/rustical.nix
++++ b/nixos/tests/web-apps/rustical.nix
+@@ -3,28 +3,35 @@
+   lib,
+   ...
+ }:
++
++let
++  port = "4000";
++in
++
+ {
+   name = "rustical";
+ 
+   meta.maintainers = pkgs.rustical.meta.maintainers;
+ 
+-  nodes.machine =
++  containers.machine =
+     {
+       pkgs,
+       ...
+     }:
+     {
+-      services.rustical.enable = true;
++      services.rustical = {
++        enable = true;
++        settings.http.bind = "[::]:${port}";
++      };
+       environment.systemPackages = with pkgs; [ calendar-cli ];
+     };
+ 
+   testScript =
+     {
+-      nodes,
++      containers,
+       ...
+     }:
+     let
+-      port = toString nodes.machine.services.rustical.settings.http.port;
+       url = "http://localhost:${toString port}";
+ 
+       createPrincipalScript = pkgs.writeScript "rustical-create-principal" ''
+diff --git a/pkgs/by-name/ru/rustical/package.nix b/pkgs/by-name/ru/rustical/package.nix
+index 07f244b5b22ec..8e58c6e13df2d 100644
+--- a/pkgs/by-name/ru/rustical/package.nix
++++ b/pkgs/by-name/ru/rustical/package.nix
+@@ -10,16 +10,16 @@
+ 
+ rustPlatform.buildRustPackage (finalAttrs: {
+   pname = "rustical";
+-  version = "0.12.15";
++  version = "0.13.1";
+ 
+   src = fetchFromGitHub {
+     owner = "lennart-k";
+     repo = "rustical";
+     tag = "v${finalAttrs.version}";
+-    hash = "sha256-ll7CFxYpzseYstBLe60VhYgvCYtobWeZ9/trBPTCSMg=";
++    hash = "sha256-DNwxQq2QKPQ6gzIxBJUhdMNbmHNYnt+MSFJ28PLzunQ=";
+   };
+ 
+-  cargoHash = "sha256-eqY5xzlPOlGSqqegTWTHeLR+YJb9l52Ku2yGVfflQkk=";
++  cargoHash = "sha256-bIbDohCkSlV7uBi+lyylLE/gSqjzlp+xwxQRS9zBiio=";
+ 
+   nativeBuildInputs = [ pkg-config ];
+ 

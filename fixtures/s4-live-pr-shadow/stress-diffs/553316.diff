@@ -1,0 +1,19 @@
+diff --git a/nixos/modules/services/audio/mpd.nix b/nixos/modules/services/audio/mpd.nix
+index 38bbb4eab1c7a..8da3a588e16ad 100644
+--- a/nixos/modules/services/audio/mpd.nix
++++ b/nixos/modules/services/audio/mpd.nix
+@@ -84,12 +84,10 @@ let
+           }
+         }
+       '';
+-      passAsFile = [
+-        "expectScript"
+-      ];
++      __structuredAttrs = true;
+     };
+     checkPhase = ''
+-      ${lib.getExe pkgs.buildPackages.expect} -f "$expectScriptPath"
++      printf "%s" "$expectScript" | ${lib.getExe pkgs.buildPackages.expect} -f -
+     '';
+   };
+ 

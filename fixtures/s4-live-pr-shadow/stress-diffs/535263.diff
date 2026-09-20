@@ -1,0 +1,454 @@
+diff --git a/nixos/modules/system/boot/systemd/journald-gateway.nix b/nixos/modules/system/boot/systemd/journald-gateway.nix
+index 28c29df71c41c..76a858e1b471f 100644
+--- a/nixos/modules/system/boot/systemd/journald-gateway.nix
++++ b/nixos/modules/system/boot/systemd/journald-gateway.nix
+@@ -9,16 +9,19 @@ let
+   cfg = config.services.journald.gateway;
+ 
+   cliArgs = lib.cli.toCommandLineShellGNU { } {
+-    # If either of these are null / false, they are not passed in the command-line
++    # If either of these are false, they are not passed in the command-line
+     inherit (cfg)
+-      cert
+-      key
+-      trust
+       system
+       user
+       merge
+       ;
+   };
++
++  tlsOptionRemovedMessage = ''
++    systemd in Nixpkgs is built without GnuTLS, so systemd-journal-gatewayd
++    cannot serve HTTPS. Use a reverse proxy (such as nginx) to terminate TLS
++    in front of the gateway if you need encrypted access.
++  '';
+ in
+ {
+   imports = [
+@@ -26,6 +29,9 @@ in
+       [ "services" "journald" "enableHttpGateway" ]
+       [ "services" "journald" "gateway" "enable" ]
+     )
++    (lib.mkRemovedOptionModule [ "services" "journald" "gateway" "cert" ] tlsOptionRemovedMessage)
++    (lib.mkRemovedOptionModule [ "services" "journald" "gateway" "key" ] tlsOptionRemovedMessage)
++    (lib.mkRemovedOptionModule [ "services" "journald" "gateway" "trust" ] tlsOptionRemovedMessage)
+   ];
+ 
+   meta.maintainers = [ ];
+@@ -40,47 +46,6 @@ in
+       '';
+     };
+ 
+-    cert = lib.mkOption {
+-      default = null;
+-      type = with lib.types; nullOr str;
+-      description = ''
+-        The path to a file or `AF_UNIX` stream socket to read the server
+-        certificate from.
+-
+-        The certificate must be in PEM format. This option switches
+-        `systemd-journal-gatewayd` into HTTPS mode and must be used together
+-        with {option}`services.journald.gateway.key`.
+-      '';
+-    };
+-
+-    key = lib.mkOption {
+-      default = null;
+-      type = with lib.types; nullOr str;
+-      description = ''
+-        Specify the path to a file or `AF_UNIX` stream socket to read the
+-        secret server key corresponding to the certificate specified with
+-        {option}`services.journald.gateway.cert` from.
+-
+-        The key must be in PEM format.
+-
+-        This key should not be world-readable, and must be readably by the
+-        `systemd-journal-gateway` user.
+-      '';
+-    };
+-
+-    trust = lib.mkOption {
+-      default = null;
+-      type = with lib.types; nullOr str;
+-      description = ''
+-        Specify the path to a file or `AF_UNIX` stream socket to read a CA
+-        certificate from.
+-
+-        The certificate must be in PEM format.
+-
+-        Setting this option enforces client certificate checking.
+-      '';
+-    };
+-
+     system = lib.mkOption {
+       default = false;
+       type = lib.types.bool;
+diff --git a/nixos/modules/system/boot/systemd/journald-remote.nix b/nixos/modules/system/boot/systemd/journald-remote.nix
+index d08c83d303baf..fbb444b6400b0 100644
+--- a/nixos/modules/system/boot/systemd/journald-remote.nix
++++ b/nixos/modules/system/boot/systemd/journald-remote.nix
+@@ -12,25 +12,30 @@ let
+   cliArgs = lib.cli.toCommandLineShellGNU { } {
+     inherit (cfg) output;
+     # "-3" specifies the file descriptor from the .socket unit.
+-    "listen-${cfg.listen}" = "-3";
++    "listen-http" = "-3";
+   };
++
++  tlsOptionRemovedMessage = ''
++    systemd in Nixpkgs is built without GnuTLS, so systemd-journal-remote
++    cannot accept HTTPS connections or validate client certificates. Use a
++    reverse proxy (such as nginx) to terminate TLS in front of journal-remote
++    if you need encrypted ingestion.
++  '';
+ in
+ {
+   meta.maintainers = [ ];
++  imports = [
++    (lib.mkRemovedOptionModule [
++      "services"
++      "journald"
++      "remote"
++      "listen"
++    ] tlsOptionRemovedMessage)
++  ];
++
+   options.services.journald.remote = {
+     enable = lib.mkEnableOption "receiving systemd journals from the network";
+ 
+-    listen = lib.mkOption {
+-      default = "https";
+-      type = lib.types.enum [
+-        "https"
+-        "http"
+-      ];
+-      description = ''
+-        Which protocol to listen to.
+-      '';
+-    };
+-
+     output = lib.mkOption {
+       default = "/var/log/journal/remote/";
+       type = lib.types.str;
+@@ -50,10 +55,6 @@ in
+       type = lib.types.port;
+       description = ''
+         The port to listen to.
+-
+-        Note that this option is used only if
+-        {option}`services.journald.upload.listen` is configured to be either
+-        "https" or "http".
+       '';
+     };
+ 
+@@ -92,55 +93,28 @@ in
+               one output journal file is used.
+             '';
+           };
+-
+-          ServerKeyFile = lib.mkOption {
+-            default = "/etc/ssl/private/journal-remote.pem";
+-            type = lib.types.str;
+-            description = ''
+-              A path to a SSL secret key file in PEM format.
+-
+-              Note that due to security reasons, `systemd-journal-remote` will
+-              refuse files from the world-readable `/nix/store`. This file
+-              should be readable by the "" user.
+-
+-              This option can be used with `listen = "https"`. If the path
+-              refers to an `AF_UNIX` stream socket in the file system a
+-              connection is made to it and the key read from it.
+-            '';
+-          };
+-
+-          ServerCertificateFile = lib.mkOption {
+-            default = "/etc/ssl/certs/journal-remote.pem";
+-            type = lib.types.str;
+-            description = ''
+-              A path to a SSL certificate file in PEM format.
+-
+-              This option can be used with `listen = "https"`. If the path
+-              refers to an `AF_UNIX` stream socket in the file system a
+-              connection is made to it and the certificate read from it.
+-            '';
+-          };
+-
+-          TrustedCertificateFile = lib.mkOption {
+-            default = "/etc/ssl/ca/trusted.pem";
+-            type = lib.types.str;
+-            description = ''
+-              A path to a SSL CA certificate file in PEM format, or `all`.
+-
+-              If `all` is set, then client certificate checking will be
+-              disabled.
+-
+-              This option can be used with `listen = "https"`. If the path
+-              refers to an `AF_UNIX` stream socket in the file system a
+-              connection is made to it and the certificate read from it.
+-            '';
+-          };
+         };
+       };
+     };
+   };
+ 
+   config = lib.mkIf cfg.enable {
++    assertions =
++      map
++        (key: {
++          assertion = !(cfg.settings ? Remote.${key});
++          message = ''
++            The option definition `services.journald.remote.settings.Remote.${key}'
++            no longer has any effect; please remove it.
++            ${tlsOptionRemovedMessage}
++          '';
++        })
++        [
++          "ServerKeyFile"
++          "ServerCertificateFile"
++          "TrustedCertificateFile"
++        ];
++
+     systemd.additionalUpstreamSystemUnits = [
+       "systemd-journal-remote.service"
+       "systemd-journal-remote.socket"
+diff --git a/nixos/tests/systemd-journal-gateway.nix b/nixos/tests/systemd-journal-gateway.nix
+index 85f007d7a94d5..17b454d9595e6 100644
+--- a/nixos/tests/systemd-journal-gateway.nix
++++ b/nixos/tests/systemd-journal-gateway.nix
+@@ -1,4 +1,4 @@
+-{ lib, pkgs, ... }:
++{ pkgs, ... }:
+ {
+   name = "systemd-journal-gateway";
+   meta = with pkgs.lib.maintainers; {
+@@ -7,64 +7,21 @@
+     ];
+   };
+ 
+-  # Named client for coherence with the systemd-journal-upload test, and for
+-  # certificate validation
++  # Named client for coherence with the systemd-journal-upload test.
+   nodes.client = {
+-    services.journald.gateway = {
+-      enable = true;
+-      cert = "/run/secrets/client/cert.pem";
+-      key = "/run/secrets/client/key.pem";
+-      trust = "/run/secrets/ca.cert.pem";
+-    };
++    services.journald.gateway.enable = true;
+   };
+ 
+   testScript = ''
+     import json
+-    import subprocess
+-    import tempfile
+-
+-    tmpdir_o = tempfile.TemporaryDirectory()
+-    tmpdir = tmpdir_o.name
+-
+-    def generate_pems(domain: str):
+-      subprocess.run(
+-        [
+-          "${pkgs.minica}/bin/minica",
+-          "--ca-key=ca.key.pem",
+-          "--ca-cert=ca.cert.pem",
+-          f"--domains={domain}",
+-        ],
+-        cwd=str(tmpdir),
+-      )
+-
+-    with subtest("Creating keys and certificates"):
+-      generate_pems("server")
+-      generate_pems("client")
+-
+-    client.wait_for_unit("multi-user.target")
+-
+-    def copy_pem(file: str):
+-      client.copy_from_host(source=f"{tmpdir}/{file}", target=f"/run/secrets/{file}")
+-      client.succeed(f"chmod 600 /run/secrets/{file} && chown systemd-journal-gateway /run/secrets/{file}")
+-
+-    with subtest("Copying keys and certificates"):
+-      client.succeed("mkdir -p /run/secrets/{client,server}")
+-      copy_pem("server/cert.pem")
+-      copy_pem("server/key.pem")
+-      copy_pem("client/cert.pem")
+-      copy_pem("client/key.pem")
+-      copy_pem("ca.cert.pem")
+ 
+     client.wait_for_unit("multi-user.target")
+ 
+     curl = '${pkgs.curl}/bin/curl'
+     accept_json = '--header "Accept: application/json"'
+-    cacert = '--cacert /run/secrets/ca.cert.pem'
+-    cert = '--cert /run/secrets/server/cert.pem'
+-    key = '--key /run/secrets/server/key.pem'
+-    base_url = 'https://client:19531'
++    base_url = 'http://client:19531'
+ 
+-    curl_cli = f"{curl} {accept_json} {cacert} {cert} {key} --fail"
++    curl_cli = f"{curl} {accept_json} --fail"
+ 
+     machine_info = client.succeed(f"{curl_cli} {base_url}/machine")
+     assert json.loads(machine_info)["hostname"] == "client", "wrong machine name"
+@@ -78,11 +35,8 @@
+ 
+     client.succeed(f"systemd-cat --identifier={identifier} <<< '{message}'")
+ 
+-    # max-time is a workaround against a bug in systemd-journal-gatewayd where
+-    # if TLS is enabled, the connection is never closed. Since it will timeout,
+-    # we ignore the return code.
+     entries = client.succeed(
+-        f"{curl_cli} --max-time 5 {base_url}/entries?SYSLOG_IDENTIFIER={identifier} || true"
++        f"{curl_cli} {base_url}/entries?SYSLOG_IDENTIFIER={identifier}"
+     )
+ 
+     # Number of entries should be only 1
+diff --git a/nixos/tests/systemd-journal-upload.nix b/nixos/tests/systemd-journal-upload.nix
+index 747e8c4ffe311..f01ed17019f81 100644
+--- a/nixos/tests/systemd-journal-upload.nix
++++ b/nixos/tests/systemd-journal-upload.nix
+@@ -7,48 +7,84 @@
+     ];
+   };
+ 
++  # systemd in Nixpkgs is built without GnuTLS, so systemd-journal-remote
++  # cannot terminate TLS itself. We put nginx in front of it with mutual TLS
++  # and have systemd-journal-upload (which uses curl+openssl) talk HTTPS to
++  # nginx. This exercises both the recommended migration path and verifies
++  # that journal-upload's TLS support still works.
+   nodes.server =
+-    { nodes, ... }:
++    { lib, nodes, ... }:
+     {
++
+       services.journald.remote = {
+         enable = true;
+-        listen = "http";
+         settings.Remote = {
+-          ServerCertificateFile = "/run/secrets/sever.cert.pem";
+-          ServerKeyFile = "/run/secrets/sever.key.pem";
+-          TrustedCertificateFile = "/run/secrets/ca.cert.pem";
+           Seal = true;
+         };
+       };
+ 
+-      networking.firewall.allowedTCPPorts = [ nodes.server.services.journald.remote.port ];
++      # Keep journal-remote loopback-only; only nginx is exposed to the network.
++      systemd.sockets.systemd-journal-remote.listenStreams = lib.mkForce [
++        ""
++        "127.0.0.1:${toString nodes.server.services.journald.remote.port}"
++      ];
++
++      virtualisation.credentials = {
++        "ca.cert.pem".source = "./ca.cert.pem";
++        "server.cert.pem".source = "./server.cert.pem";
++        "server.key.pem".source = "./server.key.pem";
++      };
++      systemd.services.nginx.serviceConfig.ImportCredential = [
++        "server.cert.pem"
++        "server.key.pem"
++        "ca.cert.pem"
++      ];
++      services.nginx = {
++        enable = true;
++        virtualHosts."server" = {
++          onlySSL = true;
++          http2 = false;
++          sslCertificate = "/run/credentials/nginx.service/server.cert.pem";
++          sslCertificateKey = "/run/credentials/nginx.service/server.key.pem";
++          extraConfig = ''
++            ssl_client_certificate /run/credentials/nginx.service/ca.cert.pem;
++            ssl_verify_client on;
++          '';
++          locations."/".proxyPass = "http://127.0.0.1:${toString nodes.server.services.journald.remote.port}";
++        };
++      };
++
++      networking.firewall.allowedTCPPorts = [ 443 ];
+     };
+ 
+   nodes.client =
+-    { lib, nodes, ... }:
++    { lib, ... }:
+     {
++      virtualisation.credentials = {
++        "ca.cert.pem".source = "./ca.cert.pem";
++        "client.cert.pem".source = "./client.cert.pem";
++        "client.key.pem".source = "./client.key.pem";
++      };
++      systemd.services.systemd-journal-upload.serviceConfig.ImportCredential = [
++        "client.cert.pem"
++        "client.key.pem"
++        "ca.cert.pem"
++      ];
+       services.journald.upload = {
+         enable = true;
+         settings.Upload = {
+-          URL = "http://server:${toString nodes.server.services.journald.remote.port}";
+-          ServerCertificateFile = "/run/secrets/client.cert.pem";
+-          ServerKeyFile = "/run/secrets/client.key.pem";
+-          TrustedCertificateFile = "/run/secrets/ca.cert.pem";
++          URL = "https://server:443";
++          ServerCertificateFile = "/run/credentials/systemd-journal-upload.service/client.cert.pem";
++          ServerKeyFile = "/run/credentials/systemd-journal-upload.service/client.key.pem";
++          TrustedCertificateFile = "/run/credentials/systemd-journal-upload.service/ca.cert.pem";
+         };
+       };
+-
+-      # Wait for the PEMs to arrive
+-      systemd.services.systemd-journal-upload.wantedBy = lib.mkForce [ ];
+-      systemd.paths.systemd-journal-upload = {
+-        wantedBy = [ "default.target" ];
+-        # This file must be copied last
+-        pathConfig.PathExists = [ "/run/secrets/ca.cert.pem" ];
+-      };
+     };
+ 
+   testScript = ''
+     import subprocess
+     import tempfile
++    import shutil
+ 
+     tmpdir_o = tempfile.TemporaryDirectory()
+     tmpdir = tmpdir_o.name
+@@ -68,33 +104,17 @@
+       generate_pems("server")
+       generate_pems("client")
+ 
+-    server.wait_for_unit("multi-user.target")
+-    client.wait_for_unit("multi-user.target")
+-
+     def copy_pems(machine: BaseMachine, domain: str):
+-      machine.succeed("mkdir /run/secrets")
+-      machine.copy_from_host(
+-        source=f"{tmpdir}/{domain}/cert.pem",
+-        target=f"/run/secrets/{domain}.cert.pem",
+-      )
+-      machine.copy_from_host(
+-        source=f"{tmpdir}/{domain}/key.pem",
+-        target=f"/run/secrets/{domain}.key.pem",
+-      )
+-      # Should be last
+-      machine.copy_from_host(
+-        source=f"{tmpdir}/ca.cert.pem",
+-        target="/run/secrets/ca.cert.pem",
+-      )
++      shutil.copy(f"{tmpdir}/{domain}/cert.pem", machine.state_dir / f"{domain}.cert.pem")
++      shutil.copy(f"{tmpdir}/{domain}/key.pem", machine.state_dir / f"{domain}.key.pem")
++      shutil.copy(f"{tmpdir}/ca.cert.pem", machine.state_dir / "ca.cert.pem")
+ 
+     with subtest("Copying keys and certificates"):
+       copy_pems(server, "server")
+       copy_pems(client, "client")
+ 
++    server.wait_for_unit("nginx.service")
+     client.wait_for_unit("systemd-journal-upload.service")
+-    # The journal upload should have started the remote service, triggered by
+-    # the .socket unit
+-    server.wait_for_unit("systemd-journal-remote.service")
+ 
+     identifier = "nixos-test"
+     message = "Hello from NixOS test infrastructure"

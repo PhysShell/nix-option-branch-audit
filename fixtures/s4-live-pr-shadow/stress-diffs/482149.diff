@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/networking/ntp/ntpd-rs.nix b/nixos/modules/services/networking/ntp/ntpd-rs.nix
+index 89735696616c8..d68b7762805ea 100644
+--- a/nixos/modules/services/networking/ntp/ntpd-rs.nix
++++ b/nixos/modules/services/networking/ntp/ntpd-rs.nix
+@@ -70,6 +70,7 @@ in
+ 
+     services.ntpd-rs.settings = {
+       observability = {
++        log-level = lib.mkDefault "warn";
+         observation-path = lib.mkDefault "/var/run/ntpd-rs/observe";
+       };
+       source = lib.mkIf cfg.useNetworkingTimeServers (

@@ -1,0 +1,13 @@
+diff --git a/nixos/modules/services/computing/boinc/client.nix b/nixos/modules/services/computing/boinc/client.nix
+index a0d244337be8e..a91beca21ec58 100644
+--- a/nixos/modules/services/computing/boinc/client.nix
++++ b/nixos/modules/services/computing/boinc/client.nix
+@@ -50,7 +50,7 @@ in
+         only the hosts listed in {var}`dataDir`/remote_hosts.cfg will be allowed to
+         connect.
+ 
+-        See also: <https://boinc.berkeley.edu/wiki/Controlling_BOINC_remotely#Remote_access>
++        See also: <https://github.com/BOINC/boinc/wiki/Controlling_BOINC_remotely#remote-access>
+       '';
+     };
+ 

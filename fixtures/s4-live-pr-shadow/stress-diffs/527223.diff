@@ -1,0 +1,30 @@
+diff --git a/nixos/tests/incus/incus-tests-module.nix b/nixos/tests/incus/incus-tests-module.nix
+index e5318443670b3..3eb00f46dd565 100644
+--- a/nixos/tests/incus/incus-tests-module.nix
++++ b/nixos/tests/incus/incus-tests-module.nix
+@@ -1,10 +1,12 @@
+ {
++  config,
+   lib,
+   pkgs,
+   ...
+ }:
+ let
+   jsonFormat = pkgs.formats.json { };
++  cfg = config.tests.incus;
+ in
+ {
+   options.tests.incus = {
+@@ -74,7 +76,11 @@ in
+             config =
+               let
+                 releases = import ../../release.nix {
+-                  configuration = config.nixosConfig;
++                  configuration = lib.recursiveUpdate config.nixosConfig {
++                    virtualisation.incus = {
++                      inherit (cfg) package;
++                    };
++                  };
+                 };
+ 
+                 images = {

@@ -1,0 +1,351 @@
+diff --git a/nixos/modules/services/web-apps/pretalx.nix b/nixos/modules/services/web-apps/pretalx.nix
+index 16fc6f0909835..6ce7d1a5ce3db 100644
+--- a/nixos/modules/services/web-apps/pretalx.nix
++++ b/nixos/modules/services/web-apps/pretalx.nix
+@@ -21,8 +21,6 @@ let
+         (toPythonModule finalPackage)
+         gunicorn
+       ]
+-      ++ finalPackage.optional-dependencies.redis
+-      ++ lib.optionals cfg.celery.enable [ celery ]
+       ++ lib.optionals (
+         cfg.settings.database.backend == "postgresql"
+       ) finalPackage.optional-dependencies.postgres;
+@@ -58,6 +56,12 @@ in
+ {
+   meta.maintainers = pkgs.pretalx.meta.maintainers;
+ 
++  imports = [
++    (lib.mkRemovedOptionModule [ "services" "pretalx" "celery" "enable" ] ''
++      Celery is now always required.
++    '')
++  ];
++
+   options.services.pretalx = {
+     enable = lib.mkEnableOption "pretalx";
+ 
+@@ -136,15 +140,6 @@ in
+     };
+ 
+     celery = {
+-      enable = lib.mkOption {
+-        type = lib.types.bool;
+-        default = true;
+-        example = false;
+-        description = ''
+-          Whether to set up celery as an asynchronous task runner.
+-        '';
+-      };
+-
+       extraArgs = lib.mkOption {
+         type = with lib.types; listOf str;
+         default = [ ];
+@@ -281,10 +276,8 @@ in
+           celery = {
+             backend = lib.mkOption {
+               type = with lib.types; nullOr str;
+-              default = lib.optionalString cfg.celery.enable "redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1";
+-              defaultText = lib.literalExpression ''
+-                optionalString config.services.pretalx.celery.enable "redis+socket://''${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1"
+-              '';
++              default = "redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1";
++              defaultText = lib.literalExpression "redis+socket://''${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1";
+               description = ''
+                 URI to the celery backend used for the asynchronous job queue.
+               '';
+@@ -292,10 +285,8 @@ in
+ 
+             broker = lib.mkOption {
+               type = with lib.types; nullOr str;
+-              default = lib.optionalString cfg.celery.enable "redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2";
+-              defaultText = lib.literalExpression ''
+-                optionalString config.services.pretalx.celery.enable "redis+socket://''${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2"
+-              '';
++              default = "redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2";
++              defaultText = lib.literalExpression "redis+socket://''${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2";
+               description = ''
+                 URI to the celery broker used for the asynchronous job queue.
+               '';
+@@ -385,6 +376,15 @@ in
+                 access_log off;
+                 more_set_headers 'Content-Disposition: attachment; filename="$1"';
+                 expires 7d;
++                types {
++                  # prevent xss through file uploads
++                  text/plain html;
++                  text/plain htm;
++                  text/plain svg;
++                  text/plain svgz;
++                  text/plain js;
++                  text/plain mjs;
++                }
+               '';
+             };
+             "/static/" = {
+@@ -523,23 +523,21 @@ in
+           };
+         };
+ 
+-        pretalx-worker = lib.mkIf cfg.celery.enable (
+-          lib.recursiveUpdate commonUnitConfig {
+-            description = "pretalx asynchronous job runner";
+-            after = [
+-              "network.target"
+-              "redis-pretalx.service"
+-            ]
+-            ++ lib.optionals (cfg.settings.database.backend == "postgresql") [
+-              "postgresql.target"
+-            ]
+-            ++ lib.optionals (cfg.settings.database.backend == "mysql") [
+-              "mysql.service"
+-            ];
+-            wantedBy = [ "multi-user.target" ];
+-            serviceConfig.ExecStart = "${lib.getExe' pythonEnv "celery"} -A pretalx.celery_app worker ${cfg.celery.extraArgs}";
+-          }
+-        );
++        pretalx-worker = lib.recursiveUpdate commonUnitConfig {
++          description = "pretalx asynchronous job runner";
++          after = [
++            "network.target"
++            "redis-pretalx.service"
++          ]
++          ++ lib.optionals (cfg.settings.database.backend == "postgresql") [
++            "postgresql.target"
++          ]
++          ++ lib.optionals (cfg.settings.database.backend == "mysql") [
++            "mysql.service"
++          ];
++          wantedBy = [ "multi-user.target" ];
++          serviceConfig.ExecStart = "${lib.getExe' pythonEnv "celery"} -A pretalx.celery_app worker ${cfg.celery.extraArgs}";
++        };
+ 
+         nginx.serviceConfig.SupplementaryGroups = lib.mkIf cfg.nginx.enable [ "pretalx" ];
+       };
+diff --git a/pkgs/by-name/pr/pretalx/package.nix b/pkgs/by-name/pr/pretalx/package.nix
+index 7098f3975c295..86485eef36fb3 100644
+--- a/pkgs/by-name/pr/pretalx/package.nix
++++ b/pkgs/by-name/pr/pretalx/package.nix
+@@ -1,9 +1,11 @@
+ {
+   lib,
+-  buildNpmPackage,
+   gettext,
+   python314,
+   fetchFromGitHub,
++  fetchNpmDeps,
++  npmHooks,
++  nodejs,
+   plugins ? [ ],
+   nixosTests,
+ }:
+@@ -15,69 +17,47 @@ let
+       django = prev.django_6;
+     };
+   };
++in
++python.pkgs.buildPythonApplication (finalAttrs: {
++  pname = "pretalx";
++  version = "2026.2.0";
++  pyproject = true;
+ 
+-  version = "2026.1.2";
++  __structuredAttrs = true;
+ 
+   src = fetchFromGitHub {
+     owner = "pretalx";
+     repo = "pretalx";
+-    tag = "v${version}";
+-    hash = "sha256-/hs2sPeHyv06aXfUn7UdaGJo9UQ2hah/nufSxG+wO5Q=";
++    tag = "v${finalAttrs.version}";
++    hash = "sha256-c6xLSosAn0HZFkujdgC4rp1CPHLsRcz4LsiAPaSgP1g=";
+   };
+ 
+-  meta = {
+-    description = "Conference planning tool: CfP, scheduling, speaker management";
+-    mainProgram = "pretalx-manage";
+-    homepage = "https://github.com/pretalx/pretalx";
+-    changelog = "https://docs.pretalx.org/changelog/v${version}/";
+-    license = lib.licenses.asl20;
+-    maintainers = with lib.maintainers; [
+-      hexa
+-      SuperSandro2000
+-    ];
+-    platforms = lib.platforms.linux;
++  npmRoot = "src/pretalx/frontend";
++  npmDeps = fetchNpmDeps {
++    inherit (finalAttrs) pname version;
++    src = "${finalAttrs.src}/src/pretalx/frontend";
++    hash = "sha256-P9A2Kms+Eb1YI2qu9mt5BfiDDeXv+NkvVxy33Ns2S2A=";
+   };
+ 
+-  pretix-schedule-editor = buildNpmPackage {
+-    pname = "pretalx-schedule-editor";
+-    inherit version src;
+-
+-    sourceRoot = "${src.name}/src/pretalx/frontend/schedule-editor";
+-
+-    npmDepsHash = "sha256-66PA2COL3lqMspYGoF/bOJje5URRu1voQbZspM7DTxs=";
+-
+-    npmBuildScript = "build";
+-
+-    installPhase = ''
+-      runHook preInstall
+-
+-      mkdir -p $out
+-      cp dist/** $out/
+-
+-      runHook postInstall
+-    '';
+-
+-    inherit meta;
+-  };
+-in
+-python.pkgs.buildPythonApplication rec {
+-  pname = "pretalx";
+-  inherit version src;
+-  pyproject = true;
+-
+   outputs = [
+     "out"
+     "static"
+   ];
+ 
+   patches = [
+-    # don't run npm during rebuild command, we already use a separate derivation
+-    # to build static assets
+-    ./rebuild-no-npm.patch
++    # template error; https://github.com/pretalx/pretalx/pull/2559
++    ./pr2559.patch
+   ];
+ 
++  postPatch = ''
++    # we already provide npm deps
++    sed -i "/npm.*ci/d" src/pretalx/_build.py
++  '';
++
+   nativeBuildInputs = [
+     gettext
++    npmHooks.npmConfigHook
++    nodejs
+   ];
+ 
+   build-system = with python.pkgs; [
+@@ -137,6 +117,7 @@ python.pkgs.buildPythonApplication rec {
+       publicsuffixlist
+       python-dateutil
+       qrcode
++      redis
+       reportlab
+       requests
+       rules
+@@ -154,16 +135,10 @@ python.pkgs.buildPythonApplication rec {
+     postgres = with python.pkgs; [
+       psycopg2
+     ];
+-    redis = with python.pkgs; [
+-      redis
+-    ];
+   };
+-
+   postBuild = ''
+-    # link schedule-editor so it can be picked up in staticfiles lookups
+-    ln -s ${pretix-schedule-editor}/** ./src/pretalx/static/
+-
+-    # Generate all static files, see https://docs.pretalx.org/administrator/commands.html#python-m-pretalx-rebuild
++    # Generate all static files and translations, see
++    # https://docs.pretalx.org/administrator/commands.html#python-m-pretalx-rebuild
+     PYTHONPATH=$PYTHONPATH:./src python -m pretalx rebuild
+   '';
+ 
+@@ -174,7 +149,6 @@ python.pkgs.buildPythonApplication rec {
+     # Copy and merge static files
+     mkdir -p $static
+     cp -r ./src/static.dist/** $static/
+-    cp -r ${pretix-schedule-editor}/** $static/
+ 
+     # And link them into the package for staticfiles lookups
+     rm -rf $out/${python.sitePackages}/pretalx/static
+@@ -200,7 +174,7 @@ python.pkgs.buildPythonApplication rec {
+       pytestCheckHook
+       responses
+     ]
+-    ++ lib.concatAttrValues optional-dependencies;
++    ++ lib.concatAttrValues finalAttrs.passthru.optional-dependencies;
+ 
+   disabledTests = [
+     #  assert 'tests.dummy_app' in ['pretalx_pages']
+@@ -220,5 +194,16 @@ python.pkgs.buildPythonApplication rec {
+     );
+   };
+ 
+-  inherit meta;
+-}
++  meta = {
++    description = "Conference planning tool: CfP, scheduling, speaker management";
++    mainProgram = "pretalx-manage";
++    homepage = "https://github.com/pretalx/pretalx";
++    changelog = "https://docs.pretalx.org/changelog/v${finalAttrs.version}/";
++    license = lib.licenses.asl20;
++    maintainers = with lib.maintainers; [
++      hexa
++      SuperSandro2000
++    ];
++    platforms = lib.platforms.linux;
++  };
++})
+diff --git a/pkgs/by-name/pr/pretalx/pr2559.patch b/pkgs/by-name/pr/pretalx/pr2559.patch
+new file mode 100644
+index 0000000000000..4f74b721d3410
+--- /dev/null
++++ b/pkgs/by-name/pr/pretalx/pr2559.patch
+@@ -0,0 +1,23 @@
++From 98186266f1a95b8eae6dcb596684ca7bd238fe48 Mon Sep 17 00:00:00 2001
++From: Martin Weinelt <hexa@darmstadt.ccc.de>
++Date: Wed, 8 Jul 2026 01:00:15 +0200
++Subject: [PATCH] Fix admin_user_events template syntax error
++
++---
++ .../orga/templates/orga/tables/columns/admin_user_events.html  | 3 ++-
++ 1 file changed, 2 insertions(+), 1 deletion(-)
++
++diff --git a/src/pretalx/orga/templates/orga/tables/columns/admin_user_events.html b/src/pretalx/orga/templates/orga/tables/columns/admin_user_events.html
++index b92a4c1eaa..f681a5c3fa 100644
++--- a/src/pretalx/orga/templates/orga/tables/columns/admin_user_events.html
+++++ b/src/pretalx/orga/templates/orga/tables/columns/admin_user_events.html
++@@ -5,7 +5,8 @@
++ {% load i18n %}
++ 
++ {% if record.is_administrator %}
++-    {% translate "All events" } {% else %}
+++    {% translate "All events" %}
+++{% else %}
++     <ul>
++         {% for event in record.get_events_with_any_permission %}
++             <li>
+diff --git a/pkgs/by-name/pr/pretalx/rebuild-no-npm.patch b/pkgs/by-name/pr/pretalx/rebuild-no-npm.patch
+deleted file mode 100644
+index 0ca15e4fbd7c0..0000000000000
+--- a/pkgs/by-name/pr/pretalx/rebuild-no-npm.patch
++++ /dev/null
+@@ -1,21 +0,0 @@
+-diff --git a/src/pretalx/common/management/commands/rebuild.py b/src/pretalx/common/management/commands/rebuild.py
+-index b7412498f..f9e2e24c3 100644
+---- a/src/pretalx/common/management/commands/rebuild.py
+-+++ b/src/pretalx/common/management/commands/rebuild.py
+-@@ -57,16 +57,6 @@ def handle(self, *args, **options):
+-         call_command(
+-             "collectstatic", verbosity=silent, interactive=False, clear=options["clear"]
+-         )
+--        with override_settings(VITE_IGNORE=True):
+--            frontend_dir = (
+--                Path(__file__).parent.parent.parent.parent / "frontend/schedule-editor/"
+--            )
+--            env = os.environ.copy()
+--            env["OUT_DIR"] = str(settings.STATIC_ROOT)
+--            env["BASE_URL"] = settings.STATIC_URL
+--            if options["npm_install"] or not (frontend_dir / "node_modules").exists():
+--                subprocess.check_call(["npm", "ci"], cwd=frontend_dir)  # noqa: S607 -- npm is commonly installed in user paths
+--            subprocess.check_call(["npm", "run", "build"], cwd=frontend_dir, env=env)  # noqa: S607 -- npm is commonly installed in user paths
+- 
+-         # This fails if we don't have db access, which is fine
+-         with suppress(Exception):

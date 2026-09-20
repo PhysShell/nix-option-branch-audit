@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/networking/murmur.nix b/nixos/modules/services/networking/murmur.nix
+index 8f72e3c52b849..65c6725d8f50c 100644
+--- a/nixos/modules/services/networking/murmur.nix
++++ b/nixos/modules/services/networking/murmur.nix
+@@ -386,6 +386,7 @@ in
+         PrivateMounts = true;
+         PrivateTmp = true;
+         PrivateUsers = true;
++        ProcSubset = "pid";
+         ProtectClock = true;
+         ProtectControlGroups = "strict";
+         ProtectHome = true;

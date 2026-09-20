@@ -1,0 +1,14 @@
+diff --git a/nixos/modules/services/editors/emacs.nix b/nixos/modules/services/editors/emacs.nix
+index 2cf753484a808..c47577a6ce094 100644
+--- a/nixos/modules/services/editors/emacs.nix
++++ b/nixos/modules/services/editors/emacs.nix
+@@ -80,6 +80,9 @@ in
+       unitConfig = lib.optionalAttrs cfg.startWithGraphical {
+         After = "graphical-session.target";
+       };
++
++      # Long-lived session that ought to only be restarted manually
++      restartIfChanged = false;
+     }
+     // lib.optionalAttrs cfg.enable {
+       wantedBy = if cfg.startWithGraphical then [ "graphical-session.target" ] else [ "default.target" ];

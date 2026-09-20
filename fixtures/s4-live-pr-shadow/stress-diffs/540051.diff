@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/misc/rsync.nix b/nixos/modules/services/misc/rsync.nix
+index f0768bf2771c6..29f75fc392eb0 100644
+--- a/nixos/modules/services/misc/rsync.nix
++++ b/nixos/modules/services/misc/rsync.nix
+@@ -137,6 +137,7 @@ in
+ 
+           services.${systemdName} = {
+             inherit description;
++            path = [ config.programs.ssh.package ];
+ 
+             serviceConfig = {
+               Type = "oneshot";

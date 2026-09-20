@@ -1,0 +1,48 @@
+diff --git a/nixos/modules/services/security/hockeypuck.nix b/nixos/modules/services/security/hockeypuck.nix
+index 785dc15393f91..b021eac7d463d 100644
+--- a/nixos/modules/services/security/hockeypuck.nix
++++ b/nixos/modules/services/security/hockeypuck.nix
+@@ -10,7 +10,7 @@ let
+   settingsFormat = pkgs.formats.toml { };
+ in
+ {
+-  meta.maintainers = [ ];
++  meta.maintainers = lib.teams.ngi.members;
+ 
+   options.services.hockeypuck = {
+     enable = lib.mkEnableOption "Hockeypuck OpenPGP Key Server";
+diff --git a/nixos/tests/hockeypuck.nix b/nixos/tests/hockeypuck.nix
+index ba6549f6cdf45..2b43ef5eaf3bd 100644
+--- a/nixos/tests/hockeypuck.nix
++++ b/nixos/tests/hockeypuck.nix
+@@ -25,7 +25,7 @@ let
+ in
+ {
+   name = "hockeypuck";
+-  meta.maintainers = [ ];
++  meta.maintainers = lib.teams.ngi.members;
+ 
+   nodes.machine =
+     { ... }:
+diff --git a/pkgs/by-name/ho/hockeypuck-web/package.nix b/pkgs/by-name/ho/hockeypuck-web/package.nix
+index d267bba0f1f41..7e2abda87e2f6 100644
+--- a/pkgs/by-name/ho/hockeypuck-web/package.nix
++++ b/pkgs/by-name/ho/hockeypuck-web/package.nix
+@@ -26,5 +26,6 @@ stdenv.mkDerivation {
+     homepage = "https://github.com/hockeypuck/hockeypuck";
+     license = lib.licenses.gpl3Plus;
+     maintainers = [ ];
++    teams = with lib.teams; [ ngi ];
+   };
+ }
+diff --git a/pkgs/by-name/ho/hockeypuck/package.nix b/pkgs/by-name/ho/hockeypuck/package.nix
+index 095d6d02990f7..d3ce5fda14d27 100644
+--- a/pkgs/by-name/ho/hockeypuck/package.nix
++++ b/pkgs/by-name/ho/hockeypuck/package.nix
+@@ -27,5 +27,6 @@ buildGoModule (finalAttrs: {
+     homepage = "https://github.com/hockeypuck/hockeypuck";
+     license = lib.licenses.agpl3Plus;
+     maintainers = [ ];
++    teams = with lib.teams; [ ngi ];
+   };
+ })

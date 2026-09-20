@@ -1,0 +1,22 @@
+diff --git a/nixos/tests/web-apps/goupile/default.nix b/nixos/tests/web-apps/goupile/default.nix
+index f386068308714..2af97b659a929 100644
+--- a/nixos/tests/web-apps/goupile/default.nix
++++ b/nixos/tests/web-apps/goupile/default.nix
+@@ -100,7 +100,6 @@ in
+     in
+     # py
+     ''
+-      import os
+       start_all()
+ 
+       machine.wait_for_unit("goupile.service")
+@@ -113,8 +112,7 @@ in
+       try:
+           machine.succeed("run-goupile-test")
+       finally:
+-          out_dir = os.environ.get("out", os.getcwd())
+-          machine.copy_from_machine("/tmp/videos", out_dir)
++          machine.copy_from_machine("/tmp/videos")
+     '';
+ 
+   # Debug interactively with:

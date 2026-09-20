@@ -1,0 +1,67 @@
+diff --git a/nixos/doc/manual/release-notes/rl-2611.section.md b/nixos/doc/manual/release-notes/rl-2611.section.md
+index 3ec838a068444..1526a0d536a90 100644
+--- a/nixos/doc/manual/release-notes/rl-2611.section.md
++++ b/nixos/doc/manual/release-notes/rl-2611.section.md
+@@ -59,6 +59,8 @@
+ 
+ - When Avahi's mDNS resolver is enabled (`services.avahi.nssmdns4` or `services.avahi.nssmdns6`), only the minimal mDNS resolver is enabled by default to avoid adding a 5 second delay to every failed reverse hostname lookup (e.g., delaying ping by 5 seconds). The "full" mDNS resolver now remains disabled unless `services.avahi.nssmdnsFull` is also enabled. Users who have customized [`/etc/mdns.allow`](https://github.com/avahi/nss-mdns/tree/master#etcmdnsallow) to allow mDNS domains not ending `.local` must enable `services.avahi.nssmdnsFull` to continue to resolve such domains.
+ 
++- String values passed to `services.phpfpm.settings`, `services.phpfpm.pools.<name>.phpEnv`, and `services.phpfpm.pools.<name>.settings` are now properly quoted and escaped, except for the `${}` syntax that is left as-is. If you are manually escaping these values, please adjust accordingly.
++
+ - `systemd.user.extraConfig` has been removed in favor of the structured [](#opt-systemd.user.settings.Manager) option. Use `systemd.user.settings.Manager` to set any `systemd-user.conf(5)` option directly. For example, replace `systemd.user.extraConfig = "DefaultTimeoutStartSec=60";` with `systemd.user.settings.Manager.DefaultTimeoutStartSec = 60;`.
+ 
+ - `services.timesyncd.extraConfig` has been removed in favor of the structured [](#opt-services.timesyncd.settings.Time) option. Use `services.timesyncd.settings.Time` to set any `timesyncd.conf(5)` option directly. For example, replace `services.timesyncd.extraConfig = "PollIntervalMaxSec=180";` with `services.timesyncd.settings.Time.PollIntervalMaxSec = 180;`.
+diff --git a/nixos/modules/services/web-servers/phpfpm/default.nix b/nixos/modules/services/web-servers/phpfpm/default.nix
+index 34845589fabea..43d394ad39f46 100644
+--- a/nixos/modules/services/web-servers/phpfpm/default.nix
++++ b/nixos/modules/services/web-servers/phpfpm/default.nix
+@@ -18,6 +18,15 @@ let
+       "yes"
+     else if false == value then
+       "no"
++    else if isString value then
++      # Escape according to https://www.php.net/manual/en/function.parse-ini-file.php
++      # Not escaping `$` since users might want to use that to interpolate environment variables.
++      # Additionally, php-fpm applies post-processing to env values that start with `$` and replaces
++      # them with the respective env variable, with no way to escape: https://github.com/php/php-src/blob/631c366f9f58c8ba4078a48d1f56187cfbf8e549/sapi/fpm/fpm/fpm_env.c#L171-L180
++      # In all platforms except for Windows, PHP_EOL is the line feed `\n` character,
++      # which we use here as an escape value since php-fpm parses the config line-by-line.
++      # See https://github.com/NixOS/nixpkgs/pull/516530#issuecomment-4878738511 for more information.
++      ''"${replaceString "\n" ''" PHP_EOL "'' (escape [ "\"" "\\" ] value)}"''
+     else
+       toString value;
+ 
+diff --git a/nixos/tests/php/fpm.nix b/nixos/tests/php/fpm.nix
+index cb128df26ebe2..16377ec19c241 100644
+--- a/nixos/tests/php/fpm.nix
++++ b/nixos/tests/php/fpm.nix
+@@ -44,6 +44,13 @@
+           "pm.min_spare_servers" = 1;
+           "pm.start_servers" = 2;
+         };
++        phpEnv = {
++          # check that keywords and special characters are escaped properly
++          keyword = "false";
++          characters = "^ = \\";
++          quoted = "\"'";
++          newline = "hello\nworld";
++        };
+       };
+     };
+   testScript =
+@@ -56,6 +63,15 @@
+       response = machine.wait_until_succeeds("curl -fvvv -s http://127.0.0.1:80/")
+       t.assertIn("PHP Version ${php.version}", response, "PHP version not detected")
+ 
++      expected_env = {
++        "keyword": "false",
++        "characters": "^ = \\",
++        "quoted": "&quot;&#039;",
++        "newline": "hello\nworld",
++      }
++      for env, value in expected_env.items():
++        assert f'<tr><td class="e">{env} </td><td class="v">{value} </td></tr>' in response, f"phpEnv.{env} not detected"
++
+       # Check so we have database and some other extensions loaded
+       for ext in ["json", "opcache", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "apcu"]:
+           assert ext in response, f"Missing {ext} extension"

@@ -1,0 +1,39 @@
+diff --git a/nixos/modules/services/hardware/sane_extra_backends/brscan5_etc_files.nix b/nixos/modules/services/hardware/sane_extra_backends/brscan5_etc_files.nix
+index 074126518b451..fe156c0c9e325 100644
+--- a/nixos/modules/services/hardware/sane_extra_backends/brscan5_etc_files.nix
++++ b/nixos/modules/services/hardware/sane_extra_backends/brscan5_etc_files.nix
+@@ -58,17 +58,17 @@ stdenv.mkDerivation {
+   dontConfigure = true;
+ 
+   buildPhase = ''
+-    TARGET_DIR="$out/etc/opt/brother/scanner/brscan5"
++    TARGET_DIR="$out/tmp"
+     mkdir -p "$TARGET_DIR"
+     cp -rp "./models" "$TARGET_DIR"
+     cp -rp "./brscan5.ini" "$TARGET_DIR"
+     cp -rp "./brsanenetdevice.cfg" "$TARGET_DIR"
+-
+     export NIX_REDIRECTS="/etc/opt/brother/scanner/brscan5/=$TARGET_DIR/"
+-
+     printf '${addAllNetDev netDevices}\n'
+-
+     ${addAllNetDev netDevices}
++
++    mkdir -p "$out/etc/opt/brother/scanner/brscan5"
++    mv -T "$TARGET_DIR" "$out/etc/opt/brother/scanner/brscan5"
+   '';
+ 
+   dontInstall = true;
+diff --git a/pkgs/by-name/br/brscan5/package.nix b/pkgs/by-name/br/brscan5/package.nix
+index 688d12caa4540..67fc343b3148d 100644
+--- a/pkgs/by-name/br/brscan5/package.nix
++++ b/pkgs/by-name/br/brscan5/package.nix
+@@ -109,7 +109,7 @@ stdenv.mkDerivation rec {
+     makeWrapper \
+       "$out/$PATH_TO_BRSCAN5/brsaneconfig5" \
+       "$out/bin/brsaneconfig5" \
+-      --suffix-each NIX_REDIRECT ":" "/etc/opt/brother/scanner/brscan5=$out/opt/brother/scanner/brscan5 /opt/brother/scanner/brscan5=$out/opt/brother/scanner/brscan5" \
++      --suffix-each NIX_REDIRECTS ":" "/etc/opt/brother/scanner/brscan5=$out/opt/brother/scanner/brscan5 /opt/brother/scanner/brscan5=$out/opt/brother/scanner/brscan5" \
+       --set LD_PRELOAD ${libredirect}/lib/libredirect.so
+ 
+     mkdir -p $out/etc/sane.d/dll.d

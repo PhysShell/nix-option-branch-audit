@@ -1,0 +1,21 @@
+diff --git a/nixos/modules/services/web-apps/lasuite-meet.nix b/nixos/modules/services/web-apps/lasuite-meet.nix
+index b2a3c4fe60d8c..9fff0e8a0b7a9 100644
+--- a/nixos/modules/services/web-apps/lasuite-meet.nix
++++ b/nixos/modules/services/web-apps/lasuite-meet.nix
+@@ -50,7 +50,6 @@ let
+     environment = pythonEnvironment;
+ 
+     serviceConfig = {
+-      RuntimeDirectory = "lasuite-meet";
+       StateDirectory = "lasuite-meet";
+       WorkingDirectory = "/var/lib/lasuite-meet";
+ 
+@@ -382,6 +381,8 @@ in
+         '';
+ 
+         serviceConfig = {
++          # needs to be here so that cronjobs don't nuke it
++          RuntimeDirectory = "lasuite-meet";
+           BindReadOnlyPaths = "${cfg.package}/share/static:/var/lib/lasuite-meet/static";
+ 
+           ExecStart = utils.escapeSystemdExecArgs (

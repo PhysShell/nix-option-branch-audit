@@ -1,0 +1,282 @@
+diff --git a/nixos/modules/system/etc/build-composefs-dump.py b/nixos/modules/system/etc/build-composefs-dump.py
+index d8ede9aebf833..6b720f1c7631b 100644
+--- a/nixos/modules/system/etc/build-composefs-dump.py
++++ b/nixos/modules/system/etc/build-composefs-dump.py
+@@ -20,6 +20,13 @@
+ 
+ Attrs = dict[str, Any]
+ 
++# mkcomposefs hard-limits inline content to LCFS_INLINE_CONTENT_MAX (5000 bytes).
++# We stay a bit below that. Files larger than this are served from the basedir
++# data-only lower layer via an overlay redirect; files at or below it are
++# embedded directly into the erofs metadata image, avoiding the redirect
++# indirection at read time and keeping the basedir empty in the common case.
++INLINE_CONTENT_MAX = 4096
++
+ 
+ class FileType(Enum):
+     """The filetype as defined by the `st_mode` stat field in octal
+@@ -55,12 +62,14 @@ def __init__(
+         mode: str,
+         payload: str,
+         path: str | None = None,
++        content: str = "-",
+     ):
+         if path is None:
+             path = attrs["target"]
+         self.path = path
+         self.size = size
+         self.filetype = filetype
++        self.content = content
+ 
+         match len(mode):
+             case 3 | 4:
+@@ -95,6 +104,43 @@ def eprint(*args: Any, **kwargs: Any) -> None:
+     print(*args, **kwargs, file=sys.stderr)
+ 
+ 
++# Bytes that may appear unescaped in a composefs-dump field. Everything else
++# is encoded as \xHH. See composefs-dump(5).
++_DUMP_SHORT_ESCAPES: dict[int, str] = {
++    ord("\\"): r"\\",
++    ord("\n"): r"\n",
++    ord("\r"): r"\r",
++    ord("\t"): r"\t",
++}
++
++
++def escape_dump_field(data: bytes) -> str:
++    """Escape raw bytes for use as a composefs-dump field.
++
++    The dump format separates fields by a single space and lines by a single
++    newline, uses '\\' as the escape character and reserves '-' for unset
++    optional fields, so all of these (plus non-printable bytes and '=') must
++    be escaped.
++    """
++    if data == b"":
++        # An empty CONTENT field would be indistinguishable from two spaces
++        # between PAYLOAD and DIGEST; callers must emit '-' for size-0 files
++        # instead of inlining them.
++        raise ValueError("cannot escape empty content; emit '-' instead")
++    if data == b"-":
++        # A bare '-' means "unset"; escape it so it round-trips as content.
++        return r"\x2d"
++    out: list[str] = []
++    for b in data:
++        if b in _DUMP_SHORT_ESCAPES:
++            out.append(_DUMP_SHORT_ESCAPES[b])
++        elif b in (ord(" "), ord("=")) or not (0x20 <= b <= 0x7E):
++            out.append(f"\\x{b:02x}")
++        else:
++            out.append(chr(b))
++    return "".join(out)
++
++
+ def normalize_path(path: str) -> str:
+     return str("/" + os.path.normpath(path).lstrip("/"))
+ 
+@@ -201,14 +247,37 @@ def main() -> None:
+                     payload=source,
+                 )
+             else:
+-                composefs_path = ComposefsPath(
+-                    attrs,
+-                    size=os.stat(source).st_size,
+-                    filetype=FileType.file,
+-                    mode=mode,
+-                    # payload needs to be relative path in this case
+-                    payload=target.lstrip("/"),
+-                )
++                size = os.stat(source).st_size
++                if size <= INLINE_CONTENT_MAX:
++                    # Inline small files directly into the erofs image so they
++                    # do not need to be served from the basedir data layer via
++                    # an overlay redirect. Empty files need neither payload nor
++                    # content; mkcomposefs treats size=0 as an empty inline
++                    # file.
++                    if size > 0:
++                        with open(source, "rb") as fh:
++                            raw = fh.read()
++                        content = escape_dump_field(raw)
++                        size = len(raw)
++                    else:
++                        content = "-"
++                    composefs_path = ComposefsPath(
++                        attrs,
++                        size=size,
++                        filetype=FileType.file,
++                        mode=mode,
++                        payload="-",
++                        content=content,
++                    )
++                else:
++                    composefs_path = ComposefsPath(
++                        attrs,
++                        size=size,
++                        filetype=FileType.file,
++                        mode=mode,
++                        # payload needs to be relative path in this case
++                        payload=target.lstrip("/"),
++                    )
+             paths[target] = composefs_path
+             add_leading_directories(target, attrs, paths)
+ 
+diff --git a/nixos/modules/system/etc/etc.nix b/nixos/modules/system/etc/etc.nix
+index 9ab019171b4c3..46cf116eabbb8 100644
+--- a/nixos/modules/system/etc/etc.nix
++++ b/nixos/modules/system/etc/etc.nix
+@@ -69,6 +69,22 @@ let
+ 
+   etcHardlinks = lib.filter (f: f.mode != "symlink" && f.mode != "direct-symlink") etc';
+ 
++  # Regular files at or below this size are inlined into the erofs metadata
++  # image (see build-composefs-dump.py) and therefore do not need to be
++  # shipped in the basedir data-only lower layer. Keep this in sync with
++  # INLINE_CONTENT_MAX in build-composefs-dump.py.
++  etcInlineContentMax = 4096;
++
++  # Entries whose content we can prove at eval time will be served directly
++  # from the metadata image (inlined, or empty). Excluding them here keeps
++  # their source paths out of the basedir build script, so changing a small
++  # text-backed /etc file does not rebuild etc-lowerdir. Entries backed by
++  # `source` (size unknown at eval time) are kept and filtered at build time
++  # below.
++  isInlinedAtEvalTime = f: f.text != null && lib.stringLength f.text <= etcInlineContentMax;
++
++  etcBasedirEntries = lib.filter (f: !isInlinedAtEvalTime f) etcHardlinks;
++
+ in
+ 
+ {
+@@ -371,6 +387,18 @@ in
+         src="$1"
+         target="$2"
+ 
++        if [[ -f "$src" ]]; then
++          # Small regular files are inlined into the erofs metadata image by
++          # build-composefs-dump.py and served directly from there, so we do
++          # not need a copy in the basedir data layer. Keep the size check in
++          # sync with INLINE_CONTENT_MAX in build-composefs-dump.py. Empty
++          # files need no backing copy either.
++          size=$(stat --dereference --format=%s "$src")
++          if (( size <= ${toString etcInlineContentMax} )); then
++            return
++          fi
++        fi
++
+         mkdir -p "$out/$(dirname "$target")"
+         cp "$src" "$out/$target"
+       }
+@@ -384,7 +412,7 @@ in
+           "${etcEntry.source}"
+           etcEntry.target
+         ]
+-      ) etcHardlinks}
++      ) etcBasedirEntries}
+     '';
+ 
+     system.build.etcMetadataImage =
+diff --git a/nixos/tests/activation/etc-overlay-immutable.nix b/nixos/tests/activation/etc-overlay-immutable.nix
+index a76c1ad297da7..0f529161e58a8 100644
+--- a/nixos/tests/activation/etc-overlay-immutable.nix
++++ b/nixos/tests/activation/etc-overlay-immutable.nix
+@@ -20,6 +20,23 @@
+           text = "foo";
+           mode = "0300";
+         };
++        # Small regular file: inlined into the metadata erofs image.
++        inlinetest = {
++          text = "inline-content\n";
++          mode = "0640";
++        };
++        # Empty regular file: served directly from the metadata erofs image
++        # without payload or content.
++        emptytest = {
++          text = "";
++          mode = "0644";
++        };
++        # Large regular file (>4096 bytes): served from the basedir data layer
++        # via overlay redirect, not inlined.
++        bigfile = {
++          text = lib.strings.replicate 5000 "a";
++          mode = "0644";
++        };
+       };
+ 
+       # Prerequisites
+@@ -63,6 +80,23 @@
+         machine.succeed("stat --format '%F' /etc/modetest | tee /dev/stderr | grep -q 'regular file'")
+         machine.succeed("stat --format '%F' /etc/modetest2 | tee /dev/stderr | grep -q 'regular file'")
+ 
++      with subtest("small regular files are inlined into the metadata image"):
++        assert machine.succeed("cat /etc/inlinetest") == "inline-content\n"
++        machine.succeed("stat --format '%a' /etc/inlinetest | tee /dev/stderr | grep -Eq '^640$'")
++        # Inlined files are stored in the metadata erofs image, not redirected
++        # to the basedir data layer, so they carry no overlay redirect xattr.
++        machine.fail("getfattr -h -n trusted.overlay.redirect /run/nixos-etc-metadata/inlinetest")
++
++      with subtest("empty regular files are served from the metadata image"):
++        assert machine.succeed("cat /etc/emptytest") == ""
++        machine.succeed("stat --format '%F %s %a' /etc/emptytest | tee /dev/stderr | grep -Eq '^regular empty file 0 644$'")
++        machine.fail("getfattr -h -n trusted.overlay.redirect /run/nixos-etc-metadata/emptytest")
++
++      with subtest("large regular files are served from the basedir"):
++        assert machine.succeed("wc -c < /etc/bigfile").strip() == "5000"
++        assert machine.succeed("head -c 10 /etc/bigfile") == "aaaaaaaaaa"
++        machine.succeed("getfattr -h -n trusted.overlay.redirect /run/nixos-etc-metadata/bigfile")
++
+       with subtest("direct symlinks point to the target without indirection"):
+         assert machine.succeed("readlink -n /etc/localtime") == "/etc/zoneinfo/Utc"
+ 
+diff --git a/nixos/tests/activation/etc-overlay-mutable.nix b/nixos/tests/activation/etc-overlay-mutable.nix
+index b30ca7b4fd895..3bfe85db8fddd 100644
+--- a/nixos/tests/activation/etc-overlay-mutable.nix
++++ b/nixos/tests/activation/etc-overlay-mutable.nix
+@@ -20,6 +20,23 @@
+           text = "foo";
+           mode = "0300";
+         };
++        # Small regular file: inlined into the metadata erofs image.
++        inlinetest = {
++          text = "inline-content\n";
++          mode = "0640";
++        };
++        # Empty regular file: served directly from the metadata erofs image
++        # without payload or content.
++        emptytest = {
++          text = "";
++          mode = "0644";
++        };
++        # Large regular file (>4096 bytes): served from the basedir data layer
++        # via overlay redirect, not inlined.
++        bigfile = {
++          text = lib.strings.replicate 5000 "a";
++          mode = "0644";
++        };
+       };
+ 
+       # Prerequisites
+@@ -66,6 +83,23 @@
+         machine.succeed("test -d /.rw-etc/upper/nixos")
+         print(machine.succeed("getfattr -h -d -m 'trusted.overlay' /.rw-etc/upper/nixos 2>&1 || true"))
+ 
++      with subtest("small regular files are inlined into the metadata image"):
++        assert machine.succeed("cat /etc/inlinetest") == "inline-content\n"
++        machine.succeed("stat --format '%a' /etc/inlinetest | tee /dev/stderr | grep -Eq '^640$'")
++        # Inlined files are stored in the metadata erofs image, not redirected
++        # to the basedir data layer, so they carry no overlay redirect xattr.
++        machine.fail("getfattr -h -n trusted.overlay.redirect /run/nixos-etc-metadata/inlinetest")
++
++      with subtest("empty regular files are served from the metadata image"):
++        assert machine.succeed("cat /etc/emptytest") == ""
++        machine.succeed("stat --format '%F %s %a' /etc/emptytest | tee /dev/stderr | grep -Eq '^regular empty file 0 644$'")
++        machine.fail("getfattr -h -n trusted.overlay.redirect /run/nixos-etc-metadata/emptytest")
++
++      with subtest("large regular files are served from the basedir"):
++        assert machine.succeed("wc -c < /etc/bigfile").strip() == "5000"
++        assert machine.succeed("head -c 10 /etc/bigfile") == "aaaaaaaaaa"
++        machine.succeed("getfattr -h -n trusted.overlay.redirect /run/nixos-etc-metadata/bigfile")
++
+       with subtest("switching to the same generation"):
+         machine.succeed("/run/current-system/bin/switch-to-configuration test")
+ 

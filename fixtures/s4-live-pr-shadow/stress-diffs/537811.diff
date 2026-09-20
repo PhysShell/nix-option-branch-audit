@@ -1,0 +1,161 @@
+diff --git a/nixos/modules/services/audio/music-assistant.nix b/nixos/modules/services/audio/music-assistant.nix
+index 8be485f1ec763..be69ad9ba057e 100644
+--- a/nixos/modules/services/audio/music-assistant.nix
++++ b/nixos/modules/services/audio/music-assistant.nix
+@@ -146,9 +146,12 @@ in
+         ++ lib.optionals (lib.elem "airplay_receiver" cfg.providers) [
+           shairport-sync
+         ]
+-        ++ lib.optionals (lib.elem "spotify" cfg.providers || lib.elem "spotify_connect" cfg.providers) [
++        ++ lib.optionals (lib.elem "spotify" cfg.providers) [
+           librespot-ma
+         ]
++        ++ lib.optionals (lib.elem "spotify_connect" cfg.providers) [
++          go-librespot
++        ]
+         ++ lib.optionals (lib.elem "snapcast" cfg.providers) [
+           snapcast
+         ]
+diff --git a/pkgs/by-name/go/go-librespot/package.nix b/pkgs/by-name/go/go-librespot/package.nix
+new file mode 100644
+index 0000000000000..a69b9b977f865
+--- /dev/null
++++ b/pkgs/by-name/go/go-librespot/package.nix
+@@ -0,0 +1,60 @@
++{
++  alsa-lib,
++  buildGoModule,
++  fetchFromGitHub,
++  flac,
++  lib,
++  libogg,
++  libvorbis,
++  pkg-config,
++  stdenv,
++}:
++
++buildGoModule (finalAttrs: {
++  pname = "go-librespot";
++  version = "0.7.4";
++
++  __structuredAttrs = true;
++
++  src = fetchFromGitHub {
++    owner = "devgianlu";
++    repo = "go-librespot";
++    tag = "v${finalAttrs.version}";
++    hash = "sha256-TJQMfZRuWDu83QZeCU+EQ90WX6gT5+nXbYRIqfvXRp8=";
++  };
++
++  vendorHash = "sha256-kCzzybOEP4Tp7OGFZBjIP1FgcQ9u+lgO3931gbaG9hA=";
++
++  subPackages = [ "cmd/daemon" ];
++
++  nativeBuildInputs = [ pkg-config ];
++
++  buildInputs = [
++    flac
++    libogg
++    libvorbis
++  ]
++  ++ lib.optionals stdenv.hostPlatform.isLinux [
++    alsa-lib
++  ];
++
++  ldflags = [
++    "-s"
++    "-X github.com/devgianlu/go-librespot.version=v${finalAttrs.version}"
++  ];
++
++  postInstall = ''
++    mv $out/bin/daemon $out/bin/go-librespot
++  '';
++
++  meta = {
++    description = "Yet another open source Spotify client, written in Go";
++    mainProgram = "go-librespot";
++    homepage = "https://github.com/devgianlu/go-librespot";
++    license = lib.licenses.gpl3Plus;
++    maintainers = with lib.maintainers; [
++      sweenu
++      emilylange
++    ];
++  };
++})
+diff --git a/pkgs/by-name/mu/music-assistant/package.nix b/pkgs/by-name/mu/music-assistant/package.nix
+index 70d6420d7e860..38490bcda4d04 100644
+--- a/pkgs/by-name/mu/music-assistant/package.nix
++++ b/pkgs/by-name/mu/music-assistant/package.nix
+@@ -40,7 +40,7 @@ assert
+ 
+ pythonPackages.buildPythonApplication (finalAttrs: {
+   pname = "music-assistant";
+-  version = "2.9.4";
++  version = "2.9.6";
+   pyproject = true;
+   __structuredAttrs = true;
+ 
+@@ -48,7 +48,7 @@ pythonPackages.buildPythonApplication (finalAttrs: {
+     owner = "music-assistant";
+     repo = "server";
+     tag = finalAttrs.version;
+-    hash = "sha256-PiSBghhlxknijRqghkO8wn1CB2XqaJrjrvGNvZUlNbo=";
++    hash = "sha256-lEbWQi6iUvqL2MXk/ZqkdX4Ou5pFWIVi6qfSyWCs8uQ=";
+   };
+ 
+   patches = [
+@@ -146,6 +146,7 @@ pythonPackages.buildPythonApplication (finalAttrs: {
+       gql
+       ifaddr
+       librosa
++      markdownify
+       mashumaro
+       modern-colorthief
+       music-assistant-frontend
+diff --git a/pkgs/by-name/mu/music-assistant/providers.nix b/pkgs/by-name/mu/music-assistant/providers.nix
+index 8c75a4f5c2c2c..6d12a614238b2 100644
+--- a/pkgs/by-name/mu/music-assistant/providers.nix
++++ b/pkgs/by-name/mu/music-assistant/providers.nix
+@@ -1,7 +1,7 @@
+ # Do not edit manually, run ./update-providers.py
+ 
+ {
+-  version = "2.9.4";
++  version = "2.9.6";
+   builtins = [
+     "builtin"
+     "coverartarchive"
+@@ -272,10 +272,8 @@
+       ps: with ps; [
+         pkce
+       ];
+-    spotify_connect =
+-      ps: with ps; [
+-        pkce
+-      ];
++    spotify_connect = ps: [
++    ];
+     squeezelite =
+       ps: with ps; [
+         aioslimproto
+diff --git a/pkgs/development/python-modules/markdownify/default.nix b/pkgs/development/python-modules/markdownify/default.nix
+index 2af5955da6537..48bedd08ddfe2 100644
+--- a/pkgs/development/python-modules/markdownify/default.nix
++++ b/pkgs/development/python-modules/markdownify/default.nix
+@@ -11,14 +11,14 @@
+ 
+ buildPythonPackage (finalAttrs: {
+   pname = "markdownify";
+-  version = "1.2.2";
++  version = "1.2.3";
+   pyproject = true;
+ 
+   src = fetchFromGitHub {
+     owner = "matthewwithanm";
+     repo = "python-markdownify";
+     tag = finalAttrs.version;
+-    hash = "sha256-r6nah7QavrMjIHd5hByhy90OoTDb2iIhFZ+YV0h61fU=";
++    hash = "sha256-zhkWkEFdDLVvA0xgFOG2PDXCTLZy+DWweuiiSVNUU80=";
+   };
+ 
+   build-system = [

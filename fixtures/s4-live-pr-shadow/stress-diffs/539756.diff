@@ -1,0 +1,13 @@
+diff --git a/nixos/modules/services/continuous-integration/hydra/default.nix b/nixos/modules/services/continuous-integration/hydra/default.nix
+index 2fd38e50459d2..65df56ef39f15 100644
+--- a/nixos/modules/services/continuous-integration/hydra/default.nix
++++ b/nixos/modules/services/continuous-integration/hydra/default.nix
+@@ -360,7 +360,7 @@ in
+         ${lib.optionalString haveLocalDB ''
+           if ! [ -e ${baseDir}/.db-created ]; then
+             runuser -u ${config.services.postgresql.superUser} ${config.services.postgresql.package}/bin/createuser hydra
+-            runuser -u ${config.services.postgresql.superUser} ${config.services.postgresql.package}/bin/createdb -O hydra hydra
++            runuser -u ${config.services.postgresql.superUser} ${config.services.postgresql.package}/bin/createdb -- -O hydra hydra
+             touch ${baseDir}/.db-created
+           fi
+           echo "create extension if not exists pg_trgm" | runuser -u ${config.services.postgresql.superUser} -- ${config.services.postgresql.package}/bin/psql hydra

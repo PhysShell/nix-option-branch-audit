@@ -1,0 +1,122 @@
+diff --git a/nixos/tests/php/fpm-modular.nix b/nixos/tests/php/fpm-modular.nix
+index 360e664963cff..443594673e134 100644
+--- a/nixos/tests/php/fpm-modular.nix
++++ b/nixos/tests/php/fpm-modular.nix
+@@ -7,7 +7,7 @@
+     aanderse
+   ];
+ 
+-  nodes.machine =
++  containers.machine =
+     { config, pkgs, ... }:
+     {
+       environment.systemPackages = [ php ];
+@@ -56,14 +56,14 @@
+       };
+     };
+   testScript =
+-    { ... }:
++    # python
+     ''
+       machine.wait_for_unit("nginx.service")
+       machine.wait_for_unit("php-fpm.service")
+ 
+       # Check so we get an evaluated PHP back
+-      response = machine.succeed("curl -fvvv -s http://127.0.0.1:80/")
+-      assert "PHP Version ${php.version}" in response, "PHP version not detected"
++      response = machine.wait_until_succeeds("curl -fvvv -s http://127.0.0.1:80/")
++      t.assertIn("PHP Version ${php.version}", response, "PHP version not detected")
+ 
+       # Check so we have database and some other extensions loaded
+       for ext in ["json", "opcache", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "apcu"]:
+diff --git a/nixos/tests/php/fpm.nix b/nixos/tests/php/fpm.nix
+index 21336ade042b7..cb128df26ebe2 100644
+--- a/nixos/tests/php/fpm.nix
++++ b/nixos/tests/php/fpm.nix
+@@ -3,7 +3,7 @@
+   name = "php-${php.version}-fpm-nginx-test";
+   meta.maintainers = lib.teams.php.members;
+ 
+-  nodes.machine =
++  containers.machine =
+     { config, pkgs, ... }:
+     {
+       environment.systemPackages = [ php ];
+@@ -47,14 +47,14 @@
+       };
+     };
+   testScript =
+-    { ... }:
++    # python
+     ''
+       machine.wait_for_unit("nginx.service")
+       machine.wait_for_unit("phpfpm-foobar.service")
+ 
+       # Check so we get an evaluated PHP back
+-      response = machine.succeed("curl -fvvv -s http://127.0.0.1:80/")
+-      assert "PHP Version ${php.version}" in response, "PHP version not detected"
++      response = machine.wait_until_succeeds("curl -fvvv -s http://127.0.0.1:80/")
++      t.assertIn("PHP Version ${php.version}", response, "PHP version not detected")
+ 
+       # Check so we have database and some other extensions loaded
+       for ext in ["json", "opcache", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "apcu"]:
+diff --git a/nixos/tests/php/httpd.nix b/nixos/tests/php/httpd.nix
+index 9ee157a010960..36381c15509f1 100644
+--- a/nixos/tests/php/httpd.nix
++++ b/nixos/tests/php/httpd.nix
+@@ -7,7 +7,7 @@
+   name = "php-${php.version}-httpd-test";
+   meta.maintainers = lib.teams.php.members;
+ 
+-  nodes.machine =
++  containers.machine =
+     {
+       config,
+       pkgs,
+@@ -32,13 +32,13 @@
+       };
+     };
+   testScript =
+-    { ... }:
++    # python
+     ''
+       machine.wait_for_unit("httpd.service")
+ 
+       # Check so we get an evaluated PHP back
+-      response = machine.succeed("curl -fvvv -s http://127.0.0.1:80/")
+-      assert "PHP Version ${php.version}" in response, "PHP version not detected"
++      response = machine.wait_until_succeeds("curl -fvvv -s http://127.0.0.1:80/")
++      t.assertIn("PHP Version ${php.version}", response, "PHP version not detected")
+ 
+       # Check so we have database and some other extensions loaded
+       for ext in ["json", "opcache", "pdo_mysql", "pdo_pgsql", "pdo_sqlite"]:
+diff --git a/nixos/tests/php/pcre.nix b/nixos/tests/php/pcre.nix
+index e95ce76c7d7e0..fb4c59e310dab 100644
+--- a/nixos/tests/php/pcre.nix
++++ b/nixos/tests/php/pcre.nix
+@@ -11,7 +11,7 @@ in
+   name = "php-${php.version}-httpd-pcre-jit-test";
+   meta.maintainers = lib.teams.php.members;
+ 
+-  nodes.machine =
++  containers.machine =
+     { pkgs, ... }:
+     {
+       time.timeZone = "UTC";
+@@ -50,12 +50,13 @@ in
+         pcntl_wait($pid);
+       '';
+     in
++    # python
+     ''
+       machine.wait_for_unit("httpd.service")
+       # Ensure php evaluation by matching on the var_dump syntax
+-      response = machine.succeed("curl -fvvv -s http://127.0.0.1:80/index.php")
++      response = machine.wait_until_succeeds("curl -fvvv -s http://127.0.0.1:80/index.php")
+       expected = 'string(${toString (builtins.stringLength testString)}) "${testString}"'
+-      assert expected in response, "Does not appear to be able to use subgroups."
+-      machine.succeed("${php}/bin/php -f ${pcreJitSeallocForkIssue}")
++      t.assertIn(expected, response, "Does not appear to be able to use subgroups.")
++      machine.succeed("${lib.getExe php} -f ${pcreJitSeallocForkIssue}")
+     '';
+ }

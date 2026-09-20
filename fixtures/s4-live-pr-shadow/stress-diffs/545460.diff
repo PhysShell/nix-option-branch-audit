@@ -1,0 +1,38 @@
+diff --git a/nixos/modules/services/web-apps/ente.nix b/nixos/modules/services/web-apps/ente.nix
+index 0eda31d834a61..63d237350c4c0 100644
+--- a/nixos/modules/services/web-apps/ente.nix
++++ b/nixos/modules/services/web-apps/ente.nix
+@@ -342,10 +342,17 @@ in
+               '';
+             };
+           };
++          virtualHosts.${domainFor "albums"} = {
++            forceSSL = mkDefault true;
++            locations."/" = {
++              root = webPackage "albums";
++              tryFiles = "$uri $uri.html /index.html";
++              extraConfig = ''
++                add_header Access-Control-Allow-Origin 'https://${cfgWeb.domains.api}';
++              '';
++            };
++          };
+           virtualHosts.${domainFor "photos"} = {
+-            serverAliases = [
+-              (domainFor "albums") # the albums app is shared with the photos frontend
+-            ];
+             forceSSL = mkDefault true;
+             locations."/" = {
+               root = webPackage "photos";
+diff --git a/pkgs/by-name/en/ente-web/package.nix b/pkgs/by-name/en/ente-web/package.nix
+index 5e5edbf274077..51a404f8c1744 100644
+--- a/pkgs/by-name/en/ente-web/package.nix
++++ b/pkgs/by-name/en/ente-web/package.nix
+@@ -84,7 +84,7 @@ buildNpmPackage (finalAttrs: {
+     # Replace hardcoded links pointing to the public ente instance so that
+     # users of a self-hosted instance are not accidentally redirected there
+     + lib.optionalString (enteMainUrl != null) ''
+-      for pattern in "https://web.ente.io" "https://ente.com" "https://ente.io"; do
++      for pattern in "https://web.ente.io" "https://ente.com" "https://ente.io" "https://photos.ente.com"; do
+         mapfile -d "" -t files < <(grep -rlFZ -- "$pattern" apps/)
+         ${lib.getExe sd} -F -- "$pattern" ${lib.escapeShellArg enteMainUrl} "''${files[@]}"
+       done

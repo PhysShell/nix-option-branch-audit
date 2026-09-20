@@ -1,0 +1,74 @@
+diff --git a/nixos/tests/your_spotify.nix b/nixos/tests/your_spotify.nix
+index c4935face7df3..9fa13e453fb5d 100644
+--- a/nixos/tests/your_spotify.nix
++++ b/nixos/tests/your_spotify.nix
+@@ -6,6 +6,7 @@
+   };
+ 
+   nodes.machine = {
++    services.mongodb.package = pkgs.mongodb-ce;
+     services.your_spotify = {
+       enable = true;
+       spotifySecretFile = pkgs.writeText "spotifySecretFile" "deadbeef";
+diff --git a/pkgs/by-name/yo/your_spotify/client.nix b/pkgs/by-name/yo/your_spotify/client.nix
+index 900a503935589..c429ae8c72562 100644
+--- a/pkgs/by-name/yo/your_spotify/client.nix
++++ b/pkgs/by-name/yo/your_spotify/client.nix
+@@ -6,7 +6,7 @@
+   pnpmDeps,
+   apiEndpoint ? "http://localhost:3000",
+   pnpmConfigHook,
+-  pnpm_9,
++  pnpm_11,
+   nodejs,
+ }:
+ 
+@@ -16,7 +16,7 @@ stdenv.mkDerivation {
+ 
+   nativeBuildInputs = [
+     pnpmConfigHook
+-    pnpm_9
++    pnpm_11
+     nodejs
+   ];
+ 
+diff --git a/pkgs/by-name/yo/your_spotify/package.nix b/pkgs/by-name/yo/your_spotify/package.nix
+index ad88f3d79da1b..764efd7f0387b 100644
+--- a/pkgs/by-name/yo/your_spotify/package.nix
++++ b/pkgs/by-name/yo/your_spotify/package.nix
+@@ -4,14 +4,13 @@
+   fetchFromGitHub,
+   fetchPnpmDeps,
+   pnpmConfigHook,
+-  pnpm_9,
++  pnpm_11,
+   nodejs,
+   makeWrapper,
+   callPackage,
+   nixosTests,
+   nix-update-script,
+ }:
+-
+ stdenv.mkDerivation (finalAttrs: {
+   pname = "your_spotify_server";
+   version = "1.20.0";
+@@ -25,15 +24,15 @@ stdenv.mkDerivation (finalAttrs: {
+ 
+   pnpmDeps = fetchPnpmDeps {
+     inherit (finalAttrs) pname version src;
+-    pnpm = pnpm_9;
+-    fetcherVersion = 3;
+-    hash = "sha256-j6COg8Q0uj+5TjN/BUVst2UMhXLT3drLWUzdG/x51rk=";
++    pnpm = pnpm_11;
++    fetcherVersion = 4;
++    hash = "sha256-eUAzQ+LV+RZs/QEb5r7l9cisBjjWU8eGMm2r9ZNXmX8=";
+   };
+ 
+   nativeBuildInputs = [
+     makeWrapper
+     pnpmConfigHook
+-    pnpm_9
++    pnpm_11
+     nodejs
+   ];
+ 

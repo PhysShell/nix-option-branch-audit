@@ -1,0 +1,13 @@
+diff --git a/nixos/modules/services/monitoring/netdata.nix b/nixos/modules/services/monitoring/netdata.nix
+index 6c53a3bb8315f..77a3d94d861ff 100644
+--- a/nixos/modules/services/monitoring/netdata.nix
++++ b/nixos/modules/services/monitoring/netdata.nix
+@@ -168,7 +168,7 @@ in
+           `cfg.package` must be built with `withNdsudo = true`
+           :::
+         '';
+-        example = ''
++        example = lib.literalExpression ''
+           [
+             pkgs.smartmontools
+             pkgs.nvme-cli

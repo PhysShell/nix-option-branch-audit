@@ -1,0 +1,49 @@
+diff --git a/doc/build-helpers/dev-shell-tools.chapter.md b/doc/build-helpers/dev-shell-tools.chapter.md
+index 2571380a3e067..9de64474d218e 100644
+--- a/doc/build-helpers/dev-shell-tools.chapter.md
++++ b/doc/build-helpers/dev-shell-tools.chapter.md
+@@ -2,7 +2,7 @@
+ 
+ The `nix-shell` command has popularized the concept of transient shell environments for development or testing purposes.
+ <!--
+-  We should try to document the product, not its development process in the Nixpkgs reference manual,
++  We should try to document the product, not its development process in the Nixpkgs manual,
+   but *something* needs to be said to provide context for this library.
+   This is the most future proof sentence I could come up with while Nix itself does not yet make use of this.
+   Relevant is the current status of the devShell attribute "project": https://github.com/NixOS/nix/issues/7501
+diff --git a/doc/manual.md.in b/doc/manual.md.in
+index 8d75d0fe459ec..2c2556b8ef4fc 100644
+--- a/doc/manual.md.in
++++ b/doc/manual.md.in
+@@ -1,4 +1,4 @@
+-# Nixpkgs Reference Manual {#nixpkgs-manual}
++# Nixpkgs Manual {#nixpkgs-manual}
+ ## Version @MANUAL_VERSION@
+ 
+ ```{=include=} chapters
+diff --git a/nixos/tests/playwright-python.nix b/nixos/tests/playwright-python.nix
+index 7911dac1b4282..018985020ddb7 100644
+--- a/nixos/tests/playwright-python.nix
++++ b/nixos/tests/playwright-python.nix
+@@ -29,7 +29,7 @@
+               "firefox": {},
+               "webkit": {}
+             }
+-            needle = re.compile("Nix.*Reference Manual")
++            needle = re.compile("Nix.* Manual")
+             if len(sys.argv) != 3 or sys.argv[1] not in browsers.keys():
+                 print(f"usage: {sys.argv[0]} [{'|'.join(browsers.keys())}] <url>")
+                 sys.exit(1)
+diff --git a/pkgs/by-name/uv/uv/package.nix b/pkgs/by-name/uv/uv/package.nix
+index 27443c8b129cb..6b5ba074c53f5 100644
+--- a/pkgs/by-name/uv/uv/package.nix
++++ b/pkgs/by-name/uv/uv/package.nix
+@@ -72,7 +72,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
+       Due to `uv`'s (over)eager fetching of dynamically-linked Python executables,
+       as well as vendoring of dynamically-linked libraries within Python modules distributed via PyPI,
+       NixOS users can run into issues when managing Python projects.
+-      See the Nixpkgs Reference Manual entry for `uv` for information on how to mitigate these issues:
++      See the Nixpkgs Manual entry for `uv` for information on how to mitigate these issues:
+       https://nixos.org/manual/nixpkgs/unstable/#sec-uv.
+ 
+       For building Python projects with `uv` and Nix outside of nixpkgs, check out `uv2nix` at https://github.com/pyproject-nix/uv2nix.

@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/monitoring/uptime-kuma.nix b/nixos/modules/services/monitoring/uptime-kuma.nix
+index 5c2100607c73f..e1b4bcf15c10b 100644
+--- a/nixos/modules/services/monitoring/uptime-kuma.nix
++++ b/nixos/modules/services/monitoring/uptime-kuma.nix
+@@ -73,6 +73,7 @@ in
+         PrivateMounts = true;
+         PrivateTmp = true;
+         PrivateUsers = true;
++        ProcSubset = "pid";
+         ProtectClock = true;
+         ProtectControlGroups = "strict";
+         ProtectHome = true;

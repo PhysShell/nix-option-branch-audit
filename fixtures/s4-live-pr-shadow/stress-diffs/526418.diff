@@ -1,0 +1,119 @@
+diff --git a/doc/release-notes/rl-2611.section.md b/doc/release-notes/rl-2611.section.md
+index 5e674df1f8da3..9273eada65628 100644
+--- a/doc/release-notes/rl-2611.section.md
++++ b/doc/release-notes/rl-2611.section.md
+@@ -15,6 +15,8 @@
+ - `hurl` has been updated to `8.x.x` which has some breaking changes. See [upstream changelog](https://github.com/Orange-OpenSource/hurl/releases/tag/8.0.0) for details.
+ - `python3Packages.django-health-check` has been updated to major version 4. See its [migration guide](https://codingjoe.dev/django-health-check/migrate-to-v4/) and [changelog](https://github.com/codingjoe/django-health-check/releases/tag/4.0.0) for breaking changes.
+ 
++- `jmtpfs` has been removed due to lack of maintenance and fuse3 support.
++
+ - `libgdata` has been removed, as it was archived upstream and relied on the insecure libsoup 2.4.
+ 
+ - `uhttpmock` providing 0.0 ABI was removed. `uhttpmock_1_0` providing 1.0 ABI was renamed to `uhttpmock` and `uhttpmock_1_0` was kept as an alias.
+diff --git a/nixos/tests/mtp.nix b/nixos/tests/mtp.nix
+index be2ed5b1f018a..47cf10561eb6a 100644
+--- a/nixos/tests/mtp.nix
++++ b/nixos/tests/mtp.nix
+@@ -23,7 +23,6 @@
+         environment.systemPackages = with pkgs; [
+           usbutils
+           glib
+-          jmtpfs
+           tree
+         ];
+         services.gvfs.enable = true;
+@@ -88,22 +87,6 @@
+           ${unmountAllMtpDevices}
+         '';
+       };
+-      jmtpfs = {
+-        # jmtpfsTest:
+-        # 1. Mounts the device on a dir named `phone` using jmtpfs
+-        # 2. Puts the current Nixpkgs libmtp version into a file
+-        # 3. Checks for corruption with `diff`
+-        # 4. Prints the directory tree
+-        jmtpfsTest = pkgs.writeScript "jmtpfsTest.sh" ''
+-          set -e
+-          mkdir phone
+-          jmtpfs phone
+-          echo "${pkgs.libmtp.version}" > phone/tmp/testFile
+-          echo "${pkgs.libmtp.version}" > testFile
+-          diff phone/tmp/testFile testFile
+-          tree phone
+-        '';
+-      };
+     in
+     # Using >&2 allows the results of the scripts to be printed to the terminal
+     # when building this test with Nix. Scripts would otherwise complete
+@@ -113,6 +96,5 @@
+       client.wait_for_unit("multi-user.target")
+       client.wait_for_unit("dbus.service")
+       client.succeed("${gvfs.gvfsTest} >&2")
+-      client.succeed("${jmtpfs.jmtpfsTest} >&2")
+     '';
+ }
+diff --git a/pkgs/by-name/jm/jmtpfs/package.nix b/pkgs/by-name/jm/jmtpfs/package.nix
+deleted file mode 100644
+index beb1821d2f3b1..0000000000000
+--- a/pkgs/by-name/jm/jmtpfs/package.nix
++++ /dev/null
+@@ -1,46 +0,0 @@
+-{
+-  lib,
+-  stdenv,
+-  fetchFromGitHub,
+-  fetchpatch,
+-  pkg-config,
+-  file,
+-  fuse,
+-  libmtp,
+-}:
+-
+-stdenv.mkDerivation (finalAttrs: {
+-  pname = "jmtpfs";
+-  version = "0.5";
+-
+-  src = fetchFromGitHub {
+-    sha256 = "1pm68agkhrwgrplrfrnbwdcvx5lrivdmqw8pb5gdmm3xppnryji1";
+-    rev = "v${finalAttrs.version}";
+-    repo = "jmtpfs";
+-    owner = "JasonFerrara";
+-  };
+-
+-  patches = [
+-    # Fix Darwin build (https://github.com/JasonFerrara/jmtpfs/pull/12)
+-    (fetchpatch {
+-      url = "https://github.com/JasonFerrara/jmtpfs/commit/b89084303477d1bc4dc9a887ba9cdd75221f497d.patch";
+-      sha256 = "0s7x3jfk8i86rd5bwhj7mb1lffcdlpj9bd7b41s1768ady91rb29";
+-    })
+-  ];
+-
+-  nativeBuildInputs = [ pkg-config ];
+-  buildInputs = [
+-    file
+-    fuse
+-    libmtp
+-  ];
+-
+-  meta = {
+-    description = "FUSE filesystem for MTP devices like Android phones";
+-    homepage = "https://github.com/JasonFerrara/jmtpfs";
+-    license = lib.licenses.gpl3Only;
+-    platforms = lib.platforms.unix;
+-    maintainers = [ lib.maintainers.coconnor ];
+-    mainProgram = "jmtpfs";
+-  };
+-})
+diff --git a/pkgs/top-level/aliases.nix b/pkgs/top-level/aliases.nix
+index 860584e73a64e..8a4f150b7aab9 100644
+--- a/pkgs/top-level/aliases.nix
++++ b/pkgs/top-level/aliases.nix
+@@ -1037,6 +1037,7 @@ mapAliases {
+   jhentai = throw "'jhentai' has been removed, as it is unmaintained"; # Added 2026-01-25
+   jikespg = throw "'jikespg' has been removed due to lack of maintenance upstream."; # Added 2025-06-10
+   jing = jing-trang; # Added 2025-09-18
++  jmtpfs = throw "'jmtpfs' has been removed, as it is unmaintained"; # Added 2026-06-06
+   joplin = joplin-cli; # Added 2025-11-03
+   jscoverage = throw "jscoverage has been removed, as it was broken"; # Added 2025-08-25
+   jsduck = throw "jsduck has been removed, as it was broken and and unmaintained upstream."; # Added 2025-12-02

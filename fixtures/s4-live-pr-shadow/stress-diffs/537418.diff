@@ -1,0 +1,34 @@
+diff --git a/nixos/modules/services/misc/ollama.nix b/nixos/modules/services/misc/ollama.nix
+index bc1693f1902e5..4ba0ccb6db7de 100644
+--- a/nixos/modules/services/misc/ollama.nix
++++ b/nixos/modules/services/misc/ollama.nix
+@@ -306,16 +306,18 @@ in
+       script =
+         let
+           binaryInputs = lib.mapAttrs (_: lib.getExe) {
+-            parallel = pkgs.parallel;
+             awk = pkgs.gawk;
+             sed = pkgs.gnused;
+           };
++
+           inherit (binaryInputs)
+-            parallel
+             awk
+             sed
+             ;
+ 
++          nproc = lib.getExe' pkgs.coreutils "nproc";
++          xargs = lib.getExe' pkgs.findutils "xargs";
++
+           declaredModelsRegex = lib.pipe cfg.loadModels [
+             (map lib.escapeRegex)
+             (lib.concatStringsSep "|")
+@@ -344,7 +346,7 @@ in
+             fi
+           ''}
+ 
+-          '${parallel}' --tag '${ollama}' pull ::: ${lib.escapeShellArgs cfg.loadModels}
++          printf "%s\0" ${lib.escapeShellArgs cfg.loadModels} | '${xargs}' -0 -r -n 1 -P "$('${nproc}')" '${ollama}' pull
+         '';
+     };
+ 

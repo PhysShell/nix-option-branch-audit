@@ -1,0 +1,23 @@
+diff --git a/nixos/modules/services/misc/rmfakecloud.nix b/nixos/modules/services/misc/rmfakecloud.nix
+index 674309ddbf455..6cfe5693cc820 100644
+--- a/nixos/modules/services/misc/rmfakecloud.nix
++++ b/nixos/modules/services/misc/rmfakecloud.nix
+@@ -146,5 +146,5 @@ in
+     };
+   };
+ 
+-  meta.maintainers = with lib.maintainers; [ euxane ];
++  meta.maintainers = with lib.maintainers; [ martinetd ];
+ }
+diff --git a/pkgs/by-name/rm/rmfakecloud/package.nix b/pkgs/by-name/rm/rmfakecloud/package.nix
+index 821484bbd4fc8..ed0a7f21170c2 100644
+--- a/pkgs/by-name/rm/rmfakecloud/package.nix
++++ b/pkgs/by-name/rm/rmfakecloud/package.nix
+@@ -70,7 +70,6 @@ buildGoModule rec {
+     homepage = "https://ddvk.github.io/rmfakecloud/";
+     license = lib.licenses.agpl3Only;
+     maintainers = with lib.maintainers; [
+-      euxane
+       martinetd
+     ];
+     mainProgram = "rmfakecloud";

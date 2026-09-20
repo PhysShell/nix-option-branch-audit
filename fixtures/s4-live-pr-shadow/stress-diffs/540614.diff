@@ -1,0 +1,60 @@
+diff --git a/nixos/modules/services/networking/legit.nix b/nixos/modules/services/networking/legit.nix
+index 2a4024a9fd286..2d11b66820653 100644
+--- a/nixos/modules/services/networking/legit.nix
++++ b/nixos/modules/services/networking/legit.nix
+@@ -52,6 +52,7 @@ in
+         for possible values.
+       '';
+       type = types.submodule {
++        freeformType = yaml.type;
+         options.repo = {
+           scanPath = mkOption {
+             type = types.path;
+@@ -60,7 +61,12 @@ in
+           };
+           readme = mkOption {
+             type = types.listOf types.str;
+-            default = [ ];
++            default = [
++              "readme"
++              "README"
++              "readme.md"
++              "README.md"
++            ];
+             description = "Readme files to look for.";
+           };
+           mainBranch = mkOption {
+@@ -80,14 +86,14 @@ in
+         options.dirs = {
+           templates = mkOption {
+             type = types.path;
+-            default = "${pkgs.legit-web}/lib/legit/templates";
+-            defaultText = literalExpression ''"''${pkgs.legit-web}/lib/legit/templates"'';
++            default = "${cfg.package}/lib/legit/templates";
++            defaultText = literalExpression ''"''${config.services.legit.package}/lib/legit/templates"'';
+             description = "Directories where template files are located.";
+           };
+           static = mkOption {
+             type = types.path;
+-            default = "${pkgs.legit-web}/lib/legit/static";
+-            defaultText = literalExpression ''"''${pkgs.legit-web}/lib/legit/static"'';
++            default = "${cfg.package}/lib/legit/static";
++            defaultText = literalExpression ''"''${config.services.legit.package}/lib/legit/static"'';
+             description = "Directories where static files are located.";
+           };
+         };
+diff --git a/pkgs/by-name/le/legit-web/package.nix b/pkgs/by-name/le/legit-web/package.nix
+index f8640f01184ce..03cde8215d281 100644
+--- a/pkgs/by-name/le/legit-web/package.nix
++++ b/pkgs/by-name/le/legit-web/package.nix
+@@ -22,8 +22,8 @@ buildGoModule (finalAttrs: {
+     mkdir -p $out/lib/legit/templates
+     mkdir -p $out/lib/legit/static
+ 
+-    cp -r $src/templates/* $out/lib/legit/templates
+-    cp -r $src/static/* $out/lib/legit/static
++    cp -r templates/* $out/lib/legit/templates
++    cp -r static/* $out/lib/legit/static
+   '';
+ 
+   passthru.tests = { inherit (nixosTests) legit; };

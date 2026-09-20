@@ -1,0 +1,58 @@
+diff --git a/nixos/tests/geoclue2.nix b/nixos/tests/geoclue2.nix
+index 0a2f311c286fb..0b836c5699c23 100644
+--- a/nixos/tests/geoclue2.nix
++++ b/nixos/tests/geoclue2.nix
+@@ -31,6 +31,6 @@
+       assert ("Latitude:    12.345000°" in whereAmI), f"Incorrect latitude in:\n{whereAmI}"
+       assert ("Longitude:   -67.890000°" in whereAmI), f"Incorrect longitude in:\n{whereAmI}"
+       assert ("Altitude:    123.450000 meters" in whereAmI), f"Incorrect altitude in:\n{whereAmI}"
+-      assert ("Accuracy:    1000.000000 meters" in whereAmI), f"Incorrect accuracy in:\n{whereAmI}"
++      assert ("Accuracy:    1000 meters" in whereAmI), f"Incorrect accuracy in:\n{whereAmI}"
+     '';
+ }
+diff --git a/pkgs/by-name/ge/geoclue2/fix-sysusers_dir.patch b/pkgs/by-name/ge/geoclue2/fix-sysusers_dir.patch
+new file mode 100644
+index 0000000000000..4759d88a58139
+--- /dev/null
++++ b/pkgs/by-name/ge/geoclue2/fix-sysusers_dir.patch
+@@ -0,0 +1,13 @@
++diff --git a/data/meson.build b/data/meson.build
++index 2591e6a..dc1bd8d 100644
++--- a/data/meson.build
+++++ b/data/meson.build
++@@ -69,7 +69,7 @@ if get_option('enable-backend')
++         if systemd.found()
++             sysusers_dir = systemd.get_variable(pkgconfig: 'sysusersdir')
++         else
++-            sysusers_dir = '/usr/lib/sysusers.d'
+++            sysusers_dir = join_paths(get_option('prefix'), 'usr/lib/sysusers.d')
++         endif
++         configure_file(output: 'geoclue-sysusers.conf',
++                        input: 'geoclue-sysusers.conf.in',
+diff --git a/pkgs/by-name/ge/geoclue2/package.nix b/pkgs/by-name/ge/geoclue2/package.nix
+index 95fb94098f4cd..52db14252d4b9 100644
+--- a/pkgs/by-name/ge/geoclue2/package.nix
++++ b/pkgs/by-name/ge/geoclue2/package.nix
+@@ -29,7 +29,7 @@
+ 
+ stdenv.mkDerivation (finalAttrs: {
+   pname = "geoclue";
+-  version = "2.7.2";
++  version = "2.8.1";
+ 
+   outputs = [
+     "out"
+@@ -42,11 +42,12 @@ stdenv.mkDerivation (finalAttrs: {
+     owner = "geoclue";
+     repo = "geoclue";
+     tag = finalAttrs.version;
+-    hash = "sha256-LwL1WtCdHb/NwPr3/OLISwaAwplhJwiZT9vUdX29Bbs=";
++    hash = "sha256-CyZhUMAa2vMUi61sL+gGBZFxGo0lu7Cm68fTjcbblTg=";
+   };
+ 
+   patches = [
+     ./add-option-for-installation-sysconfdir.patch
++    ./fix-sysusers_dir.patch
+   ];
+ 
+   nativeBuildInputs = [

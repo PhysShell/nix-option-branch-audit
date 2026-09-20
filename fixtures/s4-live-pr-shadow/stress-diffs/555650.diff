@@ -1,0 +1,13 @@
+diff --git a/nixos/tests/cloudlog.nix b/nixos/tests/cloudlog.nix
+index a86e78289877d..f067e82943ad0 100644
+--- a/nixos/tests/cloudlog.nix
++++ b/nixos/tests/cloudlog.nix
+@@ -1,7 +1,7 @@
+ { pkgs, ... }:
+ {
+   name = "cloudlog";
+-  nodes = {
++  containers = {
+     machine = {
+       services.mysql.package = pkgs.mariadb;
+       services.cloudlog.enable = true;

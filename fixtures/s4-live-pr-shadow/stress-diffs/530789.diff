@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/audio/gonic.nix b/nixos/modules/services/audio/gonic.nix
+index da259d6957d94..d1b150b6501f1 100644
+--- a/nixos/modules/services/audio/gonic.nix
++++ b/nixos/modules/services/audio/gonic.nix
+@@ -93,6 +93,7 @@ in
+         ];
+         RestrictNamespaces = true;
+         PrivateDevices = true;
++        PrivateTmp = true;
+         PrivateUsers = true;
+         ProtectClock = true;
+         ProtectControlGroups = true;

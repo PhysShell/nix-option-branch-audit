@@ -1,0 +1,108 @@
+diff --git a/nixos/modules/services/mail/postsrsd.nix b/nixos/modules/services/mail/postsrsd.nix
+index dac11fdea2362..9cf435e4893a2 100644
+--- a/nixos/modules/services/mail/postsrsd.nix
++++ b/nixos/modules/services/mail/postsrsd.nix
+@@ -281,7 +281,7 @@ in
+       environment.etc."postsrsd.conf".source = configFile;
+ 
+       systemd.services.postsrsd = {
+-        description = "PostSRSd SRS rewriting server";
++        description = "Sender Rewriting Scheme daemon for Postfix";
+         after = [
+           "network.target"
+           "postsrsd-generate-secrets.service"
+@@ -289,14 +289,20 @@ in
+         before = [ "postfix.service" ];
+         wantedBy = [ "multi-user.target" ];
+         requires = [ "postsrsd-generate-secrets.service" ];
+-        restartTriggers = [ configFile ];
++        reloadTriggers = [ configFile ];
+ 
+         serviceConfig = {
++          Type = "notify-reload";
+           ExecStart = utils.escapeSystemdExecArgs [
+             (lib.getExe cfg.package)
+             "-C"
+             "/etc/postsrsd.conf"
+           ];
++          ExecReload = toString [
++            (lib.getExe' pkgs.coreutils "kill")
++            "-SIGHUP"
++            "$MAINPID"
++          ];
+           User = cfg.user;
+           Group = cfg.group;
+           RuntimeDirectory = "postsrsd";
+@@ -319,7 +325,7 @@ in
+           ProtectKernelModules = true;
+           ProtectKernelTunables = true;
+           ProtectSystem = "strict";
+-          ProtectProc = "invisible";
++          ProtectProc = "noaccess";
+           ProcSubset = "pid";
+           RemoveIPC = true;
+           RestrictAddressFamilies =
+diff --git a/pkgs/by-name/po/postsrsd/package.nix b/pkgs/by-name/po/postsrsd/package.nix
+index 1721a5018c10c..2cfdf214d6311 100644
+--- a/pkgs/by-name/po/postsrsd/package.nix
++++ b/pkgs/by-name/po/postsrsd/package.nix
+@@ -1,37 +1,30 @@
+ {
++  cmake,
++  fetchFromGitHub,
+   lib,
+   libconfuse,
+   stdenv,
+-  fetchFromGitHub,
+-  cmake,
+-  help2man,
+ }:
+ 
+ stdenv.mkDerivation (finalAttrs: {
+   pname = "postsrsd";
+-  version = "2.0.11";
++  version = "2.2.7";
+ 
+   src = fetchFromGitHub {
+     owner = "roehling";
+     repo = "postsrsd";
+-    rev = finalAttrs.version;
+-    sha256 = "sha256-Q7tXCd2Mz3WIGnIrbb8mfgT7fcmtVS4EtF0ztYmEsmM=";
++    tag = finalAttrs.version;
++    hash = "sha256-xBVkhhnLBzCaMFrYze+MdHDJQPJefQdr6jJDTVmN1dU=";
+   };
+ 
+   cmakeFlags = [
+-    "-DGENERATE_SRS_SECRET=OFF"
+-    "-DINIT_FLAVOR=systemd"
+-    "-DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS"
+-    "-DINSTALL_SYSTEMD_SERVICE=OFF"
++    (lib.cmakeBool "GENERATE_SRS_SECRET" false)
++    (lib.cmakeBool "INSTALL_SYSTEMD_SERVICE" false)
++    (lib.cmakeFeature "FETCHCONTENT_TRY_FIND_PACKAGE_MODE" "ALWAYS")
+   ];
+ 
+-  preConfigure = ''
+-    sed -i "s,\"/etc\",\"$out/etc\",g" CMakeLists.txt
+-  '';
+-
+   nativeBuildInputs = [
+     cmake
+-    help2man
+   ];
+ 
+   buildInputs = [
+@@ -39,11 +32,12 @@ stdenv.mkDerivation (finalAttrs: {
+   ];
+ 
+   meta = {
++    changelog = "https://github.com/roehling/postsrsd/blob/${finalAttrs.src.tag}/CHANGELOG.rst";
+     homepage = "https://github.com/roehling/postsrsd";
+     description = "Postfix Sender Rewriting Scheme daemon";
+     mainProgram = "postsrsd";
+     license = lib.licenses.gpl2Plus;
+     platforms = lib.platforms.all;
+-    maintainers = [ ];
++    maintainers = [ lib.maintainers.hexa ];
+   };
+ })

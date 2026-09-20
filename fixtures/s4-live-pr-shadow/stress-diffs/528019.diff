@@ -1,0 +1,104 @@
+diff --git a/nixos/modules/services/home-automation/openthread-border-router.nix b/nixos/modules/services/home-automation/openthread-border-router.nix
+index 93e010c1c6f56..6ca8c8ffdc6db 100644
+--- a/nixos/modules/services/home-automation/openthread-border-router.nix
++++ b/nixos/modules/services/home-automation/openthread-border-router.nix
+@@ -203,15 +203,6 @@ in
+       ]) cfg.backboneInterfaces
+     );
+ 
+-    # OTBR uses avahi for mDNS service publishing
+-    services.avahi = {
+-      enable = lib.mkDefault true;
+-      publish = {
+-        enable = lib.mkDefault true;
+-        userServices = lib.mkDefault true;
+-      };
+-    };
+-
+     # The upstream service files (src/agent/otbr-agent.service.in, src/web/otbr-web.service.in) use
+     # EnvironmentFile and CMake-substituted platform scripts that don't translate to NixOS, so the
+     # services are rebuilt here from typed module options instead.
+diff --git a/pkgs/by-name/op/openthread-border-router/package.nix b/pkgs/by-name/op/openthread-border-router/package.nix
+index b1c8bc935e027..edd4d40fd2623 100644
+--- a/pkgs/by-name/op/openthread-border-router/package.nix
++++ b/pkgs/by-name/op/openthread-border-router/package.nix
+@@ -5,26 +5,23 @@
+   cmake,
+   pkg-config,
+   systemdLibs,
+-  avahi,
+   dbus,
+   protobuf,
+   jsoncpp,
+   boost,
+-  libnetfilter_queue,
+-  libnfnetlink,
+   nodejs,
+   bashNonInteractive,
+   buildNpmPackage,
+ }:
+ let
+   pname = "openthread-border-router";
+-  version = "0-unstable-2025-06-12";
++  version = "2026.06.0";
+ 
+   src = fetchFromGitHub {
+     owner = "openthread";
+     repo = "ot-br-posix";
+-    rev = "thread-reference-20250612";
+-    hash = "sha256-lPMMLtbPu9NpDcBCZE6XID7u1maCAhkZiSDEyFq7yvg=";
++    tag = "v${version}";
++    hash = "sha256-7si62h1nXnAzEmloThCcOeY3VhfSIFV+7kWKgJywcvk=";
+     fetchSubmodules = true;
+   };
+ 
+@@ -42,9 +39,6 @@ stdenv.mkDerivation {
+   strictDeps = true;
+   __structuredAttrs = true;
+ 
+-  # warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+-  env.NIX_CFLAGS_COMPILE = "-O";
+-
+   patches = [
+     # Patch the firewall script so we can run it within the systemd start script
+     ./firewall-script.patch
+@@ -62,13 +56,10 @@ stdenv.mkDerivation {
+   '';
+ 
+   buildInputs = [
+-    avahi # TODO: upstream deprecated OTBR_MDNS=avahi after this release (https://github.com/openthread/ot-br-posix/pull/3240)
+     systemdLibs
+     protobuf
+     jsoncpp
+     boost
+-    libnetfilter_queue
+-    libnfnetlink
+     dbus
+     (lib.getBin bashNonInteractive)
+   ];
+@@ -85,6 +76,9 @@ stdenv.mkDerivation {
+     (lib.cmakeBool "Boost_USE_STATIC_LIBS" false)
+     (lib.cmakeBool "OTBR_REST" true)
+ 
++    # OpenThread's built-in mDNS publisher (upstream default). No Avahi daemon needed.
++    (lib.cmakeFeature "OTBR_MDNS" "openthread")
++
+     (lib.cmakeBool "OTBR_WEB" true)
+     (lib.cmakeBool "OTBR_NAT64" true)
+     (lib.cmakeBool "OTBR_BACKBONE_ROUTER" true)
+@@ -93,9 +87,12 @@ stdenv.mkDerivation {
+     (lib.cmakeBool "OTBR_TREL" true)
+ 
+     (lib.cmakeFeature "OTBR_VERSION" version)
+-    (lib.cmakeBool "OTBR_DNSSD_DISCOVERY_PROXY" true)
+-    (lib.cmakeBool "OTBR_SRP_ADVERTISING_PROXY" true)
+-    (lib.cmakeBool "OTBR_DUA_ROUTING" true)
++    # otbr-agent aborts on startup with "Vendor name must be set." unless a vendor
++    # and product name are baked in at build time.
++    (lib.cmakeFeature "OTBR_VENDOR_NAME" "NixOS")
++    (lib.cmakeFeature "OTBR_PRODUCT_NAME" "OpenThread Border Router")
++    # OTBR_MDNS=openthread turns on the OT-core advertising and discovery proxies by default.
++    # The discovery proxy gives us the DNS-SD server OTBR_DNS_UPSTREAM_QUERY needs.
+     (lib.cmakeBool "OTBR_DNS_UPSTREAM_QUERY" true)
+ 
+     (lib.cmakeBool "OT_CHANNEL_MANAGER" true)

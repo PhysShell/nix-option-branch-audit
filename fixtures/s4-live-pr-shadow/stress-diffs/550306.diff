@@ -1,0 +1,26 @@
+diff --git a/nixos/doc/manual/release-notes/rl-2611.section.md b/nixos/doc/manual/release-notes/rl-2611.section.md
+index 2bfdc1e6b1504..b42271fbab4aa 100644
+--- a/nixos/doc/manual/release-notes/rl-2611.section.md
++++ b/nixos/doc/manual/release-notes/rl-2611.section.md
+@@ -319,3 +319,6 @@
+ - `nix` now supports running in "daemonless" mode by setting `nix.daemon.enable = false`. Under this mode all store operations must go through the [local store type](https://nix.dev/manual/nix/latest/store/types/local-store), which typically requires root permissions.
+ 
+ - [Hister](https://github.com/asciimoo/hister), a web history service offering blazing fast, content-based search across visited websites. Available as [services.hister](#opt-services.hister.enable).
++
++- The default of [`networking.firewall.checkReversePath`](#opt-networking.firewall.checkReversePath) changed to `"loose"` to align with upstream systemd.
++  If your environment requires strict reverse path filtering, you must now explicitly configure it with `networking.firewall.checkReversePath = "strict";`.
+diff --git a/nixos/modules/services/networking/firewall.nix b/nixos/modules/services/networking/firewall.nix
+index 2e3d1250ef2ca..4226e005c2fe3 100644
+--- a/nixos/modules/services/networking/firewall.nix
++++ b/nixos/modules/services/networking/firewall.nix
+@@ -205,8 +205,8 @@ in
+             "loose"
+           ]
+         );
+-        default = true;
+-        defaultText = lib.literalMD "`true` except if the iptables based firewall is in use and the kernel lacks rpfilter support";
++        default = "loose";
++        defaultText = "loose";
+         example = "loose";
+         description = ''
+           Performs a reverse path filter test on a packet.  If a reply

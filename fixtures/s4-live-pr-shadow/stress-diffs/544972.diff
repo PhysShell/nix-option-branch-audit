@@ -1,0 +1,90 @@
+diff --git a/nixos/modules/services/mail/rspamd.nix b/nixos/modules/services/mail/rspamd.nix
+index 189d2c078e0db..11867a6601ac7 100644
+--- a/nixos/modules/services/mail/rspamd.nix
++++ b/nixos/modules/services/mail/rspamd.nix
+@@ -506,6 +506,7 @@ in
+         CapabilityBoundingSet = "";
+         DevicePolicy = "closed";
+         LockPersonality = true;
++        MemoryDenyWriteExecute = false; # pcre2 jit
+         NoNewPrivileges = true;
+         PrivateDevices = true;
+         PrivateMounts = true;
+diff --git a/pkgs/by-name/hy/hyperscan/package.nix b/pkgs/by-name/hy/hyperscan/package.nix
+index d32212804412b..0a9312c052e95 100644
+--- a/pkgs/by-name/hy/hyperscan/package.nix
++++ b/pkgs/by-name/hy/hyperscan/package.nix
+@@ -8,7 +8,7 @@
+   util-linux,
+   pkg-config,
+   boost,
+-  pcre,
++  pcre2,
+   withStatic ? false, # build only shared libs by default, build static+shared if true
+ }:
+ 
+@@ -78,7 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
+   preConfigure = lib.optionalString withStatic (
+     ''
+       mkdir -p pcre
+-      tar xvf ${pcre.src} --strip-components 1 -C pcre
++      tar xvf ${pcre2.src} --strip-components 1 -C pcre
+     ''
+     # - CMake 4 dropped support of versions lower than 3.5, versions lower than 3.10 are deprecated.
+     #   https://github.com/NixOS/nixpkgs/issues/445447
+@@ -111,6 +111,7 @@ stdenv.mkDerivation (finalAttrs: {
+   '';
+ 
+   meta = {
++    broken = stdenv.hostPlatform.isStatic; # A minimum of SSSE3 compiler support is required
+     description = "High-performance multiple regex matching library";
+     longDescription = ''
+       Hyperscan is a high-performance multiple regex matching library.
+diff --git a/pkgs/by-name/rs/rspamd/package.nix b/pkgs/by-name/rs/rspamd/package.nix
+index 8c41fe9c29348..ac416fb819d76 100644
+--- a/pkgs/by-name/rs/rspamd/package.nix
++++ b/pkgs/by-name/rs/rspamd/package.nix
+@@ -21,7 +21,7 @@
+   lua,
+   luajit,
+   openssl,
+-  pcre,
++  pcre2,
+   ragel,
+   sqlite,
+   vectorscan,
+@@ -46,13 +46,13 @@ in
+ 
+ stdenv.mkDerivation (finalAttrs: {
+   pname = "rspamd";
+-  version = "4.1.0";
++  version = "4.1.2";
+ 
+   src = fetchFromGitHub {
+     owner = "rspamd";
+     repo = "rspamd";
+     tag = finalAttrs.version;
+-    hash = "sha256-QAeh8SwUwGTGmbbFlJyrprXY0quk4grP/zA/KMQQBdo=";
++    hash = "sha256-LqFLzOcLyZeDT5kRlENmyTzUhyVC0HBhoSKInMFpqZA=";
+   };
+ 
+   nativeBuildInputs = [
+@@ -71,7 +71,7 @@ stdenv.mkDerivation (finalAttrs: {
+     libsodium
+     (if withLuaJIT then luajit else lua)
+     openssl
+-    pcre
++    pcre2
+     ragel
+     sqlite
+     vectorscan
+@@ -92,8 +92,7 @@ stdenv.mkDerivation (finalAttrs: {
+     (cmakeBool' "ENABLE_HYPERSCAN" true)
+     (cmakeBool' "ENABLE_JEMALLOC" true)
+     (cmakeBool' "ENABLE_LUAJIT" withLuaJIT)
+-    # pcre2 jit seems to cause crashes: https://github.com/NixOS/nixpkgs/pull/181908
+-    (cmakeBool' "ENABLE_PCRE2" false)
++    (cmakeBool' "ENABLE_PCRE2" true)
+     # doctest 2.5.0 compat problems https://github.com/rspamd/rspamd/issues/5994
+     (cmakeBool' "SYSTEM_DOCTEST" false)
+     (cmakeBool' "SYSTEM_XXHASH" true)

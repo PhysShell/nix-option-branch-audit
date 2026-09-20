@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/web-apps/slskd.nix b/nixos/modules/services/web-apps/slskd.nix
+index fda5147e2688b..3a82af155d52c 100644
+--- a/nixos/modules/services/web-apps/slskd.nix
++++ b/nixos/modules/services/web-apps/slskd.nix
+@@ -32,6 +32,7 @@ in
+ 
+       domain = mkOption {
+         type = types.nullOr types.str;
++        default = null;
+         description = ''
+           If non-null, enables an nginx reverse proxy virtual host at this FQDN,
+           at the path configurated with `services.slskd.web.url_base`.

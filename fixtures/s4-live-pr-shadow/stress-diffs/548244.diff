@@ -1,0 +1,90 @@
+diff --git a/nixos/tests/freescout/integration.nix b/nixos/tests/freescout/integration.nix
+index 57d28f032c3ae..c3226f8488a96 100644
+--- a/nixos/tests/freescout/integration.nix
++++ b/nixos/tests/freescout/integration.nix
+@@ -26,7 +26,6 @@ let
+       ...
+     }:
+     {
+-      virtualisation.memorySize = 1024;
+       environment.systemPackages = with pkgs; [
+         curl
+         sendInitial
+@@ -99,7 +98,7 @@ let
+       };
+     };
+ 
+-  mkNode =
++  mkContainer =
+     dbType:
+     { config, pkgs, ... }:
+     {
+@@ -118,14 +117,14 @@ in
+     e1mo
+   ];
+ 
+-  nodes = {
++  containers = {
+     # This may lead to duplicate tests, but ensures that
+     # it's always tested on the current default version
+     # even if the tests are not updated
+-    freescout_pgsql = mkNode "pgsql";
++    freescout-pgsql = mkContainer "pgsql";
+ 
+     # Same as the freescout_pgsql_default node
+-    freescout_mysql = mkNode "mysql";
++    freescout-mysql = mkContainer "mysql";
+   };
+ 
+   testScript = ''
+@@ -151,7 +150,7 @@ in
+       machine.wait_for_unit("freescout-setup")
+ 
+       with subtest("Login works"):
+-        machine.succeed("/var/lib/freescout/artisan freescout:create-user --role=admin --firstName=Xenia --lastName=TheFox --email xenia@${freescoutDomain} --no-interaction --password=foo | grep 'User created with id'")
++        machine.succeed("/var/lib/freescout/artisan -- freescout:create-user --role=admin --firstName=Xenia --lastName=TheFox --email xenia@${freescoutDomain} --no-interaction --password=foo | grep 'User created with id'")
+         token=machine.succeed("curl -fsSL --cookie-jar cjar 'http://${freescoutDomain}/login' | grep -Po '(?<= name=\"_token\" value=\")(\\w+)(?=\")'").strip()
+         data=f"email=xenia%40${freescoutDomain}&password=foo&_token={token}&remember=on"
+         machine.succeed(f"curl -sSfX POST --cookie-jar cjar --cookie cjar --data-raw '{data}' 'http://${freescoutDomain}/login' | grep 'Redirecting to'")
+diff --git a/nixos/tests/freescout/upgrade.nix b/nixos/tests/freescout/upgrade.nix
+index 397788710bf1e..0cfb9f703b8aa 100644
+--- a/nixos/tests/freescout/upgrade.nix
++++ b/nixos/tests/freescout/upgrade.nix
+@@ -73,7 +73,7 @@ in
+ 
+       with subtest("Create user and log in"):
+         # Create uesr
+-        machine.succeed("/var/lib/freescout/artisan freescout:create-user --role=admin --firstName=Xenia --lastName=TheFox --email xenia@${freescoutDomain} --no-interaction --password=foo | grep 'User created with id'")
++        machine.succeed("/var/lib/freescout/artisan -- freescout:create-user --role=admin --firstName=Xenia --lastName=TheFox --email xenia@${freescoutDomain} --no-interaction --password=foo | grep 'User created with id'")
+         # Obtain CSRF token
+         token=machine.succeed("curl -fsSL --cookie-jar cjar 'http://${freescoutDomain}/login' | grep -Po '(?<= name=\"_token\" value=\")(\w+)(?=\")'").strip()
+         # Actually log in
+diff --git a/pkgs/by-name/fr/freescout/package.nix b/pkgs/by-name/fr/freescout/package.nix
+index 24442006c8518..b3fc3c7abb0f1 100644
+--- a/pkgs/by-name/fr/freescout/package.nix
++++ b/pkgs/by-name/fr/freescout/package.nix
+@@ -7,13 +7,13 @@
+ stdenv.mkDerivation (finalAttrs: {
+   preferLocalBuild = true;
+   pname = "freescout";
+-  version = "1.8.230";
++  version = "1.8.232";
+ 
+   src = fetchFromGitHub {
+     owner = "freescout-help-desk";
+     repo = "freescout";
+     tag = finalAttrs.version;
+-    hash = "sha256-QAMZj1tUSaErLTJR8IfzatNw5G8lznA4mNa+a4Bd5rQ=";
++    hash = "sha256-dqUKfj9Y/CoU4hC8rq7XejVswaEOiZtFG6rsSGgljfY=";
+   };
+ 
+   patches = [
+@@ -46,7 +46,7 @@ stdenv.mkDerivation (finalAttrs: {
+     runHook postInstall
+   '';
+ 
+-  passthru.tests = lib.attrValues nixosTests.freescout;
++  passthru.tests = nixosTests.freescout;
+ 
+   # Because freescout is searching for some folders only relative to it's own source location, we need to have the symlinks to the actual locations in here
+   dontCheckForBrokenSymlinks = true;

@@ -1,0 +1,27 @@
+diff --git a/nixos/modules/services/ttys/getty.nix b/nixos/modules/services/ttys/getty.nix
+index 01d2858602b6a..7281b38607d25 100644
+--- a/nixos/modules/services/ttys/getty.nix
++++ b/nixos/modules/services/ttys/getty.nix
+@@ -131,7 +131,7 @@ in
+ 
+   ###### implementation
+ 
+-  config = mkIf config.console.enable {
++  config = {
+     # Note: this is set here rather than up there so that changing
+     # nixos.label would not rebuild manual pages
+     services.getty.greetingLine = mkDefault ''<<< Welcome to ${config.system.nixos.distroName} ${config.system.nixos.label} (\m) - \l >>>'';
+diff --git a/nixos/modules/virtualisation/nspawn-container/default.nix b/nixos/modules/virtualisation/nspawn-container/default.nix
+index f56167ca0b079..7f3ebf153997d 100644
+--- a/nixos/modules/virtualisation/nspawn-container/default.nix
++++ b/nixos/modules/virtualisation/nspawn-container/default.nix
+@@ -109,9 +109,6 @@ in
+       }
+     ];
+ 
+-    # TODO(arianvp): Remove after https://github.com/NixOS/nixpkgs/pull/480686 is merged
+-    console.enable = true;
+-
+     virtualisation.systemd-nspawn.options = [
+       "--private-network"
+       "--machine=${config.system.name}"

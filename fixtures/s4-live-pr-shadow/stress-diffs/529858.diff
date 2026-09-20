@@ -1,0 +1,500 @@
+diff --git a/doc/release-notes/rl-2611.section.md b/doc/release-notes/rl-2611.section.md
+index f9489c5466594..87e617b19dd4d 100644
+--- a/doc/release-notes/rl-2611.section.md
++++ b/doc/release-notes/rl-2611.section.md
+@@ -25,6 +25,8 @@
+ 
+ - `zerofs` has been updated from `1.x` to `2.x` which is a breaking change. Volumes created by earlier releases are refused at open with a clear error. There is no migration tool; older volumes remain readable and writable by the release that created them.
+ 
++- `alps` has been rewritten upstream, see [upstream repository](https://github.com/migadu/alps) for documentation.
++
+ - `uhttpmock` providing 0.0 ABI was removed. `uhttpmock_1_0` providing 1.0 ABI was renamed to `uhttpmock` and `uhttpmock_1_0` was kept as an alias.
+ 
+ - `nix-serve-ng` (and `haskellPackages.nix-serve-ng`) is now built against Lix instead of CppNix, following upstream which has switched to Lix as its supported Nix implementation.
+diff --git a/nixos/doc/manual/release-notes/rl-2611.section.md b/nixos/doc/manual/release-notes/rl-2611.section.md
+index 01507338ec5f6..969b2d7fe6d95 100644
+--- a/nixos/doc/manual/release-notes/rl-2611.section.md
++++ b/nixos/doc/manual/release-notes/rl-2611.section.md
+@@ -47,6 +47,8 @@
+   Deployments running the server and worker in the same network namespace must also set at least the worker
+   `AUTHENTIK_LISTEN__HTTP` address so that the server and worker do not bind to the same address.
+ 
++- `services.alps` has been rewritten, see [upstream repository](https://github.com/migadu/alps) for configuration.
++
+ - Support for the legacy U‐Boot image format has been removed from the initrd generators, as it is deprecated upstream and no longer used by any platform in Nixpkgs.
+ 
+ - Rustical migrates from `settings.http.host` and `settings.http.port` to `settings.http.bind` to support UNIX domain sockets as well as TCP sockets in one setting.
+diff --git a/nixos/modules/services/web-apps/alps.nix b/nixos/modules/services/web-apps/alps.nix
+index 0a0925856e711..8359809fa0105 100644
+--- a/nixos/modules/services/web-apps/alps.nix
++++ b/nixos/modules/services/web-apps/alps.nix
+@@ -1,151 +1,108 @@
+ {
++  config,
+   lib,
+   pkgs,
+-  config,
++  utils,
+   ...
+ }:
+-
+-with lib;
+-
+ let
+   cfg = config.services.alps;
+ in
+ {
+-  options.services.alps = {
+-    enable = mkEnableOption "alps";
++  imports = [
++    (lib.mkRemovedOptionModule [ "services" "alps" "port" ] ''
++      Use `services.alps.settings.server.addr` instead.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "bindIP" ] ''
++      Use `services.alps.settings.server.addr` instead.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "theme" ] ''
++      Themes are no longer customizable.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "imaps" "port" ] ''
++      Use `services.alps.settings.provider.imap.server` instead.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "imaps" "host" ] ''
++      Use `services.alps.settings.provider.imap.server` instead.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "smtps" "port" ] ''
++      Use `services.alps.settings.smtp.server` instead.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "smtps" "host" ] ''
++      Use `services.alps.settings.smtp.server` instead.
++    '')
++    (lib.mkRemovedOptionModule [ "services" "alps" "args" ] ''
++      Use `services.alps.settings` instead.
++    '')
++  ];
+ 
+-    port = mkOption {
+-      type = types.port;
+-      default = 1323;
+-      description = ''
+-        TCP port the service should listen on.
+-      '';
+-    };
++  options.services.alps = {
++    enable = lib.mkEnableOption "alps";
++    package = lib.mkPackageOption pkgs "alps" { };
+ 
+-    bindIP = mkOption {
+-      default = "[::]";
+-      type = types.str;
++    settings = lib.mkOption {
+       description = ''
+-        The IP the service should listen on.
+-      '';
+-    };
++        The ALPS configuration, see <https://github.com/migadu/alps/blob/main/docs/CONFIGURATION.md> for documentation.
+ 
+-    theme = mkOption {
+-      type = types.enum [
+-        "alps"
+-        "sourcehut"
+-      ];
+-      default = "sourcehut";
+-      description = ''
+-        The frontend's theme to use.
++        Options containing secret data should be set to an attribute set
++        containing the attribute `_secret` - a string pointing to a file
++        containing the value the option should be set to.
+       '';
+-    };
+-
+-    imaps = {
+-      port = mkOption {
+-        type = types.port;
+-        default = 993;
+-        description = ''
+-          The IMAPS server port.
+-        '';
+-      };
+-
+-      host = mkOption {
+-        type = types.str;
+-        default = "[::1]";
+-        example = "mail.example.org";
+-        description = ''
+-          The IMAPS server address.
+-        '';
+-      };
+-    };
+-
+-    smtps = {
+-      port = mkOption {
+-        type = types.port;
+-        default = 465;
+-        description = ''
+-          The SMTPS server port.
+-        '';
+-      };
+-
+-      host = mkOption {
+-        type = types.str;
+-        default = cfg.imaps.host;
+-        defaultText = "services.alps.imaps.host";
+-        example = "mail.example.org";
+-        description = ''
+-          The SMTPS server address.
+-        '';
++      default = { };
++      type = lib.types.submodule {
++        freeformType = lib.types.toml;
++        options = { };
+       };
+     };
+-
+-    package = mkOption {
+-      internal = true;
+-      type = types.package;
+-      default = pkgs.alps;
+-    };
+-
+-    args = mkOption {
+-      internal = true;
+-      type = types.listOf types.str;
+-      default = [
+-        "-addr"
+-        "${cfg.bindIP}:${toString cfg.port}"
+-        "-theme"
+-        "${cfg.theme}"
+-        "imaps://${cfg.imaps.host}:${toString cfg.imaps.port}"
+-        "smtps://${cfg.smtps.host}:${toString cfg.smtps.port}"
+-      ];
+-    };
+   };
+ 
+-  config = mkIf cfg.enable {
++  config = lib.mkIf cfg.enable {
++    systemd.packages = [ cfg.package ];
++
+     systemd.services.alps = {
+-      description = "alps is a simple and extensible webmail.";
+-      documentation = [ "https://git.sr.ht/~migadu/alps" ];
+       wantedBy = [ "multi-user.target" ];
+-      wants = [ "network-online.target" ];
+-      after = [
+-        "network.target"
+-        "network-online.target"
+-      ];
+ 
+       serviceConfig = {
+-        ExecStart = "${cfg.package}/bin/alps ${escapeShellArgs cfg.args}";
+-        AmbientCapabilities = "";
+-        CapabilityBoundingSet = "";
+         DynamicUser = true;
++        RuntimeDirectory = "alps";
++        ExecStartPre =
++          let
++            script = pkgs.writeShellScript "alps-pre-start" ''
++              ${utils.genJqSecretsReplacementSnippet cfg.settings "/run/alps/config.json"}
++              ${lib.getExe pkgs.remarshal} -f json -t toml /run/alps/config.json /run/alps/config.toml
++              chown --reference=/run/alps /run/alps/config.json /run/alps/config.toml
++            '';
++          in
++          "+${script}";
++        ExecStart = [
++          ""
++          "${lib.getExe cfg.package} -config \${RUNTIME_DIRECTORY}/config.toml"
++        ];
++
+         LockPersonality = true;
+         MemoryDenyWriteExecute = true;
+-        NoNewPrivileges = true;
+         PrivateDevices = true;
+         PrivateIPC = true;
+-        PrivateTmp = true;
+         PrivateUsers = true;
++        ProcSubset = "pid";
+         ProtectClock = true;
+         ProtectControlGroups = true;
+-        ProtectHome = true;
+         ProtectHostname = true;
+         ProtectKernelLogs = true;
+         ProtectKernelModules = true;
+         ProtectKernelTunables = true;
+         ProtectProc = "invisible";
+-        ProtectSystem = "strict";
+-        RemoveIPC = true;
+         RestrictAddressFamilies = [
+           "AF_INET"
+           "AF_INET6"
+         ];
+         RestrictNamespaces = true;
+         RestrictRealtime = true;
+-        RestrictSUIDSGID = true;
+-        SocketBindAllow = cfg.port;
+-        SocketBindDeny = "any";
+-        SystemCallArchitectures = "native";
++        SystemCallArchitectures = [ "native" ];
+         SystemCallFilter = [
+           "@system-service"
+-          "~@privileged @obsolete"
++          "~@privileged"
++          "~@resources"
+         ];
+       };
+     };
+diff --git a/nixos/tests/alps.nix b/nixos/tests/alps.nix
+index 3e5d516271bcb..b33428378bc2f 100644
+--- a/nixos/tests/alps.nix
++++ b/nixos/tests/alps.nix
+@@ -1,12 +1,16 @@
++{ lib, ... }:
+ let
+   certs = import ./common/acme/server/snakeoil-certs.nix;
+   domain = certs.domain;
++  port = 1323;
+ in
+-{ pkgs, ... }:
+ {
+   name = "alps";
+-  meta = with pkgs.lib.maintainers; {
+-    maintainers = [ hmenke ];
++  meta = {
++    maintainers = with lib.maintainers; [
++      hmenke
++      prince213
++    ];
+   };
+ 
+   nodes = {
+@@ -53,9 +57,8 @@ in
+           };
+         };
+       };
+-
+     client =
+-      { nodes, config, ... }:
++      { nodes, pkgs, ... }:
+       {
+         security.pki.certificateFiles = [
+           certs.ca.cert
+@@ -65,31 +68,44 @@ in
+         '';
+         services.alps = {
+           enable = true;
+-          theme = "alps";
+-          imaps = {
+-            host = domain;
+-            port = 993;
+-          };
+-          smtps = {
+-            host = domain;
+-            port = 465;
++          settings = {
++            server = {
++              addr = ":${toString port}";
++            };
++            provider = {
++              type = "imap";
++              imap = {
++                server = "imaps://${domain}:993";
++              };
++            };
++            smtp = {
++              server = "smtps://${domain}:465";
++            };
+           };
+         };
+         environment.systemPackages = [
+           (pkgs.writers.writePython3Bin "test-alps-login" { } ''
+             from urllib.request import build_opener, HTTPCookieProcessor, Request
+-            from urllib.parse import urlencode, urljoin
++            from urllib.parse import urljoin
+             from http.cookiejar import CookieJar
++            import json
+ 
+-            baseurl = "http://localhost:${toString config.services.alps.port}"
++            baseurl = "http://localhost:${toString port}"
+             username = "alice"
+             password = "${nodes.server.users.users.alice.password}"
+             cookiejar = CookieJar()
+             cookieprocessor = HTTPCookieProcessor(cookiejar)
+             opener = build_opener(cookieprocessor)
+ 
+-            data = urlencode({"username": username, "password": password}).encode()
+-            req = Request(urljoin(baseurl, "login"), data=data, method="POST")
++            data = json.dumps(
++                {"username": username, "password": password, "remember-me": ""}
++            ).encode()
++            req = Request(
++                urljoin(baseurl, "session"),
++                data=data,
++                headers={"Content-Type": "application/json"},
++                method="POST",
++            )
+             with opener.open(req) as ret:
+                 # Check that the alps_session cookie is set
+                 print(cookiejar)
+@@ -102,9 +118,9 @@ in
+                 assert any(cookie.name == "alps_session" for cookie in cookiejar)
+                 # ...and that we have not been redirected back to the login page
+                 print(ret.url)
+-                assert ret.url == urljoin(baseurl, "mailbox/INBOX")
++                assert ret.url != urljoin(baseurl, "#/login")
+ 
+-            req = Request(urljoin(baseurl, "logout"))
++            req = Request(urljoin(baseurl, "session"), method="DELETE")
+             with opener.open(req) as ret:
+                 # Check that the alps_session cookie is now gone
+                 print(cookiejar)
+@@ -114,18 +130,16 @@ in
+       };
+   };
+ 
+-  testScript =
+-    { nodes, ... }:
+-    ''
+-      server.start()
+-      server.wait_for_unit("postfix.service")
+-      server.wait_for_unit("dovecot.service")
+-      server.wait_for_open_port(465)
+-      server.wait_for_open_port(993)
++  testScript = ''
++    server.start()
++    server.wait_for_unit("postfix.service")
++    server.wait_for_unit("dovecot.service")
++    server.wait_for_open_port(465)
++    server.wait_for_open_port(993)
+ 
+-      client.start()
+-      client.wait_for_unit("alps.service")
+-      client.wait_for_open_port(${toString nodes.client.services.alps.port})
+-      client.succeed("test-alps-login")
+-    '';
++    client.start()
++    client.wait_for_unit("alps.service")
++    client.wait_for_open_port(${toString port})
++    client.succeed("test-alps-login")
++  '';
+ }
+diff --git a/pkgs/by-name/al/alps/package.nix b/pkgs/by-name/al/alps/package.nix
+index bdefa56e2e5bf..5506537156bba 100644
+--- a/pkgs/by-name/al/alps/package.nix
++++ b/pkgs/by-name/al/alps/package.nix
+@@ -1,61 +1,86 @@
+ {
+   lib,
+   buildGoModule,
+-  fetchFromSourcehut,
+-  fetchpatch,
++  buildNpmPackage,
++  fetchFromGitHub,
+   nixosTests,
++  util-linux,
++  versionCheckHook,
+ }:
+-
+-buildGoModule {
++buildGoModule (finalAttrs: {
+   pname = "alps";
+-  version = "2022-10-18";
++  version = "1";
++  __structuredAttrs = true;
+ 
+-  src = fetchFromSourcehut {
+-    owner = "~migadu";
++  src = fetchFromGitHub {
++    owner = "migadu";
+     repo = "alps";
+-    rev = "f01fbcbc48db5e65d69a0ebd9d7cb0deb378cf13";
+-    hash = "sha256-RSug3YSiqYLGs05Bee4NoaoCyPvUZ7IqlKWI1hmxbiA=";
++    tag = "v${finalAttrs.version}";
++    hash = "sha256-uzr0N50qKpIoOr7YFfuhnJ/CTaMvcP7TZujM5YpklMs=";
+   };
+ 
+-  vendorHash = "sha256-QsGfINktk+rBj4b5h+NBVS6XV1SVz+9fDL1vtUqcKEU=";
++  postPatch = ''
++    substituteInPlace dist/alps.service \
++      --replace-fail /usr/local/bin "$out/bin" \
++      --replace-fail /bin/kill "${lib.getExe' util-linux "kill"}"
++
++    rm -r frontend/dist
++    cp -r ${finalAttrs.passthru.frontend} frontend/dist
++  '';
++
++  vendorHash = "sha256-Nm9TC0j/PSraO1AtxUJmFQWdhdLzeLP0CXY0FZZ6pV8=";
++
++  subPackages = [ "cmd/alps" ];
+ 
+   ldflags = [
+     "-s"
+-    "-w"
+-    "-X main.themesPath=${placeholder "out"}/share/alps/themes"
+-    "-X git.sr.ht/~migadu/alps.PluginDir=${placeholder "out"}/share/alps/plugins"
+-  ];
+-
+-  patches = [
+-    (fetchpatch {
+-      name = "Issue-160-Alps-theme-has-a-enormous-move-to-list-sel";
+-      url = "https://lists.sr.ht/~migadu/alps-devel/patches/30096/mbox";
+-      hash = "sha256-Sz/SCkrrXZWrmJzjfPXi+UfCcbwsy6QiA7m34iiEFX0=";
+-    })
++    "-X main.version=${finalAttrs.version}"
+   ];
+ 
+-  postPatch = ''
+-    substituteInPlace plugin.go --replace "const PluginDir" "var PluginDir"
+-  '';
+-
+   postInstall = ''
+-    mkdir -p "$out/share/alps"
+-    cp -r themes plugins "$out/share/alps/"
++    install -Dm644 -t "$out/lib/systemd/system/" dist/alps.service
+   '';
+ 
+-  proxyVendor = true;
++  doInstallCheck = true;
++  nativeInstallCheckInputs = [ versionCheckHook ];
++  versionCheckProgramArg = "-version";
++
++  passthru = {
++    frontend = buildNpmPackage (finalAttrs': {
++      pname = "${finalAttrs.pname}-frontend";
++      inherit (finalAttrs) version src;
++      sourceRoot = "${finalAttrs'.src.name}/frontend";
++
++      npmDepsHash = "sha256-gR9leLQSPo/qBNf6Yy1b2klawwuhKIvofCSPYkHOJKk=";
+ 
+-  passthru.tests = { inherit (nixosTests) alps; };
++      postPatch = ''
++        rm -r dist
++      '';
++
++      installPhase = ''
++        runHook preInstall
++
++        mkdir -p "$out"
++        cp -r dist/. "$out"
++
++        runHook postInstall
++      '';
++    });
++    tests = { inherit (nixosTests) alps; };
++  };
+ 
+   meta = {
+     description = "Simple and extensible webmail";
+-    homepage = "https://git.sr.ht/~migadu/alps";
++    homepage = "https://github.com/migadu/alps";
++    downloadPage = "https://github.com/migadu/alps/releases";
+     license = lib.licenses.mit;
+     maintainers = with lib.maintainers; [
+       booklearner
+       madonius
+       hmenke
++      prince213
+     ];
++    teams = with lib.teams; [ ngi ];
+     mainProgram = "alps";
+   };
+-}
++})

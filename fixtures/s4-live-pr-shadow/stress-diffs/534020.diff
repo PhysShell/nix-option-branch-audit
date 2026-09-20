@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/home-automation/zigbee2mqtt.nix b/nixos/modules/services/home-automation/zigbee2mqtt.nix
+index 5ec4d037073d1..5fe8b3a68db7e 100644
+--- a/nixos/modules/services/home-automation/zigbee2mqtt.nix
++++ b/nixos/modules/services/home-automation/zigbee2mqtt.nix
+@@ -84,6 +84,7 @@ in
+         StateDirectory = "zigbee2mqtt";
+         StateDirectoryMode = "0700";
+         Restart = "on-failure";
++        RestartSec = 10;
+ 
+         # Hardening
+         CapabilityBoundingSet = "";

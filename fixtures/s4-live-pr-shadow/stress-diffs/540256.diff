@@ -1,0 +1,111 @@
+diff --git a/nixos/modules/services/web-apps/immichframe.nix b/nixos/modules/services/web-apps/immichframe.nix
+index cbe7d57bab7b0..fb3257f80594f 100644
+--- a/nixos/modules/services/web-apps/immichframe.nix
++++ b/nixos/modules/services/web-apps/immichframe.nix
+@@ -134,6 +134,40 @@ in
+           Type = "simple";
+           Restart = "on-failure";
+           RestartSec = 3;
++
++          # systemd hardening, based on jellyfin (also .NET) but stricter
++          CapabilityBoundingSet = [ "" ];
++          DevicePolicy = "closed";
++          LockPersonality = true;
++          NoNewPrivileges = true;
++          PrivateDevices = true;
++          PrivateUsers = true;
++          ProcSubset = "pid";
++          ProtectClock = true;
++          ProtectControlGroups = !config.boot.isContainer;
++          ProtectHome = true;
++          ProtectHostname = true;
++          ProtectKernelLogs = true;
++          ProtectKernelModules = !config.boot.isContainer;
++          ProtectKernelTunables = !config.boot.isContainer;
++          ProtectProc = "invisible";
++          ProtectSystem = "strict";
++          # no AF_NETLINK here since there's no network connection monitoring
++          RestrictAddressFamilies = [
++            "AF_INET"
++            "AF_INET6"
++            "AF_UNIX"
++          ];
++          RestrictNamespaces = !config.boot.isContainer;
++          RestrictRealtime = true;
++          RestrictSUIDSGID = true;
++          SystemCallArchitectures = "native";
++          SystemCallErrorNumber = "EPERM";
++          SystemCallFilter = [
++            "@system-service"
++            "~@privileged"
++          ];
++          UMask = "0077";
+         };
+       };
+   };
+diff --git a/nixos/tests/web-apps/immichframe.nix b/nixos/tests/web-apps/immichframe.nix
+index f2f5904701637..dff57b5c27c22 100644
+--- a/nixos/tests/web-apps/immichframe.nix
++++ b/nixos/tests/web-apps/immichframe.nix
+@@ -1,10 +1,21 @@
++{
++  lib,
++  ...
++}:
++
+ let
+   apiKeyFile = "/tmp/immich-api.key";
+   customInterval = 5;
++  user = "alice";
+ in
+ {
+   name = "immichframe";
+ 
++  meta.maintainers = with lib.maintainers; [
++    numinit
++    jfly
++  ];
++
+   enableOCR = true;
+ 
+   nodes.machine =
+@@ -15,11 +26,17 @@ in
+       ...
+     }:
+     {
+-      imports = [ ../common/x11.nix ];
++      imports = [
++        ../common/user-account.nix
++        ../common/x11.nix
++      ];
+ 
+       # When setting this to 2500 I got "Kernel panic - not syncing: Out of
+       # memory: compulsory panic_on_oom is enabled".
+       virtualisation.memorySize = 3000;
++      hardware.graphics.enable = true;
++      environment.variables.XAUTHORITY = "/home/${user}/.Xauthority";
++      test-support.displayManager.auto.user = user;
+ 
+       environment.systemPackages = with pkgs; [
+         imagemagick
+@@ -69,6 +86,7 @@ in
+ 
+     custom_interval = ${toString customInterval}
+ 
++    machine.wait_for_x()
+     machine.wait_for_unit("immich-server.service")
+     machine.wait_for_open_port(2283)
+ 
+@@ -133,11 +151,7 @@ in
+     assert len(assets) == 2, assets
+ 
+     # Wait for a photo to be displayed.
+-    machine.wait_for_x()
+-    machine.execute("xterm -e 'firefox --kiosk http://localhost:8002' >&2 &")
+-    machine.wait_for_window("immichFrame")
+-    _, active_window = machine.execute("xdotool getactivewindow")
+-    machine.succeed(f"xdotool windowsize {quote(active_window.strip())} 100% 100%")
++    machine.execute("su - ${user} -c 'firefox --kiosk http://localhost:8002' >&2 & disown")
+     machine.wait_for_text('reproduce this moment')
+     machine.wait_for_text('with NixOS tests')
+     machine.screenshot("screen")

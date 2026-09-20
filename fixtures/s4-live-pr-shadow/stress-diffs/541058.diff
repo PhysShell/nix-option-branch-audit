@@ -1,0 +1,12 @@
+diff --git a/nixos/modules/services/security/crowdsec.nix b/nixos/modules/services/security/crowdsec.nix
+index 78d861604dad8..28550c4648635 100644
+--- a/nixos/modules/services/security/crowdsec.nix
++++ b/nixos/modules/services/security/crowdsec.nix
+@@ -825,6 +825,7 @@ in
+             RestrictSUIDSGID = true;
+             ExecReload = [
+               " " # This is needed to clear the ExecReload definitions from upstream
++              "${lib.getExe' pkgs.util-linux "kill"} -HUP $MAINPID"
+             ];
+             ExecStart = [
+               " " # This is needed to clear the ExecStart definitions from upstream

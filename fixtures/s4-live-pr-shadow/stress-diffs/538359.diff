@@ -1,0 +1,103 @@
+diff --git a/nixos/tests/scx/default.nix b/nixos/tests/scx/default.nix
+index 6865390737f84..41c7b84c90b70 100644
+--- a/nixos/tests/scx/default.nix
++++ b/nixos/tests/scx/default.nix
+@@ -13,16 +13,19 @@
+     specialisation = {
+       beerland.configuration.services.scx.scheduler = "scx_beerland";
+       bpfland.configuration.services.scx.scheduler = "scx_bpfland";
++      cake.configuration.services.scx.scheduler = "scx_cake";
++      chaos.configuration.services.scx.scheduler = "scx_chaos";
+       cosmos.configuration.services.scx.scheduler = "scx_cosmos";
+       flash.configuration.services.scx.scheduler = "scx_flash";
+-      flatcg.configuration.services.scx.scheduler = "scx_flatcg";
++      flow.configuration.services.scx.scheduler = "scx_flow";
++      forge.configuration.services.scx.scheduler = "scx_forge";
+       lavd.configuration.services.scx.scheduler = "scx_lavd";
+-      nest.configuration.services.scx.scheduler = "scx_nest";
+       p2dq.configuration.services.scx.scheduler = "scx_p2dq";
++      pandemonium.configuration.services.scx.scheduler = "scx_pandemonium";
+       rlfifo.configuration.services.scx.scheduler = "scx_rlfifo";
+       rustland.configuration.services.scx.scheduler = "scx_rustland";
+       rusty.configuration.services.scx.scheduler = "scx_rusty";
+-      simple.configuration.services.scx.scheduler = "scx_simple";
++      tickless.configuration.services.scx.scheduler = "scx_tickless";
+     };
+   };
+ 
+@@ -30,16 +33,19 @@
+     specialisation = [
+       "beerland",
+       "bpfland",
++      "cake",
++      "chaos",
+       "cosmos",
+       "flash",
+-      "flatcg",
++      "flow",
++      "forge",
+       "lavd",
+-      "nest",
+       "p2dq",
++      "pandemonium",
+       "rlfifo",
+       "rustland",
+       "rusty",
+-      "simple"
++      "tickless",
+     ]
+ 
+     def activate_specialisation(name: str):
+diff --git a/pkgs/os-specific/linux/scx/scx_rustscheds.nix b/pkgs/os-specific/linux/scx/scx_rustscheds.nix
+index 809277cd53d19..4a9da15a7ae58 100644
+--- a/pkgs/os-specific/linux/scx/scx_rustscheds.nix
++++ b/pkgs/os-specific/linux/scx/scx_rustscheds.nix
+@@ -11,30 +11,33 @@
+   libseccomp,
+   nix-update-script,
+   nixosTests,
++  openssl,
+ }:
+ rustPlatform.buildRustPackage (finalAttrs: {
+   pname = "scx_rustscheds";
+-  version = "1.1.1";
++  version = "1.1.2";
+ 
+   src = fetchFromGitHub {
+     owner = "sched-ext";
+     repo = "scx";
+     tag = "v${finalAttrs.version}";
+-    hash = "sha256-/EE1+mlbCQmeLqhbHM+k1JwrRw1Z1mOZmq/ffR1l4bg=";
++    hash = "sha256-igrmrfimVOEJnFxMr9ghN6lAHwEBSFLLVrB2MQ72PXI=";
+   };
+ 
+-  cargoHash = "sha256-1alU6Hl7wHM69JK1ZRWzhT843ROs0WhkBUuDDweZSvk=";
++  cargoHash = "sha256-CTEVdvw6aG/fFas2Fk3x9o4Sp2k3lHO/OLwUM8t9UjE=";
+ 
+   nativeBuildInputs = [
+     pkg-config
+     rustPlatform.bindgenHook
+     protobuf
+   ];
++
+   buildInputs = [
+     elfutils
+     zlib
+     zstd
+     libseccomp
++    openssl
+   ];
+ 
+   env = {
+@@ -84,9 +87,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
+     "scx_bpfland"
+     "scx_cake"
+     "scx_chaos"
++    "scx_characterize"
+     "scx_cosmos"
+     "scx_flash"
+     "scx_flow"
++    "scx_forge"
+     "scx_lavd"
+     "scx_layered"
+     "scx_mitosis"

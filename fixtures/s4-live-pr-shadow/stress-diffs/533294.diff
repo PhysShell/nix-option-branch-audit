@@ -1,0 +1,33 @@
+diff --git a/nixos/tests/victoriatraces/otlp-ingestion.nix b/nixos/tests/victoriatraces/otlp-ingestion.nix
+index d3807c6bde669..586348c58d8d8 100644
+--- a/nixos/tests/victoriatraces/otlp-ingestion.nix
++++ b/nixos/tests/victoriatraces/otlp-ingestion.nix
+@@ -82,7 +82,7 @@ in
+     machine.wait_until_succeeds("""
+       curl -s 'http://localhost:10428/select/jaeger/api/services' | \
+       jq -e '.data[] | select(. == "test-service")'
+-    """, timeout=10)
++    """, timeout=20)
+ 
+     # Query for traces from our test service
+     machine.wait_until_succeeds("""
+diff --git a/pkgs/by-name/vi/victoriatraces/package.nix b/pkgs/by-name/vi/victoriatraces/package.nix
+index 50185f9150de1..2c0f2bdc6a35a 100644
+--- a/pkgs/by-name/vi/victoriatraces/package.nix
++++ b/pkgs/by-name/vi/victoriatraces/package.nix
+@@ -13,13 +13,13 @@
+ 
+ buildGo126Module (finalAttrs: {
+   pname = "VictoriaTraces";
+-  version = "0.9.2";
++  version = "0.9.3";
+ 
+   src = fetchFromGitHub {
+     owner = "VictoriaMetrics";
+     repo = "VictoriaTraces";
+     tag = "v${finalAttrs.version}";
+-    hash = "sha256-SOPC9CqGNwJb80l9kP3jZtcdz3RS3LYNQjYC70Hg9fQ=";
++    hash = "sha256-jyVHqdnnvLEYFFVUwXNf/B9vSwKwPrE5iJzlRccOhTg=";
+   };
+ 
+   vendorHash = null;

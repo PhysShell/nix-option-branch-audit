@@ -1,0 +1,90 @@
+diff --git a/nixos/tests/ustreamer.nix b/nixos/tests/ustreamer.nix
+index a9cf7150915e1..8a1820d19d06d 100644
+--- a/nixos/tests/ustreamer.nix
++++ b/nixos/tests/ustreamer.nix
+@@ -1,4 +1,7 @@
+ { pkgs, ... }:
++let
++  test-output-filename = "snapshot.jpeg";
++in
+ {
+   name = "ustreamer-vmtest";
+   nodes = {
+@@ -43,13 +46,35 @@
+           formats/2/height = 480
+           formats/2/fps = 20/1, 15/2
+         '';
++
++        test-stream-name = "test_stream.jpeg";
++
++        test-ustreamer-python =
++          pkgs.writers.writePython3Bin "test-ustreamer-python"
++            {
++              libraries = [ pkgs.python3Packages.ustreamer ];
++            }
++            ''
++              import ustreamer
++
++              with ustreamer.Memsink("${test-stream-name}") as sink:
++                  frame = sink.wait_frame()
++              with open("${test-output-filename}", "wb") as file:
++                  file.write(frame["data"])
++            '';
+       in
+       {
+         services.ustreamer = {
+           enable = true;
+           device = "/dev/video9";
+-          extraArgs = [ "--device-timeout=8" ];
++          extraArgs = [
++            "--device-timeout=8"
++            "--sink=${test-stream-name}"
++          ];
+         };
++        environment.systemPackages = [
++          test-ustreamer-python
++        ];
+         networking.firewall.allowedTCPPorts = [ 8080 ];
+ 
+         boot.extraModulePackages = [ config.boot.kernelPackages.akvcam ];
+@@ -68,5 +93,8 @@
+ 
+     client.wait_for_unit("multi-user.target")
+     client.succeed("curl http://camera:8080")
++
++    camera.succeed("test-ustreamer-python")
++    camera.wait_for_file('${test-output-filename}')
+   '';
+ }
+diff --git a/pkgs/by-name/us/ustreamer/package.nix b/pkgs/by-name/us/ustreamer/package.nix
+index 296f2b34a4f80..61abe3c6adea2 100644
+--- a/pkgs/by-name/us/ustreamer/package.nix
++++ b/pkgs/by-name/us/ustreamer/package.nix
+@@ -62,7 +62,8 @@ stdenv.mkDerivation (finalAttrs: {
+   nativeBuildInputs = [
+     pkg-config
+     which
+-  ];
++  ]
++  ++ lib.optional withPython python3Packages.python;
+ 
+   makeFlags = [
+     "PREFIX=${placeholder "out"}"
+diff --git a/pkgs/top-level/python-packages.nix b/pkgs/top-level/python-packages.nix
+index 23139cad77a18..08cdb10661738 100644
+--- a/pkgs/top-level/python-packages.nix
++++ b/pkgs/top-level/python-packages.nix
+@@ -21662,6 +21662,13 @@ self: super: with self; {
+ 
+   usort = callPackage ../development/python-modules/usort { };
+ 
++  ustreamer = toPythonModule (
++    pkgs.ustreamer.override {
++      python3Packages = self;
++      withPython = true;
++    }
++  );
++
+   utils = callPackage ../development/python-modules/utils { };
+ 
+   utitools = callPackage ../development/python-modules/utitools { };
