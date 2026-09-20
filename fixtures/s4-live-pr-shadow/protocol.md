@@ -45,16 +45,42 @@ candidate pools, or their own unselected leftovers, are never reused.
 
 Exclusion is mechanical and reproducible, generated from repository
 evidence (`fixtures/s4-live-pr-shadow/build-exclusion-ledger.py` ->
-`exclusion-ledger.json`, committed `79c811b`, before this document was
-finalized), not constructed manually from memory:
+`exclusion-ledger.json`), not constructed manually from memory.
 
-- every PR number examined in S1, S2, or S3 (130, zero overlap)
-- every normalized subject/app/service name examined in those rounds
-  (367, each with its own provenance)
-- every module path examined in those rounds (93)
-- every test path examined in those rounds (87)
-- the 93 exporter subjects already censused in S2-F3
+**Amendment — the ledger commit this protocol originally referenced
+was superseded before the draw.** `79c811b` (367 subject names, 93
+module paths, 87 test paths, 0 PR numbers recorded at that point in
+the ledger's own history) was the FIRST version. Sanity-checking it
+against the real fresh population, before either cohort was drawn,
+found three real classes of over-exclusion bugs (generic nested
+filenames wrongly promoted to subject names, e.g.
+`nixos/tests/kubernetes/base.nix` → wrongly `"base"`; the same bug in
+`pkgs/by-name/**` paths; old hand-compiled lists' own generic-term
+entries blindly unioned in; exporter-census names with
+generic-sounding real subjects matched too broadly, causing 43
+collateral false exclusions). All were fixed in commit `e9bf65f`,
+**still before either cohort was drawn and before any adjudication**.
+**`e9bf65f` is the actual, final, operative ledger the population
+screen and both cohort draws were performed against** — `79c811b` was
+never the basis for any real screening or draw decision; it was
+corrected first. The final ledger contains:
+
+- **130** excluded PR numbers (S1's 30 + S2's 50 + S3's 50, zero
+  overlap)
+- **390** excluded subject names, each with its own provenance
+- **183** excluded module paths (includes the 93 real exporter module
+  paths, now matched by exact path rather than by generic-sounding
+  name — see `e9bf65f`'s own commit message)
+- **87** excluded test paths
 - all synthetic/golden subjects already used by this repository
+
+This correction changed only the mechanical contamination/exclusion
+implementation (a real-world precision bug in the extraction
+heuristic, found and fixed by direct inspection of real excluded
+candidates) — it never touched cohort membership, draw order, or
+adjudication in any way, since both were performed only after `e9bf65f`
+landed. Fully disclosed here rather than silently treated as if
+`79c811b` had remained the operative ledger throughout.
 
 ## Cohorts
 
@@ -98,9 +124,26 @@ order until either:
 
 Stopping depends only on presentation count, never correctness.
 
-**If the caps are reached without enough actionable presentations,
-the deployment-readiness result is `INSUFFICIENT EVIDENCE` — not pass
-and not fail.**
+**Amendment — realized S4-B cap.** The frozen S4-B stress-eligible
+pool (drawn and committed in `17a89aa`, independently reproduced
+byte-for-byte from committed inputs in `04e6ff0`) contains only **67**
+PRs — the entire stress-eligible pool remaining after S4-A's own 120
+are removed is smaller than the 80-PR cap above. The realized S4-B
+upper cap for this round is therefore:
+
+```
+min(80, frozen stress-eligible pool size) = min(80, 67) = 67
+```
+
+If the combined actionable threshold (≥30 total, ≥10 from S4-A) has
+not been reached after all 67 frozen S4-B PRs have been adjudicated,
+the evidence-volume result is `INSUFFICIENT EVIDENCE` for this round.
+No replacement or hand-picked PRs are added to compensate — the frozen
+pool is the frozen pool.
+
+**If the caps (120 for S4-A, the realized 67 for S4-B) are reached
+without enough actionable presentations, the deployment-readiness
+result is `INSUFFICIENT EVIDENCE` — not pass and not fail.**
 
 ## What counts as actionable
 
@@ -203,11 +246,42 @@ Public human-reviewed maintainer-facing advisory is supported only if
 of ≈90.5% — condition 8 has an explicit statistical meaning fixed
 before any result is seen, not a threshold chosen after the fact.)
 
+### Gate-result precedence — frozen before adjudication
+
+The 10 conditions above are not evaluated as an unordered checklist.
+Evaluation follows this exact precedence, fixed here before any real
+adjudication:
+
+**1. Any confirmed hard correctness failure** — a false PASS; a false
+finding / scanner-substance error; a PR-relevance error; a
+causal-framing error; a rendered maintainer-facing presentation error;
+or a `TOOL_ERROR` on an ordinary supported input — makes the final
+deployment gate **`FAIL`**, regardless of whether the actionable-count
+threshold was ever reached. A hard failure decides the gate on its
+own; the volume/precision conditions below are irrelevant once one
+exists.
+
+**2. If no hard correctness failure exists**, but any of the
+following holds — S4-A has fewer than 10 actionable presentations;
+total actionable presentations are fewer than 30; S4-B has zero
+actionable presentations (making its separately-required precision
+undefined); required independent adjudication remains unresolved; or
+the realized cohort cap (120 for S4-A, 67 for S4-B) is exhausted
+before the required evidence volume is reached — the result is
+**`INSUFFICIENT EVIDENCE`**.
+
+**3. Otherwise**, evaluate S4-A precision, S4-B precision, the pooled
+one-sided 95% exact lower bound, and every remaining gate condition.
+Any failed condition here still yields **`FAIL`**; all satisfied
+yields **`PASS`**.
+
 Any false finding, false PASS, or framing/relevance error fails the
-public-advisory gate for this round. The frozen evaluation continues
-to its pre-declared stopping point even after a failure, so the
-failure's prevalence and surrounding evidence are still measured. The
-gate itself is never changed after seeing results.
+public-advisory gate for this round. **The frozen evaluation continues
+to its pre-declared stopping point even after a hard failure becomes
+apparent — the round is never stopped early merely because `FAIL` has
+become inevitable**, so the failure's prevalence and surrounding
+evidence are still measured in full. The gate itself is never changed
+after seeing results.
 
 ## Additional metrics — diagnostic, not gates
 
