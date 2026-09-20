@@ -4750,3 +4750,29 @@ validation sample), then a fresh, non-overlapping S3 sample under its
 own new frozen release, with actionable precision — not correctness —
 as the metric that actually decides whether an advisory beta is
 earned.
+
+## S2-R: regression rerun, both fixes confirmed, zero regressions
+
+The same 50 PRs, re-run against S2-F1/F2 landed. `#547038` — the exact
+real PR that motivated `transition_origin` — now reports `new_finding`
+with `transition_origin: analysis_became_possible`, precisely as
+designed. `#558149` — after a reused scratch fixture turned out to
+reference the wrong real file (an investigation artifact from S2's own
+original run, not a fix regression) was rebuilt against the actual
+`firewall.nix` at the PR's own real head SHA — now resolves `enable`
+to a clean, real `PASS` (was invisible `OptionNotFound`);
+`logRefusedPackets` progresses to `PredicateNotFound` (its declaration
+is now visible; its own `optionalString`-based usage isn't a
+recognized predicate shape — a separate, honest, ordinary limitation,
+not something S2-F1 ever claimed to fix). Every other real notable
+entry reproduced its correct expected origin; exporter cases stayed
+honestly `INCONCLUSIVE`, exactly as S2-F3's own census predicted; all
+44 other reused fixtures reproduced byte-for-byte identical to S2's
+own original result. Per the same S1-R precedent, this confirms the
+fixes work, not that the tool is beta-ready.
+
+**Not started, per the user's own explicit staging, awaiting explicit
+go**: a new release, then S3 on a fresh, non-overlapping sample —
+where actionable precision (not correctness, which already looks
+strong and unchanged) is the metric that actually decides an advisory
+beta.
