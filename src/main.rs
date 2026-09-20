@@ -739,10 +739,17 @@ fn scan_options(
         let Some(value) = children.next() else {
             continue;
         };
-        if value.kind() != NODE_ATTR_SET {
-            continue;
-        }
 
+        // S2-F1: the SAME real gap `walk_options_block`'s own fix
+        // closes, one level up -- this entry point's own early
+        // "value must be a literal attrset" check would otherwise skip
+        // a top-level `options.<path> = {...} // <shared>;` (or the
+        // nested `options = {...} // <shared>;` form) before ever
+        // reaching the `segs` match below at all. `walk_merge_operands`
+        // is a real no-op for anything that's neither a literal attrset
+        // nor a `//`-merge, so dropping the old early `continue` here is
+        // safe -- it never widens what gets walked, only what gets
+        // UNWRAPPED first.
         if segs == ["options"] {
             // E1/GAP-4 fix: an `options = {...}` block reached ONLY by
             // walking down from another option's own `mkOption {...}`
@@ -772,7 +779,9 @@ fn scan_options(
             if is_nested_inside_mk_option_call(&node) {
                 continue;
             }
-            walk_options_block(file, src, &value, &mut Vec::new(), &mut out, option_prefix);
+            walk_merge_operands(&value, |attrset| {
+                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix);
+            });
             continue;
         }
 
@@ -785,7 +794,9 @@ fn scan_options(
                 .map(|resolved| resolved == option_prefix)
                 .unwrap_or(false)
         {
-            walk_options_block(file, src, &value, &mut Vec::new(), &mut out, option_prefix);
+            walk_merge_operands(&value, |attrset| {
+                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix);
+            });
         }
     }
     out
@@ -869,18 +880,68 @@ fn walk_options_block(
             if let Some(nested) = find_nested_options_block(&value) {
                 walk_options_block(file, src, &nested, path, out, option_prefix);
             }
-        } else if value.kind() == NODE_ATTR_SET {
-            if at_prefix_root {
-                walk_options_block(file, src, &value, &mut Vec::new(), out, option_prefix);
-            } else {
-                walk_options_block(file, src, &value, path, out, option_prefix);
-            }
+        } else {
+            walk_merge_operands(&value, |attrset| {
+                if at_prefix_root {
+                    walk_options_block(file, src, attrset, &mut Vec::new(), out, option_prefix);
+                } else {
+                    walk_options_block(file, src, attrset, path, out, option_prefix);
+                }
+            });
         }
 
         for _ in 0..segs.len() {
             path.pop();
         }
     }
+}
+
+/// S2-F1 (a real nixpkgs PR shadow audit): a `//`-merge (`A // B`) as a
+/// nested options block's own VALUE is a real, common nixpkgs idiom for
+/// combining a literal set of declarations with a shared/external one
+/// -- e.g. `networking.firewall`'s real `{ enable = lib.mkOption
+/// {...}; ... } // commonOptions;`, found by a real shadow-audit false
+/// `OptionNotFound` on `enable` (PR #558149: `enable` genuinely IS
+/// declared, directly, with no indirection at all -- the whole `//`
+/// expression was previously treated as unrecognized, silently losing
+/// every declaration on EITHER side). `walk_options_block`'s own
+/// attrset-literal check alone (`value.kind() == NODE_ATTR_SET`) never
+/// matched this shape at all.
+///
+/// Fixed here by unwrapping ANY operand that is, itself, either a
+/// literal attrset or another `//`-merge (recursively) -- deliberately
+/// bounded to exactly these two node shapes, nothing else. An operand
+/// that's anything other than a literal attrset or a further `//`
+/// (a bare identifier reference, a function call, ...) is left opaque,
+/// exactly as before this fix: a real, disclosed limit, not a general
+/// Nix evaluator creeping in through the back door. This is the SAME
+/// general mechanism behind part of the real `exporters.nix` gap this
+/// same shadow-audit round found (`mkExporterOpts {...} // extraOpts`)
+/// -- but only PART of it: `extraOpts` there is a bare identifier
+/// reference (deferred through a function parameter to a separate call
+/// site elsewhere in the file), not a literal attrset at its own use
+/// site, so it stays correctly opaque here too. The rest of that gap
+/// is a real multi-source-resolution problem, out of scope for this
+/// narrow, bounded fix -- see the S2-F3 census before any generic
+/// multi-file support is attempted.
+fn walk_merge_operands(value: &SyntaxNode, mut visit: impl FnMut(&SyntaxNode)) {
+    fn go(value: &SyntaxNode, visit: &mut dyn FnMut(&SyntaxNode)) {
+        if value.kind() == NODE_ATTR_SET {
+            visit(value);
+            return;
+        }
+        if let Some(bin) = rnix::ast::BinOp::cast(value.clone()) {
+            if bin.operator() == Some(rnix::ast::BinOpKind::Update) {
+                if let Some(lhs) = bin.lhs() {
+                    go(&lhs.syntax().clone(), visit);
+                }
+                if let Some(rhs) = bin.rhs() {
+                    go(&rhs.syntax().clone(), visit);
+                }
+            }
+        }
+    }
+    go(value, &mut visit);
 }
 
 fn is_mk_option_call(node: &SyntaxNode) -> bool {
@@ -6489,6 +6550,117 @@ mod tests {
             "cfg binds to a different scope than option_prefix claims -- must not correlate; \
              got {opts:?}"
         );
+    }
+
+    // --- S2-F1: a real nixpkgs PR shadow audit found a false
+    // OptionNotFound on PR #558149's own real firewall.nix -- a nested
+    // options block whose own VALUE is a `//`-merge
+    // (`{ enable = lib.mkOption {...}; ... } // commonOptions;`), not a
+    // literal attrset, which `walk_options_block`'s own attrset-literal
+    // check silently never matched at all. Root-caused with a minimal
+    // reproducer (case2/case3 under fixtures/s2-f1-firewall-merge/,
+    // real vendored firewall.nix + a synthetic isolation) before fixing.
+
+    #[test]
+    fn walk_options_block_finds_a_declaration_on_the_literal_lhs_of_an_update_merge() {
+        // The exact real shape from firewall.nix: a nested options block
+        // whose value is `{ <declared options> } // <external attrset>;`.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.networking.firewall;
+              commonOptions = {
+                allowedTCPPorts = lib.mkOption { default = [ ]; };
+              };
+            in
+            {
+              options = {
+                networking.firewall = {
+                  enable = lib.mkOption { default = true; };
+                }
+                // commonOptions;
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["networking".to_string(), "firewall".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["enable"])),
+            "enable is declared directly on the LHS of a // merge, zero indirection -- \
+             must be found; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn walk_options_block_finds_declarations_on_either_side_of_an_update_merge() {
+        // Merge side must not matter when BOTH operands are literal
+        // attrsets -- this is deliberately different from the
+        // "stays opaque" test below: a `let`-bound IDENTIFIER reference
+        // (even one that happens to resolve to an attrset) is NOT a
+        // literal attrset at its own use site, and correctly stays
+        // unresolved (see that test) -- this one instead tests two
+        // attrset LITERALS directly, on each side.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.x;
+            in
+            {
+              options.services.x =
+                {
+                  fromLhs = lib.mkOption { default = null; };
+                }
+                // {
+                  fromRhs = lib.mkOption { default = null; };
+                };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "x".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["fromLhs"])),
+            "the literal LHS of the merge must be found; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["fromRhs"])),
+            "the literal RHS of the merge must be found; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn walk_options_block_stays_opaque_for_a_merge_with_a_non_literal_operand() {
+        // Deliberately bounded, not a general evaluator: a merge operand
+        // that's a bare identifier reference (e.g. exporters.nix's own
+        // real `extraOpts`, a function parameter deferred to a separate
+        // call site elsewhere in the file) is real, disclosed opacity
+        // this fix does NOT resolve. The literal side must still be
+        // found; nothing should panic or hallucinate a declaration for
+        // the unresolvable side.
+        let src = r#"
+            { config, lib, extraOpts, ... }:
+            let
+              cfg = config.services.x;
+            in
+            {
+              options.services.x = {
+                known = lib.mkOption { default = null; };
+              }
+              // extraOpts;
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "x".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["known"])),
+            "the literal LHS must still be found even though the RHS is opaque; got {opts:?}"
+        );
+        assert_eq!(opts.len(), 1, "exactly one real declaration exists in this fixture; got {opts:?}");
     }
 
     // --- Scope-aware regression pair for the gate-1 safety gate, added
