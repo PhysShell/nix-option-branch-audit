@@ -20,6 +20,31 @@ from S3-A's own effective cohort and headline metric** (S3-A's real N
 is 29, not 30, honestly reported as such) — not silently backfilled
 with a replacement draw, and not adjudicated at all.
 
+**Second amendment, same kind of correction, applied narrowly**: S1's
+own drawn `#554779` (os-prober) resolved to a persistent
+`TestConfigUnresolved` against what is, on inspection, the same
+`nixos/tests/grub.nix` subject that S3-B's own `#481112` (`grub2:
+2.12 -> 2.14`, matched categories `package_version_source_dep`,
+`nixos_tests_touched`) also touches — a real same-subject overlap the
+original 254-name list missed because it only ever compiled S2's own
+drawn-PR *subjects*, never S1's. Caught before any fork read
+`#481112`'s real content past its title (`s3b-group1`'s own
+assignment; confirmed zero `oba` runs, zero manual adjudication, zero
+file fetch past the population listing happened against it). Per the
+same precedent as the sstorytime amendment immediately above:
+`#481112` is **excluded from S3-B's own effective cohort and headline
+metric, not backfilled** — S3-B's real N is 19, not 20. `grub`/`grub2`
+is added to the name-exclusion list for any future round. Everything
+else in both cohorts below is unchanged from the original frozen
+draw — this is a subtraction of one already-unexamined PR, not a
+redraw.
+
+(A separate, unauthorized commit briefly replaced this entire file
+with a full wholesale redraw of both cohorts — reverted; see the
+project's own git history and the disclosure to the user for the full
+account. The draw below is the actual frozen cohort real adjudication
+work has been dispatched against.)
+
 ## Population funnel
 
 ```

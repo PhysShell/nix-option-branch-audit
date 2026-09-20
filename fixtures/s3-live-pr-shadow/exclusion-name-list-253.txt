@@ -79,6 +79,7 @@ gocron
 grafana
 graphite
 grocy
+grub2
 hatsu
 hddtemp
 headscale
