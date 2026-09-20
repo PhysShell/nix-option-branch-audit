@@ -1,0 +1,15 @@
+# S3-F3: real regression fixture for the round's own `transition_origin`
+# causality bugs -- an EXISTING module (both roots have module.nix and
+# test.nix, so this is a real TargetDiff::Changed, never Added) gaining
+# a brand-new option. `newOption` is watched: base has no such
+# declaration at all (OptionNotFound), head has a real, genuine,
+# never-witnessed OBA001 finding -- the same shape as real S3 #516128
+# (tinyauth's own enableUnixSocket) and #562066 (suricata's own
+# reloadOnRulesetUpdate).
+[[target]]
+name = "demo"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["enable", "newOption"]

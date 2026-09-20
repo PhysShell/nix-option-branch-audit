@@ -670,3 +670,56 @@ fn audit_diff_test_birth_on_a_pre_existing_module_has_analysis_became_possible_o
     assert!(!markdown.contains("### NEW FINDING"));
     let _ = std::fs::remove_file(&summary_path);
 }
+
+// =======================================================================
+// S3-F3: `transition_origin` must not overclaim `analysis_became_
+// possible` for a brand-new option born inside an ALREADY-EXISTING
+// module -- the real S3 bug (`#516128`/`#562066`). This is a real
+// `TargetDiff::Changed` (both module.nix and test.nix exist on both
+// roots, unlike the module/test-birth cases above which are real
+// `TargetDiff::Added`), with the new option's own base-side verdict
+// specifically `OptionNotFound` -- the one kind that can never honestly
+// support "existing branch became observable".
+// =======================================================================
+
+#[test]
+fn audit_diff_new_option_inside_an_existing_module_has_origin_unclear_not_analysis_became_possible(
+) {
+    let out = oba(&[
+        "audit-diff",
+        "--base-root",
+        "fixtures/synthetic/audit-diff-option-lifecycle/before-without-new-option",
+        "--head-root",
+        "fixtures/synthetic/audit-diff-option-lifecycle/after-with-new-option",
+        "--targets",
+        "fixtures/synthetic/audit-diff-option-lifecycle/targets.toml",
+        "--format",
+        "json",
+        "--summary-path",
+        std::env::temp_dir().join("oba-test-s3f3-summary.md").to_str().unwrap(),
+    ]);
+    // exit 2, not 0: the base side's own real verdict for `newOption` is
+    // OptionNotFound (Inconclusive-class) -- genuinely inconclusive on
+    // one side, per this project's own exit-code philosophy (unlike the
+    // module/test-birth cases above, which route through a real `Added`
+    // diff and never touch a real base-side verdict at all).
+    assert_eq!(exit_code(&out), 2, "stderr: {}", String::from_utf8_lossy(&out.stderr));
+    let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
+    // The real diff shape: a Changed target (module+test exist on both
+    // sides), not Added -- confirms this fixture actually exercises the
+    // `transition_origin_for_oba_change` path, not the Added/
+    // module_birth_paths one.
+    assert_eq!(v["summary"]["changed"], 1);
+    assert_eq!(v["summary"]["added"], 0);
+    assert_eq!(v["summary"]["oba_verdict_transitions"]["option_not_found->oba001"], 1);
+    assert_eq!(v["summary"]["notable"][0]["bucket"], "new_finding");
+    assert_eq!(v["summary"]["notable"][0]["subject"], "newOption");
+    assert_eq!(v["summary"]["notable"][0]["transition_origin"], "origin_unclear");
+
+    let summary_path = std::env::temp_dir().join("oba-test-s3f3-summary.md");
+    let markdown = std::fs::read_to_string(&summary_path).expect("summary file was written");
+    assert!(markdown.contains("### NEWLY OBSERVABLE FINDING (ORIGIN UNCLEAR)"));
+    assert!(!markdown.contains("### EXISTING UNCOVERED BRANCH BECAME OBSERVABLE"));
+    assert!(!markdown.contains("### NEW FINDING"));
+    let _ = std::fs::remove_file(&summary_path);
+}

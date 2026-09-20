@@ -5267,12 +5267,28 @@ fn oba_kind_class(kind: VerdictKind) -> ResultVerdict {
 ///   sides, whose real prior verdict (`Pass` or `Finding`, never
 ///   `Inconclusive`) genuinely changed. The one case that really does
 ///   mean "something about this PR's own code changed the outcome."
+/// - `OriginUnclear`: S3-F3 -- a same-subject transition whose prior
+///   side was specifically `OptionNotFound` (not any of the other four
+///   `Inconclusive`-class kinds). `OptionNotFound` alone is never safe
+///   proof that the option was absent from source: real S3 evidence
+///   (S3-F2's own vxwm fix) shows the declaration SCANNER can fail to
+///   see an option that genuinely already existed, for reasons entirely
+///   unrelated to the option's own age. Confidently reporting
+///   `AnalysisBecamePossible` here overclaims "this was already there"
+///   exactly as wrongly as `SubjectAdded` would overclaim "this PR
+///   created it" -- the real S3 bug (`#516128`, `#562066`: a brand-new
+///   option, born in this exact PR, rendered as "EXISTING branch became
+///   observable"). Per the round's own mandate, extending the taxonomy
+///   with this honest, neutral answer is preferable to inventing
+///   certainty this scanner's own model cannot support without a real
+///   source-text diff (out of scope, real evaluator/differ creep).
 #[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 enum TransitionOrigin {
     SubjectAdded,
     AnalysisBecamePossible,
     VerdictChanged,
+    OriginUnclear,
 }
 
 /// A bounded, already-classified transition worth a maintainer's
@@ -5449,12 +5465,59 @@ fn record_bucket(
 /// verdict (`from`) was `Inconclusive` (we gained the ability to say
 /// something for the first time, regardless of what we can now say);
 /// `VerdictChanged` otherwise (`from` was a real `Pass` or `Finding`,
-/// a determinate prior verdict that genuinely changed).
+/// a determinate prior verdict that genuinely changed). Used for CDC's
+/// own transitions -- `cdc::ConfigContractVerdict` has no finer-grained
+/// "why is it Inconclusive" distinction than this (see this function's
+/// own CDC call site's comment: "no equivalent shape in CDC's own
+/// model"), so the coarse three-way split is already the honest ceiling
+/// there, unlike OBA below.
 fn transition_origin_for_change(from: ResultVerdict) -> TransitionOrigin {
     if from == ResultVerdict::Inconclusive {
         TransitionOrigin::AnalysisBecamePossible
     } else {
         TransitionOrigin::VerdictChanged
+    }
+}
+
+/// S3-F3: the OBA-specific, richer replacement for
+/// `transition_origin_for_change` on a same-subject `Changed`
+/// transition -- takes the full `VerdictKind` (available at OBA's own
+/// call site, unlike CDC's coarser model) instead of the
+/// already-collapsed `ResultVerdict`, specifically so it can tell
+/// `VerdictKind::OptionNotFound` apart from the other four
+/// `Inconclusive`-class kinds (`PredicateNotFound`, `DefaultUnresolved`,
+/// `TestValueUnresolved`, `TestConfigUnresolved`) before classifying:
+///
+/// - `OptionNotFound`: the declaration scanner reported no
+///   `mkOption`-shaped declaration at all on the prior side. This is
+///   genuinely ambiguous -- it can mean the option was truly absent
+///   (a real new-option case) OR that an already-existing declaration
+///   was simply invisible to the scanner for a structural reason
+///   entirely unrelated to whether the option is new (S3-F2's own real
+///   vxwm bug is exactly this: a real, pre-existing-shaped declaration
+///   the scanner failed to see). Neither `SubjectAdded` nor
+///   `AnalysisBecamePossible` can be honestly claimed here ->
+///   `OriginUnclear`.
+/// - `PredicateNotFound` / `DefaultUnresolved` / `TestValueUnresolved` /
+///   `TestConfigUnresolved`: every one of these verdicts is only
+///   reachable AFTER the declaration itself was found (a predicate
+///   search, a default-value classification, or a test-evidence lookup
+///   ran against a real, already-visible declaration) -- so the prior
+///   side genuinely was analyzable-but-opaque, never "not found at
+///   all". Confidently `AnalysisBecamePossible`, no ambiguity: this is
+///   the one case the real S3 evidence (`#547038` in S2, and every
+///   still-correct control in this round) shows this label is honest
+///   for.
+/// - `Oba001` / `Pass` (determinate): `VerdictChanged`, unchanged from
+///   `transition_origin_for_change`'s own logic.
+fn transition_origin_for_oba_change(from: VerdictKind) -> TransitionOrigin {
+    match from {
+        VerdictKind::OptionNotFound => TransitionOrigin::OriginUnclear,
+        VerdictKind::PredicateNotFound
+        | VerdictKind::DefaultUnresolved
+        | VerdictKind::TestValueUnresolved
+        | VerdictKind::TestConfigUnresolved => TransitionOrigin::AnalysisBecamePossible,
+        VerdictKind::Oba001 | VerdictKind::Pass => TransitionOrigin::VerdictChanged,
     }
 }
 
@@ -5586,6 +5649,17 @@ fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
             }
             ("new_inconclusive", Some(TransitionOrigin::AnalysisBecamePossible)) => {
                 "EXISTING BRANCH BECAME OBSERVABLE (STILL INCONCLUSIVE)"
+            }
+            // S3-F3: honest, deliberately non-committal heading for
+            // `OriginUnclear` -- neither "NEW" nor "EXISTING...
+            // OBSERVABLE" is a claim this scanner's own model can back
+            // up when the prior side was specifically OptionNotFound
+            // (see `transition_origin_for_oba_change`'s own doc comment).
+            ("new_finding", Some(TransitionOrigin::OriginUnclear)) => {
+                "NEWLY OBSERVABLE FINDING (ORIGIN UNCLEAR)"
+            }
+            ("new_inconclusive", Some(TransitionOrigin::OriginUnclear)) => {
+                "NEWLY OBSERVABLE, STILL INCONCLUSIVE (ORIGIN UNCLEAR)"
             }
             ("new_finding", _) => "NEW FINDING",
             ("new_inconclusive", _) => "NEW INCONCLUSIVE",
@@ -5833,7 +5907,14 @@ fn run_audit_diff(
                     "oba",
                     entry.identity.watched_path.clone(),
                     &result,
-                    Some(transition_origin_for_change(from_class)),
+                    // S3-F3: OBA's own call site has the full VerdictKind
+                    // available (t.from), not just the coarse ResultVerdict
+                    // (from_class) -- uses the richer classifier so a
+                    // same-subject transition whose prior side was
+                    // specifically OptionNotFound gets the honest
+                    // OriginUnclear answer instead of confidently
+                    // overclaiming AnalysisBecamePossible.
+                    Some(transition_origin_for_oba_change(t.from)),
                 );
             }
         }
@@ -8811,6 +8892,56 @@ mod tests {
         assert_eq!(added_bucket(ResultVerdict::Finding), Some("new_finding"));
         assert_eq!(added_bucket(ResultVerdict::Inconclusive), Some("new_inconclusive"));
         assert_eq!(added_bucket(ResultVerdict::Pass), None);
+    }
+
+    // =======================================================================
+    // S3-F3: `transition_origin_for_oba_change` -- the real S3 bug was
+    // that EVERY Inconclusive-class prior verdict collapsed into
+    // `AnalysisBecamePossible`, including `OptionNotFound` (the one kind
+    // that can never honestly support that claim). Exhaustive over all
+    // 7 real `VerdictKind` inputs, pinning both real S3 reproducers
+    // (`#516128`/`#562066`, both `OptionNotFound -> {Oba001,Pass}`) and
+    // the controls the round's own mandate named explicitly.
+    // =======================================================================
+
+    #[test]
+    fn transition_origin_for_oba_change_is_exhaustively_correct_over_all_verdict_kinds() {
+        // The real S3 bug shape, both directions (#516128 -> Oba001,
+        // #562066 -> Pass) -- OptionNotFound alone must never be
+        // confidently read as "this existing branch became observable".
+        assert_eq!(
+            transition_origin_for_oba_change(VerdictKind::OptionNotFound),
+            TransitionOrigin::OriginUnclear,
+            "OptionNotFound must never overclaim AnalysisBecamePossible -- the real #516128/#562066 bug"
+        );
+
+        // The declaration WAS found in all four of these -- a real
+        // opacity/inconclusive -> determinate transition, confidently
+        // AnalysisBecamePossible, no ambiguity (the case the mandate's
+        // own #547038/S2-F2 precedent already relies on staying correct).
+        for opaque_but_declared in [
+            VerdictKind::PredicateNotFound,
+            VerdictKind::DefaultUnresolved,
+            VerdictKind::TestValueUnresolved,
+            VerdictKind::TestConfigUnresolved,
+        ] {
+            assert_eq!(
+                transition_origin_for_oba_change(opaque_but_declared),
+                TransitionOrigin::AnalysisBecamePossible,
+                "{opaque_but_declared:?}: declaration was already found, opacity lifting must stay confidently AnalysisBecamePossible"
+            );
+        }
+
+        // Ordinary, determinate Pass/Finding verdict changes -- an
+        // already-analyzable subject whose real outcome genuinely
+        // changed, unaffected by this fix.
+        for determinate in [VerdictKind::Oba001, VerdictKind::Pass] {
+            assert_eq!(
+                transition_origin_for_oba_change(determinate),
+                TransitionOrigin::VerdictChanged,
+                "{determinate:?}: a determinate prior verdict must stay VerdictChanged"
+            );
+        }
     }
 
     #[test]
