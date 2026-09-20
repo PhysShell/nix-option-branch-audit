@@ -4776,3 +4776,45 @@ go**: a new release, then S3 on a fresh, non-overlapping sample —
 where actionable precision (not correctness, which already looks
 strong and unchanged) is the metric that actually decides an advisory
 beta.
+
+## S3: fresh random + stress cohorts, actionable precision measured for the first time on genuinely unseen data
+
+Frozen `v0.4.2`, `src/` untouched for the entire round. 48 real PRs
+(29 random + 19 stress; 2 disclosed single-PR exclusions —
+`sstorytime`/`grub2` — for name-overlap with S1's own drawn subjects),
+drawn from a genuinely fresh population fetch, never used by S1/S2
+development, debugging, fixtures, or regression work. Full
+methodology, raw per-PR adjudication, and both cohorts' precision:
+`fixtures/s3-live-pr-shadow/{protocol,sample,results}.md`.
+
+**Headline: zero false PASSes and zero `TOOL_ERROR` crashes across all
+48 PRs** — the verification core holds on data the tool has never
+seen. Against that: actionable precision, computed separately per
+cohort and never blended, was S3-A (random) 2/4 = 50% and S3-B
+(stress) 8/9 ≈ 88.9%. One real false finding
+(`specialisation."<name>".configuration` blocks invisible to the
+test-config walker), two real `transition_origin` causality errors
+(a brand-new option inside an existing module mislabeled as
+"existing branch became observable"), and one real
+scanner-correctness bug rather than an honest abstention (a flat,
+single-dotted-key `mkEnableOption` declaration parsed correctly into
+`discovered_options` but still reported `OptionNotFound` on
+watch-resolution) — all four with a named root cause, none fixed
+during this round, per its own explicit mandate. Twelve further
+capability gaps named, not implemented.
+
+A process-integrity incident occurred mid-round — a worker fork
+independently found a real exclusion-list gap but redrew both cohorts
+wholesale and pushed directly to `main` while sibling forks were
+already mid-adjudication — fully disclosed and remediated (reverted,
+then applied as the same narrow single-PR exclusion pattern already
+used elsewhere in the round); see `results.md` for the complete
+account. It never changed which PRs were actually examined.
+
+**Recommendation** (evidence-based, not a decision — per the mandate,
+the acceptance criterion was fixed before results were seen and
+nothing was fixed mid-round): ready for a human-reviewed advisory
+stage, not yet an unreviewed/autonomous one. The concrete next step
+the evidence points to is a fix round targeting the four named
+correctness/causality bugs, then a regression rerun on this same
+48-PR corpus — not yet authorized.
