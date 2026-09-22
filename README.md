@@ -101,8 +101,11 @@ of a branch-outcome transition). Process exit code is 4-state, not 3 —
 one `OBA001` and nothing inconclusive; `2` = `INCONCLUSIVE`, takes
 precedence over `FINDING` (a run that couldn't fully evaluate everything
 has no business reporting itself as merely "found some bugs, otherwise
-clean"); `3` = `TOOL_ERROR` — the tool itself didn't run (bad manifest, a
-target's module/test file doesn't exist, malformed TOML, a bad CLI flag).
+clean"); `3` = `TOOL_ERROR` — the tool itself didn't run (a malformed
+manifest, a bad CLI flag, or `--root` itself unreadable; an absolute
+path, a `../`/symlink escape past `--root`; or, for a `check` manifest
+where *every* target is unavailable, since there is then no other
+target's result left to preserve).
 `2` and `3` look the same from a shell ("something's wrong") but are
 different claims to a machine consumer: "I analyzed this and couldn't
 prove anything" is not "I never got to analyze it" — see
@@ -112,6 +115,41 @@ because the pre-H1.1/pre-H1.2 code let exactly this distinction collapse
 twice, in two different places (a bubbled I/O error, and `clap`'s own
 `Error::exit()` running before this tool's exit-code contract even
 started applying).
+
+**`check`'s own multi-target manifests, since S4-F1 (`940e388`, v0.4.5):**
+a manifest can name several independent targets, and one of them
+genuinely not existing under `--root` — most commonly a PR deleting a
+service module — is ordinary, real activity, not a reason to lose
+every OTHER target's result too. `check` partitions targets by
+availability BEFORE analyzing: a target whose `module`/`test` genuinely
+does not exist becomes a structured, per-target `unavailable_targets`
+entry (`{name, reason}`) in the JSON envelope, with a mirrored
+`summary.unavailable` count — joining the SAME exit-2 class
+`parse_failed_targets` already used (not a new exit-code meaning, the
+existing "analyzed, but couldn't fully resolve everything" class
+applied to a new source), while every OTHER target's own real
+verdicts/evidence/spans are reported exactly as if the unavailable one
+weren't there. Both fields are purely additive to `schema_version: 1`
+(always present, empty/`0` when nothing is unavailable — a consumer
+that doesn't know about them yet sees exactly the same envelope shape
+it always has) — a strict `schema_version: 1` consumer that treats an
+unknown key as an error is not honoring the "additive, extensible"
+contract that version number was always meant to promise (see PR B's
+own `schema_version: 1` design note below), though such consumers
+certainly exist in the wild.
+
+If, and only if, *every* target in the manifest is unavailable, `check`
+still fails the whole invocation (`TOOL_ERROR`, exit 3) — there is no
+other target's result left in that run to preserve, and a report that
+looked empty-clean would be indistinguishable from a genuine `PASS`.
+Every OTHER resolution failure (an absolute path, a `../`/symlink
+escape, `--root` itself unreadable, a malformed manifest) stays exactly
+as fatal as it always was — a target's module/test genuinely not
+existing is the ONLY condition this widened, never a general "missing
+file is now fine" relaxation. Full account, real reproducer
+(`#543492`), and hostile positive/negative-control test suite:
+`fixtures/s4-live-pr-shadow/s4-final-report.md` (item 13, the S4 finding
+this fixes) and the S4-F1/S4-F1-R commits themselves.
 
 ## Non-goals (deliberate)
 
