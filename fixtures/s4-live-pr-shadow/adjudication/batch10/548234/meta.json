@@ -1,0 +1,39 @@
+{
+  "pr": 548234,
+  "title": "nixos/gerrit: Set ProtectSystem to strict",
+  "applicable": true,
+  "base_sha": "356468b500e85491b610431c87a284ca1f41b7bc",
+  "head_sha": "bd9f9eb651de5322b2bcb608f979a15e9e862dc1",
+  "module_paths": [
+    "nixos/modules/services/web-apps/gerrit.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/gerrit.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix line 685: `gerrit = runTest ./gerrit.nix;`",
+  "watch_selection_basis": "PR diff (`gh pr diff 548234`) touches exactly one line inside the systemd hardening settings of the config block: `ProtectSystem = \"full\";` -> `ProtectSystem = \"strict\";`. No mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration line is touched. Only the baseline `enable` option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/gerrit.nix",
+        "test": "nixos/tests/gerrit.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "gerrit"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'gerrit'"
+      }
+    ]
+  }
+}

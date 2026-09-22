@@ -1,0 +1,7 @@
+[[target]]
+name = "mate"
+module = "nixos/modules/services/x11/desktop-managers/mate.nix"
+test = "nixos/tests/mate.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "desktopManager", "mate"]
+watch = ["enable"]

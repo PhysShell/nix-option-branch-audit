@@ -1,0 +1,10 @@
+oba audit-diff --base-root base-root --head-root head-root --targets targets.toml --format json --summary-path summary.md > raw.json
+oba check --root base-root --targets targets.toml --json > check-base.json
+oba check --root head-root --targets targets.toml --json > check-head.json
+
+# Supplemental (see meta.json for rationale): the combined check-head invocation above
+# hard-failed (TOOL_ERROR, exit 3, empty stdout) because target "lightdm-enso-greeter"'s
+# module file (lightdm-greeters/enso-os.nix) does not exist under head-root (it is really
+# deleted by this PR). To recover real head-side data for the unaffected baseline target
+# ("lightdm"), a single-target targets file was used:
+oba check --root head-root --targets targets-lightdm-baseline-only.toml --json > check-head-lightdm-baseline-supplemental.json

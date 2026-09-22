@@ -1,0 +1,33 @@
+{
+  "pr": 548241,
+  "title": "paperless: Make admin password fully optional",
+  "applicable": true,
+  "base_sha": "1f42b6adcd88152d75cb475d016aeb4620e9f618",
+  "head_sha": "584b918ef6f772596bffc7be40f66be6e2d99b9a",
+  "module_paths": [
+    "nixos/modules/services/misc/paperless.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paperless.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: `paperless = runTest ./paperless.nix;` (line 1327 at head)",
+  "watch_selection_basis": "PR diff (`gh pr diff 548241`) only touches a single shell-script line inside the postStart activation script: `if ${lib.boolToString (cfg.passwordFile != null)} || [[ -n $PAPERLESS_ADMIN_PASSWORD ]]; then` -> `... || [[ -n ''${PAPERLESS_ADMIN_PASSWORD-} ]]; then` (a bash unbound-variable safety fix). No mkOption/mkEnableOption/mkRenamedOptionModule/mkRemovedOptionModule/mkChangedOptionModule declaration line is textually touched anywhere in the diff. Only the baseline `enable` option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "TestConfigUnresolved",
+    "reason": "check-base.json / check-head.json target 'paperless': verdict for 'enable' is TestConfigUnresolved on both sides, not PASS. test_config_opacity reports reason 'nodes/containers value is not a literal attrset' at nixos/tests/paperless.nix line 10 col 3 -- the test's `nodes.machine = ...` is not a plain literal attrset oba's test-config reader can walk, so no direct evidence for services.paperless.enable was matched even though the module's own mkIf cfg.enable predicate was found. No transition to PASS occurred (unchanged TestConfigUnresolved -> TestConfigUnresolved), so nothing is added here beyond this raw fact for the reviewer's awareness."
+  }
+}

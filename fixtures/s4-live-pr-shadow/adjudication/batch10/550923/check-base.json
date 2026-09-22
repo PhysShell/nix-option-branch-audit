@@ -1,0 +1,1575 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 2
+  },
+  "targets": [
+    {
+      "name": "paperless",
+      "module": "nixos/modules/services/misc/paperless.nix",
+      "test": "nixos/tests/paperless.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "paperless"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 151,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/paperless\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/paperless"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 165,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "mediaDir"
+          ],
+          "default_source": "\"${cfg.dataDir}/media\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 171,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "consumptionDir"
+          ],
+          "default_source": "\"${cfg.dataDir}/consume\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 178,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "consumptionDirIsPublic"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 185,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 191,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 212,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "28981",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 218,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 224,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "defaultUser",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 270,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 315,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 334,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 343,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "domain"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 347,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "exporter",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 355,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "exporter",
+            "directory"
+          ],
+          "default_source": "cfg.dataDir + \"/export\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 357,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "exporter",
+            "onCalendar"
+          ],
+          "default_source": "\"01:30:00\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "01:30:00"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 364,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "exporter",
+            "settings"
+          ],
+          "default_source": "{\n          \"no-progress-bar\" = true;\n          \"no-color\" = true;\n          \"compare-checksums\" = true;\n          \"delete\" = true;\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 375,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configureTika"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 387,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "manage"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 395,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "settings",
+            "PAPERLESS_AI_ENABLED"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 40,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.settings.PAPERLESS_AI_ENABLED or true) {"
+        },
+        {
+          "path": [
+            "settings",
+            "PAPERLESS_ENABLE_NLTK"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 44,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.settings.PAPERLESS_ENABLE_NLTK or true) {"
+        },
+        {
+          "path": [
+            "openMPThreadingWorkaround"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 47,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.openMPThreadingWorkaround) {"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 405,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 418,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 441,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 456,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "path": [
+            "configureTika"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 462,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.configureTika {"
+        },
+        {
+          "path": [
+            "consumptionDirIsPublic"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 488,
+            "col": 41
+          },
+          "source": "if cfg.consumptionDirIsPublic then { mode = \"777\"; } else defaultRule"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 592,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 595,
+            "col": 16
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 600,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 604,
+            "col": 14
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 622,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 626,
+            "col": 14
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 644,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 648,
+            "col": 14
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "path": [
+            "configureTika"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 681,
+            "col": 30
+          },
+          "source": "lib.mkIf cfg.configureTika {"
+        },
+        {
+          "path": [
+            "configureTika"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 688,
+            "col": 25
+          },
+          "source": "lib.mkIf cfg.configureTika {"
+        },
+        {
+          "path": [
+            "exporter",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 694,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.exporter.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "PAPERLESS_AI_ENABLED"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "PAPERLESS_AI_ENABLED"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 40,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.settings.PAPERLESS_AI_ENABLED or true) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "PAPERLESS_ENABLE_NLTK"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "PAPERLESS_ENABLE_NLTK"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 44,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.settings.PAPERLESS_ENABLE_NLTK or true) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openMPThreadingWorkaround"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openMPThreadingWorkaround"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 47,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.openMPThreadingWorkaround) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 63,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.environmentFile != null) \"source ${cfg.environmentFile}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 96,
+            "col": 8
+          },
+          "source": "lib.optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 405,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 418,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 441,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "domain"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "domain"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 453,
+            "col": 12
+          },
+          "source": "lib.mkIf (cfg.domain != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 456,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureTika"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureTika"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 462,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.configureTika {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "consumptionDirIsPublic"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "consumptionDirIsPublic"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 488,
+            "col": 41
+          },
+          "source": "if cfg.consumptionDirIsPublic then { mode = \"777\"; } else defaultRule"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 516,
+            "col": 31
+          },
+          "source": "lib.optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 550,
+            "col": 30
+          },
+          "source": "lib.optionalString ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 592,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 595,
+            "col": 16
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 600,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 604,
+            "col": 14
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 622,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 626,
+            "col": 14
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 644,
+            "col": 22
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 648,
+            "col": 14
+          },
+          "source": "lib.optional cfg.database.createLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "paperless"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 668,
+            "col": 17
+          },
+          "source": "lib.optionalAttrs (cfg.user == defaultUser) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureTika"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureTika"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 681,
+            "col": 30
+          },
+          "source": "lib.mkIf cfg.configureTika {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureTika"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureTika"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 688,
+            "col": 25
+          },
+          "source": "lib.mkIf cfg.configureTika {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "exporter",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "exporter",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 694,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.exporter.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 34,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (config.time.timeZone != null) {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 37,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs enableRedis {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 52,
+            "col": 5
+          },
+          "source": "if (lib.isAttrs s || lib.isList s) then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 54,
+            "col": 10
+          },
+          "source": "if lib.isBool s then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 72,
+            "col": 9
+          },
+          "source": "if config.security.sudo.enable then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 124,
+            "col": 27
+          },
+          "source": "lib.optional enableRedis redisServer.user",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 284,
+            "col": 15
+          },
+          "source": "if cfg.settings ? PAPERLESS_OCR_LANGUAGE then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 439,
+            "col": 51
+          },
+          "source": "lib.mkIf enableRedis true",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/paperless.nix",
+            "line": 594,
+            "col": 13
+          },
+          "source": "lib.optional enableRedis \"redis-paperless.service\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "nodes/containers value is not a literal attrset",
+          "span": {
+            "file": "nixos/tests/paperless.nix",
+            "line": 10,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/misc/paperless.nix",
+              "line": 405,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable ("
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/misc/paperless.nix",
+                  "line": 405,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable ("
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/misc/paperless.nix",
+                  "line": 405,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable ("
+              },
+              "witnessed": false
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "group"
+        }
+      ]
+    }
+  ]
+}

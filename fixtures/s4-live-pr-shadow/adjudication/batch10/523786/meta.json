@@ -1,0 +1,34 @@
+{
+  "pr": 523786,
+  "title": "postgresql: 17 -> 18",
+  "applicable": true,
+  "base_sha": "46cc485e7e2e8dd20ff8a4537f9c2b23ccf0049f",
+  "head_sha": "9c5e58d0798fb7d328e984eafc0d819e46ad68b1",
+  "module_paths": [
+    "nixos/modules/services/databases/postgresql.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/postgresql/postgresql.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix line 1347: `postgresql = import ./postgresql { inherit runTest pkgs; };` -> nixos/tests/postgresql/default.nix: `postgresql = importWithArgs ./postgresql.nix;` (verified by reading default.nix content at head; real two-hop wiring, not a shallow path-name match)",
+  "watch_selection_basis": "PR diff (`gh pr diff 523786`) touches: (1) the `package` mkOption's `defaultText` literalExpression block (adds a new `if versionAtLeast config.system.stateVersion \"26.11\" then pkgs.postgresql_18 else ...` branch ahead of the existing 25.11/24.11/... chain) -- a direct edit inside the `package` option's own mkOption declaration; (2) the parallel `base = ...` let-binding inside `services.postgresql.package = let ... in ...` config assignment (same version-chain logic, config-side not a declaration); (3) an unrelated pgcopydb package.nix bump and pkgs/top-level/all-packages.nix `postgresql = postgresql_17 -> postgresql_18` alias flip (both outside nixos/modules/services/**); (4) a release-notes doc line. Only `package`'s declaration is directly touched among option declarations. Watched: baseline `enable` + `package`.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "TestConfigUnresolved",
+    "package_verdict_both_sides": "PredicateNotFound",
+    "package_reason": "check-base.json target 'postgresql' unresolved_predicate_sites lists ~30 conditional sites in postgresql.nix, none of which resolve to a simple branch predicate directly gating `cfg.package`/`services.postgresql.package` as a boolean-truthy check; the actual package selection is a chained `if versionAtLeast config.system.stateVersion \"NN.NN\" then pkgs.postgresql_NN else ...` value expression (a value computation, not an mkIf-style presence/absence predicate), and the version-chain conditions reference `config.system.stateVersion` (not a `cfg.*` watched-option reference), each flagged with failure kind UnsupportedExpression or UnsupportedScope:'function parameter'. Identical on both base and head (both PredicateNotFound), i.e. package's diff-touched defaultText change did not create or remove a discoverable predicate -- unchanged verdict, no transition."
+  }
+}

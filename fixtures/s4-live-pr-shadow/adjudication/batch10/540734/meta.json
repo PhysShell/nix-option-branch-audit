@@ -1,0 +1,40 @@
+{
+  "pr": 540734,
+  "title": "mate-power-manager: Fix backlight-helper polkit popup",
+  "applicable": true,
+  "base_sha": "83b85e6a2cd72f850fd747095bf4d32d77c0a9dd",
+  "head_sha": "b27618bc1e638e418d19317111a54a2bef0fbbc8",
+  "module_paths": [
+    "nixos/modules/services/x11/desktop-managers/mate.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mate.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix line 999: `mate = runTest ./mate.nix;`",
+  "note_on_applicability_flag": "The task brief flagged this PR as 'likely a package/polkit-rules fix, not a services module' to watch for. The real changed-file list ('gh pr view 540734 --json files') is: nixos/modules/services/x11/desktop-managers/mate.nix AND pkgs/by-name/ma/mate-power-manager/package.nix. mate.nix genuinely lives under nixos/modules/services/** (services/x11/desktop-managers/mate.nix) and IS touched -- the diff adds `security.polkit = { enable = true; enablePkexecWrapper = mkDefault true; };` inside the module's `config = mkIf cfg.enable { ... }` block (config-side cross-module wiring, gated on the mate desktop-manager's own enable). Since a real nixos/modules/services/** file is genuinely touched and a real wired test exists, this PR is applicable by the letter of the rule, notwithstanding that most of the functional fix lives in the package derivation (a C source substituteInPlace + configureFlags change).",
+  "watch_selection_basis": "The mate.nix diff hunk (`security.polkit = { enable = true; enablePkexecWrapper = mkDefault true; };`) is a config-block assignment to a DIFFERENT module's options (security.polkit), not a declaration (mkOption/mkEnableOption/etc.) of any option belonging to services.xserver.desktopManager.mate itself. No mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration line for mate's own option surface is touched anywhere in the diff. Only the baseline `enable` option (services.xserver.desktopManager.mate.enable) was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/x11/desktop-managers/mate.nix",
+        "test": "nixos/tests/mate.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "xserver", "desktopManager", "mate"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'mate'"
+      }
+    ]
+  }
+}

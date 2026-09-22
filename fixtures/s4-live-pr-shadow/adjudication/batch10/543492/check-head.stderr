@@ -1,0 +1,1 @@
+TOOL_ERROR: target lightdm-enso-greeter: module: resolving nixos/modules/services/x11/display-managers/lightdm-greeters/enso-os.nix under --root head-root: No such file or directory (os error 2)

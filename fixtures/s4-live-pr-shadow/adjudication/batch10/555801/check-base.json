@@ -1,0 +1,1480 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "syncthing",
+      "module": "nixos/modules/services/networking/syncthing.nix",
+      "test": "nixos/tests/syncthing/folders.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "syncthing"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 351,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "cert"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 353,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "key"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 362,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "guiPasswordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 371,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "overrideDevices"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 379,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "overrideFolders"
+          ],
+          "default_source": "!anyAutoAccept",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 390,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 406,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 411,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options",
+            "localAnnounceEnabled"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 421,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options",
+            "localAnnouncePort"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 429,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options",
+            "relaysEnabled"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 437,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options",
+            "urAccepted"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 445,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options",
+            "limitBandwidthInLan"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 455,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "options",
+            "maxFolderConcurrency"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 463,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "devices"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 477,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "devices",
+            "name"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 499,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "devices",
+            "id"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 507,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "devices",
+            "autoAcceptFolders"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 514,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 530,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 554,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "path"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 564,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "id"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 580,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "label"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 588,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "type"
+          ],
+          "default_source": "\"sendreceive\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "sendreceive"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 596,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "devices"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 610,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "devices",
+            "name"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 619,
+            "col": 35
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "devices",
+            "encryptionPasswordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 628,
+            "col": 35
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "versioning"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 651,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "versioning",
+            "type"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 698,
+            "col": 31
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "copyOwnershipFromParent"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 715,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "folders",
+            "ignorePatterns"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 724,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "guiAddress"
+          ],
+          "default_source": "\"127.0.0.1:8384\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1:8384"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 785,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "systemService"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 794,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "defaultUser",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 802,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "defaultGroup",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 813,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "all_proxy"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 823,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/syncthing\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/syncthing"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 835,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "databaseDir"
+          ],
+          "default_source": "cfg.configDir",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 864,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraFlags"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 873,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openDefaultPorts"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 882,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 940,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openDefaultPorts"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 957,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openDefaultPorts {"
+        },
+        {
+          "path": [
+            "systemService"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 985,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.systemService {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "guiPasswordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "guiPasswordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 333,
+            "col": 8
+          },
+          "source": "lib.optionalString (cfg.guiPasswordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 940,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openDefaultPorts"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openDefaultPorts"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 957,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openDefaultPorts {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "systemService"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "user"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "syncthing"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "systemService"
+            ],
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 968,
+            "col": 19
+          },
+          "source": "lib.mkIf (cfg.systemService && cfg.user == defaultUser) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "systemService"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "group"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "syncthing"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "systemService"
+            ],
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 978,
+            "col": 20
+          },
+          "source": "lib.mkIf (cfg.systemService && cfg.group == defaultGroup) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "systemService"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "systemService"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 985,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.systemService {"
+        },
+        {
+          "ir": {
+            "Or": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "cert"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "key"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "cert"
+            ],
+            [
+              "key"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 1002,
+            "col": 13
+          },
+          "source": "lib.mkIf (cfg.cert != null || cfg.key != null)"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "cert"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "cert"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 1005,
+            "col": 19
+          },
+          "source": "lib.optionalString (cfg.cert != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "key"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "key"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 1008,
+            "col": 19
+          },
+          "source": "lib.optionalString (cfg.key != null) ''"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 25,
+            "col": 5
+          },
+          "source": "if",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "guiAddress"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 55,
+            "col": 11
+          },
+          "source": "if builtins.isString device then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 264,
+            "col": 19
+          },
+          "source": "lib.optionalString ((conf_type == \"dirs\") && (new_cfg.ignorePatterns != null)) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 275,
+            "col": 15
+          },
+          "source": "lib.optionalString s.override ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 313,
+            "col": 8
+          },
+          "source": "lib.optionalString (cleanedConfig ? defaults) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 320,
+            "col": 24
+          },
+          "source": "if subOption == \"ignores\" then \"PUT\" else \"PATCH\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 788,
+            "col": 20
+          },
+          "source": "if lib.strings.hasPrefix \"/\" x then \"unix://${x}\" else x",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 853,
+            "col": 35
+          },
+          "source": "lib.optionalString cond \"/.config/syncthing\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/syncthing.nix",
+            "line": 1050,
+            "col": 24
+          },
+          "source": "lib.mkIf (cleanedConfig != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "a",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 25,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "b",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 68,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "c",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 113,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "etc",
+            "bar-encryption-password",
+            "text"
+          ],
+          "instance": "a",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 23,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "settings",
+            "devices",
+            "b",
+            "id"
+          ],
+          "instance": "a",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 31,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "settings",
+            "devices",
+            "c",
+            "id"
+          ],
+          "instance": "a",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 32,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "etc",
+            "bar-encryption-password",
+            "text"
+          ],
+          "instance": "b",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 66,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "settings",
+            "devices",
+            "a",
+            "id"
+          ],
+          "instance": "b",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 73,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "settings",
+            "devices",
+            "c",
+            "id"
+          ],
+          "instance": "b",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 74,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "settings",
+            "devices",
+            "a",
+            "id"
+          ],
+          "instance": "c",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 118,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "syncthing",
+            "settings",
+            "devices",
+            "b",
+            "id"
+          ],
+          "instance": "c",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/syncthing/folders.nix",
+            "line": 119,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/syncthing.nix",
+              "line": 940,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "syncthing",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "a",
+              "span": {
+                "file": "nixos/tests/syncthing/folders.nix",
+                "line": 25,
+                "col": 11
+              }
+            },
+            {
+              "path": [
+                "services",
+                "syncthing",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "b",
+              "span": {
+                "file": "nixos/tests/syncthing/folders.nix",
+                "line": 68,
+                "col": 11
+              }
+            },
+            {
+              "path": [
+                "services",
+                "syncthing",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "c",
+              "span": {
+                "file": "nixos/tests/syncthing/folders.nix",
+                "line": 113,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/syncthing.nix",
+                  "line": 940,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/syncthing.nix",
+                  "line": 940,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

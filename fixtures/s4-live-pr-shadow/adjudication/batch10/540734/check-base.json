@@ -1,0 +1,435 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "mate",
+      "module": "nixos/modules/services/x11/desktop-managers/mate.nix",
+      "test": "nixos/tests/mate.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "xserver",
+        "desktopManager",
+        "mate"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 22,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 28,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraPanelApplets"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 30,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraCajaExtensions"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 37,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableWaylandSession"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 44,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "mate",
+            "excludePackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 47,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "debug"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 71,
+            "col": 57
+          },
+          "source": "mkIf cfg.debug \"1\""
+        },
+        {
+          "path": [
+            "enableWaylandSession"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 149,
+            "col": 6
+          },
+          "source": "mkIf cfg.enableWaylandSession {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Or": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "enableWaylandSession"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ],
+            [
+              "enableWaylandSession"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 57,
+            "col": 6
+          },
+          "source": "mkIf (cfg.enable || cfg.enableWaylandSession) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debug"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debug"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 71,
+            "col": 57
+          },
+          "source": "mkIf cfg.debug \"1\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableWaylandSession"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableWaylandSession"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 149,
+            "col": 6
+          },
+          "source": "mkIf cfg.enableWaylandSession {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 62,
+            "col": 31
+          },
+          "source": "lib.optionalString config.services.gnome.gcr-ssh-agent.enable ''",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+            "line": 132,
+            "col": 48
+          },
+          "source": "mkIf config.services.printing.enable (mkDefault true)",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "machine",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/mate.nix",
+            "line": 12,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "ir": {
+              "Or": [
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enableWaylandSession"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "refs": [
+              [
+                "enable"
+              ],
+              [
+                "enableWaylandSession"
+              ]
+            ],
+            "span": {
+              "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+              "line": 57,
+              "col": 6
+            },
+            "source": "mkIf (cfg.enable || cfg.enableWaylandSession) {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "xserver",
+                "desktopManager",
+                "mate",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/mate.nix",
+                "line": 26,
+                "col": 7
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "ir": {
+                  "Or": [
+                    {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "enable"
+                          ]
+                        },
+                        {
+                          "Literal": {
+                            "Bool": true
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "enableWaylandSession"
+                          ]
+                        },
+                        {
+                          "Literal": {
+                            "Bool": true
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ],
+                  [
+                    "enableWaylandSession"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/x11/desktop-managers/mate.nix",
+                  "line": 57,
+                  "col": 6
+                },
+                "source": "mkIf (cfg.enable || cfg.enableWaylandSession) {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

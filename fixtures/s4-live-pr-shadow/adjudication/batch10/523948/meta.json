@@ -1,0 +1,39 @@
+{
+  "pr": 523948,
+  "title": "nixos/gdm: ensure environment from display-manager.service is propagated",
+  "applicable": true,
+  "base_sha": "b28d3bddfe48d9046f5dc2529625c58c20e804cc",
+  "head_sha": "2b2b69cc17df9ea22c9e9c36b2655c854068855c",
+  "module_paths": [
+    "nixos/modules/services/display-managers/gdm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/gnome.nix"
+  ],
+  "test_wiring": "No file literally named gdm.nix/gdm-*.nix exists under nixos/tests/ (confirmed via full recursive tree search at head, 73301 entries, nixos/tests/ subtree fully present through 'nixos/tests/zwave-js.nix'; grep for 'gdm' across all nixos/tests/ paths and nixos/tests/all-tests.nix content returned no dedicated gdm test). gdm IS exercised indirectly: nixos/tests/all-tests.nix line 663 `gnome = runTest ./gnome.nix;`, and nixos/tests/gnome.nix (read directly at head) sets `services.displayManager.gdm = { ... }` at line 12 and includes a subtest literally named 'Login to GNOME with GDM' (lines 69-70, 'wait for gdm to start'). This is a real, wired, indirect test exercising the gdm module -- verified by reading the actual test file content, not assumed from a path/name match.",
+  "watch_selection_basis": "PR diff (`gh pr diff 523948`) only adds a new PAM stack entry (`{ name = \"env-greeter\"; control = \"required\"; modulePath = ...; settings.conffile = ...; }`) inside gdm.nix's existing `security.pam.services.*` config-block list. No mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration line is textually touched. Only the baseline `enable` option (services.displayManager.gdm.enable) was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/display-managers/gdm.nix",
+        "test": "nixos/tests/gnome.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "displayManager", "gdm"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'gdm'"
+      }
+    ]
+  }
+}

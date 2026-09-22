@@ -1,0 +1,7 @@
+[[target]]
+name = "gdm"
+module = "nixos/modules/services/display-managers/gdm.nix"
+test = "nixos/tests/gnome.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "displayManager", "gdm"]
+watch = ["enable"]

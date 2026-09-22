@@ -1,0 +1,7 @@
+[[target]]
+name = "paperless"
+module = "nixos/modules/services/misc/paperless.nix"
+test = "nixos/tests/paperless.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "paperless"]
+watch = ["enable"]

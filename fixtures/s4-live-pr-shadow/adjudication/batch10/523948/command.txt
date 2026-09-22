@@ -1,0 +1,3 @@
+oba audit-diff --base-root base-root --head-root head-root --targets targets.toml --format json --summary-path summary.md > raw.json
+oba check --root base-root --targets targets.toml --json > check-base.json
+oba check --root head-root --targets targets.toml --json > check-head.json

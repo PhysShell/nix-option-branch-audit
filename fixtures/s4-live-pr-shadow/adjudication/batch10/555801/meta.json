@@ -1,0 +1,39 @@
+{
+  "pr": 555801,
+  "title": "nixos/syncthing: escape properly ignorePatterns",
+  "applicable": true,
+  "base_sha": "0ad5f09f5307e34b8f8c5b6dd5f152793833cff2",
+  "head_sha": "0859607696e07840c71ca98e97a27d63c6956171",
+  "module_paths": [
+    "nixos/modules/services/networking/syncthing.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/syncthing/folders.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix line 1666: `syncthing-folders = runTest ./syncthing/folders.nix;`",
+  "watch_selection_basis": "PR diff (`gh pr diff 555801`) touches only the shell-command construction inside the folder-ignore-patterns curl invocation in a `let` binding (switches from an unescaped `builtins.toJSON`-interpolated `-d '...'` to a `lib.escapeShellArg`-wrapped form, fixing apostrophe-breaks-shell-quoting), plus adds a test case in nixos/tests/syncthing/folders.nix with an ignorePatterns entry containing an apostrophe. No mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration line (including for `ignorePatterns` itself) is textually touched -- this is a pure config-generation script fix, not an option-surface change. Only the baseline `enable` option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/syncthing.nix",
+        "test": "nixos/tests/syncthing/folders.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "syncthing"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'syncthing'"
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "pr": 550923,
+  "title": "nixos/paperless: various group membership fixes",
+  "applicable": true,
+  "base_sha": "ab5827caff3e94fe01a7bc1b8204bb1fcde873c9",
+  "head_sha": "c4d23b053a99fb86286771c98c44d196717d2d82",
+  "module_paths": [
+    "nixos/modules/services/misc/paperless.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paperless.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: `paperless = runTest ./paperless.nix;` (line 1327 at head)",
+  "watch_selection_basis": "PR diff (`gh pr diff 550923`) adds a brand-new `group = lib.mkOption { type = lib.types.str; default = defaultUser; ... };` declaration block directly under `options.services.paperless` (new leaf option, full mkOption declaration line textually present in the diff). It also touches the existing `user` mkOption's description text only (no default/type change) and two config-block lines (SupplementaryGroups / sudo -g invocation) that are not declarations. Per the rule (watch only options whose own mkOption/mkEnableOption/etc. declaration is textually touched), watched: baseline `enable` + the new `group` option. `user`'s description-only edit is noted here but not watched, since no default/type/behavior-relevant part of its declaration changed, only prose.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "TestConfigUnresolved",
+    "enable_reason": "Same as sibling paperless PR #548241: test_config_opacity reason 'nodes/containers value is not a literal attrset' (nixos/tests/paperless.nix line 10); no direct evidence matched for services.paperless.enable on either side.",
+    "group_verdict_transition": "base=OptionNotFound -> head=PredicateNotFound",
+    "group_reason": "This is NOT a transition into PASS (excluded from pass_verdicts_needing_review by definition), but is flagged here as a real, asymmetric verdict change for the reviewer per the batch-9-learned instruction about asymmetric transitions worth independent review. At base, `group` does not exist in the module at all (declaration genuinely absent pre-PR) -> OptionNotFound. At head, the new `group = lib.mkOption {...}` declaration is present and oba's discovered_options picks it up, but no direct branch predicate (mkIf-style gate) was found for `group` in the module body -> PredicateNotFound. This transition is also visible in raw.json's audit-diff summary.oba_verdict_transitions: {\"option_not_found->predicate_not_found\": 1}, though notable_total remains 0 (this transition type is not bucketed into oba's own 'notable' array)."
+  }
+}

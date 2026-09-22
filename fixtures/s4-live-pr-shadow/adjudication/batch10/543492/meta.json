@@ -1,0 +1,46 @@
+{
+  "pr": 543492,
+  "title": "lightdm-enso-os-greeter: drop",
+  "applicable": true,
+  "base_sha": "ce5adc080e4cee9e8094f7ab12dc7f54e1878e98",
+  "head_sha": "aa970620a51824a5361565d16a18882fcf1a3759",
+  "module_paths": [
+    "nixos/modules/services/x11/display-managers/lightdm.nix",
+    "nixos/modules/services/x11/display-managers/lightdm-greeters/enso-os.nix (deleted at head)"
+  ],
+  "test_paths": [
+    "nixos/tests/lightdm.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix line 943: `lightdm = runTest ./lightdm.nix;`",
+  "watch_selection_basis": "PR diff (`gh pr diff 543492`) deletes nixos/modules/services/x11/display-managers/lightdm-greeters/enso-os.nix entirely (which declared `services.xserver.displayManager.lightdm.greeters.enso.{enable,theme,iconTheme,cursorTheme,blur,brightness,extraConfig}` via ordinary mkOption calls) and, in lightdm.nix, removes the `./lightdm-greeters/enso-os.nix` import line and adds a real mkRemovedOptionModule line: `(lib.mkRemovedOptionModule [ \"services\" \"xserver\" \"displayManager\" \"lightdm\" \"greeters\" \"enso\" ] \"services.xserver.displayManager.lightdm.greeters.enso has been removed following removal of the corresponding package.\")`. Per the rule explicitly calling out mkRemovedOptionModule lines, watched: baseline `enable` (target 'lightdm', module=lightdm.nix, unchanged by this diff) PLUS the removed `greeters.enso` option surface (target 'lightdm-enso-greeter', module=lightdm-greeters/enso-os.nix -- the real file that declared it, present in base-root, genuinely absent from head-root since the PR deletes it -- watch=['enable'], the removed submodule's own enable leaf).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 3
+  },
+  "tool_error": false,
+  "tool_error_explanation": "check_head's exit code 3 is NOT a crash/panic/malformed-output condition: stderr contains a single clean, well-formed line: 'TOOL_ERROR: target lightdm-enso-greeter: module: resolving nixos/modules/services/x11/display-managers/lightdm-greeters/enso-os.nix under --root head-root: No such file or directory (os error 2)'. This is oba's `check` subcommand correctly detecting that the target's module file is genuinely absent under head-root (which faithfully mirrors the real PR's deletion of that file) -- however, this causes the WHOLE combined `oba check --root head-root --targets targets.toml` invocation to abort with empty stdout, losing check-head data for the co-located, unaffected 'lightdm' baseline target too (check does not appear to fail-soft per-target the way audit-diff does; see below). This is a real, notable behavioral fact about the frozen v0.4.4 binary's `check` subcommand worth flagging to the reviewer, even though it is not itself a correctness bug in the audited-repo sense.",
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/x11/display-managers/lightdm.nix",
+        "test": "nixos/tests/lightdm.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "xserver", "displayManager", "lightdm"],
+        "watched_path": "enable",
+        "side": "both (check-base.json target 'lightdm' directly; check-head via check-head-lightdm-baseline-supplemental.json -- see additional_raw_facts_for_reviewer)",
+        "source": "check-base.json target 'lightdm'; check-head-lightdm-baseline-supplemental.json (supplemental single-target run, see below)"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "why_a_supplemental_run_was_needed": "The required combined check-head.json (from the literal 3-command sequence over targets.toml) is empty because the whole invocation aborted (TOOL_ERROR, exit 3) on account of the 'lightdm-enso-greeter' target's module file being genuinely absent under head-root. To recover real head-side data for the UNAFFECTED baseline 'lightdm' target without altering the primary required artifacts, a single-target targets file (targets-lightdm-baseline-only.toml, saved alongside targets.toml) containing only the 'lightdm' target was run separately: `oba check --root head-root --targets targets-lightdm-baseline-only.toml --json > check-head-lightdm-baseline-supplemental.json`. Result: enable=PASS at head (same predicate/evidence shape as check-base.json's PASS for 'lightdm'), confirming genuine PASS on both sides for the baseline option. Both check-head.json (empty/failed) and check-head-lightdm-baseline-supplemental.json (successful recovery) are saved in this directory for the reviewer's inspection.",
+      "lightdm_enso_greeter_target_base_verdict": "PredicateNotFound (check-base.json target 'lightdm-enso-greeter'). oba's discovered_options in enso-os.nix correctly found the real `enable` mkOption declaration (default false, line 32), but the config-side gate `config = mkIf (ldmcfg.enable && cfg.enable) { ... }` (enso-os.nix line 100) could not be resolved into a predicate: unresolved_predicate_sites reports failure {'UnsupportedScope': 'with'} (the module uses `with lib;` at the top, and this file's specific predicate-extraction path evidently can't handle the with-scoped `mkIf` construct here, unlike lightdm.nix's own `mkIf cfg.enable` which parsed fine). This is a real, base-side-only finding since it predates the PR (base still has the file with this exact unresolved-predicate shape).",
+      "lightdm_enso_greeter_target_head_state": "No verdict at all is produced for this target at head -- the module file does not exist under head-root, so `check --root head-root` on the combined targets.toml aborts before reaching a per-target verdict for anything. audit-diff, run separately over the SAME combined targets.toml, DID complete successfully (exit 2, no TOOL_ERROR) and classified this target's diff.kind as 'removed' with base.verdict = PredicateNotFound and no head verdict (raw.json oba[] entry for 'lightdm-enso-greeter'), and classified 'lightdm' as diff.kind = 'unchanged'. This shows audit-diff handles a fully-deleted-module target gracefully as a 'removed' subject, while the standalone `check` subcommand does not fail-soft per-target under the same condition -- a real, asymmetric behavioral fact between the two subcommands worth independent review, separate from any correctness judgment about the audited repo change itself."
+  }
+}
