@@ -1,0 +1,37 @@
+{
+  "pr": 531710,
+  "title": "nixos/scx-loader: fix failure to run when `/etc` is immutable",
+  "applicable": true,
+  "base_sha": "5da76dee90a3610a8c616b9a8b8d24c3757069ec",
+  "head_sha": "ab7db15c69ce1836eecfb26b374c46e7f87a81a8",
+  "module_paths": [
+    "nixos/modules/services/scheduling/scx-loader.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/scx/loader.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/scheduling/scx-loader.nix. Wired test confirmed: nixos/tests/all-tests.nix at head (ab7db15c) contains 'scx-loader = runTest ./scx/loader.nix;' (line 1498), and nixos/tests/scx/loader.nix exists and exercises services.scx-loader.enable/config.default_sched.",
+  "targets_toml": "single target scx-loader, cfg_ident=cfg, option_prefix=[services,scx-loader], watch=[enable]. The real diff (config = lib.mkIf cfg.enable { ... }) only touches the systemd.services.scx_loader implementation block (moves TemporaryFileSystem/BindReadOnlyPaths workaround to environment.etc), not any mkOption/mkEnableOption declaration line, so only the baseline enable option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/scx/loader.nix"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": []
+}

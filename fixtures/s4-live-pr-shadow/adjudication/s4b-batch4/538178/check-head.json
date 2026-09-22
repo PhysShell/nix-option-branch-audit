@@ -1,0 +1,1484 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "lasuite-meet",
+      "module": "nixos/modules/services/web-apps/lasuite-meet.nix",
+      "test": "nixos/tests/web-apps/lasuite-meet.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "lasuite-meet"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 111,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "addons"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 115,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "bind"
+          ],
+          "default_source": "\"unix:/run/lasuite-meet/gunicorn.sock\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "unix:/run/lasuite-meet/gunicorn.sock"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 130,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableNginx"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 141,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "secretKeyPath"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 145,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 161,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 165,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "livekit",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 169,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "livekit",
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 173,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "livekit",
+            "keyFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 175,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "livekit",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 190,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "gunicorn",
+            "extraArgs"
+          ],
+          "default_source": "[\n          \"--name=meet\"\n          \"--workers=3\"\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 202,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "celery",
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 215,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "domain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 224,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 231,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_CONFIGURATION"
+          ],
+          "default_source": "\"Production\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "Production"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 245,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_SETTINGS_MODULE"
+          ],
+          "default_source": "\"meet.settings\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "meet.settings"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 252,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_SECRET_KEY_FILE"
+          ],
+          "default_source": "if cfg.secretKeyPath == null then \"/var/lib/lasuite-meet/django_secret_key\" else cfg.secretKeyPath",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 259,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_DATA_DIR"
+          ],
+          "default_source": "\"/var/lib/lasuite-meet\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/lasuite-meet"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 266,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_ALLOWED_HOSTS"
+          ],
+          "default_source": "if cfg.enableNginx then \"localhost,127.0.0.1,${cfg.domain}\" else \"\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 272,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DB_NAME"
+          ],
+          "default_source": "\"lasuite-meet\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "lasuite-meet"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 281,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DB_USER"
+          ],
+          "default_source": "\"lasuite-meet\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "lasuite-meet"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 287,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DB_HOST"
+          ],
+          "default_source": "if cfg.postgresql.createLocally then \"/run/postgresql\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 293,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "REDIS_URL"
+          ],
+          "default_source": "if cfg.redis.createLocally then\n                \"unix://${config.services.redis.servers.lasuite-meet.unixSocket}?db=0\"\n              else\n                null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 299,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "CELERY_BROKER_URL"
+          ],
+          "default_source": "if cfg.redis.createLocally then\n                \"redis+socket://${config.services.redis.servers.lasuite-meet.unixSocket}?db=1\"\n              else\n                null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 309,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "LIVEKIT_API_URL"
+          ],
+          "default_source": "if cfg.enableNginx && cfg.livekit.enable then \"http://${cfg.domain}/livekit\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 319,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 347,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 44,
+            "col": 9
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-meet.service\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 47,
+            "col": 8
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 48,
+            "col": 11
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-meet.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 59,
+            "col": 29
+          },
+          "source": "mkIf cfg.redis.createLocally ["
+        },
+        {
+          "path": [
+            "secretKeyPath"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 262,
+            "col": 15
+          },
+          "source": "if cfg.secretKeyPath == null then \"/var/lib/lasuite-meet/django_secret_key\" else cfg.secretKeyPath"
+        },
+        {
+          "path": [
+            "enableNginx"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 274,
+            "col": 23
+          },
+          "source": "if cfg.enableNginx then \"localhost,127.0.0.1,${cfg.domain}\" else \"\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 295,
+            "col": 23
+          },
+          "source": "if cfg.postgresql.createLocally then \"/run/postgresql\" else null"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 302,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 312,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 358,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 436,
+            "col": 27
+          },
+          "source": "mkIf cfg.postgresql.createLocally {"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 447,
+            "col": 43
+          },
+          "source": "mkIf cfg.redis.createLocally { enable = true; }"
+        },
+        {
+          "path": [
+            "livekit",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 449,
+            "col": 24
+          },
+          "source": "mkIf cfg.livekit.enable {"
+        },
+        {
+          "path": [
+            "enableNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 458,
+            "col": 22
+          },
+          "source": "mkIf cfg.enableNginx {"
+        },
+        {
+          "path": [
+            "livekit",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 483,
+            "col": 10
+          },
+          "source": "mkIf cfg.livekit.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 44,
+            "col": 9
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-meet.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 47,
+            "col": 8
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 48,
+            "col": 11
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-meet.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 59,
+            "col": 29
+          },
+          "source": "mkIf cfg.redis.createLocally ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 92,
+            "col": 25
+          },
+          "source": "optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "secretKeyPath"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "secretKeyPath"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 262,
+            "col": 15
+          },
+          "source": "if cfg.secretKeyPath == null then \"/var/lib/lasuite-meet/django_secret_key\" else cfg.secretKeyPath"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 274,
+            "col": 23
+          },
+          "source": "if cfg.enableNginx then \"localhost,127.0.0.1,${cfg.domain}\" else \"\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 295,
+            "col": 23
+          },
+          "source": "if cfg.postgresql.createLocally then \"/run/postgresql\" else null"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 302,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 312,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "enableNginx"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "livekit",
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableNginx"
+            ],
+            [
+              "livekit",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 321,
+            "col": 23
+          },
+          "source": "if cfg.enableNginx && cfg.livekit.enable then \"http://${cfg.domain}/livekit\" else null"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 358,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "secretKeyPath"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "secretKeyPath"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 370,
+            "col": 13
+          },
+          "source": "optionalString (cfg.secretKeyPath == null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 436,
+            "col": 27
+          },
+          "source": "mkIf cfg.postgresql.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 447,
+            "col": 43
+          },
+          "source": "mkIf cfg.redis.createLocally { enable = true; }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "livekit",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "livekit",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 449,
+            "col": 24
+          },
+          "source": "mkIf cfg.livekit.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 458,
+            "col": 22
+          },
+          "source": "mkIf cfg.enableNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "livekit",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "livekit",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 483,
+            "col": 10
+          },
+          "source": "mkIf cfg.livekit.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 29,
+            "col": 5
+          },
+          "source": "if value == null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 31,
+            "col": 10
+          },
+          "source": "if value == true then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 33,
+            "col": 10
+          },
+          "source": "if value == false then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+            "line": 493,
+            "col": 10
+          },
+          "source": "mkIf (elem \"outlook\" cfg.addons) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "addons"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "lasuite-meet",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-meet.nix",
+            "line": 19,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-meet.nix",
+            "line": 16,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-meet",
+            "livekit",
+            "keyFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-meet.nix",
+            "line": 23,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-meet"
+          ],
+          "instance": "machine",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-meet.nix",
+            "line": 30,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-meet",
+            "settings",
+            "DJANGO_SECRET_KEY_FILE"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-meet.nix",
+            "line": 33,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+              "line": 358,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "lasuite-meet",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/web-apps/lasuite-meet.nix",
+                "line": 19,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+                  "line": 358,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+                  "line": 358,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

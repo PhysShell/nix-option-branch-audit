@@ -1,0 +1,54 @@
+{
+  "pr": 539406,
+  "title": "pretalx: 2026.1.2 -> 2026.2.0",
+  "applicable": true,
+  "base_sha": "497095e290ee9a83411fcc2d21e4d29d5bfd185b",
+  "head_sha": "9b2a1f97becdf7ad1f09749904e98ecbce23cc6d",
+  "module_paths": [
+    "nixos/modules/services/web-apps/pretalx.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/pretalx.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/web-apps/pretalx.nix. Wired test confirmed: nixos/tests/all-tests.nix at head (9b2a1f97) contains 'pretalx = runTest ./web-apps/pretalx.nix;' (line 1400), and nixos/tests/web-apps/pretalx.nix exists and exercises services.pretalx.enable in a container node.",
+  "targets_toml": "single target pretalx, cfg_ident=cfg, option_prefix=[services,pretalx], watch=[enable, celery.enable]. The real diff DELETES the mkOption declaration for services.pretalx.celery.enable (base lines 140-148: `enable = lib.mkOption { type = lib.types.bool; default = true; ... };` inside the celery submodule) and replaces it with `imports = [ (lib.mkRemovedOptionModule [ \"services\" \"pretalx\" \"celery\" \"enable\" ] \"Celery is now always required.\") ];`. celery.enable's declaration-deletion is a real, textually-touched mkOption removal, so it was added to watch alongside baseline enable.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 1,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "exit_code_note": "Nonzero exit codes reflect real summary content, not a crash: check-base exit 1 corresponds to summary.finding=1 (celery.enable verdict OBA001 on base), check-head exit 2 corresponds to summary.inconclusive=1 (celery.enable verdict OptionNotFound on head), audit-diff exit 2 corresponds to summary.finding_became_inconclusive=1. All three commands produced complete, well-formed JSON output (no stderr, no truncation).",
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      {
+        "bucket": "finding_became_inconclusive",
+        "subject": "celery.enable",
+        "engine": "oba",
+        "message": "no mkOption declaration found for this watched option",
+        "raw_output_index": "raw.json summary.notable[0]"
+      }
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/web-apps/pretalx.nix"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "celery.enable",
+      "base_verdict": "OBA001",
+      "head_verdict": "OptionNotFound",
+      "transition": "OBA001 -> OptionNotFound",
+      "raw_fact": "This is the exact asymmetric-transition pattern the task flagged (precedent: firezone provision-removal, bootspec). base has 4 predicate_attempts against cfg.celery.enable (lib.optionals at pretalx.nix:25, lib.optionalString at :284 and :295, lib.mkIf at :526), all witnessed=false against the test's only assignment (services.pretalx.enable=true; celery.enable is never set in the test, so base default (true) applies but the predicate-witness mechanism still records OBA001, i.e. no direct test-assignment evidence for celery.enable specifically). head reports OptionNotFound because the mkOption declaration for celery.enable no longer exists in the head module (correctly reflecting the real mkRemovedOptionModule swap) -- discovered_options in check-head.json indeed has no celery.enable entry, and discovered_predicates/resolved_predicates no longer reference cfg.celery.enable at all (the 4 predicate sites from base are gone from head's predicate list, consistent with the PR's diff removing all 4 `cfg.celery.enable`-gated code paths and making celery unconditional)."
+    }
+  ]
+}

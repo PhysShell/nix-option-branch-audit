@@ -1,0 +1,37 @@
+{
+  "pr": 538178,
+  "title": "lasuite-meet: 1.21.0 -> 1.22.0",
+  "applicable": true,
+  "base_sha": "8ef5dd756895854db76206f20c03f678120a4f9a",
+  "head_sha": "21af0e8e78265c709f6cc620066a571a36e5f5a7",
+  "module_paths": [
+    "nixos/modules/services/web-apps/lasuite-meet.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/lasuite-meet.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/web-apps/lasuite-meet.nix. Wired test confirmed: nixos/tests/all-tests.nix at head (21af0e8e) contains 'lasuite-meet = runTest ./web-apps/lasuite-meet.nix;' (line 912), and nixos/tests/web-apps/lasuite-meet.nix exists and exercises services.lasuite-meet.enable in a container node.",
+  "targets_toml": "single target lasuite-meet, cfg_ident=cfg, option_prefix=[services,lasuite-meet], watch=[enable]. The real diff restructures systemd.services.lasuite-meet* into lib.mkMerge [ {...} commonSystemdConfig ] and adds two new scheduled-cleanup systemd units, but touches zero mkOption/mkEnableOption declaration lines -- purely a config-body refactor plus version bump. Only the baseline enable option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/web-apps/lasuite-meet.nix"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": []
+}

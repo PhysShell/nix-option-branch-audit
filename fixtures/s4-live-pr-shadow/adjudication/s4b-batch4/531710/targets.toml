@@ -1,0 +1,7 @@
+[[target]]
+name = "scx-loader"
+module = "nixos/modules/services/scheduling/scx-loader.nix"
+test = "nixos/tests/scx/loader.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "scx-loader"]
+watch = ["enable"]
