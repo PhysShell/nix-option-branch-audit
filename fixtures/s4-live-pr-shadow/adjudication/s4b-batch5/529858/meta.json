@@ -1,0 +1,41 @@
+{
+  "pr": 529858,
+  "title": "alps: 2022-10-18 -> 1",
+  "applicable": true,
+  "base_sha": "fa5b5acb16c644e40d77e4db655c3d16fa255486",
+  "head_sha": "fe63e15b384c76b140eff4ac2b97c30eab22694a",
+  "module_paths": [
+    "nixos/modules/services/web-apps/alps.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/alps.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/web-apps/alps.nix. Wired test confirmed: nixos/tests/all-tests.nix at head (fe63e15b) contains 'alps = runTest ./alps.nix;' (line 219), and the PR's own diff directly rewrites nixos/tests/alps.nix to match the module rewrite (new settings.* structure, session-based login flow).",
+  "targets_toml": "single target alps, cfg_ident=cfg, option_prefix=[services,alps], watch=[enable, package, settings, port, bindIP, theme, imaps.port, imaps.host, smtps.port, smtps.host, args]. This PR is a full module rewrite: port/bindIP/theme/imaps.port/imaps.host/smtps.port/smtps.host/args are all removed via lib.mkRemovedOptionModule (their declaration sites are textually touched as removals), package flips from an internal mkOption (default pkgs.alps) to lib.mkPackageOption, and a new settings = lib.mkOption (freeform TOML submodule) is added. All of these declaration-touching options were watched alongside baseline enable (textually re-touched as lib.mkEnableOption but semantically unchanged).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/alps.nix"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "note": "No watched option transitioned into or out of PASS on either side -- enable is PASS/PASS (unchanged), and all 10 of the other watched options are non-PASS on both sides. Full base/head verdict table for the record (none PASS-involving): package PredicateNotFound->OptionNotFound; settings OptionNotFound->PredicateNotFound; port PredicateNotFound->OptionNotFound; bindIP PredicateNotFound->OptionNotFound; theme PredicateNotFound->OptionNotFound; imaps.port PredicateNotFound->OptionNotFound; imaps.host PredicateNotFound->OptionNotFound; smtps.port PredicateNotFound->OptionNotFound; smtps.host PredicateNotFound->OptionNotFound; args PredicateNotFound->OptionNotFound. This matches raw.json's oba_verdict_transitions (option_not_found->predicate_not_found:1 for settings, predicate_not_found->option_not_found:9 for the other 9). Raw fact only, no correctness judgment: in base, port/bindIP/theme/imaps.port/imaps.host/smtps.port/smtps.host/args/package were all real declared options in the pre-rewrite base module (confirmed in the diff's removed-option block and base check-base.json discovered_options), and oba reported PredicateNotFound for all of them there (i.e. option found, no witnessed predicate in the base test). In head, those same 9 watched_paths no longer correspond to any declared option (they were replaced by lib.mkRemovedOptionModule imports and are absent from head's options.services.alps), and oba reported OptionNotFound for all 9 there. settings is the mirror case: absent in base (OptionNotFound), a real new mkOption in head (PredicateNotFound, i.e. found but not witnessed by the rewritten test). Reviewer may want to independently confirm these OptionNotFound/PredicateNotFound classifications for the 9 removed options against the head module's discovered_options list in check-head.json."
+    }
+  ]
+}

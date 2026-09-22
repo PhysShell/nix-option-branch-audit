@@ -1,0 +1,780 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "beszel-agent",
+      "module": "nixos/modules/services/monitoring/beszel-agent.nix",
+      "test": "nixos/tests/beszel.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "beszel",
+        "agent"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 17,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 23,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smartmon",
+            "deviceAllow"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 30,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 46,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "SKIP_SYSTEMD"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 50,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 68,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraPath"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 75,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 84,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 85,
+            "col": 32
+          },
+          "source": "lib.optionalString cfg.smartmon.enable ''"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 133,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ cfg.smartmon.package ]"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 157,
+            "col": 14
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ \"disk\" ]"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 163,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.smartmon.enable ["
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 167,
+            "col": 33
+          },
+          "source": "lib.mkIf cfg.smartmon.enable ["
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 202,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall ["
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 84,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smartmon",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 85,
+            "col": 32
+          },
+          "source": "lib.optionalString cfg.smartmon.enable ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environment",
+                    "SKIP_SYSTEMD"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environment",
+              "SKIP_SYSTEMD"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 91,
+            "col": 30
+          },
+          "source": "lib.optionals (!cfg.environment.SKIP_SYSTEMD) ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environment",
+                    "SKIP_SYSTEMD"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environment",
+              "SKIP_SYSTEMD"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 113,
+            "col": 32
+          },
+          "source": "lib.mkIf (!cfg.environment.SKIP_SYSTEMD) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environment",
+                    "SKIP_SYSTEMD"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environment",
+              "SKIP_SYSTEMD"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 118,
+            "col": 33
+          },
+          "source": "lib.mkIf (!cfg.environment.SKIP_SYSTEMD) { }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smartmon",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 133,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ cfg.smartmon.package ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smartmon",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 157,
+            "col": 14
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ \"disk\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smartmon",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 163,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.smartmon.enable ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smartmon",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 167,
+            "col": 33
+          },
+          "source": "lib.mkIf cfg.smartmon.enable ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 202,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall ["
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 128,
+            "col": 19
+          },
+          "source": "if lib.isBool value then (lib.boolToString value) else value",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 134,
+            "col": 12
+          },
+          "source": "lib.optionals (builtins.elem \"nvidia\" config.services.xserver.videoDrivers) [",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 137,
+            "col": 12
+          },
+          "source": "lib.optionals (builtins.elem \"amdgpu\" config.services.xserver.videoDrivers) [",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 140,
+            "col": 12
+          },
+          "source": "lib.optionals (builtins.elem \"intel\" config.services.xserver.videoDrivers) [",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 153,
+            "col": 11
+          },
+          "source": "lib.optionals config.virtualisation.docker.enable [ \"docker\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 154,
+            "col": 14
+          },
+          "source": "lib.optionals (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 173,
+            "col": 23
+          },
+          "source": "lib.mkIf (cfg.smartmon.enable && cfg.smartmon.deviceAllow != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 204,
+            "col": 9
+          },
+          "source": "if (builtins.hasAttr \"PORT\" cfg.environment) then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "environment"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "beszel",
+            "agent",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "agentHost",
+          "span": {
+            "file": "nixos/tests/beszel.nix",
+            "line": 55,
+            "col": 13
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "agentHost",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/beszel.nix",
+            "line": 51,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+              "line": 84,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "beszel",
+                "agent",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "agentHost",
+              "span": {
+                "file": "nixos/tests/beszel.nix",
+                "line": 55,
+                "col": 13
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                  "line": 84,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                  "line": 84,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "dataDir"
+        }
+      ]
+    }
+  ]
+}

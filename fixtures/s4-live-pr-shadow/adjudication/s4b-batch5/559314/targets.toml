@@ -1,0 +1,7 @@
+[[target]]
+name = "udev"
+module = "nixos/modules/services/hardware/udev.nix"
+test = "nixos/tests/installer.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "udev"]
+watch = ["enable"]

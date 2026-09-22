@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "udev",
+      "module": "nixos/modules/services/hardware/udev.nix",
+      "test": "nixos/tests/installer.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "udev"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "boot",
+            "hardwareScan"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 228,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 240,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "packages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 244,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "path"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 257,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraRules"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 269,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraHwdb"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 282,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "hardware",
+            "firmware"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 299,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "hardware",
+            "firmwareCompression"
+          ],
+          "default_source": "if config.boot.kernelPackages.kernelAtLeast \"5.19\" then\n          \"zstd\"\n        else if config.boot.kernelPackages.kernelAtLeast \"5.3\" then\n          \"xz\"\n        else\n          \"none\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 321,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "usePredictableInterfaceNames"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 344,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "services",
+            "udev",
+            "packages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 362,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "services",
+            "udev",
+            "binPackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 376,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "services",
+            "udev",
+            "rules"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 388,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 408,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 408,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 89,
+            "col": 11
+          },
+          "source": "lib.optionalString (initrdBin != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 158,
+            "col": 11
+          },
+          "source": "lib.optionalString (lib.versionAtLeast pkgs.buildPackages.systemdMinimal.version systemd.version) ''",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 168,
+            "col": 11
+          },
+          "source": "lib.optionalString (!config.boot.hardwareScan) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 200,
+            "col": 5
+          },
+          "source": "if",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 204,
+            "col": 10
+          },
+          "source": "if config.hardware.firmwareCompression == \"zstd\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 328,
+            "col": 9
+          },
+          "source": "if config.boot.kernelPackages.kernelAtLeast \"5.19\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 330,
+            "col": 14
+          },
+          "source": "if config.boot.kernelPackages.kernelAtLeast \"5.3\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 445,
+            "col": 25
+          },
+          "source": "lib.mkIf (!config.networking.usePredictableInterfaceNames) [ \"net.ifnames=0\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 448,
+            "col": 7
+          },
+          "source": "lib.mkIf (!config.boot.initrd.systemd.enable && config.boot.initrd.services.udev.rules != \"\")",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 471,
+            "col": 8
+          },
+          "source": "lib.optional (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 498,
+            "col": 8
+          },
+          "source": "lib.mkIf (config.boot.initrd.services.udev.rules != \"\") (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 517,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs config.boot.modprobeConfig.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/udev.nix",
+            "line": 529,
+            "col": 38
+          },
+          "source": "lib.mkIf config.boot.kernel.enable ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/installer.nix",
+            "line": 8,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/hardware/udev.nix",
+              "line": 408,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/hardware/udev.nix",
+                  "line": 408,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/hardware/udev.nix",
+                  "line": 408,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

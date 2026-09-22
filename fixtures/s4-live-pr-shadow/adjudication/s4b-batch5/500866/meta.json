@@ -1,0 +1,44 @@
+{
+  "pr": 500866,
+  "title": "beszel-agent: add dataDir option",
+  "applicable": true,
+  "base_sha": "745da47169ec3a17edb6ad6bc7fcb013fdf098a4",
+  "head_sha": "6183d4191bcdecb51d688b540bd568d81a5c4412",
+  "module_paths": [
+    "nixos/modules/services/monitoring/beszel-agent.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/beszel.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/monitoring/beszel-agent.nix. Wired test confirmed: nixos/tests/all-tests.nix at head (6183d419) contains 'beszel = runTest ./beszel.nix;' (line 279), and nixos/tests/beszel.nix exercises services.beszel.agent.enable=true in a two-node (hub+agent) test via a specialisation.",
+  "targets_toml": "single target beszel-agent, cfg_ident=cfg, option_prefix=[services,beszel,agent], watch=[enable, dataDir]. The real diff adds `dataDir = lib.mkOption { type = lib.types.path; default = \"/var/lib/beszel-agent\"; ... }` (a genuinely new option declaration), so dataDir was watched alongside baseline enable.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/beszel.nix"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "dataDir",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Non-PASS transition (test does not set services.beszel.agent.dataDir, so the test file never exercises the new option; head module declares dataDir but no predicate over it was found witnessed by the test). Does not qualify as a PASS-involving asymmetric transition per the strict criterion, but is the only changed watched identity for this PR and drove raw.json's oba_verdict_transitions['option_not_found->predicate_not_found']=1. Flagging since exit codes were non-zero (2) on all three commands even though JSON output was well-formed and complete (tool_error=false); nonzero exit appears to be oba's normal signal for 'non-clean' (inconclusive/changed) results, consistent with an earlier batch (538178) where exit 0 correlated with all-PASS/unchanged results."
+    }
+  ]
+}

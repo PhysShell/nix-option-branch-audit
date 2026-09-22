@@ -1,0 +1,43 @@
+{
+  "pr": 526821,
+  "title": "nixos/avahi-daemon: disable the full mDNS NSS module by default",
+  "applicable": true,
+  "base_sha": "a58e42197f3d66800dd85b7e6ec223ce4a4c2245",
+  "head_sha": "e8e86c94e71b238b2bff8ca3259afe3e416294b3",
+  "module_paths": [
+    "nixos/modules/services/networking/avahi-daemon.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/avahi.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/networking/avahi-daemon.nix. Wired test confirmed: nixos/tests/all-tests.nix at head (e8e86c94) contains 'avahi = runTest { imports = [ ./avahi.nix ]; ... }' and 'avahi-with-resolved = runTest { imports = [ ./avahi.nix ]; ... }' (lines 251-257). Consistent with a prior S4-A batch note that avahi-daemon.nix was already found applicable there.",
+  "targets_toml": "single target avahi-daemon, cfg_ident=cfg, option_prefix=[services,avahi], watch=[enable, nssmdnsFull]. The real diff adds a genuinely new option declaration `nssmdnsFull = lib.mkOption { type = lib.types.bool; default = false; ... }` plus a new assertion and a config-body change gating the full mDNS NSS module behind it. Baseline services.avahi.enable (mkOption at line 60 of the head module) was confirmed present; watched alongside the new nssmdnsFull.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Unchanged on both sides (not PASS either side); no PASS-involving asymmetry."
+    },
+    {
+      "watched_path": "nssmdnsFull",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Raw fact only: nssmdnsFull does not exist in base (option genuinely added by this PR, OptionNotFound is expected there). In head it is a real declared option (bool, default false) whose only predicate site is `lib.mkAfter (lib.optional cfg.nssmdnsFull \"${mdns}\")` at nixos/modules/services/networking/avahi-daemon.nix:346 -- oba classifies this as TestConfigUnresolved rather than PredicateNotFound or PASS/FAIL. Neither side is PASS, so this does not meet the strict PASS-involving-asymmetric-transition criterion, but it is the only changed watched identity for this PR (matches raw.json's oba_verdict_transitions['option_not_found->test_config_unresolved']=1) and is flagged for the reviewer since nixos/tests/avahi.nix does not appear to set services.avahi.nssmdnsFull at all in either the base or head test file (confirmed by inspecting the fetched nixos/tests/avahi.nix content at both SHAs)."
+    }
+  ]
+}

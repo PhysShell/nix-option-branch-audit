@@ -1,0 +1,7 @@
+[[target]]
+name = "beszel-agent"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent"]
+watch = ["enable", "dataDir"]

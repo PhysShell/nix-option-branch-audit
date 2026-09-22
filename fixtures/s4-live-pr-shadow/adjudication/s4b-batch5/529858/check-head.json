@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 10
+  },
+  "targets": [
+    {
+      "name": "alps",
+      "module": "nixos/modules/services/web-apps/alps.nix",
+      "test": "nixos/tests/alps.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "alps"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/alps.nix",
+            "line": 40,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/alps.nix",
+            "line": 43,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/alps.nix",
+            "line": 59,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/alps.nix",
+            "line": 59,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "alps",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "client",
+          "span": {
+            "file": "nixos/tests/alps.nix",
+            "line": 70,
+            "col": 11
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "server",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/alps.nix",
+            "line": 20,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "dovecot2",
+            "settings",
+            "dovecot_storage_version"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/alps.nix",
+            "line": 50,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/alps.nix",
+              "line": 59,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "alps",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "client",
+              "span": {
+                "file": "nixos/tests/alps.nix",
+                "line": 70,
+                "col": 11
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/alps.nix",
+                  "line": 59,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/alps.nix",
+                  "line": 59,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "package"
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "settings"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "port"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "bindIP"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "theme"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "imaps.port"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "imaps.host"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "smtps.port"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "smtps.host"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "args"
+        }
+      ]
+    }
+  ]
+}

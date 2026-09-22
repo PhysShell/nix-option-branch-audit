@@ -1,0 +1,7 @@
+[[target]]
+name = "music-assistant"
+module = "nixos/modules/services/audio/music-assistant.nix"
+test = "nixos/tests/music-assistant.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "music-assistant"]
+watch = ["enable"]

@@ -1,0 +1,1031 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 2
+  },
+  "targets": [
+    {
+      "name": "avahi-daemon",
+      "module": "nixos/modules/services/networking/avahi-daemon.nix",
+      "test": "nixos/tests/avahi.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "avahi"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 60,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "hostName"
+          ],
+          "default_source": "config.networking.hostName",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "domainName"
+          ],
+          "default_source": "\"local\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "local"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 83,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "browseDomains"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 91,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ipv4"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 103,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ipv6"
+          ],
+          "default_source": "config.networking.enableIPv6",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "allowInterfaces"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 116,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "denyInterfaces"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 126,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 137,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "allowPointToPoint"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 146,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "wideArea"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 156,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "reflector"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 166,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraServiceFiles"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 172,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "publish",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 198,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "publish",
+            "userServices"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 204,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "publish",
+            "addresses"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 210,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "publish",
+            "hinfo"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 216,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "publish",
+            "workstation"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 225,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "publish",
+            "domain"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 233,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nssmdns4"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 240,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "nssmdns6"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 250,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "cacheEntriesMax"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 265,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 274,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 282,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 285,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "wideArea"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 287,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.wideArea \"Enabling `services.avahi.wideArea` exposes this system to `CVE-2024-52615`.\""
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 367,
+            "col": 88
+          },
+          "source": "lib.optionalString cfg.debug \"--debug\""
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 416,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall [ 5353 ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 285,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "wideArea"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "wideArea"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 287,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.wideArea \"Enabling `services.avahi.wideArea` exposes this system to `CVE-2024-52615`.\""
+        },
+        {
+          "ir": {
+            "Or": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns4"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns6"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nssmdns4"
+            ],
+            [
+              "nssmdns6"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 299,
+            "col": 25
+          },
+          "source": "lib.optional (cfg.nssmdns4 || cfg.nssmdns6) pkgs.nssmdns"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns4"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns6"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nssmdns4"
+            ],
+            [
+              "nssmdns6"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 303,
+            "col": 11
+          },
+          "source": "if (cfg.nssmdns4 && cfg.nssmdns6) then"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "nssmdns4"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns6"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nssmdns4"
+            ],
+            [
+              "nssmdns6"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 305,
+            "col": 16
+          },
+          "source": "if (!cfg.nssmdns4 && cfg.nssmdns6) then"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns4"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "nssmdns6"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nssmdns4"
+            ],
+            [
+              "nssmdns6"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 307,
+            "col": 16
+          },
+          "source": "if (cfg.nssmdns4 && !cfg.nssmdns6) then"
+        },
+        {
+          "ir": {
+            "Or": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns4"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "nssmdns6"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nssmdns4"
+            ],
+            [
+              "nssmdns6"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 312,
+            "col": 7
+          },
+          "source": "lib.optionals (cfg.nssmdns4 || cfg.nssmdns6) ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debug"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debug"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 367,
+            "col": 88
+          },
+          "source": "lib.optionalString cfg.debug \"--debug\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 416,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall [ 5353 ]"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 19,
+            "col": 9
+          },
+          "source": "lib.optionalString (hostName != \"\") \"host-name=${hostName}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 24,
+            "col": 9
+          },
+          "source": "lib.optionalString (",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 27,
+            "col": 9
+          },
+          "source": "lib.optionalString (",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 30,
+            "col": 9
+          },
+          "source": "lib.optionalString (domainName != null) \"domain-name=${domainName}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 32,
+            "col": 9
+          },
+          "source": "lib.optionalString (cacheEntriesMax != null) \"cache-entries-max=${toString cacheEntriesMax}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/avahi-daemon.nix",
+            "line": 325,
+            "col": 13
+          },
+          "source": "if lib.types.path.check v then \"source\" else \"text\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "one",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/avahi.nix",
+            "line": 38,
+            "col": 7
+          }
+        },
+        {
+          "path": [],
+          "instance": "two",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/avahi.nix",
+            "line": 39,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/avahi-daemon.nix",
+              "line": 285,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/avahi-daemon.nix",
+                  "line": 285,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/avahi-daemon.nix",
+                  "line": 285,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "nssmdnsFull"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 10,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->predicate_not_found": 1,
+      "predicate_not_found->option_not_found": 9
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "args"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "args"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "args"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "bindIP"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "bindIP"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "bindIP"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "imaps.host"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "imaps.host"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "imaps.host"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "imaps.port"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "imaps.port"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "imaps.port"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "package"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "package"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "package"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "port"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "port"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "port"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "settings"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "smtps.host"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "smtps.host"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "smtps.host"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "smtps.port"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "smtps.port"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "smtps.port"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/alps.nix",
+        "test": "nixos/tests/alps.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "alps"
+        ],
+        "watched_path": "theme"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "theme"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "theme"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

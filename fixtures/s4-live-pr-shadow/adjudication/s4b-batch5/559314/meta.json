@@ -1,0 +1,37 @@
+{
+  "pr": 559314,
+  "title": "nixos/udev: include all rules from systemd in /etc",
+  "applicable": true,
+  "base_sha": "6d318f95192ab9ecbaceaa3a58f6111b0e558eb0",
+  "head_sha": "ca3961f76815ceec20d037448d0d40b15f928f5a",
+  "module_paths": [
+    "nixos/modules/services/hardware/udev.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/installer.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/hardware/udev.nix (a real nixos/modules/services/** file). Wired test confirmed: the PR's own diff directly touches nixos/tests/installer.nix (swapping systemdMinimal.out for systemd.out to match the module change), and nixos/tests/all-tests.nix at head (ca3961f7) wires it twice: 'installer = handleTest ./installer.nix { systemdStage1 = false; };' and 'installer-systemd-stage-1 = handleTest ./installer.nix { systemdStage1 = true; };' (lines 867-868). No dedicated udev*.nix test file exists (confirmed via a scoped nixos/tests top-level directory listing and a GitHub code search for 'udev' scoped to path:nixos/tests, which returned other hits like installer.nix/kmonad.nix/os-prober.nix but nothing named for udev itself); installer.nix is the real wired test for this module.",
+  "targets_toml": "single target udev, cfg_ident=cfg, option_prefix=[services,udev], watch=[enable]. The real diff touches only implementation code (derivation logic building/verifying udev rule packages, systemd package source swap, a tpm2_id builtin check, a version-gated udevadm verify) -- zero mkOption/mkEnableOption/mkRenamedOptionModule declaration lines are textually touched. Baseline services.udev.enable (mkEnableOption at line 240 of the head module) was confirmed present; only that baseline option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Unchanged verdict on both sides (raw.json audit-diff reports 'unchanged':1, 'changed':0, empty oba_verdict_transitions) -- not a transition at all, and not PASS on either side, so no PASS-involving asymmetry to flag. Exit code 2 on all three commands despite well-formed complete JSON (tool_error=false); consistent with oba's apparent convention of nonzero exit whenever any verdict is non-PASS/inconclusive."
+    }
+  ]
+}
