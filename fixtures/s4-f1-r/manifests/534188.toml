@@ -1,0 +1,7 @@
+[[target]]
+name = "bluesky-pds"
+module = "nixos/modules/services/web-apps/bluesky-pds.nix"
+test = "nixos/tests/bluesky-pds.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "bluesky-pds"]
+watch = ["enable"]

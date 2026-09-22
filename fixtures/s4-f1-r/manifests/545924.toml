@@ -1,0 +1,7 @@
+[[target]]
+name = "llama-swap"
+module = "nixos/modules/services/networking/llama-swap.nix"
+test = "nixos/tests/web-servers/llama-swap.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "llama-swap"]
+watch = ["enable", "useLlamaCppCacheDir"]

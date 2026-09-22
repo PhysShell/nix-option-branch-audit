@@ -1,0 +1,7 @@
+[[target]]
+name = "prefect"
+module = "nixos/modules/services/scheduling/prefect.nix"
+test = "nixos/tests/prefect.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "prefect"]
+watch = ["enable", "dataDir", "databasePasswordFile", "baseUrl"]

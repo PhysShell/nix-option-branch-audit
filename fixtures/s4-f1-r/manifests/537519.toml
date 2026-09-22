@@ -1,0 +1,7 @@
+[[target]]
+name = "pipewire"
+module = "nixos/modules/services/desktops/pipewire/pipewire.nix"
+test = "nixos/tests/installed-tests/pipewire.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pipewire"]
+watch = ["enable", "socketActivation"]

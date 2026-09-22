@@ -1,0 +1,7 @@
+[[target]]
+name = "alps"
+module = "nixos/modules/services/web-apps/alps.nix"
+test = "nixos/tests/alps.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "alps"]
+watch = ["enable", "package", "settings", "port", "bindIP", "theme", "imaps.port", "imaps.host", "smtps.port", "smtps.host", "args"]

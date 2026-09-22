@@ -1,0 +1,7 @@
+[[target]]
+name = "gotosocial"
+module = "nixos/modules/services/web-apps/gotosocial.nix"
+test = "nixos/tests/web-apps/gotosocial.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gotosocial"]
+watch = ["enable"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "jirafeau"
+module = "nixos/modules/services/web-apps/jirafeau.nix"
+test = "nixos/tests/jirafeau.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "jirafeau"]
+watch = ["enable", "extraConfig"]

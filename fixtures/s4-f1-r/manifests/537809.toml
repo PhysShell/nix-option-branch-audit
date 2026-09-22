@@ -1,0 +1,7 @@
+[[target]]
+name = "autosuspend"
+module = "nixos/modules/services/misc/autosuspend.nix"
+test = "nixos/tests/autosuspend.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "autosuspend"]
+watch = ["enable"]

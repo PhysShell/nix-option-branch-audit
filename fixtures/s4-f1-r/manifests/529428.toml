@@ -1,0 +1,7 @@
+[[target]]
+name = "firezone"
+module = "nixos/modules/services/networking/firezone/server.nix"
+test = "nixos/tests/firezone/firezone.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "firezone", "server"]
+watch = ["enable", "provision.enable", "provision.accounts"]

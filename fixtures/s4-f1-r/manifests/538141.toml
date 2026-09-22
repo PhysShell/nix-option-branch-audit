@@ -1,0 +1,7 @@
+[[target]]
+name = "isso"
+module = "nixos/modules/services/web-apps/isso.nix"
+test = "nixos/tests/isso.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "isso"]
+watch = ["enable", "secretFile"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "gitlab"
+module = "nixos/modules/services/misc/gitlab/default.nix"
+test = "nixos/tests/gitlab/gitlab.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gitlab"]
+watch = ["enable"]

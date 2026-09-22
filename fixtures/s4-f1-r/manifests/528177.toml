@@ -1,0 +1,7 @@
+[[target]]
+name = "ghostunnel"
+module = "nixos/modules/services/networking/ghostunnel.nix"
+test = "nixos/tests/ghostunnel.nix"
+cfg_ident = "mainCfg"
+option_prefix = ["services", "ghostunnel"]
+watch = ["enable"]

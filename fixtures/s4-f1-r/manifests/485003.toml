@@ -1,0 +1,7 @@
+[[target]]
+name = "hockeypuck"
+module = "nixos/modules/services/security/hockeypuck.nix"
+test = "nixos/tests/hockeypuck.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "hockeypuck"]
+watch = ["enable"]

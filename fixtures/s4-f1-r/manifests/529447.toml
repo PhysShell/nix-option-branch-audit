@@ -1,0 +1,7 @@
+[[target]]
+name = "homer"
+module = "nixos/modules/services/web-apps/homer.nix"
+test = "nixos/tests/homer/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "homer"]
+watch = ["enable"]

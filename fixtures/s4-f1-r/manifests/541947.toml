@@ -1,0 +1,7 @@
+[[target]]
+name = "rtorrent"
+module = "nixos/modules/services/torrent/rtorrent.nix"
+test = "nixos/tests/rtorrent.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "rtorrent"]
+watch = ["enable"]

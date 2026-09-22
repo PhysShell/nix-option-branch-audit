@@ -1,0 +1,7 @@
+[[target]]
+name = "dnscrypt-proxy"
+module = "nixos/modules/services/networking/dnscrypt-proxy.nix"
+test = "nixos/tests/dnscrypt-proxy.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "dnscrypt-proxy"]
+watch = ["enable", "settings"]

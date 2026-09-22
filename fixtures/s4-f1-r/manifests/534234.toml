@@ -1,0 +1,7 @@
+[[target]]
+name = "canaille"
+module = "nixos/modules/services/security/canaille.nix"
+test = "nixos/tests/canaille.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "canaille"]
+watch = ["enable"]

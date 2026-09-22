@@ -1,0 +1,7 @@
+[[target]]
+name = "firewalld"
+module = "nixos/modules/services/networking/firewalld/default.nix"
+test = "nixos/tests/firewalld.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "firewalld"]
+watch = ["enable"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "netfoil"
+module = "nixos/modules/services/networking/netfoil.nix"
+test = "nixos/tests/netfoil.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "netfoil"]
+watch = ["enable", "listen.ipAddress", "listen.port"]

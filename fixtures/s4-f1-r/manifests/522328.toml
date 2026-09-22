@@ -1,0 +1,7 @@
+[[target]]
+name = "anki-sync-server"
+module = "nixos/modules/services/misc/anki-sync-server.nix"
+test = "nixos/tests/anki-sync-server.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "anki-sync-server"]
+watch = ["enable"]

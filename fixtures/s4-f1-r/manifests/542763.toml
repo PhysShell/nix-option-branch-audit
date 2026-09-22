@@ -1,0 +1,7 @@
+[[target]]
+name = "technitium-dns-server"
+module = "nixos/modules/services/networking/technitium-dns-server.nix"
+test = "nixos/tests/technitium-dns-server.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "technitium-dns-server"]
+watch = ["enable"]

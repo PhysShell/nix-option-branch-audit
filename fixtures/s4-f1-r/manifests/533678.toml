@@ -1,0 +1,7 @@
+[[target]]
+name = "zigbee2mqtt"
+module = "nixos/modules/services/home-automation/zigbee2mqtt.nix"
+test = "nixos/tests/zigbee2mqtt.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "zigbee2mqtt"]
+watch = ["enable"]

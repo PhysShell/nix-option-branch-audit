@@ -1,0 +1,15 @@
+[[target]]
+name = "runner-0"
+module = "nixos/modules/services/continuous-integration/gitlab-runner/runner.nix"
+test = "nixos/tests/gitlab/runner.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gitlab-runner"]
+watch = ["enable"]
+
+[[target]]
+name = "runner-1"
+module = "nixos/modules/services/continuous-integration/gitlab-runner/runner.nix"
+test = "nixos/tests/gitlab/runner.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gitlab-runner", "services", "*"]
+watch = ["dockerAllowedPrivilegedServices", "dockerServicesPrivileged"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "linkding"
+module = "nixos/modules/services/web-apps/linkding.nix"
+test = "nixos/tests/web-apps/linkding.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "linkding"]
+watch = ["enable", "processes", "threads"]

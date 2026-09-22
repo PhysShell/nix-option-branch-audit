@@ -1,0 +1,7 @@
+[[target]]
+name = "pcscd"
+module = "nixos/modules/services/hardware/pcscd.nix"
+test = "nixos/tests/pcsclite.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pcscd"]
+watch = ["enable", "package"]

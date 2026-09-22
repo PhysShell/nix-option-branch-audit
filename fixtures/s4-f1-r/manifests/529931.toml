@@ -1,0 +1,7 @@
+[[target]]
+name = "lauti"
+module = "nixos/modules/services/web-apps/lauti.nix"
+test = "nixos/tests/lauti.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "lauti"]
+watch = ["enable"]

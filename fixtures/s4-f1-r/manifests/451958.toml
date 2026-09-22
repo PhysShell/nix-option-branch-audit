@@ -1,0 +1,15 @@
+[[target]]
+name = "neo4j"
+module = "nixos/modules/services/databases/neo4j.nix"
+test = "nixos/tests/neo4j.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "neo4j"]
+watch = ["enable"]
+
+[[target]]
+name = "neo4j-ssl-policies"
+module = "nixos/modules/services/databases/neo4j.nix"
+test = "nixos/tests/neo4j.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "neo4j", "ssl", "policies", "*"]
+watch = ["enable"]

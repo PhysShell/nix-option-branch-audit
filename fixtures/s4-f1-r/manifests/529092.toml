@@ -1,0 +1,7 @@
+[[target]]
+name = "plasma6"
+module = "nixos/modules/services/desktop-managers/plasma6.nix"
+test = "nixos/tests/plasma6.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "desktopManager", "plasma6"]
+watch = ["enable"]

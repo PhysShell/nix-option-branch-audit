@@ -1,0 +1,7 @@
+[[target]]
+name = "aesmd"
+module = "nixos/modules/services/security/aesmd.nix"
+test = "nixos/tests/aesmd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "aesmd"]
+watch = ["enable", "settings.whitelistUrl", "settings.proxy", "settings.proxyType", "settings.defaultQuotingType", "settings.qplLogLevel"]

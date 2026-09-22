@@ -1,0 +1,7 @@
+[[target]]
+name = "gnome"
+module = "nixos/modules/services/desktop-managers/gnome.nix"
+test = "nixos/tests/gnome.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "desktopManager", "gnome"]
+watch = ["enable"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "qbittorrent"
+module = "nixos/modules/services/torrent/qbittorrent.nix"
+test = "nixos/tests/qbittorrent.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "qbittorrent"]
+watch = ["enable", "profileDir"]

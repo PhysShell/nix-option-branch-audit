@@ -1,0 +1,7 @@
+[[target]]
+name = "readeck"
+module = "nixos/modules/services/web-apps/readeck.nix"
+test = "nixos/tests/readeck.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "readeck"]
+watch = ["enable"]

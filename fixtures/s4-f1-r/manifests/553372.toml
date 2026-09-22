@@ -1,0 +1,7 @@
+[[target]]
+name = "mpd"
+module = "nixos/modules/services/audio/mpd.nix"
+test = "nixos/tests/mpd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mpd"]
+watch = ["enable"]

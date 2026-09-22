@@ -1,0 +1,7 @@
+[[target]]
+name = "gerrit"
+module = "nixos/modules/services/web-apps/gerrit.nix"
+test = "nixos/tests/gerrit.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gerrit"]
+watch = ["enable"]

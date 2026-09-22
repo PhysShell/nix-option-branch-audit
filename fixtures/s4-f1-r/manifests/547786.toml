@@ -1,0 +1,7 @@
+[[target]]
+name = "hydra"
+module = "nixos/modules/services/continuous-integration/hydra/default.nix"
+test = "nixos/tests/hydra/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "hydra"]
+watch = ["enable"]

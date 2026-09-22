@@ -1,0 +1,7 @@
+[[target]]
+name = "netdata"
+module = "nixos/modules/services/monitoring/netdata.nix"
+test = "nixos/tests/netdata.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "netdata"]
+watch = ["enable"]

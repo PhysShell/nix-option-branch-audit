@@ -1,0 +1,7 @@
+[[target]]
+name = "glusterfs"
+module = "nixos/modules/services/network-filesystems/glusterfs.nix"
+test = "nixos/tests/glusterfs.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "glusterfs"]
+watch = ["enable"]

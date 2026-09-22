@@ -1,0 +1,7 @@
+[[target]]
+name = "httpd"
+module = "nixos/modules/services/web-servers/apache-httpd/default.nix"
+test = "nixos/tests/php/httpd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "httpd"]
+watch = ["enable"]

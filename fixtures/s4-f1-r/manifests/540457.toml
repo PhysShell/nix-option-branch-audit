@@ -1,0 +1,7 @@
+[[target]]
+name = "rsyncd"
+module = "nixos/modules/services/network-filesystems/rsyncd.nix"
+test = "nixos/tests/rsyncd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "rsyncd"]
+watch = ["enable"]

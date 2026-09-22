@@ -1,0 +1,7 @@
+[[target]]
+name = "logrotate"
+module = "nixos/modules/services/logging/logrotate.nix"
+test = "nixos/tests/logrotate.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "logrotate"]
+watch = ["configFile", "enable"]

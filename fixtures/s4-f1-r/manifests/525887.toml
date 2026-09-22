@@ -1,0 +1,7 @@
+[[target]]
+name = "opensnitch"
+module = "nixos/modules/services/security/opensnitch.nix"
+test = "nixos/tests/opensnitch.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "opensnitch"]
+watch = ["enable"]

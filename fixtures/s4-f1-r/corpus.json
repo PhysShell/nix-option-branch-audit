@@ -1,0 +1,1792 @@
+[
+  {
+    "pr": 537519,
+    "cohort": "A",
+    "position": 1,
+    "base_sha": "9aff44617ac7a143d4eb367cba634df320f9a373",
+    "head_sha": "43ece43b16112c6ad2d61d52b66dcfc111a796b7",
+    "module_paths": [
+      "nixos/modules/services/desktops/pipewire/pipewire.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/installed-tests/pipewire.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/537519",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/537519/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/537519/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/537519.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "943341185a8d66124ddccff41c99e0c427209141db663fa89d506aa6d63c6b64"
+  },
+  {
+    "pr": 528177,
+    "cohort": "A",
+    "position": 2,
+    "base_sha": "de5a4facc908fe7eccf842152cea8e52948920e1",
+    "head_sha": "f394e3ecfd45521e0876ae39b726bb73ab2b04c6",
+    "module_paths": [
+      "nixos/modules/services/networking/ghostunnel.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ghostunnel.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/528177",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/528177/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/528177/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/528177.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "0a7b776e1223a311b068d87c8ff3ca2d578f0e3cbcf302b4a2e14874811cef9f"
+  },
+  {
+    "pr": 511721,
+    "cohort": "A",
+    "position": 3,
+    "base_sha": "cc828f0ae6d18ae4384e091e713a072a51e48cfb",
+    "head_sha": "13d71c3e328869c5f19da2e5590aa36951a1007d",
+    "module_paths": [
+      "nixos/modules/services/desktops/espanso.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/espanso.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/511721",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/511721/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/511721/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/511721.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "f9d0fad1cb781015527d728d834a0709429d4c8871c72b3b281c2f5924f634c7"
+  },
+  {
+    "pr": 535931,
+    "cohort": "A",
+    "position": 4,
+    "base_sha": "10dd8aa1ecce33da6b584bc7be0914bccf57146b",
+    "head_sha": "64262df5c3cd5405117ac819d3770ffbd7c7b7e0",
+    "module_paths": [
+      "nixos/modules/services/desktop-managers/gnome.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gnome.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/535931",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/535931/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/535931/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/535931.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "430a4a4df8002a356c15e39af6248aa021e6ff5264243f819010d3c1afaa685e"
+  },
+  {
+    "pr": 545582,
+    "cohort": "A",
+    "position": 6,
+    "base_sha": "b0554ba90cc9bb3cfb9561800c85a588127b6cd4",
+    "head_sha": "2669b351053f74add70e36a0495cbadaa6f7a17d",
+    "module_paths": [
+      "nixos/modules/services/monitoring/netdata.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/netdata.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/545582",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/545582/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/545582/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/545582.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "d00bf3a8f7ff42be401af36333776ea325d3024654f24eed5135c833477d9f41"
+  },
+  {
+    "pr": 533678,
+    "cohort": "A",
+    "position": 11,
+    "base_sha": "986f1b4a038e89d9153bc21394d19a77830b450d",
+    "head_sha": "93c9f9cde4d5dce13cc3bc45c5d90d1b7b0a80cf",
+    "module_paths": [
+      "nixos/modules/services/home-automation/zigbee2mqtt.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/zigbee2mqtt.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/533678",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/533678/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/533678/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/533678.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "5c76ea1377662651805bdaf455f8ab0f59209b30e2eace46a251cf6691bd5a07"
+  },
+  {
+    "pr": 538141,
+    "cohort": "A",
+    "position": 12,
+    "base_sha": "4ebb8d6c14644779d1ba80cc1a9b50861a2214d0",
+    "head_sha": "aa15810a3974fd7830aac2958e5a5d68da87b1c3",
+    "module_paths": [
+      "nixos/modules/services/web-apps/isso.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/isso.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch1/538141",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch1/538141/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch1/538141/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/538141.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "356a4d1301c3a137a152b43c80e716159c566f3dfd4b2218f0f118b8dd2991f4"
+  },
+  {
+    "pr": 536969,
+    "cohort": "A",
+    "position": 13,
+    "base_sha": "bae9b1b412900c2e55f4801bd94375cea4f2fcce",
+    "head_sha": "dc4d391fad66074e4f88110928c7f3d0f68c68fd",
+    "module_paths": [
+      "nixos/modules/services/web-apps/gotosocial.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/gotosocial.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/536969",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/536969/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/536969/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/536969.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "7730dd3c2e7ca511cd172c1ff8c150c3bb16e819598d70394097b25cc2433c06"
+  },
+  {
+    "pr": 534188,
+    "cohort": "A",
+    "position": 14,
+    "base_sha": "b3c092d3c36d91e2f61f3dfb39a159f180a56659",
+    "head_sha": "1908d92d4acacb7ca8773a04145bc160e763dc4d",
+    "module_paths": [
+      "nixos/modules/services/web-apps/bluesky-pds.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/bluesky-pds.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/534188",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/534188/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/534188/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/534188.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "d7dc9fec4bb86974707e14d054d14abc6b1a237909be913b9bad8c882d657c9f"
+  },
+  {
+    "pr": 553645,
+    "cohort": "A",
+    "position": 15,
+    "base_sha": "d3773e0bc0825f6ec550fb05d56f61f206556a1f",
+    "head_sha": "e78efecc9bd7174b6177b6f5ac9c18945282fb19",
+    "module_paths": [
+      "nixos/modules/services/misc/taskchampion-sync-server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/taskchampion-sync-server.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/553645",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/553645/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/553645/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/553645.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "833b6262dc6df7a7dd818bc653e1e3e3948573def7016aa73154893dc23f474a"
+  },
+  {
+    "pr": 548345,
+    "cohort": "A",
+    "position": 16,
+    "base_sha": "073bbb4af7d16755d438f571069930997abd78d8",
+    "head_sha": "c2d890f46320fd8ce5f6c84bb2b426c719a7ecb8",
+    "module_paths": [
+      "nixos/modules/services/security/kanidm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kanidm.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/548345",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/548345/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/548345/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/548345.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "83707c03076c2f3770fc45ca3bc6373c8b7f5676fcb9dba8e3d6cb5135c04b57"
+  },
+  {
+    "pr": 526840,
+    "cohort": "A",
+    "position": 18,
+    "base_sha": "15b4fcd2d9b4a3abe5769aecb50c4b3fc09993bd",
+    "head_sha": "fd38c2f3a27ee1ed03edadd7d20e6d9a4b93c436",
+    "module_paths": [
+      "nixos/modules/services/web-apps/pixelfed.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/pixelfed/default.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/526840",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/526840/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/526840/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/526840.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "863c83fdf882fcfc332975b3e5a595d0a3c2fb0fc9e301b7051dfc7f56813142"
+  },
+  {
+    "pr": 545924,
+    "cohort": "A",
+    "position": 19,
+    "base_sha": "a9c6e2e9bb16d450a2ee246d071df3c37d93d3bd",
+    "head_sha": "ae065a2d83537d2039259547bc4dadd3d0d26db1",
+    "module_paths": [
+      "nixos/modules/services/networking/llama-swap.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-servers/llama-swap.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/545924",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/545924/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/545924/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/545924.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "1521fd04bdaad42929847a3f50031fef73483f63631f716e84090129110c0318"
+  },
+  {
+    "pr": 529931,
+    "cohort": "A",
+    "position": 20,
+    "base_sha": "a6d914805c364052e52531c2c6a80b270710a507",
+    "head_sha": "1daadb6e879d916a201df2b62e4a97149b4ab25e",
+    "module_paths": [
+      "nixos/modules/services/web-apps/lauti.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/lauti.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/529931",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/529931/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/529931/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/529931.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "3dcb954c8a7f9bbc0e9d0fef48fcd3626daffb187dcb1eeb2130be5aeee6df5c"
+  },
+  {
+    "pr": 540457,
+    "cohort": "A",
+    "position": 21,
+    "base_sha": "9e9c0b4ad4db37971dccae5a1f1ac3bbfd275ac1",
+    "head_sha": "7d57ab127ec6799d0106da737a45e5c8a390dc9e",
+    "module_paths": [
+      "nixos/modules/services/network-filesystems/rsyncd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/rsyncd.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/540457",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/540457/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/540457/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/540457.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "3425687f845a4237992e6135f5fe97f5842b38fabbb649a553d047d8c6627d01"
+  },
+  {
+    "pr": 527496,
+    "cohort": "A",
+    "position": 22,
+    "base_sha": "432dd3f347c68e0233c5a34155476555026c6190",
+    "head_sha": "d30254cecc53fcdb0f545f43a9037f0186df45dd",
+    "module_paths": [
+      "nixos/modules/services/networking/gokapi.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gokapi.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/527496",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/527496/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/527496/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/527496.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "25a519907b3ca0c5c6a63274e75817ed841d5807ce9b3f05353dc40a77c1060b"
+  },
+  {
+    "pr": 529447,
+    "cohort": "A",
+    "position": 23,
+    "base_sha": "f75c238802b8f3c0acdbbf822e02eb9ba43ec8fc",
+    "head_sha": "5acc851f6a88f7a6504af20f543f22d8e6c58713",
+    "module_paths": [
+      "nixos/modules/services/web-apps/homer.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homer/default.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch2/529447",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch2/529447/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch2/529447/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/529447.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "b8acb0cfe7483dc966bd63c63b87c5cdbdcd989fa3b96d73529a07a80b14403e"
+  },
+  {
+    "pr": 538715,
+    "cohort": "A",
+    "position": 27,
+    "base_sha": "5060bd50d84e37ef4ec3f1befdd44191e0bf5ef9",
+    "head_sha": "af11c3d0c8cf6feca5003a595792163c60fd4446",
+    "module_paths": [
+      "nixos/modules/services/web-apps/readeck.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/readeck.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch3/538715",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch3/538715/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch3/538715/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/538715.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "408fc748e3b5dd9bda66bc2de4731b22cf0b2a15706f9b087b06d996debcdf55"
+  },
+  {
+    "pr": 542763,
+    "cohort": "A",
+    "position": 29,
+    "base_sha": "7a2a0c9750886f1794368cff0cff56796e67708f",
+    "head_sha": "411a1103c35271443e93fe440c1fe22aad7099ad",
+    "module_paths": [
+      "nixos/modules/services/networking/technitium-dns-server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/technitium-dns-server.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch3/542763",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch3/542763/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch3/542763/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/542763.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "064fbacb4b3c3a85ef1d571beda3fec55b7b9c4328c4ac64098c58dcc31897b2"
+  },
+  {
+    "pr": 527693,
+    "cohort": "A",
+    "position": 31,
+    "base_sha": "82be2412cdbf660fd63e23b304c409f5541374dd",
+    "head_sha": "3214367796ab0c847db641a372038c28ea82da1d",
+    "module_paths": [
+      "nixos/modules/services/security/opensnitch.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/opensnitch.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch3/527693",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch3/527693/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch3/527693/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/527693.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "3eed4b44066a793b844051edddfba672b1c69fec3938fb97a9e1866692222d1f"
+  },
+  {
+    "pr": 534709,
+    "cohort": "A",
+    "position": 32,
+    "base_sha": "d417afc7e4e6501012ce7a862273c6e4d0827d35",
+    "head_sha": "66cd3515f71744b9ec614c1328eb898da547ed79",
+    "module_paths": [
+      "nixos/modules/services/network-filesystems/glusterfs.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/glusterfs.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch3/534709",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch3/534709/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch3/534709/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/534709.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "8eeecac2de17bc7863e5d0623ad3657470a92aecef8ff75fc0a8686d8372a4b4"
+  },
+  {
+    "pr": 513962,
+    "cohort": "A",
+    "position": 36,
+    "base_sha": "93b9af4f8d0380d23de2e299108de7a217ee7e9d",
+    "head_sha": "e8cb691e0e3d1e6e49bb5ea3bec6e4f11ca25266",
+    "module_paths": [
+      "nixos/modules/services/misc/angrr.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/angrr.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch3/513962",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch3/513962/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch3/513962/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/513962.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "30dcb72871b499b63e1c5fcfb05a6d77676bf3fe4c8d2be574217dfd3c4d92af"
+  },
+  {
+    "pr": 541947,
+    "cohort": "A",
+    "position": 37,
+    "base_sha": "6d7e4652efb6966312774d4926493195ae532f88",
+    "head_sha": "692daeac48bce39026786e7193ae15b8e5f1b2a1",
+    "module_paths": [
+      "nixos/modules/services/torrent/rtorrent.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/rtorrent.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/541947",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/541947/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/541947/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/541947.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "dfee7e098e9bb3e327c33ab7d10cb620f7747dcaaee214e8eec424c1f090876d"
+  },
+  {
+    "pr": 534234,
+    "cohort": "A",
+    "position": 38,
+    "base_sha": "b55025c9f46ce153e7d70fef4c8a0b9362308eb2",
+    "head_sha": "6a66dea2a94337c4beec1abcd038a5f85b984472",
+    "module_paths": [
+      "nixos/modules/services/security/canaille.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/canaille.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/534234",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/534234/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/534234/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/534234.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "2d7179180f7ab52e34a2f8df75fc21bc38824b58779d7e0eb527a9c5015f53ad"
+  },
+  {
+    "pr": 561031,
+    "cohort": "A",
+    "position": 39,
+    "base_sha": "40a6fb10bfd613294cda7a30a9655de5d2385c4b",
+    "head_sha": "4b0dfa0218915c2b1796e30d4bf0af3c1d43ef50",
+    "module_paths": [
+      "nixos/modules/services/networking/netfoil.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/netfoil.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/561031",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/561031/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/561031/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/561031.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "2230bf462befb3f0b4f81c2657a17786b24226e5c1e6211763f75f2507402f5f"
+  },
+  {
+    "pr": 399257,
+    "cohort": "A",
+    "position": 40,
+    "base_sha": "d272de8c0b87513d4e22c5786549c397b2b6cc35",
+    "head_sha": "c79c23b4ab3dccc9048327102214146abd7f984d",
+    "module_paths": [
+      "nixos/modules/services/web-apps/cloudlog.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cloudlog.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/399257",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/399257/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/399257/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/399257.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "dee5dc89df1cfe4a809d8f08ca2001ef68b74b8e250e90feb8a7413c4669303d"
+  },
+  {
+    "pr": 554217,
+    "cohort": "A",
+    "position": 41,
+    "base_sha": "5987146ff1aa9a709903f827691c660161725ccd",
+    "head_sha": "00031e20b1cd9ea6da5864f8db4095c85530fc3c",
+    "module_paths": [
+      "nixos/modules/services/networking/syncthing.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/syncthing/init.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/554217",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/554217/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/554217/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/554217.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "28ebad65e9353b10d95c2cd9f7bff080ebf09a4407026370010fe6264aa5439f"
+  },
+  {
+    "pr": 549648,
+    "cohort": "A",
+    "position": 44,
+    "base_sha": "a7c0bf78db8c7975083ab2a6af8c6a7745a2cc8c",
+    "head_sha": "12f59599633080197fa5b1e901e1c3bcf154b585",
+    "module_paths": [
+      "nixos/modules/services/desktops/pipewire/pipewire.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/installed-tests/pipewire.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/549648",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/549648/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/549648/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/549648.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "cdba0ee594f22ea957686c6a096a0feb44f418b5ecbe44d248724e2107d822dc"
+  },
+  {
+    "pr": 411705,
+    "cohort": "A",
+    "position": 45,
+    "base_sha": "a2ce3ff95492b2ed7684883a683b437fe9d4b613",
+    "head_sha": "b69b9deb9ceff383ef3e9a8b53e1b3bb8d35f499",
+    "module_paths": [
+      "nixos/modules/services/continuous-integration/gitlab-runner/runner.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gitlab/runner.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/411705",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/411705/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/411705/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/411705.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "f420b0f1cc8ca36103a54f0e2c8e0b071702eda7bd6a321b4629b158f9976f45"
+  },
+  {
+    "pr": 537809,
+    "cohort": "A",
+    "position": 48,
+    "base_sha": "e55282381577d63a400d141d70b284b6dd3f61e7",
+    "head_sha": "e8595bd3254a89becb1a125dc8aac5955512f216",
+    "module_paths": [
+      "nixos/modules/services/misc/autosuspend.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/autosuspend.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch4/537809",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch4/537809/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch4/537809/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/537809.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "b2af66712fd601715a79ccd5a4120af99537c925a8df7f585e064beaec30f1e8"
+  },
+  {
+    "pr": 512581,
+    "cohort": "A",
+    "position": 49,
+    "base_sha": "5a3564babe8cae1a38b596a6bbf211d5aec3b883",
+    "head_sha": "7271b8c9577a57f9475d0e04e0529387c4ee37cc",
+    "module_paths": [
+      "nixos/modules/services/logging/logrotate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/logrotate.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/512581",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/512581/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/512581/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/512581.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "d06d08cdb03ead1ec6f3588a5b63c8aa29dd339b72806897c6c2defad178241e"
+  },
+  {
+    "pr": 520533,
+    "cohort": "A",
+    "position": 50,
+    "base_sha": "a3a744eacd0daa46e28f61e511ddf6b40c087b68",
+    "head_sha": "2ed1be538e3b18b8c924cbe0b1900ba104b4a66f",
+    "module_paths": [
+      "nixos/modules/services/networking/tinc.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/tinc/default.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/520533",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/520533/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/520533/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/520533.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "66724cd76d517d0f0b504efb1621a255e7d4df9fe4b68eaf5c6652cada2309e2"
+  },
+  {
+    "pr": 522328,
+    "cohort": "A",
+    "position": 52,
+    "base_sha": "d9854a2b31ca3b6fa946a12d965355951f91c704",
+    "head_sha": "cb1757b77803b3f650c7984a317e73fa5453a840",
+    "module_paths": [
+      "nixos/modules/services/misc/anki-sync-server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/anki-sync-server.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/522328",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/522328/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/522328/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/522328.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "c9d19d64fa86c246740c5267bc556b07ae1df2170142ddf2a252aa7f612be7e3"
+  },
+  {
+    "pr": 525469,
+    "cohort": "A",
+    "position": 55,
+    "base_sha": "24c75e99f2a1196dac0902151fee42cabe9a930d",
+    "head_sha": "084c166151e93dfacb5b0608a1baea903552d435",
+    "module_paths": [
+      "nixos/modules/services/torrent/qbittorrent.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/qbittorrent.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/525469",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/525469/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/525469/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/525469.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "a789c98fce8df7bc2e19644efb0d78ce84bcde988044b86818014e6a007b6478"
+  },
+  {
+    "pr": 532071,
+    "cohort": "A",
+    "position": 56,
+    "base_sha": "9e4ba994617839705f840a0f584732493b348a9c",
+    "head_sha": "cdb300c9a34d5f24b9cf2c2a582b92d42c1f5daf",
+    "module_paths": [
+      "nixos/modules/services/web-apps/homebox.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homebox.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/532071",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/532071/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/532071/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/532071.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "c6b204f79a2bddc52baaa49eb1de8ad75eca0eab401911038477709d34f9ed90"
+  },
+  {
+    "pr": 534756,
+    "cohort": "A",
+    "position": 59,
+    "base_sha": "6d4033f6a8b2f512827401952dd8d4ff3f766ce4",
+    "head_sha": "8f0f15a2cd385cecdbfc083cdb81bf769e1f6275",
+    "module_paths": [
+      "nixos/modules/services/backup/sanoid.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/sanoid.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/534756",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/534756/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/534756/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/534756.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "6ae337675b188dc8094be1733befab69a87cb1409b63e5aec43d5874399bfc33"
+  },
+  {
+    "pr": 538065,
+    "cohort": "A",
+    "position": 60,
+    "base_sha": "f7e1b405fb89ae7d58e3626b916d3ff0b2e4c5ce",
+    "head_sha": "fa01843a3b783cffaf0b7c8ca12a37e18ce2851c",
+    "module_paths": [
+      "nixos/modules/services/networking/yggdrasil.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/yggdrasil.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch5/538065",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch5/538065/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch5/538065/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/538065.toml",
+    "manifest_provenance": "reconstructed_from_s4_raw_json_identities",
+    "manifest_sha256": "f935d690830a52419ab7fae421bd30e24d97b32a06b23b4609947cac34794067"
+  },
+  {
+    "pr": 531455,
+    "cohort": "A",
+    "position": 62,
+    "base_sha": "b771e6213c7878a7538c065890e583d3f5e1141b",
+    "head_sha": "809048936dd5e99cf1c825f129d37e9aa8af38bb",
+    "module_paths": [
+      "nixos/modules/services/web-apps/netbox.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/netbox/default.nix",
+      "nixos/tests/web-apps/netbox/testScript.py (fetched, referenced via lib.readFile by default.nix; not passed to oba directly)",
+      "nixos/tests/web-apps/netbox-upgrade.nix (also changed by PR but not used as the oba test target -- separate upgrade-scenario test, not the module's own primary functional test)"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch6/531455",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch6/531455/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch6/531455/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/531455.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "0f2db6302d5c41284a3821f85294009ae1805dbe85a2a1eb571c382faf4c89cb"
+  },
+  {
+    "pr": 545876,
+    "cohort": "A",
+    "position": 64,
+    "base_sha": "4aa5f581bac47c3dce5f86ae1ceb374c52a62c58",
+    "head_sha": "44bfa48ab50ed97c09e4f674dcc755075c573a3f",
+    "module_paths": [
+      "nixos/modules/services/web-apps/jirafeau.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/jirafeau.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch6/545876",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch6/545876/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch6/545876/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/545876.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "742bba045309e57491db1d92c5675c73c0e06f858fd3f39579196a2995627702"
+  },
+  {
+    "pr": 553372,
+    "cohort": "A",
+    "position": 65,
+    "base_sha": "84c9f3ddbd1f8eda9cac60aea065e4f0fd4fb894",
+    "head_sha": "6369fb0333cb1faa07e71b89a3738b7b6c985bce",
+    "module_paths": [
+      "nixos/modules/services/audio/mpd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mpd.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch6/553372",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch6/553372/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch6/553372/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/553372.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "67c314f2aba1e748360d2fec7f6c63728109ff6468d62493b6e70ab0cf7dfa10"
+  },
+  {
+    "pr": 532334,
+    "cohort": "A",
+    "position": 67,
+    "base_sha": "09fc485c059d60a8ec7ae4381b8452d9302461ab",
+    "head_sha": "a84ad8a3fa1449b16de6b03f6382061ff294c6dc",
+    "module_paths": [
+      "nixos/modules/services/web-apps/rustical.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/rustical.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch6/532334",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch6/532334/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch6/532334/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/532334.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "1f7f0868c3fc0fc05effc69a0d9a39677cb2c10461e73404938c687c6e6421b1"
+  },
+  {
+    "pr": 544042,
+    "cohort": "A",
+    "position": 71,
+    "base_sha": "c2b4dd086cfddacf79cd1394f72c9ef9906dfd9b",
+    "head_sha": "6bb5009ce813c129e6c988e782b9f2c9bc1483fd",
+    "module_paths": [
+      "nixos/modules/services/web-servers/caddy/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/caddy.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch6/544042",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch6/544042/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch6/544042/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/544042.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "5f9354fa355c043e0336c66f8188f844142caa67ce26b9b7ad07cc23f42b9480"
+  },
+  {
+    "pr": 512679,
+    "cohort": "A",
+    "position": 73,
+    "base_sha": "a50faf4c47054e640207d2f0c7d00ed8b84e0999",
+    "head_sha": "50281dab558c686d031fcc8c562330eb05e7dfe8",
+    "module_paths": [
+      "nixos/modules/services/networking/haproxy.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/haproxy.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/512679",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/512679/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/512679/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/512679.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "aaee7dbf2b73b1d19900795850ef3c1d31953896bf670f2a8561c08ee8634507"
+  },
+  {
+    "pr": 555151,
+    "cohort": "A",
+    "position": 74,
+    "base_sha": "89b717b30424bc8d955a54e0a72bbb6cfcdd8267",
+    "head_sha": "403a0526e1396425a1b7d4d0753767c6737cfffa",
+    "module_paths": [
+      "nixos/modules/services/video/frigate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/frigate.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/555151",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/555151/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/555151/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/555151.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "31f3dc12c5101d47a8b2afda51d9586da461f26c4e24dd74b49a0a953c116ed9"
+  },
+  {
+    "pr": 486129,
+    "cohort": "A",
+    "position": 76,
+    "base_sha": "019e5d2c6611235e3f2cce7ed25156a659bbeb53",
+    "head_sha": "29190543f6ff77e08e2a7dc3a57fed68380008b8",
+    "module_paths": [
+      "nixos/modules/services/web-servers/apache-httpd/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/php/httpd.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/486129",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/486129/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/486129/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/486129.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "13e13d37dd045ad7df074073d03ee52da14969144c689496c418b6f08e1bb411"
+  },
+  {
+    "pr": 553854,
+    "cohort": "A",
+    "position": 77,
+    "base_sha": "c4be37bebb27087822db76f35bb865993905b9a9",
+    "head_sha": "7eb0bf42327c6fb6b3664fd733ccca1d85a3f988",
+    "module_paths": [
+      "nixos/modules/services/networking/avahi-daemon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/avahi.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/553854",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/553854/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/553854/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/553854.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "ccf71f5fca1b04f88ba2fcf1125da3aa40f2aa2f99be035df0d19b738582ff4a"
+  },
+  {
+    "pr": 539583,
+    "cohort": "A",
+    "position": 79,
+    "base_sha": "09f54bb5e042f98e1a343254a26123a8c9845f31",
+    "head_sha": "9e0f254624b39de52dc89bac625cda416b255368",
+    "module_paths": [
+      "nixos/modules/services/monitoring/beszel-hub.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/beszel.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/539583",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/539583/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/539583/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/539583.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "8ebd6b5b1a858239763f1caa99ef91ddbf9646f0f350ef3f190d6e191392edf1"
+  },
+  {
+    "pr": 544859,
+    "cohort": "A",
+    "position": 81,
+    "base_sha": "023b63b43493cdc3f8fff8261c105418171fb305",
+    "head_sha": "a6d311758c809fc91faf2d575c9d28faf7160a55",
+    "module_paths": [
+      "nixos/modules/services/misc/paperless.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paperless.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/544859",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/544859/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/544859/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/544859.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "9089a4fc626304cff14efd03f3e5e4b4e3a241d2a73645f67eb99e196333b15d"
+  },
+  {
+    "pr": 531772,
+    "cohort": "A",
+    "position": 83,
+    "base_sha": "1e5fb1e35bba13c3ea8bf56568c96ff953bbd0cd",
+    "head_sha": "458f4ef48eeac51057b56f004da841f56e184349",
+    "module_paths": [
+      "nixos/modules/services/networking/syncthing.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/syncthing/main.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/531772",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/531772/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/531772/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/531772.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "5bc4aa8a2d30160de65b783c8242a48666de6f8b7a573291247c5a9edf163bda"
+  },
+  {
+    "pr": 520988,
+    "cohort": "A",
+    "position": 84,
+    "base_sha": "612b5c80d334443d2dedea9de9c8fe2236b415a6",
+    "head_sha": "eecdf2b0cc813a737524cc7b2a7aa947b034e872",
+    "module_paths": [
+      "nixos/modules/services/networking/unifi.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/unifi.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch7/520988",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch7/520988/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch7/520988/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/520988.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "81432a53418f17c8998ec5d784aa463ed042646a965aa500381185c1125bed7e"
+  },
+  {
+    "pr": 541090,
+    "cohort": "A",
+    "position": 86,
+    "base_sha": "a851d6105da75481ff7757bbc3000595dc4997e8",
+    "head_sha": "37d3de9a86f347ce8837bc5d6074136f42e3e0f3",
+    "module_paths": [
+      "nixos/modules/services/web-apps/linkding.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/linkding.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch8/541090",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch8/541090/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch8/541090/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/541090.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "b0729e1d6af4690985dcfc86162883796fbfa51ba880a1990117de9b2234358e"
+  },
+  {
+    "pr": 548856,
+    "cohort": "A",
+    "position": 87,
+    "base_sha": "4164b5114877da475c3abed76418eb6ef9be2131",
+    "head_sha": "0d5649a5c4c508aad406005ce6c7daba6513dc9a",
+    "module_paths": [
+      "nixos/modules/services/networking/dnscrypt-proxy.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/dnscrypt-proxy.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch8/548856",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch8/548856/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch8/548856/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/548856.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "5524da02402b12fcd412d53a9daf6d8584f12f3cf91537ac45df871d73c17c1c"
+  },
+  {
+    "pr": 539734,
+    "cohort": "A",
+    "position": 88,
+    "base_sha": "4f63f39545746aa3c539abe85165e84e8ff0c3db",
+    "head_sha": "fdf59acde3b34d6e1d8c17a8522d7c9dc5e119e5",
+    "module_paths": [
+      "nixos/modules/services/monitoring/traccar.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/traccar.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch8/539734",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch8/539734/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch8/539734/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/539734.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "b3149c91ef9a2feef1cbefded7035d60afe3d9c5eece96309056873a9193f705"
+  },
+  {
+    "pr": 524479,
+    "cohort": "A",
+    "position": 90,
+    "base_sha": "bede774ba2640e0f3f914c0270cc15496fa2b1c1",
+    "head_sha": "ccf6ab0bff548155f513ea551dca4e9e13620f88",
+    "module_paths": [
+      "nixos/modules/services/security/aesmd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/aesmd.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch8/524479",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch8/524479/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch8/524479/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/524479.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "a3fcfe5e7a9971814549345af0db342a11155005e387bc20292a4faddb2914c5"
+  },
+  {
+    "pr": 538802,
+    "cohort": "A",
+    "position": 92,
+    "base_sha": "e9cb937b803e0d82d910e0322ec7b8474ee285f0",
+    "head_sha": "a75101a46ba453bf73063110815519bbc8a9ddb9",
+    "module_paths": [
+      "nixos/modules/services/networking/headplane.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/headplane.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch8/538802",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch8/538802/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch8/538802/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/538802.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "1262b4a3259ce555ed14b08f7ff34e0eac56d7a4c41c1e92dc65522de233a70e"
+  },
+  {
+    "pr": 451958,
+    "cohort": "A",
+    "position": 98,
+    "base_sha": "cc63e5249d0f84d193dd902120475c57e1637da7",
+    "head_sha": "b7d1755d90657b03b32cdcfdf9882c593b47718d",
+    "module_paths": [
+      "nixos/modules/services/databases/neo4j.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/neo4j.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch9/451958",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch9/451958/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch9/451958/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/451958.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "208ea8b9610f852af36f861f6426cf2105dd7d80c30fad71adc349d7da97e8c8"
+  },
+  {
+    "pr": 560155,
+    "cohort": "A",
+    "position": 100,
+    "base_sha": "eb43418e1a2504497022146f21b6753d590433b6",
+    "head_sha": "03e16a86c57300a354fa51c8a7004ac6c43e37a1",
+    "module_paths": [
+      "nixos/modules/services/scheduling/prefect.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/prefect.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch9/560155",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch9/560155/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch9/560155/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/560155.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "0f8de2de362a57b3b0dd46b77e5c49ce96f50acfd50109147d7c9cd6e85676cd"
+  },
+  {
+    "pr": 517473,
+    "cohort": "A",
+    "position": 101,
+    "base_sha": "6b5ddf3ef95465ea182f39e4a22d42bc62d0104f",
+    "head_sha": "49951091aad9219dcc6bfc422eb554114efd98e8",
+    "module_paths": [
+      "nixos/modules/services/misc/paperless.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paperless.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch9/517473",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch9/517473/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch9/517473/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/517473.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "9089a4fc626304cff14efd03f3e5e4b4e3a241d2a73645f67eb99e196333b15d"
+  },
+  {
+    "pr": 529856,
+    "cohort": "A",
+    "position": 102,
+    "base_sha": "b38530584b29cc6adb99ed995efd30d4fc9fa2d2",
+    "head_sha": "0476429bfce8e8cec87758ba7f9bcaa5c11c3779",
+    "module_paths": [
+      "nixos/modules/services/web-apps/plantuml-server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/plantuml-server.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch9/529856",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch9/529856/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch9/529856/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/529856.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "0523b1e36705976ce0689fd9e0d6292b9e66bb62caeeec3d144b94f21e446a9b"
+  },
+  {
+    "pr": 549175,
+    "cohort": "A",
+    "position": 106,
+    "base_sha": "3fec85bd3445ab636aec48bba8414a1f5ce5030c",
+    "head_sha": "dfca7cafbbe14c4d6ccf142eb80d55e2f7cccc5c",
+    "module_paths": [
+      "nixos/modules/services/system/nix-daemon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/nix-daemon-unprivileged.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch9/549175",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch9/549175/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch9/549175/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/549175.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "387d450c84ec83c8ab3468f1ca8e114fdb50585741acc7e1bb5f6344db77ca8e"
+  },
+  {
+    "pr": 547786,
+    "cohort": "A",
+    "position": 107,
+    "base_sha": "06066074cf7a360b238287a5838397532d18f196",
+    "head_sha": "a057770de161b621cc4cb558504f193baaf7346b",
+    "module_paths": [
+      "nixos/modules/services/continuous-integration/hydra/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/hydra/default.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch9/547786",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch9/547786/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch9/547786/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/547786.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "2f9d2996b82fe5a17fa15bb25fd7e7d0fc439a9b6734f59ca4db0376842f45ca"
+  },
+  {
+    "pr": 548241,
+    "cohort": "A",
+    "position": 110,
+    "base_sha": "1f42b6adcd88152d75cb475d016aeb4620e9f618",
+    "head_sha": "584b918ef6f772596bffc7be40f66be6e2d99b9a",
+    "module_paths": [
+      "nixos/modules/services/misc/paperless.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paperless.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/548241",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/548241/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/548241/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/548241.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "9089a4fc626304cff14efd03f3e5e4b4e3a241d2a73645f67eb99e196333b15d"
+  },
+  {
+    "pr": 523786,
+    "cohort": "A",
+    "position": 111,
+    "base_sha": "46cc485e7e2e8dd20ff8a4537f9c2b23ccf0049f",
+    "head_sha": "9c5e58d0798fb7d328e984eafc0d819e46ad68b1",
+    "module_paths": [
+      "nixos/modules/services/databases/postgresql.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/postgresql/postgresql.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/523786",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/523786/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/523786/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/523786.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "39628ca4477f0357aef338385c0c59be5109864263c1eac03d78537163b4d9b5"
+  },
+  {
+    "pr": 550923,
+    "cohort": "A",
+    "position": 112,
+    "base_sha": "ab5827caff3e94fe01a7bc1b8204bb1fcde873c9",
+    "head_sha": "c4d23b053a99fb86286771c98c44d196717d2d82",
+    "module_paths": [
+      "nixos/modules/services/misc/paperless.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paperless.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/550923",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/550923/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/550923/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/550923.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "247a67edb6be591f1f5bafc59ee43e9ab176b25751525550b3ba1f6ae280af13"
+  },
+  {
+    "pr": 555801,
+    "cohort": "A",
+    "position": 113,
+    "base_sha": "0ad5f09f5307e34b8f8c5b6dd5f152793833cff2",
+    "head_sha": "0859607696e07840c71ca98e97a27d63c6956171",
+    "module_paths": [
+      "nixos/modules/services/networking/syncthing.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/syncthing/folders.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/555801",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/555801/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/555801/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/555801.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "bc36c97fa66a1daeac602fe7130ebcd7f127989523c0d639c6e35d4bb7548a10"
+  },
+  {
+    "pr": 540734,
+    "cohort": "A",
+    "position": 114,
+    "base_sha": "83b85e6a2cd72f850fd747095bf4d32d77c0a9dd",
+    "head_sha": "b27618bc1e638e418d19317111a54a2bef0fbbc8",
+    "module_paths": [
+      "nixos/modules/services/x11/desktop-managers/mate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mate.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/540734",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/540734/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/540734/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/540734.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "09927a8803c73d0d49efa82335b5c9475f0ee6c1e07f168088bb92facb2f231b"
+  },
+  {
+    "pr": 543492,
+    "cohort": "A",
+    "position": 117,
+    "base_sha": "ce5adc080e4cee9e8094f7ab12dc7f54e1878e98",
+    "head_sha": "aa970620a51824a5361565d16a18882fcf1a3759",
+    "module_paths": [
+      "nixos/modules/services/x11/display-managers/lightdm.nix",
+      "nixos/modules/services/x11/display-managers/lightdm-greeters/enso-os.nix (deleted at head)"
+    ],
+    "test_paths": [
+      "nixos/tests/lightdm.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/543492",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/543492/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/543492/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/543492.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "dcffb01d7193a7113d5234049cc52e9439f83193ee5cd81874d0efef280f810c"
+  },
+  {
+    "pr": 523948,
+    "cohort": "A",
+    "position": 118,
+    "base_sha": "b28d3bddfe48d9046f5dc2529625c58c20e804cc",
+    "head_sha": "2b2b69cc17df9ea22c9e9c36b2655c854068855c",
+    "module_paths": [
+      "nixos/modules/services/display-managers/gdm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gnome.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/523948",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/523948/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/523948/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/523948.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "b84f4ed80c166435ec89746d963761a3455df7fb4b6ea49e02fbe27460eeabb0"
+  },
+  {
+    "pr": 548234,
+    "cohort": "A",
+    "position": 120,
+    "base_sha": "356468b500e85491b610431c87a284ca1f41b7bc",
+    "head_sha": "bd9f9eb651de5322b2bcb608f979a15e9e862dc1",
+    "module_paths": [
+      "nixos/modules/services/web-apps/gerrit.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gerrit.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/batch10/548234",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/batch10/548234/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/batch10/548234/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/548234.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "1167071fac3f0764ca5e5c2dad29a0c79d8969e7509fad2dc444728b074fe16e"
+  },
+  {
+    "pr": 550306,
+    "cohort": "B",
+    "position": 3,
+    "base_sha": "89d3b415029c3286840524199c7814cffea5c409",
+    "head_sha": "81b667462e0ef07471dd56fdceab0a8ed3f80b35",
+    "module_paths": [
+      "nixos/modules/services/networking/firewall.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/firewall.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/550306",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/550306/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/550306/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/550306.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "f5ebc44cf77604996f6d2b8891be10dbb42159b00390a79a7f839f9f44cae389"
+  },
+  {
+    "pr": 529428,
+    "cohort": "B",
+    "position": 4,
+    "base_sha": "6115d635effba217cd496311faac646d808e5222",
+    "head_sha": "d973113ac6a3550e3ea36f3da3565ccf8e4a3c35",
+    "module_paths": [
+      "nixos/modules/services/networking/firezone/server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/firezone/firezone.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/529428",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/529428/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/529428/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/529428.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "7f640d03536d8cb384871a9642187bc984460d2a74a378fd424b38c25401477b"
+  },
+  {
+    "pr": 540256,
+    "cohort": "B",
+    "position": 5,
+    "base_sha": "091e08b2b8e507eed83baf947d340914b933061a",
+    "head_sha": "246189d433c783c12440e1df45e7f7dd2b058e43",
+    "module_paths": [
+      "nixos/modules/services/web-apps/immichframe.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/immichframe.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/540256",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/540256/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/540256/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/540256.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "acbfa3dd3a9ab8c2634f7a4a47d33f38b921f91210f1d2083c09191592f8b6f1"
+  },
+  {
+    "pr": 524004,
+    "cohort": "B",
+    "position": 7,
+    "base_sha": "13191993df388306124045737b28dac71c4c06d6",
+    "head_sha": "84160ddeb87005ca31b58ea0c55c9c7241d1eb77",
+    "module_paths": [
+      "nixos/modules/services/networking/firewalld/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/firewalld.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/524004",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/524004/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/524004/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/524004.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "9a86a68962ba38eb737e0502a66288048f947aed1292619d0a7267c3a71827d2"
+  },
+  {
+    "pr": 516530,
+    "cohort": "B",
+    "position": 9,
+    "base_sha": "a263060feafdfdb5d1d70b53b04d5bb810b13cf1",
+    "head_sha": "03ac107a963d2c7910be4443cdd6ed399c5d4c92",
+    "module_paths": [
+      "nixos/modules/services/web-servers/phpfpm/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/php/fpm.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/516530",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/516530/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/516530/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/516530.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "e8627f3dbe6f62acb9d4ac756eb0ef5b6559f499458612f72588bf3973216609"
+  },
+  {
+    "pr": 528011,
+    "cohort": "B",
+    "position": 11,
+    "base_sha": "a23f52eccc86f29abec9c04d80ad22348a01f8d2",
+    "head_sha": "9126863098dcc806c2adc5ac247abd1f788c5cfb",
+    "module_paths": [
+      "nixos/modules/services/desktop-managers/pantheon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/pantheon.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/528011",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/528011/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch1/528011/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/528011.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "c02a767954d9690f7c2bcf58569301931098bd266a239b452a77f873bbe8e707"
+  },
+  {
+    "pr": 531003,
+    "cohort": "B",
+    "position": 16,
+    "base_sha": "7715f378b14b270032988abde91e57fe752c64fe",
+    "head_sha": "ac0b56ee3a2d2f8e902fdb09861a76fb2cd75c66",
+    "module_paths": [
+      "nixos/modules/services/web-apps/rustical.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/rustical.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch2/531003",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch2/531003/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch2/531003/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/531003.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "5e41054950d73e37766055f984d9fbc2bd7f2ba020511d5315b46d0fffad3c7f"
+  },
+  {
+    "pr": 544972,
+    "cohort": "B",
+    "position": 17,
+    "base_sha": "80579cca7195822499de12741792abe78e00a70d",
+    "head_sha": "22fd0559fc39aa4d7d279cc1bac18ca998129aeb",
+    "module_paths": [
+      "nixos/modules/services/mail/rspamd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/rspamd.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch2/544972",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch2/544972/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch2/544972/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/544972.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "25dabb37d0ab0743ea808454ec4652063eeb587cdb89c67d1ccbc0d33b7d2c0f"
+  },
+  {
+    "pr": 525482,
+    "cohort": "B",
+    "position": 30,
+    "base_sha": "eda09a0827956ed175104af57dafcdb48b7b3f09",
+    "head_sha": "1468d638d9872ddb999cfc3053cc66a0089eb59b",
+    "module_paths": [
+      "nixos/modules/services/hardware/pcscd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/pcsclite.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/525482",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/525482/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/525482/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/525482.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "4f4ebfb4e588803c9fc9194167c409b7060dc75cce79070ce454f0f3e2f98e80"
+  },
+  {
+    "pr": 529092,
+    "cohort": "B",
+    "position": 32,
+    "base_sha": "8c1f2d438fe443e527ee9980af487742057910a8",
+    "head_sha": "bb38195945cf64396b4997e3c84703b519be86b0",
+    "module_paths": [
+      "nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix",
+      "nixos/modules/services/desktop-managers/plasma6.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/plasma6.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/529092",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/529092/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/529092/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/529092.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "b66de03753fd338ee1985310ea026c3fccb37cf53c986c9a572c1d433bc34266"
+  },
+  {
+    "pr": 561987,
+    "cohort": "B",
+    "position": 33,
+    "base_sha": "408915da7870be337b655e72eed29b47e637f868",
+    "head_sha": "2d72ab3ad31cf050b83b824ed6edf0d47f7e7317",
+    "module_paths": [
+      "nixos/modules/services/web-apps/coder.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/coder.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/561987",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/561987/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch3/561987/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/561987.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "8dcad35904ca969b289629af4435c70d15b3e46ad7b3b230edc4f2e1bebc5fd8"
+  },
+  {
+    "pr": 531710,
+    "cohort": "B",
+    "position": 39,
+    "base_sha": "5da76dee90a3610a8c616b9a8b8d24c3757069ec",
+    "head_sha": "ab7db15c69ce1836eecfb26b374c46e7f87a81a8",
+    "module_paths": [
+      "nixos/modules/services/scheduling/scx-loader.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/scx/loader.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/531710",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/531710/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/531710/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/531710.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "a12cd12133d513824cbd17d354db61f465d02ee3c277c0d44b8f9a354431d3d6"
+  },
+  {
+    "pr": 538178,
+    "cohort": "B",
+    "position": 45,
+    "base_sha": "8ef5dd756895854db76206f20c03f678120a4f9a",
+    "head_sha": "21af0e8e78265c709f6cc620066a571a36e5f5a7",
+    "module_paths": [
+      "nixos/modules/services/web-apps/lasuite-meet.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/lasuite-meet.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/538178",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/538178/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/538178/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/538178.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "3703ae7da2eb4270ac216030e491bed5ae97a0192a745f165eabc6adf9e1e471"
+  },
+  {
+    "pr": 539406,
+    "cohort": "B",
+    "position": 48,
+    "base_sha": "497095e290ee9a83411fcc2d21e4d29d5bfd185b",
+    "head_sha": "9b2a1f97becdf7ad1f09749904e98ecbce23cc6d",
+    "module_paths": [
+      "nixos/modules/services/web-apps/pretalx.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/pretalx.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/539406",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/539406/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch4/539406/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/539406.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "47cbefb0539d6353361262103d0145cf0e7843721a1ad1dca96e16a63a20d6a7"
+  },
+  {
+    "pr": 500866,
+    "cohort": "B",
+    "position": 49,
+    "base_sha": "745da47169ec3a17edb6ad6bc7fcb013fdf098a4",
+    "head_sha": "6183d4191bcdecb51d688b540bd568d81a5c4412",
+    "module_paths": [
+      "nixos/modules/services/monitoring/beszel-agent.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/beszel.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/500866",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/500866/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/500866/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/500866.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "67dd1b8828d6bfc2a30e257271709141b473299842ade3705009aa90145101aa"
+  },
+  {
+    "pr": 559314,
+    "cohort": "B",
+    "position": 54,
+    "base_sha": "6d318f95192ab9ecbaceaa3a58f6111b0e558eb0",
+    "head_sha": "ca3961f76815ceec20d037448d0d40b15f928f5a",
+    "module_paths": [
+      "nixos/modules/services/hardware/udev.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/installer.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/559314",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/559314/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/559314/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/559314.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "17feee8e753358a1c5f2a14748095f9df544c60a41918dda177c0fa00472e62f"
+  },
+  {
+    "pr": 537811,
+    "cohort": "B",
+    "position": 55,
+    "base_sha": "84c0119acf92e1cbe6fb43a431add2d095a8d595",
+    "head_sha": "59395418b0c067afb0349784cf90d76c872ef9d4",
+    "module_paths": [
+      "nixos/modules/services/audio/music-assistant.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/music-assistant.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/537811",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/537811/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/537811/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/537811.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "f60986659678e4233875eca2fc6f65d5bbdaaa92c57a6b73dd1a1ccd4f37a589"
+  },
+  {
+    "pr": 529858,
+    "cohort": "B",
+    "position": 56,
+    "base_sha": "fa5b5acb16c644e40d77e4db655c3d16fa255486",
+    "head_sha": "fe63e15b384c76b140eff4ac2b97c30eab22694a",
+    "module_paths": [
+      "nixos/modules/services/web-apps/alps.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/alps.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/529858",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/529858/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/529858/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/529858.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "5d011bbfa12a2251c34653cf6be60aca4bee7943f3f8113e599f120c6dab56d1"
+  },
+  {
+    "pr": 526821,
+    "cohort": "B",
+    "position": 59,
+    "base_sha": "a58e42197f3d66800dd85b7e6ec223ce4a4c2245",
+    "head_sha": "e8e86c94e71b238b2bff8ca3259afe3e416294b3",
+    "module_paths": [
+      "nixos/modules/services/networking/avahi-daemon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/avahi.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/526821",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/526821/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch5/526821/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/526821.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "f7d9add24d3a0b5fbd3f11f1a95dd85c64443f7a9cf5b914281a281abb88da1f"
+  },
+  {
+    "pr": 507312,
+    "cohort": "B",
+    "position": 61,
+    "base_sha": "d788c73c0f412c477ce143f5e85f6b37145cc624",
+    "head_sha": "693faedb738c66c6e3ab610097f47cadf47543a4",
+    "module_paths": [
+      "nixos/modules/services/networking/frp.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/frp.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/507312",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/507312/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/507312/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/507312.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "4889196b31583ee3f2aa895d6d1ea56919cac6a1a67d1827c05d56d5938b9151"
+  },
+  {
+    "pr": 525887,
+    "cohort": "B",
+    "position": 62,
+    "base_sha": "d591cf3617da5759efe0f4166236f9224d328263",
+    "head_sha": "1859b4a89bc757bd8841520783794f2c0b246f72",
+    "module_paths": [
+      "nixos/modules/services/security/opensnitch.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/opensnitch.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/525887",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/525887/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/525887/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/525887.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "a53adf68824d49a36e1f6621c97178f037f09a7df776701ebf34135b611371b2"
+  },
+  {
+    "pr": 485003,
+    "cohort": "B",
+    "position": 63,
+    "base_sha": "988307fd6b2981b969f4b50ca32c9037837d1dce",
+    "head_sha": "928065b6a678a28fb4ef59ced6757496eb4bb290",
+    "module_paths": [
+      "nixos/modules/services/security/hockeypuck.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/hockeypuck.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/485003",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/485003/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/485003/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/485003.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "8e2d3f8aad8b4a13db82c632f77afc8d0418d5d05d6f6dc5d3d8881985d42c8e"
+  },
+  {
+    "pr": 535928,
+    "cohort": "B",
+    "position": 64,
+    "base_sha": "aa3f34806fdbc5033064b1539633a9fff019a233",
+    "head_sha": "9d280168ccc67309ede60df194b8a830a164cf71",
+    "module_paths": [
+      "nixos/modules/services/ttys/getty.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/login.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/535928",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/535928/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/535928/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/535928.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "d3b6416a1067413dbe2c4144362e2ca7e951cc046bb38939dd0221b202f6c6bb"
+  },
+  {
+    "pr": 549901,
+    "cohort": "B",
+    "position": 65,
+    "base_sha": "8595dfd89dea6889cb8e22d35f0a9dd722a09aa9",
+    "head_sha": "4a8df6774c526cad61bb82ac2f95a888f4bb25f0",
+    "module_paths": [
+      "nixos/modules/services/desktop-managers/pantheon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/pantheon.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/549901",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/549901/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/549901/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/549901.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "c02a767954d9690f7c2bcf58569301931098bd266a239b452a77f873bbe8e707"
+  },
+  {
+    "pr": 547674,
+    "cohort": "B",
+    "position": 66,
+    "base_sha": "6260e153462b0ee052fa0304a27b64fffe9592ab",
+    "head_sha": "52de0c604fda338ac2bf44f161fe580b87021b2b",
+    "module_paths": [
+      "nixos/modules/services/misc/gitlab/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gitlab/gitlab.nix"
+    ],
+    "s4_artifact_dir": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/547674",
+    "s4_targets_toml": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/547674/targets.toml",
+    "s4_raw_json": "fixtures/s4-live-pr-shadow/adjudication/s4b-batch6/547674/raw.json",
+    "manifest_path": "fixtures/s4-f1-r/manifests/547674.toml",
+    "manifest_provenance": "copied_verbatim_from_s4_artifact",
+    "manifest_sha256": "77288b46da026c8237cf1b015ef50275e2a6444f4375366359bc29d7d897fe67"
+  }
+]

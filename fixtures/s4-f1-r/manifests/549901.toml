@@ -1,0 +1,7 @@
+[[target]]
+name = "pantheon"
+module = "nixos/modules/services/desktop-managers/pantheon.nix"
+test = "nixos/tests/pantheon.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "desktopManager", "pantheon"]
+watch = ["enable"]

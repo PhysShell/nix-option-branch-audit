@@ -1,0 +1,7 @@
+[[target]]
+name = "pixelfed"
+module = "nixos/modules/services/web-apps/pixelfed.nix"
+test = "nixos/tests/web-apps/pixelfed/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pixelfed"]
+watch = ["enable"]

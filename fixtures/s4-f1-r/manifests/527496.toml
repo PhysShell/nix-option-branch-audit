@@ -1,0 +1,7 @@
+[[target]]
+name = "gokapi"
+module = "nixos/modules/services/networking/gokapi.nix"
+test = "nixos/tests/gokapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gokapi"]
+watch = ["enable"]

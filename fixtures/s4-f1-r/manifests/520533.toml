@@ -1,0 +1,7 @@
+[[target]]
+name = "tinc"
+module = "nixos/modules/services/networking/tinc.nix"
+test = "nixos/tests/tinc/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "tinc"]
+watch = ["networks"]

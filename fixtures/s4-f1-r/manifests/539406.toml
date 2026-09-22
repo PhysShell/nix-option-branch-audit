@@ -1,0 +1,11 @@
+# PR #539406 pretalx: 2026.1.2 -> 2026.2.0
+# `services.pretalx.celery.enable` mkOption declaration is DELETED by this PR
+# (replaced with `lib.mkRemovedOptionModule [ "services" "pretalx" "celery" "enable" ]`).
+# Watched alongside the baseline `enable` per the firezone-provision-removal precedent.
+[[target]]
+name = "pretalx"
+module = "nixos/modules/services/web-apps/pretalx.nix"
+test = "nixos/tests/web-apps/pretalx.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pretalx"]
+watch = ["enable", "celery.enable"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "avahi-daemon"
+module = "nixos/modules/services/networking/avahi-daemon.nix"
+test = "nixos/tests/avahi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "avahi"]
+watch = ["enable", "nssmdnsFull"]

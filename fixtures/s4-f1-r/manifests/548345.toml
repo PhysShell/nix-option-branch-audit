@@ -1,0 +1,7 @@
+[[target]]
+name = "kanidm"
+module = "nixos/modules/services/security/kanidm.nix"
+test = "nixos/tests/kanidm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kanidm"]
+watch = ["server.enable"]

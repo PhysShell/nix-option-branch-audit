@@ -1,0 +1,7 @@
+[[target]]
+name = "cloudlog"
+module = "nixos/modules/services/web-apps/cloudlog.nix"
+test = "nixos/tests/cloudlog.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cloudlog"]
+watch = ["enable"]

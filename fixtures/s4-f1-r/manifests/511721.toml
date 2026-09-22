@@ -1,0 +1,7 @@
+[[target]]
+name = "espanso"
+module = "nixos/modules/services/desktops/espanso.nix"
+test = "nixos/tests/espanso.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "espanso"]
+watch = ["enable", "extraPackages"]

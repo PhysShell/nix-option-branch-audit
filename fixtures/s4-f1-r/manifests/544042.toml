@@ -1,0 +1,7 @@
+[[target]]
+name = "caddy"
+module = "nixos/modules/services/web-servers/caddy/default.nix"
+test = "nixos/tests/caddy.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "caddy"]
+watch = ["enable"]

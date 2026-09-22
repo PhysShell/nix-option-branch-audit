@@ -1,0 +1,7 @@
+[[target]]
+name = "immichframe"
+module = "nixos/modules/services/web-apps/immichframe.nix"
+test = "nixos/tests/web-apps/immichframe.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "immichframe"]
+watch = ["enable"]

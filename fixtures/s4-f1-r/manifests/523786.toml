@@ -1,0 +1,7 @@
+[[target]]
+name = "postgresql"
+module = "nixos/modules/services/databases/postgresql.nix"
+test = "nixos/tests/postgresql/postgresql.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "postgresql"]
+watch = ["enable", "package"]

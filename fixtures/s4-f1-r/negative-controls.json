@@ -1,0 +1,142 @@
+[
+  {
+    "name": "absolute_module_path",
+    "args": [
+      "check",
+      "--root",
+      "fixtures/synthetic",
+      "--targets",
+      "fixtures/synthetic/root-escape/t-absolute.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "fb9fd4d441968b33d894ed46148589f737114566d19c8df3b8172429b53a71cd",
+    "candidate_stderr_sha256": "fb9fd4d441968b33d894ed46148589f737114566d19c8df3b8172429b53a71cd",
+    "stderr_differs": false,
+    "baseline_stderr": "TOOL_ERROR: target absolute-escape: module: /this-path-does-not-need-to-exist-rejection-is-syntactic must be relative to --root, not absolute\n",
+    "candidate_stderr": "TOOL_ERROR: target absolute-escape: module: /this-path-does-not-need-to-exist-rejection-is-syntactic must be relative to --root, not absolute\n",
+    "both_fatal_and_matching": true
+  },
+  {
+    "name": "dotdot_escape",
+    "args": [
+      "check",
+      "--root",
+      "fixtures/synthetic",
+      "--targets",
+      "fixtures/synthetic/root-escape/t-dotdot.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "b302b1542e7a6dce3d5576a97897d9952996229bb045f66d5d5266d3f91f7889",
+    "candidate_stderr_sha256": "b302b1542e7a6dce3d5576a97897d9952996229bb045f66d5d5266d3f91f7889",
+    "stderr_differs": false,
+    "baseline_stderr": "TOOL_ERROR: target dotdot-escape: module: ../../Cargo.toml escapes --root fixtures/synthetic (resolves to /home/tandem/nix-option-branch-audit/Cargo.toml)\n",
+    "candidate_stderr": "TOOL_ERROR: target dotdot-escape: module: ../../Cargo.toml escapes --root fixtures/synthetic (resolves to /home/tandem/nix-option-branch-audit/Cargo.toml)\n",
+    "both_fatal_and_matching": true
+  },
+  {
+    "name": "symlink_escape",
+    "args": [
+      "check",
+      "--root",
+      "fixtures/synthetic/root-escape/root",
+      "--targets",
+      "fixtures/synthetic/root-escape/t-symlink.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "f42bb8c9ab6f30c0d6afdb7f24b3ae1f4b1800786a2c41965e00c096b2ae632e",
+    "candidate_stderr_sha256": "f42bb8c9ab6f30c0d6afdb7f24b3ae1f4b1800786a2c41965e00c096b2ae632e",
+    "stderr_differs": false,
+    "baseline_stderr": "TOOL_ERROR: target symlink-escape: module: evil/decoy.nix escapes --root fixtures/synthetic/root-escape/root (resolves to /home/tandem/nix-option-branch-audit/fixtures/synthetic/root-escape/decoy.nix)\n",
+    "candidate_stderr": "TOOL_ERROR: target symlink-escape: module: evil/decoy.nix escapes --root fixtures/synthetic/root-escape/root (resolves to /home/tandem/nix-option-branch-audit/fixtures/synthetic/root-escape/decoy.nix)\n",
+    "both_fatal_and_matching": true
+  },
+  {
+    "name": "missing_root",
+    "args": [
+      "check",
+      "--root",
+      "this-root-does-not-exist-anywhere",
+      "--targets",
+      "targets/golden.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "6e6ef766fe393ad3f045232d97746f1d38a120f44c1aa83d73c52d9c90d35ded",
+    "candidate_stderr_sha256": "6e6ef766fe393ad3f045232d97746f1d38a120f44c1aa83d73c52d9c90d35ded",
+    "stderr_differs": false,
+    "baseline_stderr": "TOOL_ERROR: target kimai-before: module: --root this-root-does-not-exist-anywhere: No such file or directory (os error 2)\n",
+    "candidate_stderr": "TOOL_ERROR: target kimai-before: module: --root this-root-does-not-exist-anywhere: No such file or directory (os error 2)\n",
+    "both_fatal_and_matching": true
+  },
+  {
+    "name": "s4f1_negative_control_absolute_path_alongside_deleted_target",
+    "args": [
+      "check",
+      "--root",
+      ".",
+      "--targets",
+      "targets/s4f1-negative-control-escape.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "5f32e8e8c8e663cab208c13db6d09f0c82d7500a45806c684d0bfbc1262b62ec",
+    "candidate_stderr_sha256": "fb9fd4d441968b33d894ed46148589f737114566d19c8df3b8172429b53a71cd",
+    "stderr_differs": true,
+    "baseline_stderr": "TOOL_ERROR: target deleted-target: module: resolving fixtures/synthetic/this-module-does-not-exist.nix under --root .: No such file or directory (os error 2)\n",
+    "candidate_stderr": "TOOL_ERROR: target absolute-escape: module: /this-path-does-not-need-to-exist-rejection-is-syntactic must be relative to --root, not absolute\n",
+    "both_fatal_and_matching": true
+  },
+  {
+    "name": "s4f1_malformed_manifest",
+    "args": [
+      "check",
+      "--root",
+      ".",
+      "--targets",
+      "targets/s4f1-malformed-manifest.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "ba7da877f82d6ebe12fc76d86c435a7447fe6f92b3cb51f63a8a48a7d19ccabb",
+    "candidate_stderr_sha256": "ba7da877f82d6ebe12fc76d86c435a7447fe6f92b3cb51f63a8a48a7d19ccabb",
+    "stderr_differs": false,
+    "baseline_stderr": "TOOL_ERROR: parsing targets manifest targets/s4f1-malformed-manifest.toml: TOML parse error at line 8, column 9\n  |\n8 | [[target]\n  |         ^\ninvalid table header\nexpected `.`, `]]`\n\n",
+    "candidate_stderr": "TOOL_ERROR: parsing targets manifest targets/s4f1-malformed-manifest.toml: TOML parse error at line 8, column 9\n  |\n8 | [[target]\n  |         ^\ninvalid table header\nexpected `.`, `]]`\n\n",
+    "both_fatal_and_matching": true
+  },
+  {
+    "name": "s4f1_all_targets_unavailable_multi_target",
+    "args": [
+      "check",
+      "--root",
+      ".",
+      "--targets",
+      "targets/s4f1-all-deleted.toml"
+    ],
+    "baseline_exit": 3,
+    "candidate_exit": 3,
+    "baseline_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baseline_stderr_sha256": "c2a03da8cd91ac407f77048a0a82597170176b3574e4159e52c6fdfca42ffd76",
+    "candidate_stderr_sha256": "1725388fa6c6ad5faa1cab90aaf46488a5630a0f877c4c26837ebf66da9480a1",
+    "stderr_differs": true,
+    "baseline_stderr": "TOOL_ERROR: target deleted-target-one: module: resolving fixtures/synthetic/this-module-does-not-exist.nix under --root .: No such file or directory (os error 2)\n",
+    "candidate_stderr": "TOOL_ERROR: no target in this manifest is analyzable under --root .: deleted-target-one: module: fixtures/synthetic/this-module-does-not-exist.nix not found under --root .; deleted-target-two: module: fixtures/synthetic/this-other-module-does-not-exist-either.nix not found under --root .\n",
+    "both_fatal_and_matching": true
+  }
+]

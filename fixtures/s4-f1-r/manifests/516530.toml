@@ -1,0 +1,7 @@
+[[target]]
+name = "phpfpm"
+module = "nixos/modules/services/web-servers/phpfpm/default.nix"
+test = "nixos/tests/php/fpm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "phpfpm"]
+watch = ["enable"]
