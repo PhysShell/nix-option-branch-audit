@@ -1,0 +1,66 @@
+{
+  "pr": 538802,
+  "title": "headplane: 0.6.3 -> 0.7.0, inherit headplane-agent from headplane, nixos/headplane: clean up deprecated options",
+  "applicable": true,
+  "base_sha": "e9cb937b803e0d82d910e0322ec7b8474ee285f0",
+  "head_sha": "a75101a46ba453bf73063110815519bbc8a9ddb9",
+  "module_paths": [
+    "nixos/modules/services/networking/headplane.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/headplane.nix"
+  ],
+  "structural_notes": "Diff adds settings.headscale.api_key_path (new mkOption) and removes four deprecated mkOption declarations: settings.integration.agent.pre_authkey_path, settings.integration.agent.cache_path, settings.oidc.headscale_api_key_path, settings.oidc.redirect_uri, settings.oidc.strict_validation, settings.oidc.user_storage_file (6 removed total), and changes settings.integration.agent.cache_ttl's type/default (touched declaration line). Watched: enable (baseline) + all 8 touched mkOption declaration paths listed above.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 4,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "option": "settings.integration.agent.cache_ttl",
+        "verdict-class": "finding_became_inconclusive (engine: oba) -- declaration found, but no direct branch predicate was found for this option"
+      },
+      {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "option": "settings.oidc.redirect_uri",
+        "verdict-class": "finding_became_inconclusive (engine: oba) -- no mkOption declaration found for this watched option"
+      },
+      {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "option": "settings.oidc.strict_validation",
+        "verdict-class": "finding_became_inconclusive (engine: oba) -- no mkOption declaration found for this watched option"
+      },
+      {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "option": "settings.oidc.user_storage_file",
+        "verdict-class": "finding_became_inconclusive (engine: oba) -- no mkOption declaration found for this watched option"
+      }
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json"
+      }
+    ]
+  }
+}

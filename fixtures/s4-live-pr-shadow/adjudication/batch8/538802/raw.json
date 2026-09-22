@@ -1,0 +1,787 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 8,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "oba001->option_not_found": 3,
+      "oba001->predicate_not_found": 1,
+      "option_not_found->predicate_not_found": 1,
+      "predicate_not_found->option_not_found": 3
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 4,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 4,
+    "notable": [
+      {
+        "bucket": "finding_became_inconclusive",
+        "engine": "oba",
+        "subject": "settings.integration.agent.cache_ttl",
+        "message": "declaration found, but no direct branch predicate was found for this option",
+        "detail": "predicate: not found",
+        "transition_origin": "verdict_changed"
+      },
+      {
+        "bucket": "finding_became_inconclusive",
+        "engine": "oba",
+        "subject": "settings.oidc.redirect_uri",
+        "message": "no mkOption declaration found for this watched option",
+        "detail": "declaration: not found",
+        "transition_origin": "verdict_changed"
+      },
+      {
+        "bucket": "finding_became_inconclusive",
+        "engine": "oba",
+        "subject": "settings.oidc.strict_validation",
+        "message": "no mkOption declaration found for this watched option",
+        "detail": "declaration: not found",
+        "transition_origin": "verdict_changed"
+      },
+      {
+        "bucket": "finding_became_inconclusive",
+        "engine": "oba",
+        "subject": "settings.oidc.user_storage_file",
+        "message": "no mkOption declaration found for this watched option",
+        "detail": "declaration: not found",
+        "transition_origin": "verdict_changed"
+      }
+    ]
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.headscale.api_key_path"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.headscale.api_key_path"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.headscale.api_key_path"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.integration.agent.cache_path"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.integration.agent.cache_path"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.integration.agent.cache_path"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.integration.agent.cache_ttl"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "settings.integration.agent.cache_ttl",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "integration",
+                            "agent"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "integration",
+                            "agent",
+                            "cache_ttl"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "settings",
+                  "integration",
+                  "agent"
+                ],
+                [
+                  "settings",
+                  "integration",
+                  "agent",
+                  "cache_ttl"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/networking/headplane.nix",
+                "line": 475,
+                "col": 10
+              },
+              "source": "lib.optionals (agentSettings != null && agentSettings.cache_ttl != null) ["
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "integration",
+                                "agent"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "integration",
+                                "agent",
+                                "cache_ttl"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "settings",
+                      "integration",
+                      "agent"
+                    ],
+                    [
+                      "settings",
+                      "integration",
+                      "agent",
+                      "cache_ttl"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/networking/headplane.nix",
+                    "line": 475,
+                    "col": 10
+                  },
+                  "source": "lib.optionals (agentSettings != null && agentSettings.cache_ttl != null) ["
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.integration.agent.cache_ttl"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.integration.agent.pre_authkey_path"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.integration.agent.pre_authkey_path"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.integration.agent.pre_authkey_path"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.oidc.headscale_api_key_path"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.oidc.headscale_api_key_path"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.oidc.headscale_api_key_path"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.oidc.redirect_uri"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "settings.oidc.redirect_uri",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "oidc"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "oidc",
+                            "redirect_uri"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "settings",
+                  "oidc"
+                ],
+                [
+                  "settings",
+                  "oidc",
+                  "redirect_uri"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/networking/headplane.nix",
+                "line": 456,
+                "col": 7
+              },
+              "source": "lib.optionals (cfg.settings.oidc != null && cfg.settings.oidc.redirect_uri != null) ["
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "oidc"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "oidc",
+                                "redirect_uri"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "settings",
+                      "oidc"
+                    ],
+                    [
+                      "settings",
+                      "oidc",
+                      "redirect_uri"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/networking/headplane.nix",
+                    "line": 456,
+                    "col": 7
+                  },
+                  "source": "lib.optionals (cfg.settings.oidc != null && cfg.settings.oidc.redirect_uri != null) ["
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.oidc.redirect_uri"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.oidc.strict_validation"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "settings.oidc.strict_validation",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "oidc"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "oidc",
+                            "strict_validation"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "settings",
+                  "oidc"
+                ],
+                [
+                  "settings",
+                  "oidc",
+                  "strict_validation"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/networking/headplane.nix",
+                "line": 463,
+                "col": 10
+              },
+              "source": "lib.optionals (cfg.settings.oidc != null && cfg.settings.oidc.strict_validation != null) ["
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "oidc"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "oidc",
+                                "strict_validation"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "settings",
+                      "oidc"
+                    ],
+                    [
+                      "settings",
+                      "oidc",
+                      "strict_validation"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/networking/headplane.nix",
+                    "line": 463,
+                    "col": 10
+                  },
+                  "source": "lib.optionals (cfg.settings.oidc != null && cfg.settings.oidc.strict_validation != null) ["
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.oidc.strict_validation"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/headplane.nix",
+        "test": "nixos/tests/headplane.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "headplane"
+        ],
+        "watched_path": "settings.oidc.user_storage_file"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "settings.oidc.user_storage_file",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "oidc"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "settings",
+                            "oidc",
+                            "user_storage_file"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "settings",
+                  "oidc"
+                ],
+                [
+                  "settings",
+                  "oidc",
+                  "user_storage_file"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/networking/headplane.nix",
+                "line": 469,
+                "col": 10
+              },
+              "source": "lib.optionals (cfg.settings.oidc != null && cfg.settings.oidc.user_storage_file != null) ["
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "oidc"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "settings",
+                                "oidc",
+                                "user_storage_file"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "settings",
+                      "oidc"
+                    ],
+                    [
+                      "settings",
+                      "oidc",
+                      "user_storage_file"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/networking/headplane.nix",
+                    "line": 469,
+                    "col": 10
+                  },
+                  "source": "lib.optionals (cfg.settings.oidc != null && cfg.settings.oidc.user_storage_file != null) ["
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.oidc.user_storage_file"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

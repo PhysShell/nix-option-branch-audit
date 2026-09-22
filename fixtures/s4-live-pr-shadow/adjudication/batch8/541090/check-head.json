@@ -1,0 +1,897 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 2
+  },
+  "targets": [
+    {
+      "name": "linkding",
+      "module": "nixos/modules/services/web-apps/linkding.nix",
+      "test": "nixos/tests/web-apps/linkding.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "linkding"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 21,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"linkding\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "linkding"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 25,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"linkding\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "linkding"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 39,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/linkding\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/linkding"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 53,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 59,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "9090",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 65,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "contextPath"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 71,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 82,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 93,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "database",
+            "type"
+          ],
+          "default_source": "\"sqlite\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "sqlite"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 109,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 118,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "5432",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 124,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"linkding\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "linkding"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 130,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "\"linkding\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "linkding"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 136,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 142,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 149,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "processes"
+          ],
+          "default_source": "2",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 155,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "threads"
+          ],
+          "default_source": "2",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 161,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 168,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 332,
+            "col": 29
+          },
+          "source": "mkIf cfg.openFirewall {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 401,
+            "col": 29
+          },
+          "source": "mkIf cfg.database.createLocally {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 168,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgres"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 176,
+            "col": 11
+          },
+          "source": "lib.strings.optionalString usePostgres \":${pkg.passthru.python.pkgs.makePythonPath pkg.optional-dependencies.postgres}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "contextPath"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "contextPath"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 184,
+            "col": 10
+          },
+          "source": "optionalAttrs (cfg.contextPath != \"\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgres"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 187,
+            "col": 10
+          },
+          "source": "optionalAttrs usePostgres {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgres"
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "createLocally"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 193,
+            "col": 10
+          },
+          "source": "optionalAttrs (usePostgres && !cfg.database.createLocally) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 254,
+            "col": 16
+          },
+          "source": "lib.optional (cfg.environmentFile != null) \"--property=EnvironmentFile=${cfg.environmentFile}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 279,
+            "col": 12
+          },
+          "source": "lib.optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 332,
+            "col": 29
+          },
+          "source": "mkIf cfg.openFirewall {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgres"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 358,
+            "col": 12
+          },
+          "source": "lib.optionals (usePostgres && cfg.database.createLocally) [ \"postgresql.target\" ]"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgres"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 359,
+            "col": 20
+          },
+          "source": "lib.optionals (usePostgres && cfg.database.createLocally) [ \"postgresql.target\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 401,
+            "col": 29
+          },
+          "source": "mkIf cfg.database.createLocally {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/linkding.nix",
+            "line": 385,
+            "col": 9
+          },
+          "source": "mkIf ((cfg.settings.LD_DISABLE_BACKGROUND_TASKS or \"False\") != \"True\")",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "LD_DISABLE_BACKGROUND_TASKS"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "linkding",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/web-apps/linkding.nix",
+            "line": 13,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/linkding.nix",
+              "line": 168,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable ("
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "linkding",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/web-apps/linkding.nix",
+                "line": 13,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/linkding.nix",
+                  "line": 168,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable ("
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/linkding.nix",
+                  "line": 168,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable ("
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "processes"
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "threads"
+        }
+      ]
+    }
+  ]
+}

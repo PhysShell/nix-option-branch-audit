@@ -1,0 +1,1079 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 8
+  },
+  "targets": [
+    {
+      "name": "headplane",
+      "module": "nixos/modules/services/networking/headplane.nix",
+      "test": "nixos/tests/headplane.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "headplane"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 37,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 42,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 44,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 51,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "host"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 54,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "port"
+          ],
+          "default_source": "3000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 61,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "base_url"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 67,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "cookie_secret_path"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 77,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "cookie_secure"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 87,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "cookie_max_age"
+          ],
+          "default_source": "86400",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 97,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "cookie_domain"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 103,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "data_path"
+          ],
+          "default_source": "\"/var/lib/headplane\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/headplane"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 113,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 129,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "api_key_path"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 132,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "url"
+          ],
+          "default_source": "\"http://127.0.0.1:${toString config.services.headscale.port}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 142,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "tls_cert_path"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 155,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "public_url"
+          ],
+          "default_source": "config.services.headscale.settings.server_url",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 164,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "config_path"
+          ],
+          "default_source": "config.services.headscale.configFile",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 172,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "config_strict"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 185,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "headscale",
+            "dns_records_path"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 191,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 207,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "agent"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 210,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "agent",
+            "enabled"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 214,
+            "col": 25
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "agent",
+            "executable_path"
+          ],
+          "default_source": "\"${cfg.agent.package}/bin/hp_agent\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 224,
+            "col": 25
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "agent",
+            "host_name"
+          ],
+          "default_source": "\"headplane-agent\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "headplane-agent"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 234,
+            "col": 25
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "agent",
+            "cache_ttl"
+          ],
+          "default_source": "180000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 240,
+            "col": 25
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "agent",
+            "work_dir"
+          ],
+          "default_source": "\"/var/lib/headplane/agent\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/headplane/agent"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 249,
+            "col": 25
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "proc"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 265,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "integration",
+            "proc",
+            "enabled"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 268,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 289,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "enabled"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 293,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "issuer"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 302,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "client_id"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 308,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "client_secret_path"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 314,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "disable_api_key_login"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 323,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "token_endpoint_auth_method"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 329,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "use_pkce"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 345,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "profile_picture_source"
+          ],
+          "default_source": "\"oidc\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "oidc"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 354,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "scope"
+          ],
+          "default_source": "\"openid email profile\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "openid email profile"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 363,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "extra_params"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 369,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "authorization_endpoint"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 378,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "token_endpoint"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 385,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "oidc",
+            "userinfo_endpoint"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 392,
+            "col": 19
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 410,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Or": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "settings",
+                      "integration",
+                      "agent"
+                    ]
+                  },
+                  {
+                    "Literal": "Null"
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "settings",
+                        "integration",
+                        "agent",
+                        "enabled"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "integration",
+              "agent"
+            ],
+            [
+              "settings",
+              "integration",
+              "agent",
+              "enabled"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 30,
+            "col": 15
+          },
+          "source": "if agentSettings == null || !agentSettings.enabled then null else agentSettings"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/headplane.nix",
+            "line": 410,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "headplane",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/headplane.nix",
+            "line": 27,
+            "col": 7
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "headplane",
+            "settings",
+            "server",
+            "cookie_secret_path"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/headplane.nix",
+            "line": 29,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "headplane",
+            "settings",
+            "oidc",
+            "client_secret_path"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/headplane.nix",
+            "line": 41,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "headplane",
+            "settings",
+            "oidc",
+            "headscale_api_key_path"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/headplane.nix",
+            "line": 42,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/headplane.nix",
+              "line": 410,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "headplane",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/headplane.nix",
+                "line": 27,
+                "col": 7
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/headplane.nix",
+                  "line": 410,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/headplane.nix",
+                  "line": 410,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "settings.headscale.api_key_path"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.integration.agent.pre_authkey_path"
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "settings.integration.agent.cache_ttl"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.integration.agent.cache_path"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.oidc.headscale_api_key_path"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.oidc.redirect_uri"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.oidc.strict_validation"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.oidc.user_storage_file"
+        }
+      ]
+    }
+  ]
+}

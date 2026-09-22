@@ -1,0 +1,41 @@
+{
+  "pr": 541090,
+  "title": "nixos/linkding: add options to configure process and thread counts",
+  "applicable": true,
+  "base_sha": "a851d6105da75481ff7757bbc3000595dc4997e8",
+  "head_sha": "37d3de9a86f347ce8837bc5d6074136f42e3e0f3",
+  "module_paths": [
+    "nixos/modules/services/web-apps/linkding.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/linkding.nix"
+  ],
+  "structural_notes": "Diff also touches the .ini rendering lines (processes/threads interpolation) but the watched set is the two new mkOption declarations (processes, threads) plus baseline enable. A sibling test nixos/tests/web-apps/linkding-postgres.nix also exists and is wired in all-tests.nix but was not used as the primary test target (linkding.nix matches the module basename).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/linkding.nix",
+        "test": "nixos/tests/web-apps/linkding.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "linkding"
+        ],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json"
+      }
+    ]
+  }
+}

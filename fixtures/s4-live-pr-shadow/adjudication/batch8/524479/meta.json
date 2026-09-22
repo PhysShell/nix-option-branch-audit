@@ -1,0 +1,48 @@
+{
+  "pr": 524479,
+  "title": "sgx-psw: 2.27 -> 2.29; nixos/aesmd: update",
+  "applicable": true,
+  "base_sha": "bede774ba2640e0f3f914c0270cc15496fa2b1c1",
+  "head_sha": "ccf6ab0bff548155f513ea551dca4e9e13620f88",
+  "module_paths": [
+    "nixos/modules/services/security/aesmd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/aesmd.nix"
+  ],
+  "structural_notes": "Diff restructures options.services.aesmd.settings from an mkOption{type=types.submodule{...}} wrapper to a plain nested options attrset (options.services.aesmd.settings = {proxy=mkOption{...}; proxyType=mkOption{...}; defaultQuotingType=mkOption{...}; qplLogLevel=mkOption{...};}); defaultQuotingType's enum type is also narrowed (drops epid_linkable/epid_unlinkable). whitelistUrl's mkOption declaration is deleted and replaced with a mkRemovedOptionModule entry. Watched: enable (baseline) + settings.proxy, settings.proxyType, settings.defaultQuotingType, settings.qplLogLevel (all touched mkOption declaration lines) + settings.whitelistUrl (touched via its mkOption removal / mkRemovedOptionModule addition).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/security/aesmd.nix",
+        "test": "nixos/tests/aesmd.nix",
+        "option": "settings.proxy",
+        "verdict-class": "OBA001 (bucket: new_finding, engine: oba) -- uncovered option branch: no test assignment provably flips this predicate away from its default"
+      }
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/security/aesmd.nix",
+        "test": "nixos/tests/aesmd.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "aesmd"
+        ],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json"
+      }
+    ]
+  }
+}

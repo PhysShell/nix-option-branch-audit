@@ -1,0 +1,7 @@
+[[target]]
+name = "headplane"
+module = "nixos/modules/services/networking/headplane.nix"
+test = "nixos/tests/headplane.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "headplane"]
+watch = ["enable", "settings.headscale.api_key_path", "settings.integration.agent.pre_authkey_path", "settings.integration.agent.cache_ttl", "settings.integration.agent.cache_path", "settings.oidc.headscale_api_key_path", "settings.oidc.redirect_uri", "settings.oidc.strict_validation", "settings.oidc.user_storage_file"]

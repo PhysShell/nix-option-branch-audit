@@ -1,0 +1,41 @@
+{
+  "pr": 548856,
+  "title": "nixos/dnscrypt-proxy: fix `.settings` type",
+  "applicable": true,
+  "base_sha": "4164b5114877da475c3abed76418eb6ef9be2131",
+  "head_sha": "0d5649a5c4c508aad406005ce6c7daba6513dc9a",
+  "module_paths": [
+    "nixos/modules/services/networking/dnscrypt-proxy.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/dnscrypt-proxy.nix"
+  ],
+  "structural_notes": "Diff changes the settings option's type from lib.types.attrs to settingsFormat.type (pkgs.formats.toml{}.type); this is a type-only change on the existing settings mkOption declaration line, so settings is watched alongside baseline enable. Test file changes (extra listen port / deep-merge check) do not touch enable or settings mkOption declaration lines themselves.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/dnscrypt-proxy.nix",
+        "test": "nixos/tests/dnscrypt-proxy.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "dnscrypt-proxy"
+        ],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json"
+      }
+    ]
+  }
+}

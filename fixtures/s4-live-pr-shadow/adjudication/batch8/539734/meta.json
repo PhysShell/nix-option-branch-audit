@@ -1,0 +1,41 @@
+{
+  "pr": 539734,
+  "title": "nixos/traccar: fix shellcheck warning in preStart script",
+  "applicable": true,
+  "base_sha": "4f63f39545746aa3c539abe85165e84e8ff0c3db",
+  "head_sha": "fdf59acde3b34d6e1d8c17a8522d7c9dc5e119e5",
+  "module_paths": [
+    "nixos/modules/services/monitoring/traccar.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/traccar.nix"
+  ],
+  "structural_notes": "Diff only quotes a shell variable (umask \"$old_umask\") inside the preStart script body; no mkOption/mkEnableOption/mkRenamedOptionModule/mkRemovedOptionModule/mkChangedOptionModule declaration line is touched. Only the baseline enable option is watched; nothing else in this diff is conceptually option-relevant.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/monitoring/traccar.nix",
+        "test": "nixos/tests/traccar.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "traccar"
+        ],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 5
+  },
+  "targets": [
+    {
+      "name": "aesmd",
+      "module": "nixos/modules/services/security/aesmd.nix",
+      "test": "nixos/tests/aesmd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "aesmd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 51,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environment"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 53,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "quoteProviderLibrary"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 63,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 69,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 121,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "settings",
+                    "proxy"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "settings",
+              "proxy"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 93,
+            "col": 21
+          },
+          "source": "if (cfg.settings.proxy != null) then \"manual\" else null"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 121,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 31,
+            "col": 9
+          },
+          "source": "optional (whitelistUrl != null) \"whitelist url = ${whitelistUrl}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 32,
+            "col": 12
+          },
+          "source": "optional (proxy != null) \"aesm proxy = ${proxy}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 33,
+            "col": 12
+          },
+          "source": "optional (proxyType != null) \"proxy type = ${proxyType}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/aesmd.nix",
+            "line": 34,
+            "col": 12
+          },
+          "source": "optional (defaultQuotingType != null) \"default quoting type = ${defaultQuotingType}\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "aesmd",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/aesmd.nix",
+            "line": 14,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "systemd",
+            "services",
+            "aesmd",
+            "unitConfig",
+            "AssertPathExists"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/aesmd.nix",
+            "line": 32,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "aesmd",
+            "quoteProviderLibrary"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/aesmd.nix",
+            "line": 39,
+            "col": 15
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/security/aesmd.nix",
+              "line": 121,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "aesmd",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/aesmd.nix",
+                "line": 14,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/security/aesmd.nix",
+                  "line": 121,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/security/aesmd.nix",
+                  "line": 121,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.whitelistUrl"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.proxy"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.proxyType"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.defaultQuotingType"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.qplLogLevel"
+        }
+      ]
+    }
+  ]
+}
