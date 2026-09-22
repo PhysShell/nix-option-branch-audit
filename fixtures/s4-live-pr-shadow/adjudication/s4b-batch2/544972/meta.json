@@ -1,0 +1,33 @@
+{
+  "pr": 544972,
+  "title": "hyperscan: mark static build broken, replace pcre with pcre2; rspamd: pcre -> pcre2; 4.1.0 -> 4.1.2",
+  "applicable": true,
+  "base_sha": "80579cca7195822499de12741792abe78e00a70d",
+  "head_sha": "22fd0559fc39aa4d7d279cc1bac18ca998129aeb",
+  "module_paths": [
+    "nixos/modules/services/mail/rspamd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/rspamd.nix"
+  ],
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": [],
+    "note": "raw.json summary.notable is an empty array (notable_total: 0). The only watched identity ('enable') is diff.kind == 'unchanged'; the PR's real module-file change (adding `MemoryDenyWriteExecute = false; # pcre2 jit` to the systemd hardening serviceConfig block, nixos/modules/services/mail/rspamd.nix line 509 on head) does not touch any mkOption/mkEnableOption/mkRenamedOptionModule declaration line, so no other watched_path was added per the 'watch = baseline enable + any textually-touched option declaration line' rule."
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": [],
+    "note": "The only watched identity ('enable') is verdict = 'DefaultUnresolved' on BOTH check-base.json and check-head.json (not PASS on either side), so no genuine both-sides-PASS verdicts exist for this PR."
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "check-base.json and check-head.json both report verdict 'DefaultUnresolved' for watched_path 'enable' (predicate: mkIf cfg.enable at rspamd.nix line 443, kind Truthy/mkIf). Identical on both sides -- no transition, symmetric or asymmetric, and not a PASS state at all, so nothing to flag under the PASS-transition rule.",
+    "diff_scope_note": "Verified via `gh pr diff 544972` and a direct base-vs-head diff of the fetched module file content: the only change inside nixos/modules/services/mail/rspamd.nix is the single added line `MemoryDenyWriteExecute = false; # pcre2 jit` in the rspamd systemd service's serviceConfig hardening block -- a config-side systemd unit setting, not an option declaration. The rest of the PR (pkgs/by-name/hy/hyperscan/package.nix, pkgs/by-name/rs/rspamd/package.nix) is package-level (hyperscan static-build-broken marker + pcre->pcre2 swap, rspamd version bump) and out of oba's module/test scope."
+  }
+}

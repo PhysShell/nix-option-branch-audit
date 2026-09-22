@@ -1,0 +1,7 @@
+[[target]]
+name = "rspamd"
+module = "nixos/modules/services/mail/rspamd.nix"
+test = "nixos/tests/rspamd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "rspamd"]
+watch = ["enable"]

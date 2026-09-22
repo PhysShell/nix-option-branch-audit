@@ -1,0 +1,48 @@
+{
+  "pr": 531003,
+  "title": "rustical: 0.12.15 -> 0.13.1",
+  "applicable": true,
+  "base_sha": "7715f378b14b270032988abde91e57fe752c64fe",
+  "head_sha": "ac0b56ee3a2d2f8e902fdb09861a76fb2cd75c66",
+  "module_paths": [
+    "nixos/modules/services/web-apps/rustical.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/rustical.nix"
+  ],
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": [],
+    "note": "raw.json summary.notable is an empty array (notable_total: 0) for this PR."
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/rustical.nix",
+        "test": "nixos/tests/web-apps/rustical.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "rustical"
+        ],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "verdict": "PASS",
+        "source": "check-base.json / check-head.json, target name 'rustical'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "settings_http_host_transition": "raw.json oba: watched_path 'settings.http.host' -- base verdict = PredicateNotFound (option existed in base but no discoverable mkIf/truthy predicate directly gating on it), head verdict = OptionNotFound (mkOption declaration for `settings.http.host` removed by the PR). Not a PASS transition (neither side was PASS), so does not meet the strict 'transitioned into/out of PASS' flag criterion, but is a genuine verdict_changed entry in raw.json's oba array and is recorded here for the reviewer's visibility.",
+    "settings_http_port_transition": "raw.json oba: watched_path 'settings.http.port' -- base verdict = PredicateNotFound, head verdict = OptionNotFound (mkOption declaration for `settings.http.port` removed by the PR). Same non-PASS caveat as above; recorded for visibility.",
+    "settings_http_bind_transition": "raw.json oba: watched_path 'settings.http.bind' -- base verdict = OptionNotFound (option did not exist pre-PR), head verdict = PredicateNotFound (new mkOption declaration exists on head, but oba found no directly-gating predicate referencing it -- consistent with `bind` not being referenced in any `mkIf`/truthy predicate in the module). Not a PASS transition.",
+    "unresolved_predicate_site_on_head": "check-head.json unresolved_predicate_sites contains one entry: nixos/modules/services/web-apps/rustical.nix line 121 col 16, source `lib.optionals (cfg.settings.http ? host || cfg.settings.http ? port) [` , failure = UnsupportedExpression, refs = [['settings','http'], ['settings','http']]. This is the new deprecation-warning predicate the PR adds; oba's resolver cannot model the `?` has-attr operator, so this predicate site is recorded as unresolved rather than contributing any verdict. Not present on base (the construct did not exist pre-PR)."
+  }
+}

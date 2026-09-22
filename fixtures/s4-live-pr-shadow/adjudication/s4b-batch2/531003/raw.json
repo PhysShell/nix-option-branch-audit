@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 3,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->predicate_not_found": 1,
+      "predicate_not_found->option_not_found": 2
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/rustical.nix",
+        "test": "nixos/tests/web-apps/rustical.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "rustical"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/rustical.nix",
+        "test": "nixos/tests/web-apps/rustical.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "rustical"
+        ],
+        "watched_path": "settings.http.bind"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.http.bind"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.http.bind"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/rustical.nix",
+        "test": "nixos/tests/web-apps/rustical.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "rustical"
+        ],
+        "watched_path": "settings.http.host"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.http.host"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.http.host"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/rustical.nix",
+        "test": "nixos/tests/web-apps/rustical.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "rustical"
+        ],
+        "watched_path": "settings.http.port"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.http.port"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.http.port"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}
