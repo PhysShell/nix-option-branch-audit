@@ -1,0 +1,28 @@
+# S4-F1's single most important negative control: a target whose module
+# is a genuinely-missing file (would, alone, become a soft
+# `unavailable_targets` entry) alongside a SEPARATE target whose module
+# is an ABSOLUTE path -- a real `--root` security-boundary violation,
+# not ordinary "a PR deleted this file" activity. This must stay a hard,
+# whole-invocation TOOL_ERROR (exit 3) exactly as before S4-F1: a
+# security-relevant resolution failure must never be silently downgraded
+# into a partial success just because it happens to sit in the same
+# manifest as an ordinary missing-module target. Mirrors
+# fixtures/synthetic/root-escape/t-absolute.toml's own existing coverage,
+# combined here with a genuinely-missing target to prove the two failure
+# classes are never conflated.
+
+[[target]]
+name = "deleted-target"
+module = "fixtures/synthetic/this-module-does-not-exist.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent"]
+watch = ["enable"]
+
+[[target]]
+name = "absolute-escape"
+module = "/this-path-does-not-need-to-exist-rejection-is-syntactic"
+test = "/this-path-does-not-need-to-exist-rejection-is-syntactic"
+cfg_ident = "cfg"
+option_prefix = ["services", "x"]
+watch = ["foo"]

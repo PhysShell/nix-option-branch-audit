@@ -284,3 +284,22 @@ repo = "AkkomaGang/akkoma"
 commit = "4ceb81aa7f86af7b093d3d683940933e96e5dfcb"
 upstream_path = "config/description.exs"
 sha256 = "447ba65caf5aa1c503c4635b7d89b6dca89f2dc7a59aaa1e2a19822f19e8e418"
+
+# S4-F1 regression fixture (real #543492 content, see
+# fixtures/regressions/543492-lightdm-enso-greeter-removed/targets.toml's
+# own header for the full incident writeup). lightdm-greeters/enso-os.nix
+# is deliberately, genuinely absent at this commit -- that IS the real
+# fact this PR itself introduced, not something to vendor/lock.
+[[fixture]]
+path = "fixtures/regressions/543492-lightdm-enso-greeter-removed/root/nixos/modules/services/x11/display-managers/lightdm.nix"
+repo = "NixOS/nixpkgs"
+commit = "aa970620a51824a5361565d16a18882fcf1a3759"
+upstream_path = "nixos/modules/services/x11/display-managers/lightdm.nix"
+sha256 = "d4a92f28de9a0f1ab9100c2f02f8497cd6ebae9c14a533f82594e7dd746b6a9d"
+
+[[fixture]]
+path = "fixtures/regressions/543492-lightdm-enso-greeter-removed/root/nixos/tests/lightdm.nix"
+repo = "NixOS/nixpkgs"
+commit = "aa970620a51824a5361565d16a18882fcf1a3759"
+upstream_path = "nixos/tests/lightdm.nix"
+sha256 = "47df405e5c9b37bdfdd83d95fd40426f8f4fd3f1b24191f1a501f412af5a483b"

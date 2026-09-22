@@ -1,0 +1,9 @@
+# S4-F1 negative control: the manifest file ITSELF is not valid TOML --
+# a genuine manifest-level failure, entirely upstream of
+# partition_targets_by_availability (which never runs: `toml::from_str`
+# fails first). Must stay a hard, whole-invocation TOOL_ERROR (exit 3),
+# completely unaffected by S4-F1 -- proves the fix didn't accidentally
+# widen "soft" handling to manifest-parse failures too.
+
+[[target]
+name = "this is not valid toml, the target table header is never closed

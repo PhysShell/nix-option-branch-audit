@@ -1,0 +1,26 @@
+# S4-F1 ordering control: the deleted target is declared LAST, after
+# two real targets -- see s4f1-deleted-first.toml's own header.
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "davis-before"
+module = "fixtures/davis/before/module.nix"
+test = "fixtures/davis/before/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "davis"]
+watch = ["database.driver"]
+
+[[target]]
+name = "deleted-target"
+module = "fixtures/synthetic/this-module-does-not-exist.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent"]
+watch = ["enable"]

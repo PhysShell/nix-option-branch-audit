@@ -1,0 +1,32 @@
+# S4-F1 regression fixture -- the real, historical `oba check` TOOL_ERROR
+# found during the S4 deployment-readiness evaluation (S4-A position
+# 117/120, nixpkgs PR #543492 "lightdm-enso-os-greeter: drop", head SHA
+# aa970620a51824a5361565d16a18882fcf1a3759). This manifest is byte-for-byte
+# the real one used against the real PR at the time (copied from
+# fixtures/s4-live-pr-shadow/adjudication/batch10/543492/targets.toml,
+# which stays untouched -- S4's own artifacts are not modified by this
+# fix). `root/` under this same directory holds the real nixpkgs content
+# at that exact head SHA for the "lightdm" target (fetched via `gh api`);
+# `lightdm-greeters/enso-os.nix` is deliberately, genuinely absent --
+# that is the real fact this PR itself introduced, not a fixture mistake.
+# Before S4-F1: `oba check --root root --targets targets.toml` aborted
+# with TOOL_ERROR (exit 3) and EMPTY stdout, discarding "lightdm"'s own
+# real, unrelated PASS result. After S4-F1: "lightdm" is analyzed and
+# reported normally; "lightdm-enso-greeter" becomes a structured
+# `unavailable_targets` entry; exit code is 2, not 3.
+
+[[target]]
+name = "lightdm"
+module = "nixos/modules/services/x11/display-managers/lightdm.nix"
+test = "nixos/tests/lightdm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "displayManager", "lightdm"]
+watch = ["enable"]
+
+[[target]]
+name = "lightdm-enso-greeter"
+module = "nixos/modules/services/x11/display-managers/lightdm-greeters/enso-os.nix"
+test = "nixos/tests/lightdm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "displayManager", "lightdm", "greeters", "enso"]
+watch = ["enable"]

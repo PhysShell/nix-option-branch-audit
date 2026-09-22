@@ -1,0 +1,25 @@
+# S4-F1 negative control: a MULTI-target manifest where EVERY target is
+# unavailable. Deliberately stays the pre-S4-F1 hard failure (TOOL_ERROR,
+# exit 3) -- there is no OTHER target's real result in this invocation
+# left to preserve, so silently emitting an empty-looking report would
+# be indistinguishable from a clean, boring PASS. Distinct from
+# targets/tool-error-missing-file.toml (which covers the SAME invariant
+# for a single-target manifest, h1_1_missing_file_is_tool_error_not_finding):
+# this fixture proves the "all unavailable" case stays fatal even when
+# there's more than one target to have been unavailable.
+
+[[target]]
+name = "deleted-target-one"
+module = "fixtures/synthetic/this-module-does-not-exist.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent-one"]
+watch = ["enable"]
+
+[[target]]
+name = "deleted-target-two"
+module = "fixtures/synthetic/this-other-module-does-not-exist-either.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent-two"]
+watch = ["enable"]

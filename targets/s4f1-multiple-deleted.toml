@@ -1,0 +1,27 @@
+# S4-F1: two DIFFERENT deleted targets alongside one real one -- proves
+# `unavailable_targets` records every unavailable target, not just the
+# first one encountered.
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "deleted-target-one"
+module = "fixtures/synthetic/this-module-does-not-exist.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent-one"]
+watch = ["enable"]
+
+[[target]]
+name = "deleted-target-two"
+module = "fixtures/synthetic/this-other-module-does-not-exist-either.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent-two"]
+watch = ["enable"]

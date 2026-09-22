@@ -3375,16 +3375,32 @@ fn resolve_within_root(root: &Path, rel: &Path) -> anyhow::Result<PathBuf> {
 /// genuinely does not exist" (`Ok(None)`) from every other real
 /// problem (`Err`, exactly the same cases `resolve_within_root` itself
 /// already rejects: an absolute path, a root escape, a permission
-/// error, ...). Exists ONLY for `audit-diff`'s own per-target
-/// orchestration (`run_audit_diff`): a target whose module/test is
-/// absent on one side of a real base/head comparison is real PR-diff
-/// algebra (a brand-new or since-deleted module), not a tool
-/// malfunction -- see `run_audit_diff`'s own `AddedSubject`/
-/// `RemovedSubject` handling below. `check`/`diff`/`audit` keep calling
-/// `resolve_within_root` directly, completely unchanged: asking to
-/// analyze a single root whose named module is simply missing is, and
-/// stays, a real error there -- there is no "other side" for it to be
-/// diff algebra relative to.
+/// error, ...). Originally written ONLY for `audit-diff`'s own
+/// per-target orchestration (`run_audit_diff`): a target whose
+/// module/test is absent on one side of a real base/head comparison is
+/// real PR-diff algebra (a brand-new or since-deleted module), not a
+/// tool malfunction -- see `run_audit_diff`'s own `AddedSubject`/
+/// `RemovedSubject` handling below.
+///
+/// S4-F1 (real incident: a live S4 evaluation run, nixpkgs PR #543492,
+/// deleted a whole greeter submodule; `oba check`'s own combined
+/// multi-target manifest -- listing that now-deleted target ALONGSIDE
+/// an entirely unrelated, still-valid one -- aborted the WHOLE
+/// invocation with empty stdout, discarding the unrelated target's
+/// real result too): the reasoning above ("there is no 'other side' for
+/// it to be diff algebra relative to") was true but incomplete -- even
+/// a SINGLE root's own manifest can have multiple, independent targets,
+/// and one of them genuinely not existing under that root is exactly as
+/// ordinary as a PR deleting a module on one side of a diff. `check` now
+/// also calls this function, via `partition_targets_by_availability`,
+/// for precisely that reason: to keep a missing target from destroying
+/// every OTHER target's result in the same invocation. What stays
+/// unchanged: any resolution failure that ISN'T "genuinely does not
+/// exist" (an absolute path, a `../`/symlink escape, `--root` itself
+/// unreadable, a permission error) is still a real, fatal,
+/// whole-invocation error for `check` too -- this function's own `Err`
+/// path is untouched by S4-F1, only its `Ok(None)` path gained a second
+/// caller.
 fn resolve_within_root_if_exists(root: &Path, rel: &Path) -> anyhow::Result<Option<PathBuf>> {
     if rel.is_absolute() {
         anyhow::bail!(
@@ -3416,6 +3432,67 @@ fn resolve_within_root_if_exists(root: &Path, rel: &Path) -> anyhow::Result<Opti
         );
     }
     Ok(Some(canon))
+}
+
+/// S4-F1: one target whose `module` or `test` genuinely does not exist
+/// under a `check` invocation's `--root` -- a real, structured,
+/// per-target result, never a reason to discard every OTHER target's
+/// analysis in the same manifest. Deliberately as bare as
+/// `resolve_within_root_if_exists`'s own `Ok(None)` case that produces
+/// it: a `name` (so a consumer can correlate this back to the manifest's
+/// own `[[target]]` entry) and a `reason` string naming which of
+/// `module`/`test` was missing and its manifest-relative path. No
+/// `Verdict`-shaped fields here on purpose -- an unavailable target was
+/// never analyzed, so there is nothing to report beyond the plain fact
+/// that it couldn't be.
+#[derive(Serialize, Debug, Clone)]
+struct UnavailableTarget {
+    name: String,
+    reason: String,
+}
+
+/// S4-F1: split `targets` into the subset genuinely analyzable under
+/// `root` and the subset that is not, mirroring `run_audit_diff`'s own
+/// base/head partitioning (`only_on_head`/`only_on_base` above) in its
+/// single-root form. Any resolution problem OTHER than "this specific
+/// file genuinely does not exist" -- an absolute path, a `../`/symlink
+/// escape, `--root` itself unreadable, a permission error -- still
+/// propagates as a real, fatal, whole-invocation error via `?`,
+/// completely unchanged from before S4-F1: this function only ever
+/// turns `resolve_within_root_if_exists`'s `Ok(None)` into a soft,
+/// per-target result, never its `Err`.
+fn partition_targets_by_availability(
+    root: &Path,
+    targets: &[Target],
+) -> anyhow::Result<(Vec<Target>, Vec<UnavailableTarget>)> {
+    let mut available = Vec::new();
+    let mut unavailable = Vec::new();
+    for t in targets {
+        let module = resolve_within_root_if_exists(root, &t.module)
+            .map_err(|e| anyhow::anyhow!("target {}: module: {e}", t.name))?;
+        let test = resolve_within_root_if_exists(root, &t.test)
+            .map_err(|e| anyhow::anyhow!("target {}: test: {e}", t.name))?;
+        match (module, test) {
+            (Some(_), Some(_)) => available.push(t.clone()),
+            (None, _) => unavailable.push(UnavailableTarget {
+                name: t.name.clone(),
+                reason: format!(
+                    "module: {} not found under --root {}",
+                    t.module.display(),
+                    root.display()
+                ),
+            }),
+            (Some(_), None) => unavailable.push(UnavailableTarget {
+                name: t.name.clone(),
+                reason: format!(
+                    "test: {} not found under --root {}",
+                    t.test.display(),
+                    root.display()
+                ),
+            }),
+        }
+    }
+    Ok((available, unavailable))
 }
 
 // ---------------------------------------------------------------------
@@ -4269,6 +4346,11 @@ struct ReportEnvelope {
     mode: &'static str,
     summary: CheckSummary,
     targets: Vec<TargetReport>,
+    /// S4-F1: purely additive to `schema_version: 1` (see `UnavailableTarget`'s
+    /// own doc comment) -- always present, empty when every target in the
+    /// manifest was analyzable, same convention `targets` itself already
+    /// uses for "nothing to report here".
+    unavailable_targets: Vec<UnavailableTarget>,
 }
 
 #[derive(Serialize, Debug)]
@@ -4282,6 +4364,11 @@ struct CheckSummary {
     pass: usize,
     finding: usize,
     inconclusive: usize,
+    /// S4-F1: count of `unavailable_targets`, mirrored into the summary
+    /// for the same reason `pass`/`finding`/`inconclusive` are -- a
+    /// consumer that only reads `summary` (not the full `targets`/
+    /// `unavailable_targets` arrays) still sees the fact.
+    unavailable: usize,
 }
 
 /// Exit codes are a 4-state scheme, not 3: `0` clean analysis / `1` a
@@ -4391,11 +4478,42 @@ fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32
         .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
-    // analyze()'s own `?`s (missing module/test file, a path escaping
-    // --root, etc.) bubble up here as a genuine tool error too: a target
-    // naming a file that doesn't exist -- or reaches outside --root -- is
-    // a manifest problem, not an OBA001 finding.
-    let reports = analyze(root, &manifest)?.targets;
+    // S4-F1: partition BEFORE calling analyze(), so one target's module
+    // genuinely not existing under --root can never destroy every OTHER
+    // target's real result in the same manifest (the real incident this
+    // fixes: nixpkgs PR #543492's lightdm-enso-greeter deletion took an
+    // unrelated, still-valid "lightdm" target's PASS down with it). Any
+    // OTHER resolution failure -- an absolute path, a `../`/symlink
+    // escape, --root itself unreadable, a permission error -- still
+    // propagates as a real, fatal, whole-invocation error here via `?`,
+    // completely unchanged: see `partition_targets_by_availability`'s own
+    // doc comment.
+    let (available, unavailable) = partition_targets_by_availability(root, &manifest.target)?;
+
+    // If NOTHING in the manifest is analyzable, this stays the pre-S4-F1
+    // hard failure: there is no OTHER target's result in this invocation
+    // left to preserve, and silently emitting an empty-looking report
+    // would be indistinguishable from a clean, boring PASS. Deliberately
+    // keeps `h1_1_missing_file_is_tool_error_not_finding` (a single-target
+    // manifest whose only target is missing) exit 3, unchanged by S4-F1.
+    if available.is_empty() && !unavailable.is_empty() {
+        anyhow::bail!(
+            "no target in this manifest is analyzable under --root {}: {}",
+            root.display(),
+            unavailable
+                .iter()
+                .map(|u| format!("{}: {}", u.name, u.reason))
+                .collect::<Vec<_>>()
+                .join("; ")
+        );
+    }
+
+    let reports = if available.is_empty() {
+        Vec::new()
+    } else {
+        let sub = TargetFile { target: available, cdc_target: Vec::new() };
+        analyze(root, &sub)?.targets
+    };
 
     let findings = reports
         .iter()
@@ -4417,7 +4535,12 @@ fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32
         .filter(|r| !r.parse_errors.is_empty())
         .count();
 
-    let (exit_code, status) = if inconclusive > 0 || parse_failed_targets > 0 {
+    // S4-F1: an unavailable target joins the SAME exit-2 condition
+    // `parse_failed_targets` already does -- both are "this specific
+    // target couldn't be analyzed, but the tool ran and every other
+    // target's result stands", the exact class exit 2 already means. Not
+    // a new exit-code meaning, the existing one applied to a new source.
+    let (exit_code, status) = if inconclusive > 0 || parse_failed_targets > 0 || !unavailable.is_empty() {
         (2, "INCONCLUSIVE")
     } else if findings > 0 {
         (1, "FINDING")
@@ -4437,12 +4560,20 @@ fn run_check(root: &Path, targets_path: &Path, json: bool) -> anyhow::Result<i32
                 pass,
                 finding: findings,
                 inconclusive,
+                unavailable: unavailable.len(),
             },
             targets: reports,
+            unavailable_targets: unavailable,
         };
         println!("{}", serde_json::to_string_pretty(&envelope)?);
     } else {
-        println!("=== summary: {status}  findings={findings}  inconclusive={inconclusive} ===");
+        println!(
+            "=== summary: {status}  findings={findings}  inconclusive={inconclusive}  unavailable={} ===",
+            unavailable.len()
+        );
+        for u in &unavailable {
+            println!("=== target: {} ===\n  UNAVAILABLE  {}", u.name, u.reason);
+        }
         for r in &reports {
             print_human(r);
         }

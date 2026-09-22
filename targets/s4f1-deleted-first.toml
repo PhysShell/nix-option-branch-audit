@@ -1,0 +1,28 @@
+# S4-F1 ordering control: the deleted target is declared FIRST, two real
+# targets follow -- proves the fix doesn't depend on a deleted target's
+# position in the manifest, and that `targets`/`unavailable_targets`
+# stay correctly attributed to the right names regardless of order.
+
+[[target]]
+name = "deleted-target"
+module = "fixtures/synthetic/this-module-does-not-exist.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent"]
+watch = ["enable"]
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "davis-before"
+module = "fixtures/davis/before/module.nix"
+test = "fixtures/davis/before/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "davis"]
+watch = ["database.driver"]

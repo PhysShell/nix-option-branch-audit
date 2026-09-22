@@ -1,0 +1,19 @@
+# S4-F1: the `module` exists but the `test` does not -- proves the fix
+# covers BOTH halves of a target's resolution, not just `module`, and
+# that the reason text correctly names which one was missing.
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "test-missing-target"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/synthetic/this-test-does-not-exist.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]

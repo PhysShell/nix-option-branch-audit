@@ -1,0 +1,23 @@
+# S4-F1 positive control: one real, analyzable target ("kimai-after")
+# alongside one whose module genuinely does not exist under --root
+# ("deleted-target"). Before S4-F1 this aborted the whole invocation
+# (TOOL_ERROR, exit 3, empty stdout) -- kimai-after's own real PASS
+# never reached stdout at all. After S4-F1: kimai-after is analyzed and
+# reported normally, deleted-target becomes a structured
+# `unavailable_targets` entry, exit code is 2.
+
+[[target]]
+name = "kimai-after"
+module = "fixtures/kimai/after/module.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kimai", "sites", "*"]
+watch = ["database.socket"]
+
+[[target]]
+name = "deleted-target"
+module = "fixtures/synthetic/this-module-does-not-exist.nix"
+test = "fixtures/kimai/after/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nonexistent"]
+watch = ["enable"]
