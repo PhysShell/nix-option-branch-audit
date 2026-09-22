@@ -1,0 +1,76 @@
+{
+  "pr": 520988,
+  "title": "nixos/unifi: pass Java version via passthru",
+  "applicable": true,
+  "base_sha": "612b5c80d334443d2dedea9de9c8fe2236b415a6",
+  "head_sha": "eecdf2b0cc813a737524cc7b2a7aa947b034e872",
+  "module_paths": [
+    "nixos/modules/services/networking/unifi.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/unifi.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix line 1731: `unifi = runTest ./unifi.nix;`",
+  "watch_selection_basis": "PR diff (`gh pr diff 520988`) textually rewrites two option declaration lines: `services.unifi.enable` (mkOption{type=bool;default=false;...} -> `lib.mkEnableOption \"UniFi controller service\"`) and `services.unifi.jrePackage` (mkPackageOption pkgs \"jdk\" {...} -> a new mkOption block defaulting to `cfg.unifiPackage.passthru.jrePackage or jdk25_headless`). Both watched. openFirewall/initialJavaHeapSize/maximumJavaHeapSize/extraJvmOptions option blocks each show a `+` diff hunk too, but only for an inserted blank line inside the block body -- the actual `lib.mkOption`/option-path declaration line itself is untouched context in every case, so per the letter of the watch rule these were NOT added to watch (noted here rather than guessed at).",
+  "oba_binary": {
+    "path": "/tmp/verify-v044-scratch/oba-x86_64-unknown-linux-musl/oba",
+    "sha256": "388ea5ab8147c1bc5d71948ff63afe0c8ee3fec3ac4abb9fbc53ca14293d9225",
+    "note": "frozen v0.4.4 binary, verified before use, not rebuilt or substituted"
+  },
+  "run_exit_codes": {
+    "audit-diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/unifi.nix",
+        "test": "nixos/tests/unifi.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "unifi"
+        ],
+        "watched_path": "enable",
+        "side": "PASS on both base and head (per oba check)",
+        "source": "check-base.json / check-head.json targets[0].verdicts[] where option=='enable'"
+      }
+    ]
+  },
+  "other_watched_verdicts_base": {
+    "enable": "PASS",
+    "jrePackage": "OptionNotFound"
+  },
+  "other_watched_verdicts_head": {
+    "enable": "PASS",
+    "jrePackage": "PredicateNotFound"
+  },
+  "audit_diff_summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->predicate_not_found": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  }
+}

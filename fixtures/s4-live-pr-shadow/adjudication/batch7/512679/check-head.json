@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "haproxy",
+      "module": "nixos/modules/services/networking/haproxy.nix",
+      "test": "nixos/tests/haproxy.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "haproxy"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 20,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"haproxy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "haproxy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 24,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"haproxy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "haproxy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 30,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "config"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 36,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 47,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 47,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "haproxy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 95,
+            "col": 19
+          },
+          "source": "lib.optionalAttrs (cfg.user == \"haproxy\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "haproxy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/haproxy.nix",
+            "line": 102,
+            "col": 20
+          },
+          "source": "lib.optionalAttrs (cfg.group == \"haproxy\") {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "haproxy",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "server",
+          "span": {
+            "file": "nixos/tests/haproxy.nix",
+            "line": 9,
+            "col": 11
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "httpd",
+            "virtualHosts",
+            "localhost",
+            "documentRoot"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/haproxy.nix",
+            "line": 45,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/haproxy.nix",
+              "line": 47,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "haproxy",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "server",
+              "span": {
+                "file": "nixos/tests/haproxy.nix",
+                "line": 9,
+                "col": 11
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/haproxy.nix",
+                  "line": 47,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/haproxy.nix",
+                  "line": 47,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

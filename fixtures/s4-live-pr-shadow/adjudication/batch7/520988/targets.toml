@@ -1,0 +1,7 @@
+[[target]]
+name = "unifi"
+module = "nixos/modules/services/networking/unifi.nix"
+test = "nixos/tests/unifi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "unifi"]
+watch = ["enable", "jrePackage"]

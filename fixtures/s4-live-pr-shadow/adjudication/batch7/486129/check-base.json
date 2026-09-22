@@ -1,0 +1,1556 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "httpd",
+      "module": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+      "test": "nixos/tests/php/httpd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "httpd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 529,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configFile"
+          ],
+          "default_source": "confFile",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 533,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 544,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraModules"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 554,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "adminAddr"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 572,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logFormat"
+          ],
+          "default_source": "\"common\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "common"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 579,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "customLogFormat"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 601,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logLevel"
+          ],
+          "default_source": "\"notice\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "notice"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 615,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logPerVirtualHost"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 644,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"wwwrun\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "wwwrun"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 655,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"wwwrun\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "wwwrun"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 669,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logDir"
+          ],
+          "default_source": "\"/var/log/httpd\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/log/httpd"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 677,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "virtualHosts"
+          ],
+          "default_source": "{\n          localhost = {\n            documentRoot = \"${pkg}/htdocs\";\n          };\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 685,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableMellon"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 718,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enablePHP"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 720,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enablePerl"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 724,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "phpOptions"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 726,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "mpm"
+          ],
+          "default_source": "\"event\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "event"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 737,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "maxClients"
+          ],
+          "default_source": "150",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 756,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "maxRequestsPerChild"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 763,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sslCiphers"
+          ],
+          "default_source": "\"HIGH:!aNULL:!MD5:!EXP\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "HIGH:!aNULL:!MD5:!EXP"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 772,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sslProtocols"
+          ],
+          "default_source": "\"All -SSLv2 -SSLv3 -TLSv1 -TLSv1.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "All -SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 778,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enableMellon"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 99,
+            "col": 6
+          },
+          "source": "optional cfg.enableMellon {"
+        },
+        {
+          "path": [
+            "enablePHP"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 103,
+            "col": 6
+          },
+          "source": "optional cfg.enablePHP {"
+        },
+        {
+          "path": [
+            "enablePerl"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 107,
+            "col": 6
+          },
+          "source": "optional cfg.enablePerl {"
+        },
+        {
+          "path": [
+            "logPerVirtualHost"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 282,
+            "col": 9
+          },
+          "source": "optionalString cfg.logPerVirtualHost ''"
+        },
+        {
+          "path": [
+            "package",
+            "luaSupport"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 404,
+            "col": 7
+          },
+          "source": "optionalString cfg.package.luaSupport luaSetPaths"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 790,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enablePHP"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 982,
+            "col": 9
+          },
+          "source": "optionalAttrs cfg.enablePHP { PHPRC = phpIni; }"
+        },
+        {
+          "path": [
+            "enableMellon"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 983,
+            "col": 12
+          },
+          "source": "optionalAttrs cfg.enableMellon { LD_LIBRARY_PATH = \"${pkgs.xmlsec}/lib\"; }"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "mpm"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "prefork"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "mpm"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 95,
+            "col": 7
+          },
+          "source": "if cfg.mpm == \"prefork\" then [ \"cgi\" ] else [ \"cgid\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableMellon"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableMellon"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 99,
+            "col": 6
+          },
+          "source": "optional cfg.enableMellon {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enablePHP"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enablePHP"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 103,
+            "col": 6
+          },
+          "source": "optional cfg.enablePHP {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enablePerl"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enablePerl"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 107,
+            "col": 6
+          },
+          "source": "optional cfg.enablePerl {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "logFormat"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "none"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "logFormat"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 114,
+            "col": 16
+          },
+          "source": "if cfg.logFormat != \"none\" then \"${cfg.logDir}/error.log\" else \"/dev/null\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "logLevel"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "logLevel"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 115,
+            "col": 7
+          },
+          "source": "optionalString (cfg.logLevel != null) \"LogLevel ${cfg.logLevel}\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "logFormat"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "custom"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "logFormat"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 121,
+            "col": 7
+          },
+          "source": "optionalString ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "logPerVirtualHost"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "logPerVirtualHost"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 282,
+            "col": 9
+          },
+          "source": "optionalString cfg.logPerVirtualHost ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "mpm"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "prefork"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "mpm"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 344,
+            "col": 7
+          },
+          "source": "optionalString (cfg.mpm != \"prefork\") ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "package",
+                  "luaSupport"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "package",
+              "luaSupport"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 404,
+            "col": 7
+          },
+          "source": "optionalString cfg.package.luaSupport luaSetPaths"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 790,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "wwwrun"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 842,
+            "col": 19
+          },
+          "source": "optionalAttrs (cfg.user == \"wwwrun\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "wwwrun"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 850,
+            "col": 20
+          },
+          "source": "optionalAttrs (cfg.group == \"wwwrun\") {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "logFormat"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "none"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "logFormat"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 886,
+            "col": 26
+          },
+          "source": "optionalAttrs (cfg.logFormat != \"none\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enablePHP"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enablePHP"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 982,
+            "col": 9
+          },
+          "source": "optionalAttrs cfg.enablePHP { PHPRC = phpIni; }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableMellon"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableMellon"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 983,
+            "col": 12
+          },
+          "source": "optionalAttrs cfg.enableMellon { LD_LIBRARY_PATH = \"${pkgs.xmlsec}/lib\"; }"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 35,
+            "col": 6
+          },
+          "source": "if majorVersion == \"8\" then \"php\" else \"php${majorVersion}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "phpPackage",
+              "override"
+            ],
+            [
+              "package",
+              "out"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 46,
+            "col": 18
+          },
+          "source": "if hostOpts.useACMEHost != null then hostOpts.useACMEHost else hostOpts.hostName",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 54,
+            "col": 5
+          },
+          "source": "if hostOpts.listen != [ ] then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 57,
+            "col": 7
+          },
+          "source": "optionals (hostOpts.onlySSL || hostOpts.addSSL || hostOpts.forceSSL) (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 64,
+            "col": 10
+          },
+          "source": "optionals (!hostOpts.onlySSL) (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 96,
+            "col": 6
+          },
+          "source": "optional enableHttp2 \"http2\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "virtualHosts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 97,
+            "col": 6
+          },
+          "source": "optional enableSSL \"ssl\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "virtualHosts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 98,
+            "col": 6
+          },
+          "source": "optional enableUserDir \"userdir\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "virtualHosts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 184,
+            "col": 19
+          },
+          "source": "if hostOpts.adminAddr != null then hostOpts.adminAddr else cfg.adminAddr",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "adminAddr"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 190,
+            "col": 9
+          },
+          "source": "if hostOpts.enableACME then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 192,
+            "col": 14
+          },
+          "source": "if hostOpts.useACMEHost != null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 197,
+            "col": 23
+          },
+          "source": "if useACME then \"${sslCertDir}/fullchain.pem\" else hostOpts.sslServerCert",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 198,
+            "col": 22
+          },
+          "source": "if useACME then \"${sslCertDir}/key.pem\" else hostOpts.sslServerKey",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 199,
+            "col": 24
+          },
+          "source": "if useACME then \"${sslCertDir}/chain.pem\" else hostOpts.sslServerChain",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 201,
+            "col": 23
+          },
+          "source": "optionalString (useACME && hostOpts.acmeRoot != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 211,
+            "col": 5
+          },
+          "source": "optionalString (listen != [ ]) ''",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 215,
+            "col": 13
+          },
+          "source": "optionalString (adminAddr != null) \"ServerAdmin ${adminAddr}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "adminAddr"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 221,
+            "col": 13
+          },
+          "source": "if hostOpts.forceSSL then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 235,
+            "col": 7
+          },
+          "source": "optionalString (listenSSL != [ ]) ''",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 239,
+            "col": 13
+          },
+          "source": "optionalString (adminAddr != null) \"ServerAdmin ${adminAddr}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "adminAddr"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 243,
+            "col": 13
+          },
+          "source": "optionalString (sslServerChain != null) \"SSLCertificateChainFile ${sslServerChain}\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 244,
+            "col": 13
+          },
+          "source": "optionalString hostOpts.http2 \"Protocols h2 h2c http/1.1\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 253,
+            "col": 22
+          },
+          "source": "if hostOpts.documentRoot != null then hostOpts.documentRoot else pkgs.emptyDirectory",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 260,
+            "col": 17
+          },
+          "source": "optionalString (config.proxyPass != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 266,
+            "col": 17
+          },
+          "source": "optionalString (config.index != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 271,
+            "col": 17
+          },
+          "source": "optionalString (config.alias != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 287,
+            "col": 9
+          },
+          "source": "optionalString (hostOpts.robotsEntries != \"\") ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 299,
+            "col": 9
+          },
+          "source": "optionalString hostOpts.enableUserDir ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "virtualHosts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 314,
+            "col": 9
+          },
+          "source": "optionalString (hostOpts.globalRedirect != null && hostOpts.globalRedirect != \"\") ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 357,
+            "col": 66
+          },
+          "source": "if listen.ssl then \"https\" else \"http\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 370,
+            "col": 11
+          },
+          "source": "if isString module then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 375,
+            "col": 16
+          },
+          "source": "if isAttrs module then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 834,
+            "col": 12
+          },
+          "source": "lib.optional (vhostCertNames != [ ]) config.systemd.services.httpd-config-reload",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "virtualHosts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 866,
+            "col": 35
+          },
+          "source": "if hasRoot then 1000 else 2000",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 868,
+            "col": 39
+          },
+          "source": "if hasRoot then 1000 else 2000",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 872,
+            "col": 38
+          },
+          "source": "if hostOpts.adminAddr != null then hostOpts.adminAddr else cfg.adminAddr",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 904,
+            "col": 7
+          },
+          "source": "optionalString (config.time.timeZone != null) ''",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+            "line": 1018,
+            "col": 7
+          },
+          "source": "mkIf (vhostCertNames != [ ]) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "virtualHosts"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "httpd",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/php/httpd.nix",
+            "line": 18,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "httpd",
+            "phpPackage"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/php/httpd.nix",
+            "line": 30,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+              "line": 790,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "httpd",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/php/httpd.nix",
+                "line": 18,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+                  "line": 790,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-servers/apache-httpd/default.nix",
+                  "line": 790,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

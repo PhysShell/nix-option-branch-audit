@@ -1,0 +1,7 @@
+[[target]]
+name = "beszel-hub"
+module = "nixos/modules/services/monitoring/beszel-hub.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "hub"]
+watch = ["enable"]

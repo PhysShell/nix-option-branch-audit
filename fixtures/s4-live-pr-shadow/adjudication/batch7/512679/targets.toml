@@ -1,0 +1,7 @@
+[[target]]
+name = "haproxy"
+module = "nixos/modules/services/networking/haproxy.nix"
+test = "nixos/tests/haproxy.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "haproxy"]
+watch = ["enable"]
