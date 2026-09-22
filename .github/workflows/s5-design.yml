@@ -1,0 +1,53 @@
+name: S5 design round self-tests
+
+# Design-only checks for fixtures/s5-design/ -- no Rust build, no `oba`
+# invocation, since this whole round deliberately never touches src/.
+# Proves the S5-B enrichment-selector leakage boundary mechanically on
+# every push, not just at design-round authorship time.
+
+on:
+  push:
+    paths:
+      - "fixtures/s5-design/**"
+      - ".github/workflows/s5-design.yml"
+  pull_request:
+    paths:
+      - "fixtures/s5-design/**"
+      - ".github/workflows/s5-design.yml"
+
+jobs:
+  leakage-and-schema-checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Leakage-prevention self-tests
+        run: python3 fixtures/s5-design/test_no_leakage.py
+      - name: Feature-schema validation
+        run: python3 fixtures/s5-design/validate_features_schema.py fixtures/s5-design/features.jsonl
+      - name: Recompute rule comparison and diff against committed output
+        run: |
+          cd fixtures/s5-design
+          python3 evaluate-rules.py > /tmp/rule-eval.log
+          git diff --exit-code rule-comparison.jsonl selection-record-example.json || {
+            echo "::error::rule-comparison.jsonl is not reproducible from the committed features/labels -- regenerate and commit"
+            exit 1
+          }
+      - name: Recompute planning calculations and diff against committed output
+        run: |
+          cd fixtures/s5-design
+          python3 planning-calculations.py > /tmp/planning.log
+          git diff --exit-code planning-calculations.json || {
+            echo "::error::planning-calculations.json is not reproducible -- regenerate and commit"
+            exit 1
+          }
+      - name: Recompute historical labels and diff against committed output
+        run: |
+          cd fixtures/s5-design
+          python3 extract-labels.py
+          git diff --exit-code historical-labels.jsonl || {
+            echo "::error::historical-labels.jsonl is not reproducible from the S4 ledger -- regenerate and commit"
+            exit 1
+          }

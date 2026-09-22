@@ -1,0 +1,62 @@
+{
+  "_comment": "S5 protocol DRAFT ledger schema -- extends S4's own record_type union (fixtures/s4-live-pr-shadow/generate-report.py) with a new selection_record type. Not authorized for real use; no fresh S5 ledger exists yet. Every S4 record_type below is carried forward unchanged in shape; only selection_record and its cohort-B-specific fields are new.",
+  "record_types": {
+    "population_record": {
+      "record_type": "population_record",
+      "cohort": "A | B",
+      "source_commits_or_shas": "list[str] -- real, frozen source-of-truth PR/commit coordinates for the population funnel",
+      "screen_summary": "object -- same shape as S4's own population-funnel.json"
+    },
+    "selection_record": {
+      "_comment": "NEW for S5-B. Must be written for EVERY candidate PR examined by the enrichment selector, whether or not it was selected -- a selection_record with selected=false is real evidence too (it proves the selector actually ran on that PR, not skipped it).",
+      "record_type": "selection_record",
+      "cohort": "B",
+      "pr": "int",
+      "selected_by": "str, e.g. 'S5-B-enrichment-R4-v1'",
+      "features": {
+        "_comment": "the EXACT feature dict extract-features.py produced for this PR -- copied verbatim, not summarized, so a reviewer can re-derive the selection decision from this record alone",
+        "option_declaration_changed": "bool",
+        "test_assignment_changed": "bool",
+        "predicate_logic_changed": "bool",
+        "...": "every key in validate_features_schema.py's own ALLOWED_KEYS"
+      },
+      "score": "int (only meaningful for a scoring rule like R7; 0/1 for a boolean rule like R4)",
+      "selected": "bool",
+      "reasons": "list[str] -- the exact source-diff facts that caused (or would have caused) selection"
+    },
+    "pr_processing_record": {
+      "_comment": "S4's own pr_summary record type, unchanged shape",
+      "record_type": "pr_summary"
+    },
+    "actionable_presentation": {
+      "_comment": "S4's own actionable_presentation record type, unchanged shape (presentation_id, engine, subject, bucket, raw_output_index, 2 reviews, coordinator_resolution)",
+      "record_type": "actionable_presentation"
+    },
+    "pass_adjudication": {
+      "_comment": "S4's own pass_adjudication record type, unchanged shape",
+      "record_type": "pass_adjudication"
+    },
+    "tool_error": {
+      "_comment": "S4's own tool_error record type, unchanged shape",
+      "record_type": "tool_error"
+    },
+    "reviewer_disagreement": {
+      "_comment": "S4 derives this from actionable_presentation/pass_adjudication's own two-review disagreement, never a separately hand-typed record; carried forward identically for S5"
+    },
+    "protocol_note": {
+      "_comment": "S4's own protocol_note record type, unchanged shape",
+      "record_type": "protocol_note"
+    }
+  },
+  "invariants_carried_forward_from_s4": [
+    "every actionable_presentation/pass_adjudication has EXACTLY 2 distinct reviews",
+    "presentation_id/pass_id are genuinely derived and validated against supplied values, never trusted",
+    "no false_finding/false_pass field anywhere -- always derived from the RESOLVED judgment",
+    "an unresolved disagreement returns None from resolved_judgment, excluded from hard-failure inventories, surfaced only via a dedicated unresolved-disagreement check",
+    "frozen-order PREFIX property: processed positions for a cohort are an unbroken 1..N prefix of that cohort's frozen order"
+  ],
+  "new_invariant_for_s5_b": [
+    "every pr_summary record in cohort B must have a matching selection_record (selected=true) -- a processed S5-B PR with no selection_record is a schema violation, proving the selector's own reasoning was never captured for it",
+    "a selection_record's own `features` field must pass validate_features_schema.py's allowlist check -- an outcome-shaped key anywhere in a real selection_record is a hard validation failure, not a warning"
+  ]
+}

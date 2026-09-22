@@ -1,0 +1,14 @@
+{
+  "pr": 538141,
+  "selected_by": "R7_compound_transparent_score-v1",
+  "features": {
+    "option_declaration_changed": true,
+    "test_assignment_changed": false,
+    "predicate_logic_changed": true
+  },
+  "score": 4,
+  "reasons": [
+    "+2 option_declaration_changed",
+    "+2 predicate_logic_changed"
+  ]
+}

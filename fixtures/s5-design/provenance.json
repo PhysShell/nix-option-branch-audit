@@ -1,0 +1,54 @@
+{
+  "design_round": "S5 sampling/enrichment protocol design (design-only, no fresh draw)",
+  "authorized_at_commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+  "released_analyzer_baseline": {
+    "version": "0.4.5",
+    "release_commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+    "tag": "v0.4.5"
+  },
+  "historical_design_corpus_sources": {
+    "s4_report": "fixtures/s4-live-pr-shadow/s4-final-report.md",
+    "s4_ledger": "fixtures/s4-live-pr-shadow/adjudication-ledger.jsonl",
+    "s4_frozen_orders": [
+      "fixtures/s4-live-pr-shadow/s4a-frozen-order.json",
+      "fixtures/s4-live-pr-shadow/s4b-frozen-order.json"
+    ],
+    "s4_population_artifacts": [
+      "fixtures/s4-live-pr-shadow/population-survivors.json",
+      "fixtures/s4-live-pr-shadow/population-funnel.json",
+      "fixtures/s4-live-pr-shadow/exclusion-ledger.json"
+    ],
+    "s4_f1_commit": "940e388d625bd9ed09138f816bfacdccdd187bb1",
+    "s4_f1_r_report": "fixtures/s4-f1-r/f1-r-report.md",
+    "s4_f1_r_corpus": "fixtures/s4-f1-r/corpus.json",
+    "s4_f1_r_ledger": "fixtures/s4-f1-r/ledger.jsonl",
+    "s1_artifacts": [
+      "fixtures/s1-live-pr-shadow/sample.md",
+      "fixtures/s1-live-pr-shadow/results.md",
+      "fixtures/s1-live-pr-shadow/results-regression.md"
+    ],
+    "s2_artifacts": [
+      "fixtures/s2-live-pr-shadow/sample.md",
+      "fixtures/s2-live-pr-shadow/results.md",
+      "fixtures/s2-live-pr-shadow/results-regression.md"
+    ],
+    "s3_artifacts": [
+      "fixtures/s3-live-pr-shadow/sample.md",
+      "fixtures/s3-live-pr-shadow/results.md",
+      "fixtures/s3-live-pr-shadow/results-regression.md"
+    ]
+  },
+  "confirmed_before_design_work_began": {
+    "s4_unchanged": true,
+    "s4_unchanged_check": "git status --short fixtures/s4-live-pr-shadow/ empty at design-round start; no file under that path touched by this round",
+    "src_unchanged_and_not_authorized_here": true,
+    "src_last_touch_commit": "940e388d625bd9ed09138f816bfacdccdd187bb1"
+  },
+  "historical_label_availability_by_round": {
+    "S4": "complete, machine-readable, per-record adjudication ledger (adjudication-ledger.jsonl) -- 187 processed PRs, 94 applicable, real per-actionable-presentation and per-PASS review outcomes. Used as the PRIMARY, fully-mechanical labeled design/validation corpus for this round.",
+    "S3": "a real per-PR Markdown table exists (results.md, 48 rows: applicable/verdict-summary/notable/effort as free text) but is not machine-uniform with S4's own JSONL schema. Not joined into the quantitative rule-comparison in this round -- see design-report.md's own disclosed-limitations section.",
+    "S2": "NO per-PR table exists at all in results.md -- only cohort-level aggregate counts. Cannot support per-PR feature/label joining under any extraction method. Population membership only (sample.md) could support a feature-DISTRIBUTION comparison, not a labeled validation; not attempted in this round given time/scope.",
+    "S1": "a real per-PR Markdown table exists (results.md, ~9 rows shown, oba yes/no + free-text result/notable) but small and free-text, same limitation class as S3.",
+    "decision": "This round's quantitative rule comparison (evaluate-rules.py) uses S4 alone as the labeled design corpus. The authorization's suggested Option B (leave-one-round-out across S1/S2/S3/S4) could not be implemented as specified because S1-S3 predate the machine-readable ledger convention S4 introduced and do not support reliable, non-fragile per-PR label extraction at the same standard. This is a real, disclosed methodological constraint of the historical record, not a shortcut taken for convenience."
+  }
+}

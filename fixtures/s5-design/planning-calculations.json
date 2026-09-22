@@ -1,0 +1,324 @@
+{
+  "precision_lower_bounds": [
+    {
+      "n": 20,
+      "successes_all_correct": 20,
+      "one_sided_95_lower_bound_all_correct": 0.8609,
+      "successes_one_miss": 19,
+      "one_sided_95_lower_bound_one_miss": 0.7839
+    },
+    {
+      "n": 25,
+      "successes_all_correct": 25,
+      "one_sided_95_lower_bound_all_correct": 0.8871,
+      "successes_one_miss": 24,
+      "one_sided_95_lower_bound_one_miss": 0.8239
+    },
+    {
+      "n": 30,
+      "successes_all_correct": 30,
+      "one_sided_95_lower_bound_all_correct": 0.905,
+      "successes_one_miss": 29,
+      "one_sided_95_lower_bound_one_miss": 0.8514
+    },
+    {
+      "n": 35,
+      "successes_all_correct": 35,
+      "one_sided_95_lower_bound_all_correct": 0.918,
+      "successes_one_miss": 34,
+      "one_sided_95_lower_bound_one_miss": 0.8715
+    },
+    {
+      "n": 40,
+      "successes_all_correct": 40,
+      "one_sided_95_lower_bound_all_correct": 0.9278,
+      "successes_one_miss": 39,
+      "one_sided_95_lower_bound_one_miss": 0.8868
+    },
+    {
+      "n": 49,
+      "successes_all_correct": 49,
+      "one_sided_95_lower_bound_all_correct": 0.9407,
+      "successes_one_miss": 48,
+      "one_sided_95_lower_bound_one_miss": 0.9068
+    }
+  ],
+  "representative_cohort_ci_widths": [
+    {
+      "n": 100,
+      "assumed_rate": 0.05,
+      "observed_k": 5,
+      "two_sided_95_ci": [
+        0.0164,
+        0.1128
+      ],
+      "half_width": 0.0482
+    },
+    {
+      "n": 100,
+      "assumed_rate": 0.1,
+      "observed_k": 10,
+      "two_sided_95_ci": [
+        0.049,
+        0.1762
+      ],
+      "half_width": 0.0636
+    },
+    {
+      "n": 100,
+      "assumed_rate": 0.25,
+      "observed_k": 25,
+      "two_sided_95_ci": [
+        0.1688,
+        0.3466
+      ],
+      "half_width": 0.0889
+    },
+    {
+      "n": 100,
+      "assumed_rate": 0.5,
+      "observed_k": 50,
+      "two_sided_95_ci": [
+        0.3983,
+        0.6017
+      ],
+      "half_width": 0.1017
+    },
+    {
+      "n": 150,
+      "assumed_rate": 0.05,
+      "observed_k": 8,
+      "two_sided_95_ci": [
+        0.0233,
+        0.1024
+      ],
+      "half_width": 0.0395
+    },
+    {
+      "n": 150,
+      "assumed_rate": 0.1,
+      "observed_k": 15,
+      "two_sided_95_ci": [
+        0.0571,
+        0.1596
+      ],
+      "half_width": 0.0513
+    },
+    {
+      "n": 150,
+      "assumed_rate": 0.25,
+      "observed_k": 38,
+      "two_sided_95_ci": [
+        0.1859,
+        0.3307
+      ],
+      "half_width": 0.0724
+    },
+    {
+      "n": 150,
+      "assumed_rate": 0.5,
+      "observed_k": 75,
+      "two_sided_95_ci": [
+        0.4174,
+        0.5826
+      ],
+      "half_width": 0.0826
+    },
+    {
+      "n": 200,
+      "assumed_rate": 0.05,
+      "observed_k": 10,
+      "two_sided_95_ci": [
+        0.0242,
+        0.09
+      ],
+      "half_width": 0.0329
+    },
+    {
+      "n": 200,
+      "assumed_rate": 0.1,
+      "observed_k": 20,
+      "two_sided_95_ci": [
+        0.0622,
+        0.1502
+      ],
+      "half_width": 0.044
+    },
+    {
+      "n": 200,
+      "assumed_rate": 0.25,
+      "observed_k": 50,
+      "two_sided_95_ci": [
+        0.1916,
+        0.316
+      ],
+      "half_width": 0.0622
+    },
+    {
+      "n": 200,
+      "assumed_rate": 0.5,
+      "observed_k": 100,
+      "two_sided_95_ci": [
+        0.4287,
+        0.5713
+      ],
+      "half_width": 0.0713
+    }
+  ],
+  "volume_planning_not_a_guarantee": [
+    {
+      "rule": "R1_module_and_test_cochange",
+      "historical_yield_per_selected_pr": 0.0909,
+      "historical_selection_rate": 0.1176,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": 220.0,
+          "candidate_prs_needed_approx": 1871
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": 330.0,
+          "candidate_prs_needed_approx": 2806
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": 440.0,
+          "candidate_prs_needed_approx": 3742
+        }
+      ]
+    },
+    {
+      "rule": "R2_option_declaration_and_test_change",
+      "historical_yield_per_selected_pr": 0.0,
+      "historical_selection_rate": 0.016,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": null,
+          "candidate_prs_needed_approx": null
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": null,
+          "candidate_prs_needed_approx": null
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": null,
+          "candidate_prs_needed_approx": null
+        }
+      ]
+    },
+    {
+      "rule": "R3_predicate_change_and_test_change",
+      "historical_yield_per_selected_pr": 0.1111,
+      "historical_selection_rate": 0.0481,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": 180.0,
+          "candidate_prs_needed_approx": 3743
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": 270.0,
+          "candidate_prs_needed_approx": 5614
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": 360.0,
+          "candidate_prs_needed_approx": 7485
+        }
+      ]
+    },
+    {
+      "rule": "R4_option_lifecycle",
+      "historical_yield_per_selected_pr": 0.2647,
+      "historical_selection_rate": 0.1818,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": 75.6,
+          "candidate_prs_needed_approx": 416
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": 113.3,
+          "candidate_prs_needed_approx": 623
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": 151.1,
+          "candidate_prs_needed_approx": 831
+        }
+      ]
+    },
+    {
+      "rule": "R5_module_lifecycle",
+      "historical_yield_per_selected_pr": 0.5,
+      "historical_selection_rate": 0.0107,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": 40.0,
+          "candidate_prs_needed_approx": 3738
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": 60.0,
+          "candidate_prs_needed_approx": 5607
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": 80.0,
+          "candidate_prs_needed_approx": 7477
+        }
+      ]
+    },
+    {
+      "rule": "R6_branch_relevant_configuration_change",
+      "historical_yield_per_selected_pr": 0.1324,
+      "historical_selection_rate": 0.3636,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": 151.1,
+          "candidate_prs_needed_approx": 415
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": 226.6,
+          "candidate_prs_needed_approx": 623
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": 302.1,
+          "candidate_prs_needed_approx": 831
+        }
+      ]
+    },
+    {
+      "rule": "R7_compound_transparent_score",
+      "historical_yield_per_selected_pr": 0.32,
+      "historical_selection_rate": 0.1337,
+      "targets": [
+        {
+          "actionable_target": 20,
+          "selected_prs_needed_approx": 62.5,
+          "candidate_prs_needed_approx": 467
+        },
+        {
+          "actionable_target": 30,
+          "selected_prs_needed_approx": 93.8,
+          "candidate_prs_needed_approx": 701
+        },
+        {
+          "actionable_target": 40,
+          "selected_prs_needed_approx": 125.0,
+          "candidate_prs_needed_approx": 935
+        }
+      ]
+    }
+  ]
+}
