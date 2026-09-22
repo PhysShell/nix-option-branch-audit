@@ -1,0 +1,30 @@
+{
+  "pr": 516530,
+  "title": "nixos/phpfpm: escape string values in settings/phpEnv per parse_ini_file rules",
+  "applicable": true,
+  "base_sha": "a263060feafdfdb5d1d70b53b04d5bb810b13cf1",
+  "head_sha": "03ac107a963d2c7910be4443cdd6ed399c5d4c92",
+  "module_paths": ["nixos/modules/services/web-servers/phpfpm/default.nix"],
+  "test_paths": ["nixos/tests/php/fpm.nix"],
+  "test_wiring": "nixos/tests/all-tests.nix (head 03ac107a963d2c7910be4443cdd6ed399c5d4c92): `php = import ./php/default.nix { inherit runTest; php = pkgs.php; }` (line ~1339), and nixos/tests/php/default.nix (fetched at head) confirms: `fpm = runTest { imports = [ ./fpm.nix ]; _module.args.php = php'; };` -- fpm.nix is wired.",
+  "watch_selection_basis": "PR diff (`gh pr diff 516530`) touches nixos/modules/services/web-servers/phpfpm/default.nix inside the `toStr` helper function (a private let-binding used to serialize option *values* into php.ini syntax -- adds a new `isString value` branch with escaping logic), and nixos/tests/php/fpm.nix (adds phpEnv test fixtures + assertions). The touched module lines are NOT inside any mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration -- toStr is a plain helper function used later when rendering `settings`/`phpEnv` values, confirmed by inspecting the full option declarations (lines 187-260 at head): `settings`, `extraConfig`, `phpPackage`, `phpOptions`, `pools` (submodule). IMPORTANT: this module has NO `enable` option at all -- the phpfpm service is implicitly enabled via `config = mkIf (cfg.pools != { }) { ... }` rather than a declared boolean. Per the standing instruction to always watch baseline `enable` regardless, `enable` was still included in the target's watch list; oba correctly reports it as OptionNotFound on both sides (see below), which is accurate raw tool behavior, not an error.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "OptionNotFound on both check-base.json and check-head.json (target 'phpfpm', watched_path 'enable') -- consistent with the module declaring no `enable` option; discovered_options for this module are: socket, listen, phpPackage, phpOptions, phpEnv, user, group, settings, extraConfig (x2, top-level + pool-level), phpOptions (pool-level), pools. This is why exit code is 2 (inconclusive) on all three runs rather than 0.",
+    "no_asymmetric_transitions": "audit-diff raw.json oba_verdict_transitions = {}, notable = [], diff.kind = 'unchanged' for the single watched identity (enable, OptionNotFound both sides). No transition of any kind, including no OBA001->PASS.",
+    "reviewer_note": "The actual behavioral change under audit (string-value ini escaping in toStr, exercised via phpEnv) does not correspond to any option this target's watch list covers (enable). A reviewer wanting to assess whether oba's contract-audit model has anything meaningful to say about this PR's real change would need a target watching `phpEnv` or `settings` rather than `enable` -- out of scope for this mechanical data-gathering pass, which follows the fixed watch-selection rule (baseline enable + touched option declarations only)."
+  }
+}

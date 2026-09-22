@@ -1,0 +1,40 @@
+{
+  "pr": 550306,
+  "title": "nixos/firewall: change default checkReversePath to \"loose\" to align with systemd",
+  "applicable": true,
+  "base_sha": "89d3b415029c3286840524199c7814cffea5c409",
+  "head_sha": "81b667462e0ef07471dd56fdceab0a8ed3f80b35",
+  "module_paths": ["nixos/modules/services/networking/firewall.nix"],
+  "test_paths": ["nixos/tests/firewall.nix"],
+  "test_wiring": "nixos/tests/all-tests.nix (head 81b667462e0ef07471dd56fdceab0a8ed3f80b35): `firewall = runTest { imports = [ ./firewall.nix ]; ... }` (line ~627), plus firewall-firewalld and firewall-nftables variants also importing ./firewall.nix.",
+  "watch_selection_basis": "PR diff (`gh pr diff 550306`) touches only nixos/modules/services/networking/firewall.nix (plus a release-notes doc, not a code target). The touched lines are inside the `checkReversePath = lib.mkOption { ... }` declaration block: `default = true;` -> `default = \"loose\";` and `defaultText` updated to match. This is a declaration-line touch for the `checkReversePath` option, so it was added to watch alongside baseline `enable`.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/firewall.nix",
+        "test": "nixos/tests/firewall.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["networking", "firewall"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "verdict": "PASS",
+        "source": "check-base.json / check-head.json, target name 'firewall'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "checkReversePath_verdict_both_sides": "PredicateNotFound (inconclusive on both base and head; exit code 2 both runs, no tool_error). raw.json audit-diff reports this identity's diff.kind as 'unchanged' (no oba_verdict_transitions recorded, notable_total 0). summary.md audit-diff notes 'Analysis was inconclusive on at least one side'.",
+    "no_asymmetric_transitions": "audit-diff raw.json oba_verdict_transitions = {} and notable = [] -- no PASS/FAIL/Inconclusive transition of any kind (including no OBA001->PASS) between base and head for either watched option."
+  }
+}

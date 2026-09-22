@@ -1,0 +1,1387 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 2
+  },
+  "targets": [
+    {
+      "name": "firezone",
+      "module": "nixos/modules/services/networking/firezone/server.nix",
+      "test": "nixos/tests/firezone/firezone.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "firezone",
+        "server"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 178,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableLocalDB"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 179,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 180,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "openClusterFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 182,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "clusterHosts"
+          ],
+          "default_source": "[\n        \"api@localhost.localdomain\"\n        \"web@localhost.localdomain\"\n        \"domain@localhost.localdomain\"\n      ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 193,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settingsSecret"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 209,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "RELEASE_COOKIE"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 225,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "TOKENS_KEY_BASE"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 240,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "SECRET_KEY_BASE"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 255,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "TOKENS_SALT"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 270,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "LIVE_VIEW_SIGNING_SALT"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 285,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "COOKIE_SIGNING_SALT"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 300,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settingsSecret",
+            "COOKIE_ENCRYPTION_SALT"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 315,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 333,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "configureManually"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 359,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "from"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 378,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "host"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 384,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "port"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 390,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "implicitTls"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 396,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "username"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 402,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "passwordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 408,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "web",
+            "externalUrl"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 418,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "web",
+            "address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 428,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "web",
+            "port"
+          ],
+          "default_source": "8080",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 434,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "web",
+            "trustedProxies"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 440,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "api",
+            "externalUrl"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 448,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "api",
+            "address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 458,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "api",
+            "port"
+          ],
+          "default_source": "8081",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 464,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "api",
+            "trustedProxies"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 470,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 480,
+            "col": 6
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableLocalDB"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 486,
+            "col": 6
+          },
+          "source": "mkIf cfg.enableLocalDB {"
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 511,
+            "col": 6
+          },
+          "source": "mkIf cfg.nginx.enable {"
+        },
+        {
+          "path": [
+            "smtp",
+            "implicitTls"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 630,
+            "col": 40
+          },
+          "source": "if cfg.smtp.implicitTls then \"ssl\" else \"tcp\""
+        },
+        {
+          "path": [
+            "enableLocalDB"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 665,
+            "col": 17
+          },
+          "source": "mkIf cfg.enableLocalDB [ \"postgresql.target\" ]"
+        },
+        {
+          "path": [
+            "enableLocalDB"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 666,
+            "col": 20
+          },
+          "source": "mkIf cfg.enableLocalDB [ \"postgresql.target\" ]"
+        },
+        {
+          "path": [
+            "domain",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 689,
+            "col": 49
+          },
+          "source": "mkIf cfg.domain.enable {"
+        },
+        {
+          "path": [
+            "web",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 720,
+            "col": 46
+          },
+          "source": "mkIf cfg.web.enable {"
+        },
+        {
+          "path": [
+            "api",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 736,
+            "col": 46
+          },
+          "source": "mkIf cfg.api.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 480,
+            "col": 6
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLocalDB"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLocalDB"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 486,
+            "col": 6
+          },
+          "source": "mkIf cfg.enableLocalDB {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "nginx",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nginx",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 511,
+            "col": 6
+          },
+          "source": "mkIf cfg.nginx.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "smtp",
+                    "configureManually"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "smtp",
+              "configureManually"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 623,
+            "col": 6
+          },
+          "source": "mkIf (!cfg.smtp.configureManually) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smtp",
+                  "implicitTls"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smtp",
+              "implicitTls"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 630,
+            "col": 40
+          },
+          "source": "if cfg.smtp.implicitTls then \"ssl\" else \"tcp\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "openClusterFirewall"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "domain",
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openClusterFirewall"
+            ],
+            [
+              "domain",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 637,
+            "col": 6
+          },
+          "source": "mkIf (cfg.openClusterFirewall && cfg.domain.enable) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "openClusterFirewall"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "web",
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openClusterFirewall"
+            ],
+            [
+              "web",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 642,
+            "col": 6
+          },
+          "source": "mkIf (cfg.openClusterFirewall && cfg.web.enable) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "openClusterFirewall"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "api",
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openClusterFirewall"
+            ],
+            [
+              "api",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 647,
+            "col": 6
+          },
+          "source": "mkIf (cfg.openClusterFirewall && cfg.api.enable) {"
+        },
+        {
+          "ir": {
+            "Or": [
+              {
+                "Or": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "domain",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "web",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "api",
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "domain",
+              "enable"
+            ],
+            [
+              "web",
+              "enable"
+            ],
+            [
+              "api",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 652,
+            "col": 6
+          },
+          "source": "mkIf (cfg.domain.enable || cfg.web.enable || cfg.api.enable) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLocalDB"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLocalDB"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 665,
+            "col": 17
+          },
+          "source": "mkIf cfg.enableLocalDB [ \"postgresql.target\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLocalDB"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLocalDB"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 666,
+            "col": 20
+          },
+          "source": "mkIf cfg.enableLocalDB [ \"postgresql.target\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "domain",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "domain",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 689,
+            "col": 49
+          },
+          "source": "mkIf cfg.domain.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "web",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "web",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 720,
+            "col": 46
+          },
+          "source": "mkIf cfg.web.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "api",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "api",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 736,
+            "col": 46
+          },
+          "source": "mkIf cfg.api.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 44,
+            "col": 21
+          },
+          "source": "if isBool v then boolToString v else toString v",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/firezone/server.nix",
+            "line": 83,
+            "col": 11
+          },
+          "source": "if cfg.settingsSecret.${secret} == null then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "firezone",
+            "server",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "server",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 72,
+            "col": 11
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "nginx"
+          ],
+          "instance": "server",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 51,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firezone",
+            "server",
+            "smtp",
+            "passwordFile"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 84,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firezone",
+            "relay",
+            "tokenFile"
+          ],
+          "instance": "relay",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 110,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firezone",
+            "relay",
+            "publicIpv4"
+          ],
+          "instance": "relay",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 111,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firezone",
+            "relay",
+            "publicIpv6"
+          ],
+          "instance": "relay",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 112,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firezone",
+            "gateway",
+            "tokenFile"
+          ],
+          "instance": "gateway",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 226,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firezone",
+            "headless-client",
+            "tokenFile"
+          ],
+          "instance": "client",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firezone/firezone.nix",
+            "line": 249,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/firezone/server.nix",
+              "line": 480,
+              "col": 6
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "firezone",
+                "server",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "server",
+              "span": {
+                "file": "nixos/tests/firezone/firezone.nix",
+                "line": 72,
+                "col": 11
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/firezone/server.nix",
+                  "line": 480,
+                  "col": 6
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/firezone/server.nix",
+                  "line": 480,
+                  "col": 6
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "provision.enable"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "provision.accounts"
+        }
+      ]
+    }
+  ]
+}

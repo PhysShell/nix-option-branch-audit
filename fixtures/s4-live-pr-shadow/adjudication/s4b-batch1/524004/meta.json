@@ -1,0 +1,39 @@
+{
+  "pr": 524004,
+  "title": "nixos/firewalld: add reloadTriggers, fix ExecReload override",
+  "applicable": true,
+  "base_sha": "13191993df388306124045737b28dac71c4c06d6",
+  "head_sha": "84160ddeb87005ca31b58ea0c55c9c7241d1eb77",
+  "module_paths": ["nixos/modules/services/networking/firewalld/default.nix"],
+  "test_paths": ["nixos/tests/firewalld.nix"],
+  "test_wiring": "nixos/tests/all-tests.nix (head 84160ddeb87005ca31b58ea0c55c9c7241d1eb77): `firewalld = runTest ./firewalld.nix;` (line ~595); also `firewall-firewalld = runTest { imports = [ ./firewall.nix ]; _module.args.backend = \"firewalld\"; }` (line ~587), but the target used here is the module's own dedicated test nixos/tests/firewalld.nix.",
+  "watch_selection_basis": "PR diff (`gh pr diff 524004`) touches only nixos/modules/services/networking/firewalld/default.nix, entirely inside the `systemd.services.firewalld = { ... }` block: ExecReload changed to a list form (RFC-style override) and a new `reloadTriggers` attribute added. No mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration line is touched. Only the baseline `enable` option (declared `lib.mkEnableOption \"FirewallD\"` at line 24) was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/firewalld/default.nix",
+        "test": "nixos/tests/firewalld.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "firewalld"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "verdict": "PASS",
+        "source": "check-base.json / check-head.json, target name 'firewalld'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "no_asymmetric_transitions": "audit-diff raw.json oba_verdict_transitions = {}, notable = [], diff.kind = 'unchanged' for the single watched identity (enable). No transition of any kind, including no OBA001->PASS."
+  }
+}

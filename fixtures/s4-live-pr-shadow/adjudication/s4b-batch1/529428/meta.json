@@ -1,0 +1,52 @@
+{
+  "pr": 529428,
+  "title": "firezone: remove provisioning support (services.firezone.server.provision.*)",
+  "applicable": true,
+  "base_sha": "6115d635effba217cd496311faac646d808e5222",
+  "head_sha": "d973113ac6a3550e3ea36f3da3565ccf8e4a3c35",
+  "module_paths": ["nixos/modules/services/networking/firezone/server.nix"],
+  "test_paths": ["nixos/tests/firezone/firezone.nix"],
+  "test_wiring": "nixos/tests/all-tests.nix (head d973113ac6a3550e3ea36f3da3565ccf8e4a3c35): `firezone = runTest ./firezone/firezone.nix;` (line ~597). PR's own diff also touches nixos/tests/firezone/create-tokens.exs and nixos/tests/firezone/firezone.nix directly.",
+  "watch_selection_basis": "PR diff (`gh pr diff 529428`, 1544 lines total) touches nixos/modules/services/networking/firezone/{provision.exs,server.nix}, a release-notes doc, and two test files. provision.exs is an Elixir script (not a .nix module/option file), excluded from targets. In server.nix, the entire `provision = { enable = mkEnableOption \"provisioning of the Firezone domain server\"; accounts = mkOption { ... }; }` block (options.services.firezone.server.provision.{enable,accounts}) is deleted (~393 lines removed), and a new `imports = [ (lib.mkRemovedOptionModule [ \"services\" \"firezone\" \"server\" \"provision\" ] ''...'') ];` is added in its place. A private helper type `typePortRange` (with its own local `from`/`to` mkOption fields, unrelated to any cfg.* path -- used only as a coercedTo type for an unrelated option, not itself reachable as a dotted cfg path) is also deleted, and is not watched for that reason. Watched: baseline `enable` (cfg.enable, unchanged mkEnableOption), plus `provision.enable` and `provision.accounts` -- both are direct dotted cfg-reachable option declarations whose mkOption/mkEnableOption lines are textually deleted by the diff. Nested submodule-internal fields of `provision.accounts` (e.g. accounts.<name>.name/features/actors/auth/resources/policies/groups/relayGroups/gatewayGroups, dozens of further nested mkOptions) are generic per-instance submodule field definitions with no single fixed dotted path from cfg (consistent with how other targets in this batch, e.g. phpfpm's `pools` submodule, do not enumerate nested submodule-instance fields individually) -- not watched.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/firezone/server.nix",
+        "test": "nixos/tests/firezone/firezone.nix",
+        "watched_path": "provision.enable",
+        "bucket": "new_inconclusive",
+        "raw_output_index": "raw.json summary.notable[0]",
+        "message": "no mkOption declaration found for this watched option",
+        "detail": "declaration: not found"
+      }
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/networking/firezone/server.nix",
+        "test": "nixos/tests/firezone/firezone.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "firezone", "server"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "verdict": "PASS",
+        "source": "check-base.json / check-head.json, target name 'firezone'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "provision_enable_transition": "raw.json oba_verdict_transitions includes 'pass->option_not_found': 1 -- this is `provision.enable`: check-base.json verdict = PASS (evidence: nixos/tests/firezone/firezone.nix line 88, `services.firezone.server.provision.enable = true;` on the 'server' test instance; predicate `mkIf cfg.provision.enable { ... }` at server.nix:1069 witnessed true); check-head.json verdict = OptionNotFound (the option and its predicate no longer exist post-removal). This is a PASS-to-removed transition (the reverse direction of an OBA00x->PASS transition), driven entirely by the PR's intentional removal of the provision feature.",
+    "provision_accounts_transition": "raw.json oba_verdict_transitions includes 'predicate_not_found->option_not_found': 1 -- this is `provision.accounts`: check-base.json verdict = PredicateNotFound (option existed with no discoverable mkIf/truthy predicate directly gating on it); check-head.json verdict = OptionNotFound (option removed). Also driven by the provision-feature removal.",
+    "no_pass_to_pass_transition_for_these": "Neither provision.enable nor provision.accounts is a genuine PASS on both sides, so neither qualifies for pass_verdicts_needing_review under the 'only genuine PASS on both sides' rule -- recorded here instead as raw transition facts.",
+    "mkRemovedOptionModule_added": "The diff adds `lib.mkRemovedOptionModule [ \"services\" \"firezone\" \"server\" \"provision\" ]` at server.nix (new imports block) as the replacement mechanism for the deleted provision.* options -- this produces a build-time eval error/warning for users still setting provision.*, but is not itself a target oba's mkOption-based discovery models (oba's discovered_options/predicates machinery looks for mkOption/mkEnableOption declarations, not mkRemovedOptionModule declarations), which is consistent with why provision.enable/provision.accounts surface as OptionNotFound on head rather than some other specific 'removed-option' verdict kind."
+  }
+}

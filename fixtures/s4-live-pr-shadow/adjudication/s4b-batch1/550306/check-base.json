@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "firewall",
+      "module": "nixos/modules/services/networking/firewall.nix",
+      "test": "nixos/tests/firewall.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "networking",
+        "firewall"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 73,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "backend"
+          ],
+          "default_source": "if config.services.firewalld.enable then\n            \"firewalld\"\n          else if config.networking.nftables.enable then\n            \"nftables\"\n          else\n            \"iptables\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 83,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "if config.networking.nftables.enable then pkgs.nftables else pkgs.iptables",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 109,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logRefusedConnections"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 119,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logRefusedPackets"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 129,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logRefusedUnicastsOnly"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 141,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "rejectPackets"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 152,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "trustedInterfaces"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 164,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "allowPing"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 175,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "pingLimit"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 186,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "checkReversePath"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 201,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logReversePathDrops"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 226,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "filterForward"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 235,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "connectionTrackingModules"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 245,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "autoLoadConntrackHelpers"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 276,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraPackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 287,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "interfaces"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 297,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "allInterfaces"
+          ],
+          "default_source": "{\n          default = lib.mapAttrs (name: value: cfg.${name}) commonOptions;\n        }\n        // cfg.interfaces",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 305,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 321,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "autoLoadConntrackHelpers"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 339,
+            "col": 8
+          },
+          "source": "lib.optional cfg.autoLoadConntrackHelpers \"nf_conntrack\""
+        },
+        {
+          "path": [
+            "autoLoadConntrackHelpers"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 341,
+            "col": 32
+          },
+          "source": "lib.optionalString cfg.autoLoadConntrackHelpers ''"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 321,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "autoLoadConntrackHelpers"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "autoLoadConntrackHelpers"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 339,
+            "col": 8
+          },
+          "source": "lib.optional cfg.autoLoadConntrackHelpers \"nf_conntrack\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "autoLoadConntrackHelpers"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "autoLoadConntrackHelpers"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 341,
+            "col": 32
+          },
+          "source": "lib.optionalString cfg.autoLoadConntrackHelpers ''"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 90,
+            "col": 11
+          },
+          "source": "if config.services.firewalld.enable then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 92,
+            "col": 16
+          },
+          "source": "if config.networking.nftables.enable then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/firewall.nix",
+            "line": 111,
+            "col": 19
+          },
+          "source": "if config.networking.nftables.enable then pkgs.nftables else pkgs.iptables",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "networking",
+            "firewall",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "walled",
+          "span": {
+            "file": "nixos/tests/firewall.nix",
+            "line": 19,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "firewall",
+            "enable"
+          ],
+          "value_source": "false",
+          "value_class": {
+            "Bool": false
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "instance": "attacker",
+          "span": {
+            "file": "nixos/tests/firewall.nix",
+            "line": 78,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "networking",
+            "firewall"
+          ],
+          "instance": "walled",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/firewall.nix",
+            "line": 20,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "firewall",
+            "interfaces"
+          ],
+          "instance": "walled",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firewall.nix",
+            "line": 42,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "firewalld",
+            "enable"
+          ],
+          "instance": "walled",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firewall.nix",
+            "line": 63,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "nftables",
+            "enable"
+          ],
+          "instance": "walled",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/firewall.nix",
+            "line": 64,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/firewall.nix",
+              "line": 321,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": true,
+          "evidence": [
+            {
+              "path": [
+                "networking",
+                "firewall",
+                "enable"
+              ],
+              "value_source": "false",
+              "value_class": {
+                "Bool": false
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": false
+                }
+              },
+              "instance": "attacker",
+              "span": {
+                "file": "nixos/tests/firewall.nix",
+                "line": 78,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/firewall.nix",
+                  "line": 321,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/firewall.nix",
+                  "line": 321,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "checkReversePath"
+        }
+      ]
+    }
+  ]
+}

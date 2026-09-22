@@ -1,0 +1,39 @@
+{
+  "pr": 540256,
+  "title": "nixos/immichframe: add systemd hardening; fix flaky x11 test",
+  "applicable": true,
+  "base_sha": "091e08b2b8e507eed83baf947d340914b933061a",
+  "head_sha": "246189d433c783c12440e1df45e7f7dd2b058e43",
+  "module_paths": ["nixos/modules/services/web-apps/immichframe.nix"],
+  "test_paths": ["nixos/tests/web-apps/immichframe.nix"],
+  "test_wiring": "nixos/tests/all-tests.nix (head 246189d433c783c12440e1df45e7f7dd2b058e43): `immichframe = runTest ./web-apps/immichframe.nix;` (line ~810).",
+  "watch_selection_basis": "PR diff (`gh pr diff 540256`) touches nixos/modules/services/web-apps/immichframe.nix and nixos/tests/web-apps/immichframe.nix. The module change is entirely inside the existing `systemd.services.immichframe.serviceConfig = { ... }` block (adds ~25 systemd hardening directives: CapabilityBoundingSet, ProtectSystem, RestrictAddressFamilies, SystemCallFilter, etc.) -- a service-config change, not an option declaration. No mkOption/mkEnableOption/mkRenamedOptionModule/etc. declaration line is touched (confirmed: module's only options block declares just `enable = mkEnableOption \"ImmichFrame\";` at line 19, untouched by the diff). The test-file changes (switch from a kiosk-window xdotool approach to a real user-session X11 login via ../common/user-account.nix, plus maintainer metadata) are test-harness fixes unrelated to option surface. Only the baseline `enable` option was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/immichframe.nix",
+        "test": "nixos/tests/web-apps/immichframe.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "immichframe"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "verdict": "PASS",
+        "source": "check-base.json / check-head.json, target name 'immichframe'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "no_asymmetric_transitions": "audit-diff raw.json oba_verdict_transitions = {}, notable = [], diff.kind = 'unchanged' for the single watched identity (enable). No transition of any kind, including no OBA001->PASS."
+  }
+}

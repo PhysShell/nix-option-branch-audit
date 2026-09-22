@@ -1,0 +1,7 @@
+[[target]]
+name = "firewall"
+module = "nixos/modules/services/networking/firewall.nix"
+test = "nixos/tests/firewall.nix"
+cfg_ident = "cfg"
+option_prefix = ["networking", "firewall"]
+watch = ["enable", "checkReversePath"]

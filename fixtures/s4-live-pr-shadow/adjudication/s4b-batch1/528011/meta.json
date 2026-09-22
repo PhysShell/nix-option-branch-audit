@@ -1,0 +1,39 @@
+{
+  "pr": 528011,
+  "title": "pantheon: re-enable xdg-desktop-portal-pantheon; elementary-screenshot GTK4 update",
+  "applicable": true,
+  "base_sha": "a23f52eccc86f29abec9c04d80ad22348a01f8d2",
+  "head_sha": "9126863098dcc806c2adc5ac247abd1f788c5cfb",
+  "module_paths": ["nixos/modules/services/desktop-managers/pantheon.nix"],
+  "test_paths": ["nixos/tests/pantheon.nix"],
+  "test_wiring": "nixos/tests/all-tests.nix (head 9126863098dcc806c2adc5ac247abd1f788c5cfb): `pantheon = runTest ./pantheon.nix;` (line ~1272).",
+  "watch_selection_basis": "PR diff (`gh pr diff 528011`) touches nixos/modules/services/desktop-managers/pantheon.nix (uncommenting `xdg-desktop-portal-pantheon` inside the `xdg.portal.extraPortals` config list) and pkgs/desktops/pantheon/apps/elementary-screenshot/default.nix (GTK3->GTK4 package rebuild, not a module/option file). The pantheon.nix touch is inside the module's `config` block usage of `xdg.portal.extraPortals`, not inside any mkOption/mkEnableOption/mkRenamedOptionModule declaration line -- confirmed by inspecting the surrounding context (lines 260-290 at head), which shows it is a list literal passed to `utils.removePackagesByName`, not an option default. No option declaration line is touched. Only the baseline `enable` option (declared `enable = mkOption { type = types.bool; default = false; ... }` at line 53, under `services.desktopManager.pantheon`) was watched.",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/desktop-managers/pantheon.nix",
+        "test": "nixos/tests/pantheon.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "desktopManager", "pantheon"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "verdict": "PASS",
+        "source": "check-base.json / check-head.json, target name 'pantheon'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "no_asymmetric_transitions": "audit-diff raw.json oba_verdict_transitions = {}, notable = [], diff.kind = 'unchanged' for the single watched identity (enable). No transition of any kind, including no OBA001->PASS."
+  }
+}

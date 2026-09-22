@@ -1,0 +1,363 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "phpfpm",
+      "module": "nixos/modules/services/web-servers/phpfpm/default.nix",
+      "test": "nixos/tests/php/fpm.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "phpfpm"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "socket"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 65,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "listen"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 78,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "phpPackage"
+          ],
+          "default_source": "cfg.phpPackage",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 87,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "phpOptions"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 96,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "phpEnv"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 103,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 119,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 124,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 129,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 156,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 189,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 208,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "phpOptions"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 222,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "pools"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 233,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extraConfig"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extraConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 38,
+            "col": 9
+          },
+          "source": "optionalString (cfg.extraConfig != null) cfg.extraConfig"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extraConfig"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extraConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 269,
+            "col": 10
+          },
+          "source": "optional (cfg.extraConfig != null) ''"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 17,
+            "col": 5
+          },
+          "source": "if true == value then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 19,
+            "col": 10
+          },
+          "source": "if false == value then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 21,
+            "col": 10
+          },
+          "source": "if isString value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "optionalString (poolOpts.extraConfig != null) poolOpts.extraConfig",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 168,
+            "col": 18
+          },
+          "source": "if poolOpts.listen == \"\" then \"${runtimeDir}/${name}.sock\" else poolOpts.listen",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/phpfpm/default.nix",
+            "line": 260,
+            "col": 12
+          },
+          "source": "mkIf (cfg.pools != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "pools"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "phpfpm",
+            "pools",
+            "foobar",
+            "phpPackage"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/php/fpm.nix",
+            "line": 35,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enable"
+        }
+      ]
+    }
+  ]
+}
