@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "plantuml-server",
+      "module": "nixos/modules/services/web-apps/plantuml-server.nix",
+      "test": "nixos/tests/plantuml-server.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "plantuml-server"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 33,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"plantuml\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "plantuml"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 52,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"plantuml\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "plantuml"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 58,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "home"
+          ],
+          "default_source": "\"/var/lib/plantuml\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/plantuml"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 64,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenHost"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 70,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenPort"
+          ],
+          "default_source": "8080",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 76,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "plantumlLimitSize"
+          ],
+          "default_source": "4096",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 82,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "plantumlStats"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 90,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "httpAuthorization"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 96,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 104,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "plantumlStats"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 112,
+            "col": 26
+          },
+          "source": "if cfg.plantumlStats then \"on\" else \"off\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 104,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "plantumlStats"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "plantumlStats"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 112,
+            "col": 26
+          },
+          "source": "if cfg.plantumlStats then \"on\" else \"off\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "home"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "/var/lib/plantuml"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "home"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 128,
+            "col": 26
+          },
+          "source": "mkIf (cfg.home == \"/var/lib/plantuml\") \"plantuml\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "home"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "/var/lib/plantuml"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "home"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+            "line": 129,
+            "col": 30
+          },
+          "source": "mkIf (cfg.home == \"/var/lib/plantuml\") \"0750\""
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "plantuml-server",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/plantuml-server.nix",
+            "line": 10,
+            "col": 7
+          }
+        }
+      ],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+              "line": 104,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "plantuml-server",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/plantuml-server.nix",
+                "line": 10,
+                "col": 7
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+                  "line": 104,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/plantuml-server.nix",
+                  "line": 104,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "packages.jetty"
+        }
+      ]
+    }
+  ]
+}

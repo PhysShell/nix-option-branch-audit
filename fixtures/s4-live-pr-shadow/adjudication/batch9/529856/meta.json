@@ -1,0 +1,42 @@
+{
+  "pr": 529856,
+  "title": "plantuml-server: 1.2026.5 -> 1.2026.6 + switch to jetty 12",
+  "applicable": true,
+  "base_sha": "b38530584b29cc6adb99ed995efd30d4fc9fa2d2",
+  "head_sha": "0476429bfce8e8cec87758ba7f9bcaa5c11c3779",
+  "module_paths": [
+    "nixos/modules/services/web-apps/plantuml-server.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/plantuml-server.nix"
+  ],
+  "structural_notes": "Diff touches the packages.jetty mkPackageOption declaration block (default changes from [ \"jetty_11\" ] to [ \"jetty_12\" ], the extraDescription block explaining the jetty-12 unsupported warning is deleted) and the jetty startup script's --module list / arg-flag syntax (--module=deploy,http,jsp -> --module=http,ee11-deploy,ee11-jsp, and jetty.* args gain a -D prefix). packages.jdk's mkPackageOption declaration is unchanged. Watched: baseline enable + packages.jetty (its mkPackageOption declaration line/default is directly touched). nixos/tests/plantuml-server.nix (identical base/head) only sets services.plantuml-server.enable = true; packages.jetty is left at its module default in the test, i.e. no test assignment for packages.jetty on either side.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/plantuml-server.nix",
+        "test": "nixos/tests/plantuml-server.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "plantuml-server"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'plantuml-server'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "packages.jetty_verdict_both_sides": "OptionNotFound",
+    "note": "packages.jetty is declared via mkPackageOption inside a plain nested attrset (options.services.plantuml-server.packages = { jdk = mkPackageOption ...; jetty = mkPackageOption ...; };), not a top-level mkOption. Consistent with the pattern seen in batch8/524479 (aesmd's settings.* nested-attrset options also all showed OptionNotFound in check's discovered_options despite being real, present option declarations), the check command's option-discovery walk does not register packages.jetty as a discovered option on either side, so its verdict is OptionNotFound both sides -- not counted as a PASS-needing-review case. Raw fact only, no diagnosis attempted about why discovery misses this shape."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "pr": 451958,
+  "title": "nixos/neo4j: add ssl.policies.<name>.enable",
+  "applicable": true,
+  "base_sha": "cc63e5249d0f84d193dd902120475c57e1637da7",
+  "head_sha": "b7d1755d90657b03b32cdcfdf9882c593b47718d",
+  "module_paths": [
+    "nixos/modules/services/databases/neo4j.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/neo4j.nix"
+  ],
+  "structural_notes": "Diff adds a new `enable = lib.mkEnableOption \"this policy\";` declaration line (line 471 at head) inside the ssl.policies.<name> submodule under options.services.neo4j.ssl.policies = mkOption { type = attrsOf (submodule ({name,config,options,...}: { options = { enable = ...; allowKeyGeneration = ...; ...}; })); }. The rendered-config `let` binding sslPolicies also changed from iterating `cfg.ssl.policies` to `lib.filterAttrs (_: v: v.enable) cfg.ssl.policies`, and per-policy config gained a new `dbms.ssl.policy.${name}.enabled=...` line. Watched: baseline `enable` (services.neo4j.enable, untouched by this diff, included per standing instruction) via target 'neo4j', plus the new per-policy `enable` via target 'neo4j-ssl-policies' with option_prefix [\"services\",\"neo4j\",\"ssl\",\"policies\",\"*\"] (attrsOf-submodule wildcard pattern, matching the shape used for prior batches' gitlab-runner-services target). nixos/tests/neo4j.nix (both base and head) sets only services.neo4j.enable = true, services.neo4j.https.enable = false, services.neo4j.bolt.enable = false -- it never configures any named entry under services.neo4j.ssl.policies, so no test instance of the wildcard submodule exists in either root.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/databases/neo4j.nix",
+        "test": "nixos/tests/neo4j.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "neo4j"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'neo4j'"
+      }
+    ]
+  }
+}

@@ -1,0 +1,813 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "hydra",
+      "module": "nixos/modules/services/continuous-integration/hydra/default.nix",
+      "test": "nixos/tests/hydra/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "hydra"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 88,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dbi"
+          ],
+          "default_source": "localDB",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 96,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "hydraURL"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 112,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenHost"
+          ],
+          "default_source": "\"*\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "*"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 119,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "3000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 129,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "minimumDiskFree"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 137,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "minimumDiskFreeEvaluator"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 145,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "notificationSender"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 153,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtpHost"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 160,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "tracker"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 169,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logo"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 177,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "debugServer"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 185,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "maxServers"
+          ],
+          "default_source": "25",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 191,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "minSpareServers"
+          ],
+          "default_source": "4",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 197,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "maxSpareServers"
+          ],
+          "default_source": "5",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 203,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 209,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraEnv"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 214,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "gcRootsDir"
+          ],
+          "default_source": "\"/nix/var/nix/gcroots/hydra\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/nix/var/nix/gcroots/hydra"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 220,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "buildMachinesFiles"
+          ],
+          "default_source": "lib.optional (config.nix.buildMachines != [ ]) \"/etc/nix/machines\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 226,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "useSubstitutes"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 237,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "debugServer"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 41,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs cfg.debugServer { DBIC_TRACE = \"1\"; }"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 256,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "useSubstitutes"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 305,
+            "col": 27
+          },
+          "source": "if cfg.useSubstitutes then \"1\" else \"0\""
+        },
+        {
+          "path": [
+            "debugServer"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 409,
+            "col": 76
+          },
+          "source": "lib.optionalString cfg.debugServer \"-d\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "smtpHost"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "smtpHost"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 26,
+            "col": 6
+          },
+          "source": "lib.optionalAttrs (cfg.smtpHost != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debugServer"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debugServer"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 41,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs cfg.debugServer { DBIC_TRACE = \"1\"; }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 256,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "logo"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "logo"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 301,
+            "col": 9
+          },
+          "source": "lib.optionalString (cfg.logo != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "useSubstitutes"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "useSubstitutes"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 305,
+            "col": 27
+          },
+          "source": "if cfg.useSubstitutes then \"1\" else \"0\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dbi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dbi:Pg:dbname=hydra;user=hydra;"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dbi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 336,
+            "col": 18
+          },
+          "source": "lib.optional haveLocalDB \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dbi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dbi:Pg:dbname=hydra;user=hydra;"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dbi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 337,
+            "col": 15
+          },
+          "source": "lib.optional haveLocalDB \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dbi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dbi:Pg:dbname=hydra;user=hydra;"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dbi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 360,
+            "col": 11
+          },
+          "source": "lib.optionalString haveLocalDB ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debugServer"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debugServer"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 409,
+            "col": 76
+          },
+          "source": "lib.optionalString cfg.debugServer \"-d\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dbi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dbi:Pg:dbname=hydra;user=hydra;"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dbi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 563,
+            "col": 34
+          },
+          "source": "lib.mkIf haveLocalDB true"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dbi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dbi:Pg:dbname=hydra;user=hydra;"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dbi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 565,
+            "col": 36
+          },
+          "source": "lib.optionalString haveLocalDB ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dbi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dbi:Pg:dbname=hydra;user=hydra;"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dbi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 572,
+            "col": 42
+          },
+          "source": "lib.optionalString haveLocalDB ''"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 228,
+            "col": 19
+          },
+          "source": "lib.optional (config.nix.buildMachines != [ ]) \"/etc/nix/machines\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+            "line": 319,
+            "col": 8
+          },
+          "source": "lib.mkIf (lib.versionOlder (lib.getVersion config.nix.package.out) \"2.4pre\") {",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "machine",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/hydra/default.nix",
+            "line": 14,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+              "line": 256,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+                  "line": 256,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/continuous-integration/hydra/default.nix",
+                  "line": 256,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

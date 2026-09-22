@@ -1,0 +1,33 @@
+{
+  "pr": 517473,
+  "title": "paperless-ngx: refactor for easier overriding",
+  "applicable": true,
+  "base_sha": "6b5ddf3ef95465ea182f39e4a22d42bc62d0104f",
+  "head_sha": "49951091aad9219dcc6bfc422eb554114efd98e8",
+  "module_paths": [
+    "nixos/modules/services/misc/paperless.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paperless.nix"
+  ],
+  "structural_notes": "Verified via direct diff of the fetched base-root/head-root module files that the ONLY change inside nixos/modules/services/misc/paperless.nix is one line (base line 624): PYTHONPATH's value changes from '${cfg.package.python.pkgs.makePythonPath cfg.package.propagatedBuildInputs}:...' to '${cfg.package.python.pkgs.makePythonPath cfg.package.passthru.dependencies}:...', tracking the package.nix refactor (rec {} -> finalAttrs: {}, frontend/dependencies moved under passthru, buildPythonApplication takes a finalAttrs function). No mkOption/mkEnableOption declaration line in the module is touched at all; the bulk of the PR is a pkgs/by-name/pa/paperless-ngx/ package restructuring (new frontend.nix split out, passthru reorg) that is out of the module's option surface entirely. Per the stated diff-touch rule, the only option watched is the baseline enable (services.paperless.enable, cfg_ident 'cfg', option_prefix [services, paperless]); no other option's declaration line was touched. nixos/tests/paperless.nix unchanged between base/head.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "check_base_verdict": "TestConfigUnresolved on option 'enable' (target 'paperless')",
+    "check_head_verdict": "TestConfigUnresolved on option 'enable' (target 'paperless')",
+    "note": "Both sides report TestConfigUnresolved rather than PASS for the baseline enable option -- excluded from pass_verdicts_needing_review per the task's instruction to count only genuine PASS-on-both-sides. Raw observation only, no diagnosis attempted: nixos/tests/paperless.nix's 'simple' node sets services.paperless.passwordFile = builtins.toFile \"password\" \"admin\"; (a function-call value, not a literal), which is plausibly why the walker can't fully resolve that node's config."
+  }
+}

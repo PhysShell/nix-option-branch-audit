@@ -1,0 +1,33 @@
+{
+  "pr": 549175,
+  "title": "nixos/nix-daemon: Set HOME for unprivileged daemon",
+  "applicable": true,
+  "base_sha": "3fec85bd3445ab636aec48bba8414a1f5ce5030c",
+  "head_sha": "dfca7cafbbe14c4d6ccf142eb80d55e2f7cccc5c",
+  "module_paths": [
+    "nixos/modules/services/system/nix-daemon.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/nix-daemon-unprivileged.nix"
+  ],
+  "structural_notes": "Note on module namespace: this module file lives under nixos/modules/services/system/nix-daemon.nix (a real nixos/modules/services/** path) but its options are declared under the top-level `nix.*` namespace (cfg = config.nix; options.nix = {...}), not `services.nix-daemon`. Diff adds two lines inside the existing `config = lib.mkIf (cfg.daemonUser != \"root\") { systemd.services.nix-daemon = { ... }; }` block (an unprivileged-daemon branch, base line 67): `environment.HOME = \"%S/nix-daemon\";` and `serviceConfig.StateDirectory = \"nix-daemon\";`. No mkOption/mkEnableOption declaration line is touched anywhere in the diff -- daemonUser's own mkOption block (default \"root\", base line 187) is unchanged; only its already-existing `cfg.daemonUser != \"root\"` predicate's controlled body gained two new statements. Per the stated diff-touch rule only the baseline `nix.enable` is watched (daemonUser is the conceptually relevant gating option for this change but its declaration line isn't touched, so it is not added as a watched target here). Test used: nixos/tests/nix-daemon-unprivileged.nix, which is the test directly exercising the unprivileged-daemon branch this PR modifies (sets nix.daemonUser = \"nix-daemon\", nix.daemonGroup = \"nix-daemon\", plus required experimental-features; does not explicitly set nix.enable, relying on its default true).",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 1,
+    "check_head": 1
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "OBA001 (finding), default_outcome=true, all predicate_attempts witnessed=false",
+    "audit_diff_summary": { "unchanged": 1, "notable_total": 0 },
+    "note": "nix.enable shows verdict OBA001 (not PASS) on BOTH base and head -- excluded from pass_verdicts_needing_review since it isn't a PASS. It is also excluded from notable_actionable_presentations because raw.json's audit-diff shows this single subject as diff.kind='unchanged' (the finding already existed identically on both sides, so it is not a new_finding/transition and summary.notable is empty, notable_total=0). Raw observation only: matched_test_assignments is empty for the 'enable' predicate in check-base.json/check-head.json -- the test relies on nix.enable's default (true) rather than an explicit test assignment, which is why oba reports the mkIf cfg.enable branch as not provably witnessed even though the module's actual default already takes that branch. run_exit_codes differ from a typical 'inconclusive present' pattern (2) because summary.pass=0/finding=1/inconclusive=0 here, giving check exit code 1; audit-diff exit code is 0 because the single subject is unchanged with zero notable transitions."
+  }
+}

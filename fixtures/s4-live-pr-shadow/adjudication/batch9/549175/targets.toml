@@ -1,0 +1,7 @@
+[[target]]
+name = "nix-daemon"
+module = "nixos/modules/services/system/nix-daemon.nix"
+test = "nixos/tests/nix-daemon-unprivileged.nix"
+cfg_ident = "cfg"
+option_prefix = ["nix"]
+watch = ["enable"]

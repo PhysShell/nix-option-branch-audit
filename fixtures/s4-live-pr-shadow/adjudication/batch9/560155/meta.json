@@ -1,0 +1,43 @@
+{
+  "pr": 560155,
+  "title": "nixos.prefect: module fixes",
+  "applicable": true,
+  "base_sha": "eb43418e1a2504497022146f21b6753d590433b6",
+  "head_sha": "03e16a86c57300a354fa51c8a7004ac6c43e37a1",
+  "module_paths": [
+    "nixos/modules/services/scheduling/prefect.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/prefect.nix"
+  ],
+  "structural_notes": "Diff touches three existing mkOption declaration blocks: dataDir (description text rewritten, type/default unchanged), databasePasswordFile (example added, description rewritten), and baseUrl (type changed nullOr str -> str, default changed null -> \"http://${localHost}:${toString cfg.port}\", defaultText/example/description changed). Watched: baseline enable + dataDir + databasePasswordFile + baseUrl. Not watched (diff does not touch their mkOption declaration lines, only their usages/call-sites inside serviceConfig blocks that were refactored into a shared `hardening` attrset and `postgresEnvironment`/`localHost` let-bindings): host, port, database, databaseHost, databasePort, databaseName, databaseUser, workerPools.<name>.installPolicy -- noted here structurally but excluded per the stated diff-touch rule. Test file also changed substantially: base test's single 'machine' node set baseUrl=\"http://127.0.0.1\" and no workerPools; head test's 'machine' node sets workerPools.default.installPolicy=\"never\" (no baseUrl) and adds a new 'postgres' node with database=postgres, databaseUser=prefect, databasePasswordFile=/etc/prefect-db-password.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/scheduling/prefect.nix",
+        "test": "nixos/tests/prefect.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "prefect"],
+        "watched_path": "enable",
+        "side": "both (check-base.json and check-head.json)",
+        "source": "check-base.json / check-head.json, target name 'prefect'"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": {
+    "audit_diff_summary_oba_verdict_transitions": { "oba001->pass": 1 },
+    "audit_diff_summary_resolved_findings": 1,
+    "note": "databasePasswordFile transitions from OBA001 (base, predicate witnessed:false) to PASS (head, predicate witnessed:true via the new postgres test node). This shows up in raw.json's oba_verdict_transitions/resolved_findings but NOT in summary.notable (notable_total=0), so it is reported here only as a raw fact, not counted as an actionable presentation per the task's notable-array-only definition. dataDir and baseUrl both show PredicateNotFound on both sides (no mkIf/predicate site referencing them was found by the tool), so neither is a PASS-on-both-sides case."
+  }
+}

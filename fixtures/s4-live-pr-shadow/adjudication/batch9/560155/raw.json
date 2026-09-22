@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 3,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "oba001->pass": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 1,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/scheduling/prefect.nix",
+        "test": "nixos/tests/prefect.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "prefect"
+        ],
+        "watched_path": "baseUrl"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/scheduling/prefect.nix",
+        "test": "nixos/tests/prefect.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "prefect"
+        ],
+        "watched_path": "dataDir"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/scheduling/prefect.nix",
+        "test": "nixos/tests/prefect.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "prefect"
+        ],
+        "watched_path": "databasePasswordFile"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "databasePasswordFile",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "database"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "postgres"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "databasePasswordFile"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "database"
+                ],
+                [
+                  "databasePasswordFile"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/scheduling/prefect.nix",
+                "line": 151,
+                "col": 13
+              },
+              "source": "if cfg.database == \"postgres\" && cfg.databasePasswordFile != null then"
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "database"
+                            ]
+                          },
+                          {
+                            "Literal": {
+                              "Str": "postgres"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "databasePasswordFile"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "database"
+                    ],
+                    [
+                      "databasePasswordFile"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/scheduling/prefect.nix",
+                    "line": 151,
+                    "col": 13
+                  },
+                  "source": "if cfg.database == \"postgres\" && cfg.databasePasswordFile != null then"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PASS",
+            "option": "databasePasswordFile",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "database"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "postgres"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "databasePasswordFile"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "database"
+                ],
+                [
+                  "databasePasswordFile"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/scheduling/prefect.nix",
+                "line": 206,
+                "col": 29
+              },
+              "source": "lib.optional ("
+            },
+            "default_outcome": false,
+            "evidence": [
+              {
+                "path": [
+                  "services",
+                  "prefect",
+                  "databasePasswordFile"
+                ],
+                "value_source": "\"/etc/prefect-db-password\"",
+                "value_class": "DefinitelyNonNull",
+                "known_value": {
+                  "Exact": {
+                    "Str": "/etc/prefect-db-password"
+                  }
+                },
+                "instance": "postgres",
+                "span": {
+                  "file": "nixos/tests/prefect.nix",
+                  "line": 27,
+                  "col": 11
+                }
+              }
+            ],
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "database"
+                            ]
+                          },
+                          {
+                            "Literal": {
+                              "Str": "postgres"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "databasePasswordFile"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "database"
+                    ],
+                    [
+                      "databasePasswordFile"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/scheduling/prefect.nix",
+                    "line": 206,
+                    "col": 29
+                  },
+                  "source": "lib.optional ("
+                },
+                "witnessed": true
+              }
+            ]
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/scheduling/prefect.nix",
+        "test": "nixos/tests/prefect.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "prefect"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    }
+  ],
+  "cdc": []
+}

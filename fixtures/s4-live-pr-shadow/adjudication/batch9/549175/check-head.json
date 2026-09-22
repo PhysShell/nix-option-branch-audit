@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 1,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "nix-daemon",
+      "module": "nixos/modules/services/system/nix-daemon.nix",
+      "test": "nixos/tests/nix-daemon-unprivileged.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "nix"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 173,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "pkgs.nix",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 182,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "daemonUser"
+          ],
+          "default_source": "\"root\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "root"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 191,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "daemonGroup"
+          ],
+          "default_source": "\"root\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "root"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 201,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "daemonCPUSchedPolicy"
+          ],
+          "default_source": "\"other\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "other"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 209,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "daemonIOSchedClass"
+          ],
+          "default_source": "\"best-effort\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "best-effort"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 243,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "daemonIOSchedPriority"
+          ],
+          "default_source": "4",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 269,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "envVars"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 283,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nrBuildUsers"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 290,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 305,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "settings",
+            "auto-allocate-uids"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 390,
+            "col": 9
+          },
+          "source": "if cfg.settings.auto-allocate-uids or false then"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "daemonUser"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "root"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "daemonUser"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 67,
+            "col": 16
+          },
+          "source": "lib.mkIf (cfg.daemonUser != \"root\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 305,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "enable"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "package",
+                        "out",
+                        "pname"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "lix"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ],
+            [
+              "package",
+              "out",
+              "pname"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 314,
+            "col": 6
+          },
+          "source": "lib.mkIf (cfg.enable && nixPackage.pname != \"lix\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "daemonUser"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "root"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "daemonUser"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 324,
+            "col": 35
+          },
+          "source": "lib.mkIf (cfg.daemonUser == \"root\") [ nixPackage ]"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "daemonUser"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "root"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "daemonUser"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 334,
+            "col": 12
+          },
+          "source": "lib.optional (cfg.daemonUser != \"root\") \"/run/wrappers\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "auto-allocate-uids"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "auto-allocate-uids"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 390,
+            "col": 9
+          },
+          "source": "if cfg.settings.auto-allocate-uids or false then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "max-jobs"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "auto"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "max-jobs"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 393,
+            "col": 23
+          },
+          "source": "if cfg.settings.max-jobs == \"auto\" then 0 else cfg.settings.max-jobs"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/system/nix-daemon.nix",
+            "line": 319,
+            "col": 10
+          },
+          "source": "lib.optional (config.programs.bash.completion.enable) pkgs.nix-bash-completions",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "nix",
+            "package"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/nix-daemon-unprivileged.nix",
+            "line": 14,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OBA001",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/system/nix-daemon.nix",
+              "line": 305,
+              "col": 6
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/system/nix-daemon.nix",
+                  "line": 305,
+                  "col": 6
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/system/nix-daemon.nix",
+                  "line": 305,
+                  "col": 6
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "And": [
+                    {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "enable"
+                          ]
+                        },
+                        {
+                          "Literal": {
+                            "Bool": true
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Not": {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "package",
+                              "out",
+                              "pname"
+                            ]
+                          },
+                          {
+                            "Literal": {
+                              "Str": "lix"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ],
+                  [
+                    "package",
+                    "out",
+                    "pname"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/system/nix-daemon.nix",
+                  "line": 314,
+                  "col": 6
+                },
+                "source": "lib.mkIf (cfg.enable && nixPackage.pname != \"lix\") {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

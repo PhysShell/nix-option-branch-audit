@@ -1,0 +1,1071 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "neo4j",
+      "module": "nixos/modules/services/databases/neo4j.nix",
+      "test": "nixos/tests/neo4j.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "neo4j"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 161,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "constrainLoadCsv"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 169,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "defaultListenAddress"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 184,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraServerConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 198,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "readOnly"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 210,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "workerCount"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 218,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "bolt",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 229,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "bolt",
+            "listenAddress"
+          ],
+          "default_source": "\":7687\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ":7687"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 239,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "bolt",
+            "advertisedAddress"
+          ],
+          "default_source": "cfg.bolt.listenAddress",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 248,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "bolt",
+            "sslPolicy"
+          ],
+          "default_source": "\"legacy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "legacy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 258,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "bolt",
+            "tlsLevel"
+          ],
+          "default_source": "\"OPTIONAL\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "OPTIONAL"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 276,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "directories",
+            "certificates"
+          ],
+          "default_source": "\"${cfg.directories.home}/certificates\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 290,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "directories",
+            "data"
+          ],
+          "default_source": "\"${cfg.directories.home}/data\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 313,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "directories",
+            "home"
+          ],
+          "default_source": "\"/var/lib/neo4j\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/neo4j"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 327,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "directories",
+            "imports"
+          ],
+          "default_source": "\"${cfg.directories.home}/import\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 338,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "directories",
+            "plugins"
+          ],
+          "default_source": "\"${cfg.directories.home}/plugins\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 354,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "http",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 371,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "http",
+            "listenAddress"
+          ],
+          "default_source": "\":7474\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ":7474"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 381,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "http",
+            "advertisedAddress"
+          ],
+          "default_source": "cfg.http.listenAddress",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 390,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "https",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 402,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "https",
+            "listenAddress"
+          ],
+          "default_source": "\":7473\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ":7473"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 412,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "https",
+            "advertisedAddress"
+          ],
+          "default_source": "cfg.https.listenAddress",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 421,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "https",
+            "sslPolicy"
+          ],
+          "default_source": "\"legacy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "legacy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 431,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "shell",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 447,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 457,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "allowKeyGeneration"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 470,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "baseDirectory"
+          ],
+          "default_source": "\"${cfg.directories.certificates}/${name}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 488,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "ciphers"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 506,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "clientAuth"
+          ],
+          "default_source": "\"REQUIRE\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "REQUIRE"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 515,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "privateKey"
+          ],
+          "default_source": "\"private.key\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "private.key"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 527,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "publicCertificate"
+          ],
+          "default_source": "\"public.crt\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "public.crt"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 537,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "revokedDir"
+          ],
+          "default_source": "\"${config.baseDirectory}/revoked\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 552,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "tlsVersions"
+          ],
+          "default_source": "[ \"TLSv1.2\" ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 568,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "trustAll"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 577,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "trustedDir"
+          ],
+          "default_source": "\"${config.baseDirectory}/trusted\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 588,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "policies",
+            "directoriesToCreate"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 608,
+            "col": 17
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "constrainLoadCsv"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 52,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.constrainLoadCsv) ''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 656,
+            "col": 5
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "constrainLoadCsv"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "constrainLoadCsv"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 52,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.constrainLoadCsv) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 656,
+            "col": 5
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 18,
+            "col": 7
+          },
+          "source": "lib.optionalString (conf.ciphers != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 23,
+            "col": 7
+          },
+          "source": "if lib.length (lib.splitString \"/\" conf.privateKey) > 1 then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 29,
+            "col": 7
+          },
+          "source": "if lib.length (lib.splitString \"/\" conf.privateKey) > 1 then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 44,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.workerCount > 0) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "workerCount"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 621,
+            "col": 44
+          },
+          "source": "lib.optionals (",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "neo4j",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "server",
+          "span": {
+            "file": "nixos/tests/neo4j.nix",
+            "line": 8,
+            "col": 5
+          }
+        }
+      ],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/databases/neo4j.nix",
+              "line": 656,
+              "col": 5
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "neo4j",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "server",
+              "span": {
+                "file": "nixos/tests/neo4j.nix",
+                "line": 8,
+                "col": 5
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/databases/neo4j.nix",
+                  "line": 656,
+                  "col": 5
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/databases/neo4j.nix",
+                  "line": 656,
+                  "col": 5
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "neo4j-ssl-policies",
+      "module": "nixos/modules/services/databases/neo4j.nix",
+      "test": "nixos/tests/neo4j.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "neo4j",
+        "ssl",
+        "policies",
+        "*"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "constrainLoadCsv"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 52,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.constrainLoadCsv) ''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 656,
+            "col": 5
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "constrainLoadCsv"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "constrainLoadCsv"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 52,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.constrainLoadCsv) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 656,
+            "col": 5
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 18,
+            "col": 7
+          },
+          "source": "lib.optionalString (conf.ciphers != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 23,
+            "col": 7
+          },
+          "source": "if lib.length (lib.splitString \"/\" conf.privateKey) > 1 then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 29,
+            "col": 7
+          },
+          "source": "if lib.length (lib.splitString \"/\" conf.privateKey) > 1 then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 44,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.workerCount > 0) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "workerCount"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/neo4j.nix",
+            "line": 621,
+            "col": 44
+          },
+          "source": "lib.optionals (",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enable"
+        }
+      ]
+    }
+  ]
+}

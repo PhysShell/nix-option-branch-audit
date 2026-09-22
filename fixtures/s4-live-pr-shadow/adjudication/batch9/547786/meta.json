@@ -1,0 +1,32 @@
+{
+  "pr": 547786,
+  "title": "nixos/hydra: Add zstd and bzip2 to hydra-server's PATH",
+  "applicable": true,
+  "base_sha": "06066074cf7a360b238287a5838397532d18f196",
+  "head_sha": "a057770de161b621cc4cb558504f193baaf7346b",
+  "module_paths": [
+    "nixos/modules/services/continuous-integration/hydra/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/hydra/default.nix"
+  ],
+  "structural_notes": "Diff adds a single `path = [ pkgs.zstd pkgs.bzip2 ];` block (base line ~400) to the existing `systemd.services.hydra-server` definition. No mkOption/mkEnableOption declaration line is touched anywhere in the diff -- verified by directly diffing the fetched base-root/head-root module files, which shows exactly this 5-line addition and nothing else. Per the stated diff-touch rule, only the baseline services.hydra.enable is watched. Test wiring verified per the task's indirection warning: nixos/tests/all-tests.nix has `hydra = runTest ./hydra;` (a directory import), which resolves to nixos/tests/hydra/default.nix (name = \"hydra\"; imports ./common.nix for baseConfig; nodes.machine imports baseConfig and exercises hydra-init.service, hydra-queue-runner.service, hydra-evaluator.service, hydra-notify.service, hydra-server on port 3000, and runs create-trivial-project.sh + checks build status) -- this IS a real, wired test exercising the hydra-server unit that this PR's PATH change targets. Laid out base-root/head-root with nixos/tests/hydra/{default.nix,common.nix,create-trivial-project.sh} (all three files, unchanged base vs head) alongside the module file.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": {
+    "enable_verdict_both_sides": "TestConfigUnresolved",
+    "note": "Both check-base.json and check-head.json report TestConfigUnresolved (not PASS) for services.hydra.enable on target 'hydra' -- excluded from pass_verdicts_needing_review. Raw observation only, no diagnosis attempted: nixos/tests/hydra/default.nix's machine node config is `imports = [ baseConfig ];` where baseConfig comes from `inherit (import ./common.nix) baseConfig;`, an aliased import rather than an inline literal, which is plausibly why the walker can't fully resolve that node's config to a literal enable=true assignment."
+  }
+}

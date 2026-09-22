@@ -1,0 +1,7 @@
+[[target]]
+name = "plantuml-server"
+module = "nixos/modules/services/web-apps/plantuml-server.nix"
+test = "nixos/tests/plantuml-server.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "plantuml-server"]
+watch = ["enable", "packages.jetty"]
