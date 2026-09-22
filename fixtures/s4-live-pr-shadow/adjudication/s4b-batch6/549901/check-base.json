@@ -1,0 +1,513 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "pantheon",
+      "module": "nixos/modules/services/desktop-managers/pantheon.nix",
+      "test": "nixos/tests/pantheon.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "desktopManager",
+        "pantheon"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "pantheon",
+            "contractor",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 43,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pantheon",
+            "parental-controls",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 46,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pantheon",
+            "apps",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 48,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 53,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sessionPath"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 59,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraWingpanelIndicators"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 71,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraSwitchboardPlugs"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 77,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraGSettingsOverrides"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 83,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraGSettingsOverridePackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 89,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 95,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "pantheon",
+            "excludePackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 99,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 109,
+            "col": 6
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 288,
+            "col": 58
+          },
+          "source": "mkIf cfg.debug \"1\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 109,
+            "col": 6
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debug"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debug"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 288,
+            "col": 58
+          },
+          "source": "mkIf cfg.debug \"1\""
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 118,
+            "col": 18
+          },
+          "source": "optional (config.services.xserver.displayManager.lightdm.enable != true) ''",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 160,
+            "col": 48
+          },
+          "source": "mkIf config.services.printing.enable (mkDefault true)",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 319,
+            "col": 6
+          },
+          "source": "mkIf serviceCfg.apps.enable {",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 346,
+            "col": 14
+          },
+          "source": "lib.optionals config.services.flatpak.enable [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 361,
+            "col": 6
+          },
+          "source": "mkIf serviceCfg.contractor.enable {",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+            "line": 372,
+            "col": 6
+          },
+          "source": "mkIf serviceCfg.parental-controls.enable {",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "desktopManager",
+            "pantheon",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/pantheon.nix",
+            "line": 32,
+            "col": 7
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "machine",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/pantheon.nix",
+            "line": 26,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+              "line": 109,
+              "col": 6
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "desktopManager",
+                "pantheon",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/pantheon.nix",
+                "line": 32,
+                "col": 7
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+                  "line": 109,
+                  "col": 6
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/desktop-managers/pantheon.nix",
+                  "line": 109,
+                  "col": 6
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

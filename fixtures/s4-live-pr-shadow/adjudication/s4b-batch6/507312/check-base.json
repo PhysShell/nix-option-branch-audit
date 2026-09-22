@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 2
+  },
+  "targets": [
+    {
+      "name": "frp",
+      "module": "nixos/modules/services/networking/frp.nix",
+      "test": "nixos/tests/frp.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "frp",
+        "instances",
+        "*"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "frp",
+            "instances"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 27,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "frp",
+            "instances",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 31,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "frp",
+            "instances",
+            "role"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 33,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "frp",
+            "instances",
+            "environmentFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 46,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "frp",
+            "instances",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 57,
+            "col": 15
+          }
+        }
+      ],
+      "discovered_predicates": [],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 92,
+            "col": 12
+          },
+          "source": "lib.mkIf (enabledInstances != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "instances"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 96,
+            "col": 31
+          },
+          "source": "lib.optionalString (instance != \"\") (\"-\" + instance)",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 100,
+            "col": 29
+          },
+          "source": "lib.optionals isServer [ \"CAP_NET_BIND_SERVICE\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 101,
+            "col": 26
+          },
+          "source": "if isClient then \"frpc\" else \"frps\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 104,
+            "col": 17
+          },
+          "source": "lib.optionals isClient [ \"network-online.target\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 105,
+            "col": 17
+          },
+          "source": "if isClient then [ \"network-online.target\" ] else [ \"network.target\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 129,
+            "col": 14
+          },
+          "source": "lib.optionals isClient [ \"AF_UNIX\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/frp.nix",
+            "line": 138,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs isServer {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "httpd",
+            "phpPackage"
+          ],
+          "instance": "frpc",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/frp.nix",
+            "line": 69,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "frp",
+            "instances",
+            "client",
+            "settings",
+            "auth",
+            "token"
+          ],
+          "instance": "frpc",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/frp.nix",
+            "line": 80,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enable"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "extraConfig"
+        }
+      ]
+    }
+  ]
+}

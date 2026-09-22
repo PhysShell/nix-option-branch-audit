@@ -1,0 +1,7 @@
+[[target]]
+name = "frp"
+module = "nixos/modules/services/networking/frp.nix"
+test = "nixos/tests/frp.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "frp", "instances", "*"]
+watch = ["enable", "extraConfig"]

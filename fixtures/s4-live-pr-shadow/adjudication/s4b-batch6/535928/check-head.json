@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "getty",
+      "module": "nixos/modules/services/ttys/getty.nix",
+      "test": "nixos/tests/login.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "getty"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "autologinUser"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 60,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "autologinOnce"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 69,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 79,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "loginProgram"
+          ],
+          "default_source": "\"${pkgs.shadow}/bin/login\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 97,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "loginOptions"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 106,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 121,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "greetingLine"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 130,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "helpLine"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 138,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "autologinOnce"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 33,
+            "col": 7
+          },
+          "source": "lib.optionalString cfg.autologinOnce ''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 154,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "autologinUser"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "autologinOnce"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "autologinUser"
+            ],
+            [
+              "autologinOnce"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 19,
+            "col": 6
+          },
+          "source": "optionals (cfg.autologinUser != null && !cfg.autologinOnce) ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "loginOptions"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "loginOptions"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 23,
+            "col": 6
+          },
+          "source": "optionals (cfg.loginOptions != null) ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "autologinOnce"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "autologinOnce"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 33,
+            "col": 7
+          },
+          "source": "lib.optionalString cfg.autologinOnce ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 154,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 158,
+            "col": 31
+          },
+          "source": "mkIf (",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/ttys/getty.nix",
+            "line": 174,
+            "col": 35
+          },
+          "source": "lib.mkIf (!config.services.displayManager.enable) [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/login.nix",
+            "line": 9,
+            "col": 3
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "kernelPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/login.nix",
+            "line": 18,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/ttys/getty.nix",
+              "line": 154,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/ttys/getty.nix",
+                  "line": 154,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/ttys/getty.nix",
+                  "line": 154,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

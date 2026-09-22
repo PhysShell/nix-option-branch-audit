@@ -1,0 +1,37 @@
+{
+  "pr": 525887,
+  "title": "nixos/opensnitch: link network_aliases.json to /etc/opensnitchd",
+  "applicable": true,
+  "base_sha": "d591cf3617da5759efe0f4166236f9224d328263",
+  "head_sha": "1859b4a89bc757bd8841520783794f2c0b246f72",
+  "module_paths": [
+    "nixos/modules/services/security/opensnitch.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/opensnitch.nix"
+  ],
+  "reason": "Applicable: changed-file list is [nixos/modules/services/security/opensnitch.nix, nixos/tests/opensnitch.nix]. Wired test confirmed: nixos/tests/all-tests.nix at head (1859b4a89) contains 'opensnitch = runTest ./opensnitch.nix;' (line 1232). Real diff only adds one new tmpfiles.rules entry (`L+ /etc/opensnitchd/network_aliases.json ... ${cfg.package}/etc/opensnitchd/network_aliases.json`) using the existing `cfg.package` -- no mkOption/mkEnableOption/mkRenamedOptionModule declaration line is textually touched, so only baseline `enable` was watched.",
+  "targets_toml": "single target opensnitch, cfg_ident=cfg, option_prefix=[services,opensnitch], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Unchanged, both sides TestConfigUnresolved (inconclusive), not a PASS transition. Both predicate_attempts (Truthy mkIf and Eq-true) report witnessed=false in both base and head check JSON. Flagged only because it is the sole watched identity for this PR; does not meet the strict PASS-involving asymmetric-transition criterion."
+    }
+  ]
+}

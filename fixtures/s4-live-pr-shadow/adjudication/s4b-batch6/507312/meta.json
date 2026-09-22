@@ -1,0 +1,43 @@
+{
+  "pr": 507312,
+  "title": "nixos/frp: add 'extraConfig' option",
+  "applicable": true,
+  "base_sha": "d788c73c0f412c477ce143f5e85f6b37145cc624",
+  "head_sha": "693faedb738c66c6e3ab610097f47cadf47543a4",
+  "module_paths": [
+    "nixos/modules/services/networking/frp.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/frp.nix"
+  ],
+  "reason": "Applicable: changed-file list is [nixos/modules/services/networking/frp.nix, nixos/tests/frp.nix]. Wired test confirmed: nixos/tests/all-tests.nix at head (693faedb7) contains 'frp = runTest ./frp.nix;' (line 622). Real diff adds a genuinely new mkOption `extraConfig` (lib.types.lines) inside the per-instance submodule at services.frp.instances.<name>.extraConfig, and the test file (nixos/tests/frp.nix) was extended in the same PR to set frpc's `extraConfig` and assert port-range proxying works.",
+  "targets_toml": "single target frp, cfg_ident=cfg, option_prefix=[services,frp,instances,*] (wildcard attrsOf-submodule-instance form, same shape oba's own kimai fixture (fixtures/synthetic/diff-kimai/targets.toml) documents for per-site/per-instance submodules), watch=[enable, extraConfig].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Unchanged, both sides OptionNotFound, despite `enable` being a real mkEnableOption declared inside the services.frp.instances.<name> submodule (discovered_options in check-base.json/check-head.json DOES list it at path [services,frp,instances,enable] with default false) and the test genuinely setting frpc/frps instance enable=true. This looks like a real raw-data artifact of the wildcard option_prefix (`[\"services\",\"frp\",\"instances\",\"*\"]`) resolver path not matching watched-option lookups the same way a concrete option_prefix does -- flagging for the coordinator/reviewer, not making a correctness judgment."
+    },
+    {
+      "watched_path": "extraConfig",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Unchanged, both sides OptionNotFound. At HEAD, extraConfig is a genuinely new mkOption declared in the same wildcard-prefix submodule and the test file genuinely sets it (frpc instance extraConfig = '' ... ''), yet the head-side verdict is still OptionNotFound rather than any PASS/predicate-found verdict. Same wildcard-option_prefix raw fact as `enable` above -- flagging, not judging."
+    }
+  ]
+}

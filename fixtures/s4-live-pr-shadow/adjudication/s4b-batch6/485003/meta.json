@@ -1,0 +1,39 @@
+{
+  "pr": 485003,
+  "title": "hockeypuck: add NGI team",
+  "applicable": true,
+  "base_sha": "988307fd6b2981b969f4b50ca32c9037837d1dce",
+  "head_sha": "928065b6a678a28fb4ef59ced6757496eb4bb290",
+  "module_paths": [
+    "nixos/modules/services/security/hockeypuck.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/hockeypuck.nix"
+  ],
+  "reason": "Applicable by the letter of the rule: changed-file list includes nixos/modules/services/security/hockeypuck.nix and a wired test exists (nixos/tests/all-tests.nix at head 928065b6a contains 'hockeypuck = runTest ./hockeypuck.nix;', line 796). HOWEVER the real diff to both hockeypuck.nix and hockeypuck.nix (test) is maintainer-list-only: `meta.maintainers = [ ];` -> `meta.maintainers = lib.teams.ngi.members;` in both files. No mkOption/mkEnableOption/mkRenamedOptionModule declaration line is touched anywhere in the diff (full diff also touches pkgs/by-name/ho/hockeypuck{,-web}/package.nix, package-only). Only baseline `enable` was watched, as no option-declaration line changed.",
+  "targets_toml": "single target hockeypuck, cfg_ident=cfg, option_prefix=[services,hockeypuck], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/hockeypuck.nix",
+        "evidence_span": "nixos/tests/hockeypuck.nix:36 (services.hockeypuck.enable = true)",
+        "predicate_span": "nixos/modules/services/security/hockeypuck.nix:72 (lib.mkIf cfg.enable {...})"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": []
+}

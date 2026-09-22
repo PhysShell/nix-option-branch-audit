@@ -1,0 +1,37 @@
+{
+  "pr": 535928,
+  "title": "nixos/getty: allow disabling",
+  "applicable": true,
+  "base_sha": "aa3f34806fdbc5033064b1539633a9fff019a233",
+  "head_sha": "9d280168ccc67309ede60df194b8a830a164cf71",
+  "module_paths": [
+    "nixos/modules/services/ttys/getty.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/login.nix"
+  ],
+  "reason": "Applicable: real changed-file list is exactly [nixos/modules/services/ttys/getty.nix] -- the module lives at nixos/modules/services/ttys/getty.nix, genuinely under nixos/modules/services/**, NOT under nixos/modules/system/** as the naive title-based guess suggested. Real diff adds a genuinely NEW `enable = mkOption { type = types.bool; default = true; ... }` declaration and wraps the module's whole `config` block in `mkIf cfg.enable` (previously unconditional `config = {...}`). No test file is touched by this PR's own diff, and no test anywhere in the repo sets `services.getty.enable` or `getty.enable` explicitly (verified via `gh api search/code` for both exact strings against NixOS/nixpkgs: 0 hits each). nixos/tests/all-tests.nix at head (9d280168c) has NO 'getty' entry at all -- there is no dedicated getty.nix test. The closest real, wired test that exercises the getty module's runtime behavior is nixos/tests/login.nix (wired at all-tests.nix line 942: 'login = runTest ./login.nix;'), which asserts `agetty.*tty1`/`agetty.*tty2` processes and `getty@tty2.service` -- but it relies entirely on the DEFAULT value of the new `enable` option (true) and never assigns `services.getty.enable` itself, so it does not exercise the new disabling behavior this PR adds. Used login.nix as the `test` in targets.toml since it is the only real, wired test touching getty's own runtime surface; this is a materially weaker test-coverage fact than the other PRs in this batch and is flagged for the reviewer.",
+  "targets_toml": "single target getty, cfg_ident=cfg, option_prefix=[services,getty], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Genuine asymmetric transition captured in raw.json's summary.oba_verdict_transitions: {\"option_not_found->test_config_unresolved\": 1} (changed=1, unchanged=0). Base: `enable` genuinely does not exist as an option in nixos/modules/services/ttys/getty.nix at base_sha (correct -- this PR adds it). Head: `enable` now exists (mkOption, default true) and is guarded by a real predicate `mkIf cfg.enable {...}` at getty.nix:154, default_outcome=true, but both predicate_attempts (Truthy mkIf, Eq-true) report witnessed=false against nixos/tests/login.nix -- consistent with login.nix never assigning services.getty.enable (see `reason` above). Does NOT qualify as a PASS-involving asymmetric transition per the strict criterion (neither endpoint is PASS), but it is the only changed watched identity in this batch's PR and the direct, expected consequence of the new option being genuinely untested -- flagging per the same pattern as the prior batch's 500866/dataDir case."
+    }
+  ]
+}

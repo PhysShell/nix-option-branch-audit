@@ -1,0 +1,39 @@
+{
+  "pr": 547674,
+  "title": "gitlab: 19.0.4 -> 19.2.2",
+  "applicable": true,
+  "base_sha": "6260e153462b0ee052fa0304a27b64fffe9592ab",
+  "head_sha": "52de0c604fda338ac2bf44f161fe580b87021b2b",
+  "module_paths": [
+    "nixos/modules/services/misc/gitlab/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/gitlab/gitlab.nix"
+  ],
+  "reason": "Applicable: changed-file list includes nixos/modules/services/misc/gitlab/default.nix (plus release notes, gitaly/gitlab-shell/gitlab-workhorse/gitlab package.nix/data.json/rubyEnv files -- package-only/version-data). This is NOT a pure package-hash bump with zero module changes: default.nix's own systemd.tmpfiles.rules gains one new line, `\"d ${gitlabConfig.production.shared.path}/agent_plan_content 0750 ${cfg.user} ${cfg.group} -\"`, using existing cfg.* references -- no mkOption/mkEnableOption/mkRenamedOptionModule declaration line is touched. Wired test confirmed indirectly: nixos/tests/all-tests.nix at head (52de0c604) has `gitlab = import ./gitlab { inherit runTest; };` (line 694), and nixos/tests/gitlab/default.nix (fetched, content: `{ runTest }: { gitlab = runTest ./gitlab.nix; runner = runTest ./runner.nix; }`) confirms nixos/tests/gitlab/gitlab.nix is the real, wired test -- this is exactly the 'nested/indirect test file' case the task warned a shallow search could miss. Only baseline `enable` was watched.",
+  "targets_toml": "single target gitlab, cfg_ident=cfg, option_prefix=[services,gitlab], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/gitlab/gitlab.nix",
+        "evidence_span": "nixos/tests/gitlab/gitlab.nix:94 (services.gitlab.enable = true, node 'gitlab')",
+        "predicate_span": "nixos/modules/services/misc/gitlab/default.nix:1109 (mkIf cfg.enable {...})"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": []
+}

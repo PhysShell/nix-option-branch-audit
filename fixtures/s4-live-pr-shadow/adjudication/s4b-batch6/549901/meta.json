@@ -1,0 +1,39 @@
+{
+  "pr": 549901,
+  "title": "pantheon.pantheon-agent-polkit: 8.0.2 -> 8.1.0",
+  "applicable": true,
+  "base_sha": "8595dfd89dea6889cb8e22d35f0a9dd722a09aa9",
+  "head_sha": "4a8df6774c526cad61bb82ac2f95a888f4bb25f0",
+  "module_paths": [
+    "nixos/modules/services/desktop-managers/pantheon.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/pantheon.nix"
+  ],
+  "reason": "Applicable by the letter of the rule: changed-file list includes nixos/modules/services/desktop-managers/pantheon.nix (plus pkgs/desktops/pantheon/services/pantheon-agent-polkit/default.nix, package-only) and a wired test exists (nixos/tests/all-tests.nix at head 4a8df6774 contains 'pantheon = runTest ./pantheon.nix;', line 1327). HOWEVER despite the module file being genuinely touched, the real diff to pantheon.nix is not a version-pin change nor an option declaration: it adds `pantheon.pantheon-agent-polkit` to an existing systemPackages list and adds one new `systemd.user.services.\"io.elementary.desktop.agent-polkit\"` block. No mkOption/mkEnableOption/mkRenamedOptionModule declaration line is touched. Only baseline `enable` was watched.",
+  "targets_toml": "single target pantheon, cfg_ident=cfg, option_prefix=[services,desktopManager,pantheon] (cfg = config.services.desktopManager.pantheon in the module), watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "watched_path": "enable",
+        "base_verdict": "PASS",
+        "head_verdict": "PASS",
+        "test": "nixos/tests/pantheon.nix",
+        "evidence_span": "nixos/tests/pantheon.nix:32 (services.desktopManager.pantheon.enable = true)",
+        "predicate_span": "nixos/modules/services/desktop-managers/pantheon.nix:109 (mkIf cfg.enable {...})"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": []
+}

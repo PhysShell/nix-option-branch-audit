@@ -1,0 +1,7 @@
+[[target]]
+name = "getty"
+module = "nixos/modules/services/ttys/getty.nix"
+test = "nixos/tests/login.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "getty"]
+watch = ["enable"]
