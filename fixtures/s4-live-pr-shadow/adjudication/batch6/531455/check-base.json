@@ -1,0 +1,787 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 4
+  },
+  "targets": [
+    {
+      "name": "netbox",
+      "module": "nixos/modules/services/web-apps/netbox.nix",
+      "test": "nixos/tests/web-apps/netbox/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "netbox"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 55,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 66,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "ALLOWED_HOSTS"
+          ],
+          "default_source": "[ \"*\" ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 78,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "listenAddress"
+          ],
+          "default_source": "\"[::1]\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "[::1]"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 90,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "unixSocket"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 99,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "gunicornArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "if lib.versionAtLeast config.system.stateVersion \"26.05\" then pkgs.netbox_4_5 else pkgs.netbox_4_4",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 119,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "8001",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 133,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "_: [ ]",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 142,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/netbox\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/netbox"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 153,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "secretKeyFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 161,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "apiTokenPeppersFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 168,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 177,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableLdap"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 186,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ldapConfigPath"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 196,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "keycloakClientSecret"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 229,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enableLdap"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 30,
+            "col": 11
+          },
+          "source": "lib.optionalString cfg.enableLdap ''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 238,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableLdap"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 240,
+            "col": 17
+          },
+          "source": "lib.mkIf cfg.enableLdap (ps: [ ps.django-auth-ldap ])"
+        },
+        {
+          "path": [
+            "enableLdap"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 273,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.enableLdap \"netbox.authentication.LDAPBackend\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLdap"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLdap"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 30,
+            "col": 11
+          },
+          "source": "lib.optionalString cfg.enableLdap ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 238,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLdap"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLdap"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 240,
+            "col": 17
+          },
+          "source": "lib.mkIf cfg.enableLdap (ps: [ ps.django-auth-ldap ])"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLdap"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLdap"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 273,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.enableLdap \"netbox.authentication.LDAPBackend\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "apiTokenPeppersFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "apiTokenPeppersFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 297,
+            "col": 10
+          },
+          "source": "lib.optionalString (cfg.apiTokenPeppersFile != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "keycloakClientSecret"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "keycloakClientSecret"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 303,
+            "col": 10
+          },
+          "source": "lib.optionalString (cfg.keycloakClientSecret != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "unixSocket"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "unixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 387,
+            "col": 19
+          },
+          "source": "if (cfg.unixSocket != null) then"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 122,
+            "col": 9
+          },
+          "source": "if lib.versionAtLeast config.system.stateVersion \"26.05\" then pkgs.netbox_4_5 else pkgs.netbox_4_4",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/netbox.nix",
+            "line": 373,
+            "col": 15
+          },
+          "source": "lib.optionalString",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package",
+              "version"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "netbox",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 35,
+            "col": 11
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "netbox",
+            "package"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 36,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "netbox",
+            "secretKeyFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 37,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "netbox",
+            "apiTokenPeppersFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 41,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "netbox",
+            "ldapConfigPath"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 46,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openldap",
+            "settings",
+            "children",
+            "olcDatabase={1}mdb",
+            "attrs",
+            "olcSuffix"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 104,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openldap",
+            "settings",
+            "children",
+            "olcDatabase={1}mdb",
+            "attrs",
+            "olcRootPW"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 106,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openldap",
+            "declarativeContents"
+          ],
+          "instance": "machine",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/web-apps/netbox/default.nix",
+            "line": 112,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/netbox.nix",
+              "line": 238,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "netbox",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/web-apps/netbox/default.nix",
+                "line": 35,
+                "col": 11
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/netbox.nix",
+                  "line": 238,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/netbox.nix",
+                  "line": 238,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "bind"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "environmentFiles"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "apiTokenPepperFiles"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "ldapConfigFile"
+        }
+      ]
+    }
+  ]
+}

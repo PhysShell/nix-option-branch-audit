@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "jirafeau",
+      "module": "nixos/modules/services/web-apps/jirafeau.nix",
+      "test": "nixos/tests/jirafeau.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "jirafeau"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "adminPasswordSha256"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 30,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/jirafeau/data/\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/jirafeau/data/"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 38,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 44,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 46,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "hostName"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 63,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "maxUploadSizeMegabytes"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 69,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "maxUploadTimeout"
+          ],
+          "default_source": "\"30m\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "30m"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 75,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "nginxConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 89,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "poolConfig"
+          ],
+          "default_source": "{\n        \"pm\" = \"dynamic\";\n        \"pm.max_children\" = 32;\n        \"pm.start_servers\" = 2;\n        \"pm.min_spare_servers\" = 2;\n        \"pm.max_spare_servers\" = 4;\n        \"pm.max_requests\" = 500;\n      }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 102,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 125,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 125,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 15,
+            "col": 28
+          },
+          "source": "if hasSuffix \"/\" str then str else \"${str}/\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/jirafeau.nix",
+            "line": 135,
+            "col": 19
+          },
+          "source": "if cfg.maxUploadSizeMegabytes == 0 then \"0\" else \"${cfg.maxUploadSizeMegabytes}m\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "maxUploadSizeMegabytes"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "jirafeau",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/jirafeau.nix",
+            "line": 11,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/jirafeau.nix",
+              "line": 125,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "jirafeau",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/jirafeau.nix",
+                "line": 11,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/jirafeau.nix",
+                  "line": 125,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/jirafeau.nix",
+                  "line": 125,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "extraConfig"
+        }
+      ]
+    }
+  ]
+}

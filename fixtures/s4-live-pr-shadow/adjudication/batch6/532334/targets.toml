@@ -1,0 +1,7 @@
+[[target]]
+name = "rustical"
+module = "nixos/modules/services/web-apps/rustical.nix"
+test = "nixos/tests/web-apps/rustical.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "rustical"]
+watch = ["enable"]

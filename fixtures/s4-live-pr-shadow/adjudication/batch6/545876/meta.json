@@ -1,0 +1,56 @@
+{
+  "pr": 545876,
+  "title": "jirafeau: 4.4.0 -> 4.7.2",
+  "applicable": true,
+  "base_sha": "4aa5f581bac47c3dce5f86ae1ceb374c52a62c58",
+  "head_sha": "44bfa48ab50ed97c09e4f674dcc755075c573a3f",
+  "module_paths": [
+    "nixos/modules/services/web-apps/jirafeau.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/jirafeau.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: jirafeau = runTest ./jirafeau.nix;",
+  "watch_selection_basis": "enable (baseline) + extraConfig (the only option whose description text the module diff touches -- a documentation-URL-only change from gitlab.com/mojo42/Jirafeau to gitlab.com/jirafeau/Jirafeau, no behavioral change)",
+  "tool_invocation": "audit-diff (module existed on both sides) + check on base-root and head-root to resolve 'unchanged' diff entries",
+  "run_exit_codes": {
+    "audit-diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/jirafeau.nix",
+        "test": "nixos/tests/jirafeau.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "jirafeau"],
+        "watched_path": "enable",
+        "side": "unchanged (PASS on both base and head, per oba check)",
+        "source": "check-base.json / check-head.json targets[0].verdicts[] where option=='enable'"
+      }
+    ]
+  },
+  "audit_diff_raw_summary": {
+    "unchanged": 2,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "notable_total": 0
+  },
+  "other_watched_verdicts_base": {
+    "extraConfig": "PredicateNotFound"
+  },
+  "other_watched_verdicts_head": {
+    "extraConfig": "PredicateNotFound"
+  },
+  "structural_notes": [
+    "extraConfig is PredicateNotFound on both sides (unchanged in audit-diff); not PASS-class."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "pr": 553372,
+  "title": "writeTextFile: enable strictDeps, enable structuredAttrs",
+  "applicable": true,
+  "base_sha": "84c9f3ddbd1f8eda9cac60aea065e4f0fd4fb894",
+  "head_sha": "6369fb0333cb1faa07e71b89a3738b7b6c985bce",
+  "module_paths": [
+    "nixos/modules/services/audio/mpd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mpd.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: mpd = runTest ./mpd.nix;",
+  "watch_selection_basis": "enable (baseline) only -- this PR's own diff to mpd.nix is a single-line removal of `__structuredAttrs = true;` from inside the `derivationArgs` of a `pkgs.writeTextFile` call used to render mpd.conf (an internal build-time derivation attribute); the diff does not touch any `mkOption`/`mkEnableOption` declaration or any option-name-bearing line, so no option beyond the baseline enable was added to watch",
+  "tool_invocation": "audit-diff (module existed on both sides) + check on base-root and head-root to resolve 'unchanged' diff entries",
+  "run_exit_codes": {
+    "audit-diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "audit_diff_raw_summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "notable_total": 0
+  },
+  "watched_verdicts_base": {
+    "enable": "TestConfigUnresolved"
+  },
+  "watched_verdicts_head": {
+    "enable": "TestConfigUnresolved"
+  },
+  "structural_notes": [
+    "enable is TestConfigUnresolved (not PASS, not a Finding) on both base and head -- no PASS-class verdict for mpd in this run.",
+    "check-head.json test_config_opacity lists two opaque instance configs: serverALSA (nixos/tests/mpd.nix line 59) and serverPulseAudio (line 80), reason 'instance config is not a literal attrset (alias, function call, or similar)'. The test's default/main instance sets services.mpd = mpd; (nixos/tests/mpd.nix line 43) where `mpd` is a let-bound attrset built via a `mkServer` helper function rather than a literal attrset written inline -- recorded raw as a plausible mechanical explanation for TestConfigUnresolved, not a correctness judgment.",
+    "unresolved_predicate_sites: 9 for this target (head) -- raw count only, not interpreted."
+  ]
+}

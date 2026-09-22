@@ -1,0 +1,50 @@
+{
+  "pr": 532334,
+  "title": "nixos/rustical: fix unix domain socket support",
+  "applicable": true,
+  "base_sha": "09fc485c059d60a8ec7ae4381b8452d9302461ab",
+  "head_sha": "a84ad8a3fa1449b16de6b03f6382061ff294c6dc",
+  "module_paths": [
+    "nixos/modules/services/web-apps/rustical.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/rustical.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: rustical = runTest ./web-apps/rustical.nix;",
+  "watch_selection_basis": "enable (baseline) only -- this PR's own diff to rustical.nix is confined to the systemd.services.rustical.serviceConfig hardening block (adds RuntimeDirectory/RuntimeDirectoryMode, adds AF_UNIX to RestrictAddressFamilies, changes UMask 0077->0007); it does not textually touch any mkOption/mkEnableOption declaration. Note for coordinator: the module also declares a nested settings.http.bind option (module.nix line 58, 'Address and port or UNIX socket path to bind the HTTP service to') which is conceptually what this PR's unix-socket fix concerns, but that option's own declaration line is not part of this PR's diff, so per the literal 'diff touches' rule it was not added to watch.",
+  "tool_invocation": "audit-diff (module existed on both sides) + check on base-root and head-root to resolve 'unchanged' diff entries",
+  "run_exit_codes": {
+    "audit-diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/rustical.nix",
+        "test": "nixos/tests/web-apps/rustical.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "rustical"],
+        "watched_path": "enable",
+        "side": "unchanged (PASS on both base and head, per oba check)",
+        "source": "check-base.json / check-head.json targets[0].verdicts[] where option=='enable'"
+      }
+    ]
+  },
+  "audit_diff_raw_summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "notable_total": 0
+  },
+  "structural_notes": [
+    "nixos/tests/web-apps/rustical.nix sets only services.rustical.enable = true; it reads (does not assign) config.services.rustical.settings.http.bind at nix-eval time in nginx's proxyPass and again in the testScript's wait_for_file call, relying on the module's own default for settings.http.bind rather than setting it explicitly."
+  ]
+}

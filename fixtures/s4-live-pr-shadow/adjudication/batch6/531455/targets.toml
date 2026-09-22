@@ -1,0 +1,7 @@
+[[target]]
+name = "netbox"
+module = "nixos/modules/services/web-apps/netbox.nix"
+test = "nixos/tests/web-apps/netbox/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "netbox"]
+watch = ["enable", "bind", "environmentFiles", "apiTokenPepperFiles", "ldapConfigFile"]

@@ -1,0 +1,721 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "mpd",
+      "module": "nixos/modules/services/audio/mpd.nix",
+      "test": "nixos/tests/mpd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "mpd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 103,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "startWhenNeeded"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 111,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 121,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 127,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/${name}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 133,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 144,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 154,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "music_directory"
+          ],
+          "default_source": "\"${cfg.dataDir}/music\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 179,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "playlist_directory"
+          ],
+          "default_source": "\"${cfg.dataDir}/playlists\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 191,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "bind_to_address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 203,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "port"
+          ],
+          "default_source": "6600",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 213,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "db_file"
+          ],
+          "default_source": "\"${cfg.dataDir}/tag_cache\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 222,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "credentials"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 280,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "credentials",
+            "passwordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 284,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "fluidsynth"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 333,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "fluidsynth"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 34,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs cfg.fluidsynth {"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 374,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "startWhenNeeded"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 393,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.startWhenNeeded {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "fluidsynth"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "fluidsynth"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 34,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs cfg.fluidsynth {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 374,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "startWhenNeeded"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "startWhenNeeded"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 393,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.startWhenNeeded {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "settings",
+                    "bind_to_address"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "any"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "settings",
+              "bind_to_address"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 402,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.settings.bind_to_address != \"any\") \"${cfg.settings.bind_to_address}:\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "startWhenNeeded"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "startWhenNeeded"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 409,
+            "col": 18
+          },
+          "source": "lib.optional (!cfg.startWhenNeeded) \"multi-user.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mpd"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 450,
+            "col": 19
+          },
+          "source": "lib.optionalAttrs (cfg.user == name) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mpd"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 460,
+            "col": 20
+          },
+          "source": "lib.optionalAttrs (cfg.group == name) {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 22,
+            "col": 9
+          },
+          "source": "if builtins.isBool v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 67,
+            "col": 17
+          },
+          "source": "if builtins.isList v then (map (b: processSingleBlock n b) v) else (processSingleBlock n v)",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 377,
+            "col": 7
+          },
+          "source": "lib.optional",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "bind_to_address"
+            ],
+            [
+              "settings",
+              "bind_to_address"
+            ],
+            [
+              "openFirewall"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 398,
+            "col": 11
+          },
+          "source": "if pkgs.lib.hasPrefix \"/\" cfg.settings.bind_to_address then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "bind_to_address"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 415,
+            "col": 9
+          },
+          "source": "lib.optionalString (cfg.credentials != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "credentials"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 434,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.dataDir == \"/var/lib/${name}\") [ name ]",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dataDir"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 435,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.settings.playlist_directory == \"/var/lib/${name}/playlists\") [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "playlist_directory"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 439,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.settings.music_directory == \"/var/lib/${name}/music\") [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "music_directory"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 446,
+            "col": 43
+          },
+          "source": "lib.optionals (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "openFirewall"
+            ],
+            [
+              "openFirewall"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "serverALSA",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/mpd.nix",
+            "line": 59,
+            "col": 5
+          }
+        },
+        {
+          "path": [],
+          "instance": "serverPulseAudio",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/mpd.nix",
+            "line": 80,
+            "col": 5
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/audio/mpd.nix",
+              "line": 374,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/audio/mpd.nix",
+                  "line": 374,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/audio/mpd.nix",
+                  "line": 374,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

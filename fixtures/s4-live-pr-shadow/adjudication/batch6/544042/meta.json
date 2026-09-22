@@ -1,0 +1,48 @@
+{
+  "pr": 544042,
+  "title": "nixos/caddy: increase UDP buffer size to match linked recommendation",
+  "applicable": true,
+  "base_sha": "c2b4dd086cfddacf79cd1394f72c9ef9906dfd9b",
+  "head_sha": "6bb5009ce813c129e6c988e782b9f2c9bc1483fd",
+  "module_paths": [
+    "nixos/modules/services/web-servers/caddy/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/caddy.nix"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: caddy = runTest ./caddy.nix; (plus several unrelated tests reference caddy incidentally: acme/caddy.nix, bentopdf/caddy.nix, freshrss/caddy-sqlite.nix, homer/caddy.nix, vector/caddy-clickhouse.nix, web-apps/rss-bridge/caddy.nix -- not used here, nixos/tests/caddy.nix is the module's own primary test)",
+  "watch_selection_basis": "enable (baseline) only -- this PR's own diff changes only two boot.kernel.sysctl mkDefault numeric values (net.core.rmem_max / net.core.wmem_max, 2500000 -> 7500000); it does not textually touch any mkOption/mkEnableOption declaration",
+  "tool_invocation": "audit-diff (module existed on both sides) + check on base-root and head-root to resolve 'unchanged' diff entries",
+  "run_exit_codes": {
+    "audit-diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-servers/caddy/default.nix",
+        "test": "nixos/tests/caddy.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "caddy"],
+        "watched_path": "enable",
+        "side": "unchanged (PASS on both base and head, per oba check)",
+        "source": "check-base.json / check-head.json targets[0].verdicts[] where option=='enable'"
+      }
+    ]
+  },
+  "audit_diff_raw_summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "notable_total": 0
+  },
+  "structural_notes": []
+}

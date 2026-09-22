@@ -1,0 +1,70 @@
+{
+  "pr": 531455,
+  "title": "nixos/netbox: uplift",
+  "state_from_gh": "seen via gh pr view",
+  "applicable": true,
+  "base_sha": "b771e6213c7878a7538c065890e583d3f5e1141b",
+  "head_sha": "809048936dd5e99cf1c825f129d37e9aa8af38bb",
+  "module_paths": [
+    "nixos/modules/services/web-apps/netbox.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/netbox/default.nix",
+    "nixos/tests/web-apps/netbox/testScript.py (fetched, referenced via lib.readFile by default.nix; not passed to oba directly)",
+    "nixos/tests/web-apps/netbox-upgrade.nix (also changed by PR but not used as the oba test target -- separate upgrade-scenario test, not the module's own primary functional test)"
+  ],
+  "test_wiring": "nixos/tests/all-tests.nix: netbox-upgrade, netbox_4_4, netbox_4_5 all wired to web-apps/netbox/default.nix and web-apps/netbox-upgrade.nix",
+  "watch_selection_basis": "enable (baseline) + bind, environmentFiles, apiTokenPepperFiles, ldapConfigFile (new/renamed leaf options introduced by this PR's own diff via mkRemovedOptionModule/mkRenamedOptionModule/mkChangedOptionModule + new mkOption blocks; PR is a large uplift, only options textually touched by the diff were watched, not the full option surface)",
+  "tool_invocation": "audit-diff (module existed on both sides) + check on base-root and head-root to resolve 'unchanged' diff entries",
+  "run_exit_codes": {
+    "audit-diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "module": "nixos/modules/services/web-apps/netbox.nix",
+        "test": "nixos/tests/web-apps/netbox/default.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": ["services", "netbox"],
+        "watched_path": "enable",
+        "side": "unchanged (PASS on both base and head, per oba check)",
+        "source": "check-base.json / check-head.json targets[0].verdicts[] where option=='enable'"
+      }
+    ]
+  },
+  "audit_diff_raw_summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 4,
+    "oba_verdict_transitions": {
+      "option_not_found->predicate_not_found": 3,
+      "option_not_found->test_value_unresolved": 1
+    },
+    "notable_total": 0
+  },
+  "other_watched_verdicts_base": {
+    "bind": "OptionNotFound",
+    "environmentFiles": "OptionNotFound",
+    "apiTokenPepperFiles": "OptionNotFound",
+    "ldapConfigFile": "OptionNotFound"
+  },
+  "other_watched_verdicts_head": {
+    "bind": "PredicateNotFound",
+    "environmentFiles": "PredicateNotFound",
+    "apiTokenPepperFiles": "PredicateNotFound",
+    "ldapConfigFile": "TestValueUnresolved"
+  },
+  "structural_notes": [
+    "None of bind/environmentFiles/apiTokenPepperFiles/ldapConfigFile are PASS-class on either side -- recorded raw only, no correctness judgment made.",
+    "test_config_opacity (head, check) lists 5 opaque test-config sites in default.nix: services.netbox.package (line 39), services.netbox.ldapConfigFile (line 46), two nested openldap settings.children attrs (lines 92, 94), and services.openldap.declarativeContents (dynamic attr name, line 100). Recorded raw for coordinator; not judged."
+  ]
+}
