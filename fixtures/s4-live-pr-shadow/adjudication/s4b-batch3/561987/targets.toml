@@ -1,0 +1,7 @@
+[[target]]
+name = "coder"
+module = "nixos/modules/services/web-apps/coder.nix"
+test = "nixos/tests/coder.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "coder"]
+watch = ["enable", "environment.extra", "environment.file"]

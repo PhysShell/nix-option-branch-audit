@@ -1,0 +1,501 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0
+  },
+  "targets": [
+    {
+      "name": "plasma6",
+      "module": "nixos/modules/services/desktop-managers/plasma6.nix",
+      "test": "nixos/tests/plasma6.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "desktopManager",
+        "plasma6"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 29,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableQt5Integration"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 35,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "plasma6",
+            "excludePackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 47,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 70,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 70,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 173,
+            "col": 12
+          },
+          "source": "lib.optional config.networking.networkmanager.enable qrca",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 174,
+            "col": 12
+          },
+          "source": "lib.optionals config.hardware.sensor.iio.enable [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 178,
+            "col": 12
+          },
+          "source": "lib.optionals (config.services.flatpak.enable || config.services.fwupd.enable) [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 186,
+            "col": 10
+          },
+          "source": "lib.optionals config.services.desktopManager.plasma6.enableQt5Integration [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 205,
+            "col": 10
+          },
+          "source": "lib.optionals config.hardware.bluetooth.enable [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 211,
+            "col": 10
+          },
+          "source": "lib.optional config.networking.networkmanager.enable plasma-nm",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 212,
+            "col": 10
+          },
+          "source": "lib.optional config.services.pulseaudio.enable plasma-pa",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 213,
+            "col": 10
+          },
+          "source": "lib.optional config.services.pipewire.pulse.enable plasma-pa",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 214,
+            "col": 10
+          },
+          "source": "lib.optional config.powerManagement.enable powerdevil",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 215,
+            "col": 10
+          },
+          "source": "lib.optional config.services.printing.enable print-manager",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 216,
+            "col": 10
+          },
+          "source": "lib.optional config.hardware.sane.enable skanpage",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 217,
+            "col": 10
+          },
+          "source": "lib.optional config.services.colord.enable colord-kde",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 218,
+            "col": 10
+          },
+          "source": "lib.optional config.services.hardware.bolt.enable plasma-thunderbolt",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 219,
+            "col": 10
+          },
+          "source": "lib.optional config.services.samba.enable kdenetwork-filesharing",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 220,
+            "col": 10
+          },
+          "source": "lib.optional config.services.xserver.wacom.enable wacomtablet",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 221,
+            "col": 10
+          },
+          "source": "lib.optional config.services.flatpak.enable flatpak-kcm",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 270,
+            "col": 45
+          },
+          "source": "mkIf config.services.printing.enable (mkDefault true)",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 340,
+            "col": 25
+          },
+          "source": "lib.mkIf config.services.fprintd.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 344,
+            "col": 23
+          },
+          "source": "lib.mkIf config.security.pam.p11.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+            "line": 378,
+            "col": 35
+          },
+          "source": "lib.mkIf (config.time.timeZone != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "desktopManager",
+            "plasma6",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/plasma6.nix",
+            "line": 18,
+            "col": 7
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "machine",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/plasma6.nix",
+            "line": 13,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+              "line": 70,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "desktopManager",
+                "plasma6",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/plasma6.nix",
+                "line": 18,
+                "col": 7
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+                  "line": 70,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/desktop-managers/plasma6.nix",
+                  "line": 70,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "pr": 525482,
+  "title": "nixos/pcscd: expose package as option; pcsclite: enable structuredAttrs, separateDebugInfo, strictDeps",
+  "applicable": true,
+  "base_sha": "eda09a0827956ed175104af57dafcdb48b7b3f09",
+  "head_sha": "1468d638d9872ddb999cfc3053cc66a0089eb59b",
+  "module_paths": [
+    "nixos/modules/services/hardware/pcscd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/pcsclite.nix"
+  ],
+  "test_wiring_evidence": "nixos/tests/all-tests.nix @ head 1468d638: line 1277 `pcsclite = runTest ./pcsclite.nix;` -- test exercises `services.pcscd.enable = true;` and waits on `pcscd.socket`.",
+  "watch_list_derivation": "Real diff (`gh pr diff 525482`) adds a new `package = (lib.mkPackageOption pkgs \"pcsclite\" { }) // { ... }` option declaration inside `options.services.pcscd = { ... }` and removes the local `let package = ...` binding, replacing usages with `cfg.package`. Watched: baseline `enable` + the newly-declared `package` option.",
+  "run_exit_codes": {
+    "audit-diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    "check-base.json and check-head.json both show verdict 'PredicateNotFound' for watched option 'enable' (no transition -- same verdict both sides).",
+    "check-base.json and check-head.json both show verdict 'OptionNotFound' for watched option 'package' (no transition -- same verdict both sides). Note: 'package' IS present in the head module source as a real mkOption-based declaration (`(lib.mkPackageOption pkgs \"pcsclite\" { }) // { default = ...; defaultText = ...; }`), but it does NOT appear in either check-base.json's or check-head.json's `discovered_options` array -- oba's static option discovery did not recognize this `mkPackageOption ... // { ... }` merge-expression shape as an option declaration on EITHER side, so 'package' registers as OptionNotFound symmetrically rather than as a genuine base-absent/head-present asymmetry. This is a discovery-miss fact, not a verdict transition (raw.json's oba_verdict_transitions is {} and diff.kind is 'unchanged' for both watched_path entries), flagging for reviewer awareness per the tool's discovery limitations, not as an actionable PASS/FAIL signal.",
+    "raw.json audit-diff summary: unchanged=2, added=0, removed=0, changed=0, oba_verdict_transitions={}, notable=[] -- no asymmetric transitions detected for this PR."
+  ]
+}

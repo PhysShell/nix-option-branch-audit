@@ -1,0 +1,42 @@
+{
+  "pr": 529092,
+  "title": "nixos/plasma6: install plasma-keyboard by default",
+  "applicable": true,
+  "base_sha": "8c1f2d438fe443e527ee9980af487742057910a8",
+  "head_sha": "bb38195945cf64396b4997e3c84703b519be86b0",
+  "module_paths": [
+    "nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix",
+    "nixos/modules/services/desktop-managers/plasma6.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/plasma6.nix"
+  ],
+  "test_wiring_evidence": "nixos/tests/all-tests.nix @ head bb381959: line 1327 `plasma6 = runTest ./plasma6.nix;` -- test sets `services.desktopManager.plasma6.enable = true;` on line 18 of nixos/tests/plasma6.nix.",
+  "watch_list_derivation": "Real diff (`gh pr diff 529092`) only touches `environment.systemPackages` inside the installer CD module (removing an explicit plasma-keyboard add) and adds `plasma-keyboard`/`qtvirtualkeyboard` to an existing packages list inside plasma6.nix's `config` block -- no mkOption/mkEnableOption/mkRenamedOptionModule declaration line is textually touched anywhere in the diff. Watched: baseline `enable` only (declared via `enable = mkOption { type = types.bool; default = false; ... }` at services.desktopManager.plasma6.enable, cfg_ident `cfg` = `config.services.desktopManager.plasma6`).",
+  "run_exit_codes": {
+    "audit-diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "target": "plasma6",
+        "option": "enable",
+        "verdict_base": "PASS",
+        "verdict_head": "PASS",
+        "predicate": "mkIf cfg.enable { ... } (Truthy/mkIf, line 70 in both base and head module source)",
+        "witnessed_by": "nixos/tests/plasma6.nix line 18: services.desktopManager.plasma6.enable = true;"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    "raw.json audit-diff summary: unchanged=1, added=0, removed=0, changed=0, oba_verdict_transitions={}, notable=[] -- no asymmetric transitions detected for this PR; the single watched target (enable) is genuinely unchanged PASS->PASS across base/head."
+  ]
+}

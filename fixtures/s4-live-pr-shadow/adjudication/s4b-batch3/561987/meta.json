@@ -1,0 +1,41 @@
+{
+  "pr": 561987,
+  "title": "nixos/coder: add url to Coder configuration reference",
+  "applicable": true,
+  "base_sha": "408915da7870be337b655e72eed29b47e637f868",
+  "head_sha": "2d72ab3ad31cf050b83b824ed6edf0d47f7e7317",
+  "module_paths": [
+    "nixos/modules/services/web-apps/coder.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/coder.nix"
+  ],
+  "test_wiring_evidence": "nixos/tests/all-tests.nix @ head 2d72ab3a: line 456 `coder = runTest ./coder.nix;` -- test sets `services.coder.enable = true;` (line 10 of nixos/tests/coder.nix) and waits on `coder.service`.",
+  "watch_list_derivation": "Real diff (`gh pr diff 561987`) adds a `configRefUrl` let-binding and rewrites the `description` field inside two existing `mkOption { ... }` blocks: `environment.extra` (types.attrs) and `environment.file` (types.nullOr types.path) -- both declaration bodies are textually touched by the diff (description text only, no type/default change). Watched: baseline `enable` + `environment.extra` + `environment.file` (cfg_ident `cfg` = `config.services.coder`, option_prefix services.coder).",
+  "run_exit_codes": {
+    "audit-diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      {
+        "target": "coder",
+        "option": "enable",
+        "verdict_base": "PASS",
+        "verdict_head": "PASS"
+      }
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    "check-base.json and check-head.json both show verdict 'PredicateNotFound' for watched option 'environment.extra' (no transition -- same verdict both sides, contributes to summary.inconclusive=1).",
+    "check-base.json and check-head.json both show verdict 'OBA001' for watched option 'environment.file' (no transition -- same verdict both sides, contributes to summary.finding=1). This is expected: the PR only edits option description text, not any predicate/config wiring, so pre-existing finding/inconclusive states for these two options are unchanged by the PR.",
+    "raw.json audit-diff summary: unchanged=3, added=0, removed=0, changed=0, oba_verdict_transitions={}, notable=[] -- no asymmetric transitions detected for this PR across any of the 3 watched options."
+  ]
+}

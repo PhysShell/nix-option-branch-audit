@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 2
+  },
+  "targets": [
+    {
+      "name": "pcscd",
+      "module": "nixos/modules/services/hardware/pcscd.nix",
+      "test": "nixos/tests/pcsclite.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "pcscd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 35,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 42,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "readerConfigs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 49,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 67,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ignoreReaderNames"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extendReaderNames"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 93,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extendReaderNames"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extendReaderNames"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 124,
+            "col": 47
+          },
+          "source": "lib.mkIf ("
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 38,
+            "col": 17
+          },
+          "source": "if config.security.polkit.enable then pkgs.pcscliteWithPolkit else pkgs.pcsclite",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 104,
+            "col": 12
+          },
+          "source": "lib.mkIf config.services.pcscd.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/pcscd.nix",
+            "line": 120,
+            "col": 47
+          },
+          "source": "lib.mkIf (cfg.ignoreReaderNames != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "ignoreReaderNames"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "enable"
+        },
+        {
+          "verdict": "OptionNotFound",
+          "option": "package"
+        }
+      ]
+    }
+  ]
+}

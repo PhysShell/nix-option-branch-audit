@@ -1,0 +1,762 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.4"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 1,
+    "inconclusive": 1
+  },
+  "targets": [
+    {
+      "name": "coder",
+      "module": "nixos/modules/services/web-apps/coder.nix",
+      "test": "nixos/tests/coder.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "coder"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 18,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"coder\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "coder"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 20,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"coder\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "coder"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 33,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "homeDir"
+          ],
+          "default_source": "\"/var/lib/coder\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/coder"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 48,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenAddress"
+          ],
+          "default_source": "\"127.0.0.1:3000\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1:3000"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 56,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "accessUrl"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 64,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "wildcardAccessUrl"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 73,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "extra"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 83,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "file"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 92,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 100,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"/run/postgresql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/postgresql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 108,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "database"
+          ],
+          "default_source": "\"coder\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "coder"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 116,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "username"
+          ],
+          "default_source": "\"coder\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "coder"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 124,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "password"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 132,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "sslmode"
+          ],
+          "default_source": "\"disable\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "disable"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 140,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "tlsCert"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 149,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "tlsKey"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 157,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 167,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 215,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 167,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "password"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "password"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 186,
+            "col": 11
+          },
+          "source": "optionalString (cfg.database.password != null) \"password=${cfg.database.password}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "sslmode"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "sslmode"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 188,
+            "col": 11
+          },
+          "source": "optionalString (cfg.database.sslmode != null) \"sslmode=${cfg.database.sslmode}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "tlsCert"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "tlsCert"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 191,
+            "col": 28
+          },
+          "source": "optionalString (cfg.tlsCert != null) \"1\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environment",
+                    "file"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environment",
+              "file"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 211,
+            "col": 27
+          },
+          "source": "lib.mkIf (cfg.environment.file != null) cfg.environment.file"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 215,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "coder"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 228,
+            "col": 20
+          },
+          "source": "optionalAttrs (cfg.group == name) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "coder"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/coder.nix",
+            "line": 231,
+            "col": 19
+          },
+          "source": "optionalAttrs (cfg.user == name) {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "coder",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "machine",
+          "span": {
+            "file": "nixos/tests/coder.nix",
+            "line": 10,
+            "col": 9
+          }
+        }
+      ],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/web-apps/coder.nix",
+              "line": 167,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "coder",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "machine",
+              "span": {
+                "file": "nixos/tests/coder.nix",
+                "line": 10,
+                "col": 9
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/coder.nix",
+                  "line": 167,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/coder.nix",
+                  "line": 167,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        },
+        {
+          "verdict": "PredicateNotFound",
+          "option": "environment.extra"
+        },
+        {
+          "verdict": "OBA001",
+          "option": "environment.file",
+          "predicate": {
+            "ir": {
+              "Not": {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "environment",
+                      "file"
+                    ]
+                  },
+                  {
+                    "Literal": "Null"
+                  }
+                ]
+              }
+            },
+            "refs": [
+              [
+                "environment",
+                "file"
+              ]
+            ],
+            "span": {
+              "file": "nixos/modules/services/web-apps/coder.nix",
+              "line": 211,
+              "col": 27
+            },
+            "source": "lib.mkIf (cfg.environment.file != null) cfg.environment.file"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "ir": {
+                  "Not": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "environment",
+                          "file"
+                        ]
+                      },
+                      {
+                        "Literal": "Null"
+                      }
+                    ]
+                  }
+                },
+                "refs": [
+                  [
+                    "environment",
+                    "file"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/coder.nix",
+                  "line": 211,
+                  "col": 27
+                },
+                "source": "lib.mkIf (cfg.environment.file != null) cfg.environment.file"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
