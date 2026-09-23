@@ -1,0 +1,694 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "449173",
+      "module": "nixos/modules/services/web-apps/dolibarr.nix",
+      "test": "nixos/tests/dolibarr.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "dolibarr"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 82,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "domain"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 86,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"dolibarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "dolibarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 94,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"dolibarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "dolibarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 108,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/dolibarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/dolibarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 122,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 131,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "3306",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 136,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"dolibarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "dolibarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 141,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "\"dolibarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "dolibarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 146,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 151,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 157,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 164,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "nginx"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 176,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "poolConfig"
+          ],
+          "default_source": "{\n        \"pm\" = \"dynamic\";\n        \"pm.max_children\" = 32;\n        \"pm.start_servers\" = 2;\n        \"pm.min_spare_servers\" = 2;\n        \"pm.max_spare_servers\" = 4;\n        \"pm.max_requests\" = 500;\n      }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 207,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 231,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable (mkMerge ["
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 280,
+            "col": 24
+          },
+          "source": "mkIf cfg.database.createLocally {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 311,
+            "col": 50
+          },
+          "source": "mkIf cfg.database.createLocally [ \"mysql.service\" ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "nginx"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "nginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 28,
+            "col": 14
+          },
+          "source": "lib.optionalAttrs (cfg.nginx != null) config.services.nginx.virtualHosts.\"${cfg.domain}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 75,
+            "col": 6
+          },
+          "source": "optionalAttrs (cfg.database.passwordFile != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 231,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable (mkMerge ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 252,
+            "col": 33
+          },
+          "source": "mkIf (cfg.database.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 280,
+            "col": 24
+          },
+          "source": "mkIf cfg.database.createLocally {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "nginx"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "nginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 294,
+            "col": 31
+          },
+          "source": "mkIf (cfg.nginx != null) true"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "nginx"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "nginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 295,
+            "col": 53
+          },
+          "source": "mkIf (cfg.nginx != null) ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 311,
+            "col": 50
+          },
+          "source": "mkIf cfg.database.createLocally [ \"mysql.service\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dolibarr"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 366,
+            "col": 30
+          },
+          "source": "mkIf (cfg.user == \"dolibarr\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dolibarr"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 371,
+            "col": 22
+          },
+          "source": "optionalAttrs (cfg.group == \"dolibarr\") {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "nginx"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "nginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 375,
+            "col": 6
+          },
+          "source": "mkIf (cfg.nginx != null) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "nginx"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "nginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 376,
+            "col": 66
+          },
+          "source": "mkIf (cfg.nginx != null) [ cfg.group ]"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 42,
+            "col": 9
+          },
+          "source": "if (any (str: k == str) secretKeys) then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 44,
+            "col": 14
+          },
+          "source": "if isString v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 46,
+            "col": 14
+          },
+          "source": "if isBool v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dolibarr.nix",
+            "line": 48,
+            "col": 14
+          },
+          "source": "if v == null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "database.type"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

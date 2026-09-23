@@ -1,0 +1,44 @@
+{
+  "pr": 419908,
+  "title": "victoriametrics & vmagent: Make the config check optional",
+  "applicable": true,
+  "base_sha": "cc80af1b81627d5a61f075d5de486dd143a8540e",
+  "head_sha": "292073c5cce560c375a17e754cdc4be292d1abb4",
+  "module_paths": [
+    "nixos/modules/services/databases/victoriametrics.nix",
+    "nixos/modules/services/monitoring/vmagent.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/victoriametrics/default.nix"
+  ],
+  "reason": "Real new mkOption 'checkConfig' (bool, default true) added identically to both victoriametrics.nix and vmagent.nix. Only victoriametrics.nix has a real dedicated test (nixos/tests/victoriametrics/default.nix); vmagent.nix has no test file in nixos/tests, so only the victoriametrics side was targeted.",
+  "targets_toml": "option_prefix=[services,victoriametrics], watch=[checkConfig]. (vmagent's identical option add was NOT targeted -- no test coverage exists for vmagent.)",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "checkConfig",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option; head-side is TestConfigUnresolved (predicate exists, real option, but no test assignment sets it to a resolvable literal) rather than PredicateNotFound -- both are non-gap 'correctly declined to guess' classes, just distinct verdict labels for a related but not identical situation."
+    },
+    {
+      "watched_path": "checkConfig",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

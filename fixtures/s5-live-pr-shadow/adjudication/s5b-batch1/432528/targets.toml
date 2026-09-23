@@ -1,0 +1,7 @@
+[[target]]
+name = "432528"
+module = "nixos/modules/services/networking/tayga.nix"
+test = "nixos/tests/tayga.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "tayga"]
+watch = ["wkpfStrict"]

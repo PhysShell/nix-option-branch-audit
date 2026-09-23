@@ -1,0 +1,37 @@
+{
+  "pr": 396915,
+  "title": "nixos/homebox: add 'database.createLocally'",
+  "applicable": true,
+  "base_sha": "134bc9de5348cc783b4cb3283ea9b920d92cf2d6",
+  "head_sha": "52cb257ea6b3da911b134143117d9c7480c4a312",
+  "module_paths": [
+    "nixos/modules/services/web-apps/homebox.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/homebox.nix"
+  ],
+  "reason": "Applicable: real homebox module + wired test. Real diff adds a genuinely new database.createLocally mkOption -- same shape/title pattern as tandoor-recipes (S5-B batch1) and the earlier non-applicable homebox settings-key-rename PR (S5-A batch7).",
+  "targets_toml": "single target homebox, cfg_ident=cfg, option_prefix=[services,homebox,database], watch=[createLocally].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "createLocally",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides). homebox.nix declares `options.services.homebox = {...}` -- dotted-path, NO inline with, same bare shape as tandoor-recipes (also blackout) -- another data point against the with-inline lead being sufficient/necessary on its own."
+    }
+  ]
+}

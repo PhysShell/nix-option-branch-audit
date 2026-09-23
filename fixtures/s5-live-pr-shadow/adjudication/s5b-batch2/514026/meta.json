@@ -1,0 +1,38 @@
+{
+  "pr": 514026,
+  "title": "Add spire-tpm-plugin support to spire NixOS module",
+  "applicable": true,
+  "base_sha": "cf929aef5b6b3610e024147a535ef17fed77cc5f",
+  "head_sha": "e27ef5378cdea60940f246675e7f663cb76ac5e3",
+  "module_paths": [
+    "nixos/modules/services/security/spire/agent.nix",
+    "nixos/modules/services/security/spire/agent-tpm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/spire.nix"
+  ],
+  "reason": "Applicable: real spire-agent module + wired test. Real diff adds a new TPM NodeAttestor plugin option in a NEW file (agent-tpm.nix) not included as this target's own `module`; watched a pre-existing, unchanged field (trust_domain) in the main agent.nix instead, to probe a real doubly-repeated path-segment shape (services.spire.agent.settings.agent.trust_domain -- 'agent' appears twice).",
+  "targets_toml": "single target spire-agent, module=agent.nix only (agent-tpm.nix, where the PR's own real new content lives, was not included as the module target given oba takes one module path -- the new TPM option itself was not directly probed this pass), cfg_ident=cfg, option_prefix=[services,spire,agent,settings,agent] (the full real absolute path, confirmed via an initial shallower-prefix run whose discovered_options listed ['settings','agent','trust_domain'] relative to [services,spire,agent]), watch=[trust_domain].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "trust_domain",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "GENUINELY CONFUSING RESULT worth flagging with care: a shallower option_prefix=[services,spire,agent] run showed trust_domain present in discovered_options (as a 3-segment relative path ['settings','agent','trust_domain'], implying the full absolute path is services.spire.agent.settings.agent.trust_domain -- note 'agent' appears twice, once as the top-level cfg namespace and once as a real nested settings key). But re-running with the FULL matching option_prefix=[services,spire,agent,settings,agent] returns EMPTY discovered_options and OptionNotFound for the watched option -- the deeper, more-specific prefix found LESS than the shallower one, which is the opposite of what I'd expect. Possibly a real resolution bug specific to a path with a repeated segment name; possibly a real limitation in how I'm allowed to specify option_prefix at all. Not confirmed either way, flagging as a third, structurally distinct candidate_capability_gap shape from the mkPackageOption and dotted-path-blackout ones."
+    }
+  ]
+}

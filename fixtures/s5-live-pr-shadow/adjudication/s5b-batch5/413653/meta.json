@@ -1,0 +1,9 @@
+{
+  "pr": 413653,
+  "title": "nixos/traccar: Rework configuration file creation.",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/monitoring/traccar.nix"
+  ],
+  "reason": "No nixos/tests file exists for traccar."
+}

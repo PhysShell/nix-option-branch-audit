@@ -1,0 +1,37 @@
+{
+  "pr": 506239,
+  "title": "nixos/roundcube: increase client_max_body_size for maxAttachmentSize",
+  "applicable": true,
+  "base_sha": "7bf1f7ec252aad5a2a72068acfcbec7998e4ff2d",
+  "head_sha": "d965362c0d1633423a88e644b4e620bd22f8ef06",
+  "module_paths": [
+    "nixos/modules/services/mail/roundcube.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/roundcube.nix"
+  ],
+  "reason": "Applicable: real roundcube module + wired test. Real diff adds a genuinely new use SITE of the existing maxAttachmentSize option (nginx `client_max_body_size ${toString cfg.maxAttachmentSize};`) -- same declared option as batch1's PR473031, not a new declaration.",
+  "targets_toml": "single target roundcube, cfg_ident=cfg, option_prefix=[services,roundcube], watch=[maxAttachmentSize] (same as batch1's PR473031, deliberately, to see if a new use site changes the verdict).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "maxAttachmentSize",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged, correctly, consistent with batch1's own PR473031 finding: maxAttachmentSize is used only as value substitutions (now in a second config-generation site too), never as a branch/predicate condition -- a new use site doesn't change the module-wide predicate-discovery verdict. Not a new finding."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "pr": 458481,
+  "title": "nixos/writefreely: add support for email smtp password + minor fixes",
+  "applicable": true,
+  "base_sha": "d42f6ed0d61c4de3f06202542b0f69b2bcaa5b85",
+  "head_sha": "fbe6fd7edd1f92023e5468a3800161222bd559c0",
+  "module_paths": [
+    "nixos/modules/services/web-apps/writefreely.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/writefreely.nix"
+  ],
+  "reason": "Real new mkOption 'email.smtpPasswordFile' added, matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,writefreely], watch=['email.smtpPasswordFile'].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "email.smtpPasswordFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option, correctly not-found at base, head-side TestConfigUnresolved (real option/predicate, test never sets a resolvable literal) -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "email.smtpPasswordFile",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

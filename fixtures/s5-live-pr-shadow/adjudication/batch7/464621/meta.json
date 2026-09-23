@@ -1,0 +1,37 @@
+{
+  "pr": 464621,
+  "title": "nixos/services.mysql: Set default data directory for MySQL at option",
+  "applicable": true,
+  "base_sha": "de3255d9ebab95d73cef7167991a8098083541a9",
+  "head_sha": "b80c547be836f80040791c6a8a269ea7c6226235",
+  "module_paths": [
+    "nixos/modules/services/databases/mysql.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mysql/mysql.nix"
+  ],
+  "reason": "Applicable: real mysql module + wired test. Real diff moves dataDir's real default expression from a separate config-block `lib.mkDefault (...)` assignment INTO the mkOption's own literal `default` field -- a genuine declaration-level change (functionally equivalent priority-wise, but the declaration itself now carries a real default where it previously had none).",
+  "targets_toml": "single target mysql, cfg_ident=cfg, option_prefix=[services,mysql], watch=[dataDir].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "dataDir",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Unchanged verdict class, but not a rendering-gap case (a real witnessed predicate exists on both sides, `cfg.dataDir == \"/var/lib/mysql\"`, unresolved because the real test doesn't set dataDir to a literal value oba's walker can see). Base predicate at line 731, head at line 730 -- SAME logical predicate content, just shifted one line because the diff added a new `default` field above it. Same known 'default-only changes invisible to the predicate-only verdict model' limitation already seen with wastebin/snapserver/jenkins earlier this round, not a new finding."
+    }
+  ]
+}

@@ -1,0 +1,2101 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "405047",
+      "module": "nixos/modules/services/misc/gitlab.nix",
+      "test": "nixos/tests/gitlab.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "gitlab",
+        "secrets"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 299,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "statePath"
+          ],
+          "default_source": "\"/var/gitlab/state\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/gitlab/state"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 319,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "extraEnv"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 333,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "backup",
+            "startAt"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 341,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "backup",
+            "path"
+          ],
+          "default_source": "cfg.statePath + \"/backup\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 352,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "backup",
+            "keepTime"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 359,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "backup",
+            "skip"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 370,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "backup",
+            "uploadOptions"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 404,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databaseHost"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 442,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databasePasswordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 451,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databaseCreateLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 462,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databaseName"
+          ],
+          "default_source": "\"gitlab\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gitlab"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 473,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databaseUsername"
+          ],
+          "default_source": "\"gitlab\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gitlab"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 479,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databasePool"
+          ],
+          "default_source": "5",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 485,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "extraDatabaseConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 491,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "redisUrl"
+          ],
+          "default_source": "\"unix:/run/gitlab/redis.sock\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "unix:/run/gitlab/redis.sock"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 497,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "extraGitlabRb"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 504,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "host"
+          ],
+          "default_source": "config.networking.hostName",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 524,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "port"
+          ],
+          "default_source": "8080",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 531,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "https"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 540,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "user"
+          ],
+          "default_source": "\"gitlab\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gitlab"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 546,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "group"
+          ],
+          "default_source": "\"gitlab\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gitlab"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 552,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "initialRootEmail"
+          ],
+          "default_source": "\"admin@local.host\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "admin@local.host"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 558,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "initialRootPasswordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 566,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 579,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "package"
+          ],
+          "default_source": "if versionAtLeast config.system.stateVersion \"23.11\" then\n              pkgs.gitlab-container-registry\n            else\n              pkgs.docker-distribution",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 584,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "host"
+          ],
+          "default_source": "config.services.gitlab.host",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 599,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "port"
+          ],
+          "default_source": "4567",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 605,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "certFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 610,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "keyFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 614,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "defaultForProjects"
+          ],
+          "default_source": "cfg.registry.enable",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 618,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "issuer"
+          ],
+          "default_source": "\"gitlab-issuer\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gitlab-issuer"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 624,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "serviceName"
+          ],
+          "default_source": "\"container_registry\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "container_registry"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 629,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "externalAddress"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 634,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "registry",
+            "externalPort"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 639,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 646,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "address"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 652,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "port"
+          ],
+          "default_source": "25",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 658,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "username"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 664,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 670,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "domain"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 681,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "authentication"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 687,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "enableStartTLSAuto"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 693,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "tls"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 699,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "smtp",
+            "opensslVerifyMode"
+          ],
+          "default_source": "\"peer\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "peer"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 705,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 712,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 714,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "listen-http"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 753,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "listen-https"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 762,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "listen-proxy"
+          ],
+          "default_source": "[ \"127.0.0.1:8090\" ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 771,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "artifacts-server"
+          ],
+          "default_source": "\"http${optionalString cfg.https \"s\"}://${cfg.host}/api/v4\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 780,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "gitlab-server"
+          ],
+          "default_source": "\"http${optionalString cfg.https \"s\"}://${cfg.host}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 790,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "internal-gitlab-server"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 800,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "api-secret-key"
+          ],
+          "default_source": "\"${cfg.statePath}/gitlab_pages_secret\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 814,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "pages-domain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 824,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "pages",
+            "settings",
+            "pages-root"
+          ],
+          "default_source": "\"${gitlabConfig.production.shared.path}/pages\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 832,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "secretFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 844,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dbFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 860,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "otpFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 876,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "jwsFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 892,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "extraShellConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 910,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "puma",
+            "workers"
+          ],
+          "default_source": "2",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 916,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "puma",
+            "threadsMin"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 932,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "puma",
+            "threadsMax"
+          ],
+          "default_source": "4",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 947,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "sidekiq",
+            "concurrency"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 965,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "sidekiq",
+            "memoryKiller",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 975,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "sidekiq",
+            "memoryKiller",
+            "maxMemory"
+          ],
+          "default_source": "2000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 988,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "sidekiq",
+            "memoryKiller",
+            "graceTime"
+          ],
+          "default_source": "900",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 998,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "sidekiq",
+            "memoryKiller",
+            "shutdownWait"
+          ],
+          "default_source": "30",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1008,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "logrotate",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1019,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "logrotate",
+            "frequency"
+          ],
+          "default_source": "\"daily\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "daily"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1027,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "logrotate",
+            "keep"
+          ],
+          "default_source": "30",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1033,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "workhorse",
+            "config"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1040,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "extraConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1073,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "registry",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 174,
+            "col": 18
+          },
+          "source": "lib.optionalAttrs cfg.registry.enable {"
+        },
+        {
+          "path": [
+            "pages",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 185,
+            "col": 15
+          },
+          "source": "optionalAttrs cfg.pages.enable {"
+        },
+        {
+          "path": [
+            "https"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 782,
+            "col": 32
+          },
+          "source": "optionalString cfg.https \"s\""
+        },
+        {
+          "path": [
+            "https"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 792,
+            "col": 32
+          },
+          "source": "optionalString cfg.https \"s\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1131,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "registry",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1281,
+            "col": 45
+          },
+          "source": "optionalAttrs cfg.registry.enable {"
+        },
+        {
+          "path": [
+            "registry",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1305,
+            "col": 40
+          },
+          "source": "optionalAttrs cfg.registry.enable {"
+        },
+        {
+          "path": [
+            "registry",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1311,
+            "col": 31
+          },
+          "source": "optionalAttrs cfg.registry.enable {"
+        },
+        {
+          "path": [
+            "smtp",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1427,
+            "col": 13
+          },
+          "source": "optionalString cfg.smtp.enable ''"
+        },
+        {
+          "path": [
+            "pages",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1438,
+            "col": 15
+          },
+          "source": "optionalString cfg.pages.enable ''"
+        },
+        {
+          "path": [
+            "sidekiq",
+            "memoryKiller",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1550,
+            "col": 13
+          },
+          "source": "optionalAttrs cfg.sidekiq.memoryKiller.enable {"
+        },
+        {
+          "path": [
+            "pages",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1666,
+            "col": 7
+          },
+          "source": "mkIf cfg.pages.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 22,
+            "col": 5
+          },
+          "source": "if config.services.postgresql.enable then",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 46,
+            "col": 10
+          },
+          "source": "if (gitlabVersionAtLeast \"15.0\") then { main = val; } else val",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "packages",
+              "gitlab"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 47,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs (gitlabVersionAtLeast \"15.9\") {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "packages",
+              "gitlab"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 150,
+            "col": 13
+          },
+          "source": "optionalAttrs (cfg.backup.uploadOptions != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "backup",
+              "uploadOptions"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 392,
+            "col": 20
+          },
+          "source": "if isString x then x else concatStringsSep \",\" x",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 587,
+            "col": 13
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"23.11\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 755,
+            "col": 26
+          },
+          "source": "if x == [ ] then null else lib.concatStringsSep \",\" x",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 764,
+            "col": 26
+          },
+          "source": "if x == [ ] then null else lib.concatStringsSep \",\" x",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 773,
+            "col": 26
+          },
+          "source": "if x == [ ] then null else lib.concatStringsSep \",\" x",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1133,
+            "col": 8
+          },
+          "source": "mkIf",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "registry",
+              "enable"
+            ],
+            [
+              "packages",
+              "gitlab"
+            ],
+            [
+              "registry",
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1143,
+            "col": 8
+          },
+          "source": "mkIf",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "packages",
+              "gitlab"
+            ],
+            [
+              "packages",
+              "gitlab"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1461,
+            "col": 39
+          },
+          "source": "lib.optionalString (gitlabVersionAtLeast \"15.0\") \".main\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "packages",
+              "gitlab"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1463,
+            "col": 26
+          },
+          "source": "lib.optional (gitlabVersionAtLeast \"15.9\") \"| .production.ci.password = $ENV.db_password\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "packages",
+              "gitlab"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1639,
+            "col": 15
+          },
+          "source": "if isInt v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1641,
+            "col": 20
+          },
+          "source": "if isString v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1643,
+            "col": 20
+          },
+          "source": "if true == v then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1645,
+            "col": 20
+          },
+          "source": "if false == v then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1647,
+            "col": 20
+          },
+          "source": "if isSecret v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1741,
+            "col": 51
+          },
+          "source": "optionalString (lib.versionAtLeast (lib.getVersion cfg.packages.gitlab-workhorse) \"16.10\") \"gitlab-\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "packages",
+              "gitlab-workhorse"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1752,
+            "col": 40
+          },
+          "source": "mkIf (gitlabConfig.production.incoming_email.enabled or false) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "extraConfig"
+            ],
+            [
+              "host"
+            ],
+            [
+              "port"
+            ],
+            [
+              "https"
+            ],
+            [
+              "user"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "packages",
+              "gitaly"
+            ],
+            [
+              "packages",
+              "gitaly"
+            ],
+            [
+              "backup",
+              "path"
+            ],
+            [
+              "backup",
+              "keepTime"
+            ],
+            [
+              "backup",
+              "uploadOptions"
+            ],
+            [
+              "backup",
+              "uploadOptions"
+            ],
+            [
+              "packages",
+              "gitlab-shell"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "packages",
+              "gitaly",
+              "git"
+            ],
+            [
+              "registry",
+              "enable"
+            ],
+            [
+              "registry",
+              "externalAddress"
+            ],
+            [
+              "registry",
+              "externalPort"
+            ],
+            [
+              "registry",
+              "keyFile"
+            ],
+            [
+              "registry",
+              "issuer"
+            ],
+            [
+              "statePath"
+            ],
+            [
+              "pages",
+              "enable"
+            ],
+            [
+              "pages",
+              "enable"
+            ],
+            [
+              "pages",
+              "settings",
+              "pages-domain"
+            ],
+            [
+              "pages",
+              "settings",
+              "api-secret-key"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/gitlab.nix",
+            "line": 1832,
+            "col": 12
+          },
+          "source": "optionalAttrs (stringLength cfg.backup.skip > 0) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "backup",
+              "skip"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "gitlab",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 41,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 43,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "systemd",
+            "services",
+            "gitlab",
+            "serviceConfig",
+            "Restart"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 54,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "systemd",
+            "services",
+            "gitlab-workhorse",
+            "serviceConfig",
+            "Restart"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 55,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "systemd",
+            "services",
+            "gitaly",
+            "serviceConfig",
+            "Restart"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 56,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "systemd",
+            "services",
+            "gitlab-sidekiq",
+            "serviceConfig",
+            "Restart"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 57,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "databasePasswordFile"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 86,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "initialRootPasswordFile"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 87,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "secrets",
+            "secretFile"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 105,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "secrets",
+            "otpFile"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 106,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "secrets",
+            "dbFile"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 107,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "gitlab",
+            "secrets",
+            "jwsFile"
+          ],
+          "instance": "gitlab",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/gitlab.nix",
+            "line": 108,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "activeRecordPrimaryKeyFile"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

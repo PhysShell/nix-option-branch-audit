@@ -1,0 +1,37 @@
+{
+  "pr": 382862,
+  "title": "nixos/peering-manager: 1.8.3 -> 1.9.6",
+  "applicable": true,
+  "base_sha": "dc71c8cc49eb48aadb244c15cab3bca1820b24e1",
+  "head_sha": "1918e3ced1882d3a31f3ba0753abe78fa84781e4",
+  "module_paths": [
+    "nixos/modules/services/web-apps/peering-manager.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/peering-manager.nix"
+  ],
+  "reason": "Applicable: real peering-manager module + wired test. Real diff adds a genuinely new environmentFile mkOption, wired into a real if/then/else predicate (finalConfigFile = if cfg.environmentFile != null then ... else configFile).",
+  "targets_toml": "single target peering-manager, cfg_ident=cfg, option_prefix=[services,peering-manager], watch=[environmentFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides). peering-manager.nix declares `options.services.peering-manager = with lib; {...}` -- dotted-path WITH an inline `with lib;` right at the assignment, the SAME shape as trilium (S5-B batch1), which also blacked out. 2/2 so far for this specific with-inline-at-assignment shape -- a real candidate lead, still not confirmed against a large enough sample to rule out coincidence (per the coordinator's guidance, not asserting this as the unifying cause yet)."
+    }
+  ]
+}

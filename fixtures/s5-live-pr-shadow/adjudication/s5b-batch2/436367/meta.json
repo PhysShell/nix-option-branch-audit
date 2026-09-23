@@ -1,0 +1,39 @@
+{
+  "pr": 436367,
+  "title": "nixos/mihomo: add an option for processes info",
+  "applicable": true,
+  "base_sha": "80bdc1e5ce51f56b19791b52b2901187931f5353",
+  "head_sha": "46f22dc20ad86d7520aef0544120d46a4a990972",
+  "module_paths": [
+    "nixos/modules/services/networking/mihomo.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mihomo.nix"
+  ],
+  "reason": "Applicable: real mihomo module + wired test. Real diff adds a genuinely new processesInfo mkEnableOption, wired into a real predicate (lib.optionals cfg.processesInfo [...]) merged into AmbientCapabilities/CapabilityBoundingSet.",
+  "targets_toml": "single target mihomo, cfg_ident=cfg, option_prefix=[services,mihomo], watch=[processesInfo]. SELF-CAUGHT CONTENT-FETCH ERROR: the first run used base-root/head-root content fetched at gerrit's (PR446636) commit SHAs by mistake (same class of copy-paste error as opensnitch above, caught the same way via post-batch reconciliation). Re-fetched with the correct SHAs and re-ran fully.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 1
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "B:436367:oba:processesInfo:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "processesInfo",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "FIFTH REAL ACTIONABLE PRESENTATION (after prosody checkConfig, guacamole logbackXml, sshd banner, photoprism databasePasswordFile) -- and this one SUPERSEDES/VOIDS an earlier wrong-content result on this same PR that had incorrectly reported 'OptionNotFound both sides, a selective miss vs the sibling tunMode option' -- that entire finding was an artifact of running against the WRONG file content (gerrit's, not mihomo's own) and should be disregarded; there is no real selective-miss anomaly here. The REAL result: check-head exits 1, finding=1, verdict OBA001, same 'uncovered option branch: no test assignment provably flips this predicate away from its default' class as the other 4 -- both predicate_attempts witnessed=False (the real mihomo test never sets processesInfo either way). Flagging for the same independent review process."
+    }
+  ]
+}

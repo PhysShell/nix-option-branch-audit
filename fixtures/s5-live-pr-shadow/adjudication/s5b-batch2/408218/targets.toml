@@ -1,0 +1,7 @@
+[[target]]
+name = "408218"
+module = "nixos/modules/services/misc/bazarr.nix"
+test = "nixos/tests/bazarr.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "bazarr"]
+watch = ["dataDir"]

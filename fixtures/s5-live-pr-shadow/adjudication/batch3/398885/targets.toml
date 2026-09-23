@@ -1,0 +1,7 @@
+[[target]]
+name = "cockpit"
+module = "nixos/modules/services/monitoring/cockpit.nix"
+test = "nixos/tests/cockpit.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cockpit"]
+watch = ["allowed-origins"]

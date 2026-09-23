@@ -1,0 +1,37 @@
+{
+  "pr": 366842,
+  "title": "nixos/networkmanager: add an enableDefaultPlugins option",
+  "applicable": true,
+  "base_sha": "b34038394e39f0c60cc73dadba5e2bf76fc4baef",
+  "head_sha": "98c23a61c3d0cce6bdfd12c76a5d72f4983a3a6d",
+  "module_paths": [
+    "nixos/modules/services/networking/networkmanager.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/networking/networkmanager.nix"
+  ],
+  "reason": "Applicable: real networkmanager module + wired test. Real diff adds enableDefaultPlugins mkOption, wired into a genuinely NEW predicate wrapping a previously-unconditional plugin list (mkIf cfg.enableDefaultPlugins {...}).",
+  "targets_toml": "single target networkmanager, cfg_ident=cfg, option_prefix=[networking,networkmanager], watch=[enableDefaultPlugins].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enableDefaultPlugins",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real, correct transition: option+predicate genuinely added, real test never sets it to a literal the walker can resolve -- same TestConfigUnresolved shape as other cases, not a new gap."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "pr": 512159,
+  "title": "reframe: init at 1.15.1, nixos/reframe: init",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/networking/reframe.nix"
+  ],
+  "reason": "Brand-new module init; no nixos/tests file exists yet for reframe. Notable: despite living in nixos/modules/services/networking/, the module declares its real options under 'options.programs.reframe' (not 'services.reframe') -- a real naming quirk in the PR itself, unrelated to test availability."
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "k3s"
+module = "nixos/modules/services/cluster/k3s/default.nix"
+test = "nixos/tests/k3s/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "k3s"]
+watch = ["autoDeployCharts"]

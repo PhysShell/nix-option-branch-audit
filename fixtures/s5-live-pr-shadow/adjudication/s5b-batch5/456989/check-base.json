@@ -1,0 +1,671 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "456989",
+      "module": "nixos/modules/services/audio/mpd.nix",
+      "test": "nixos/tests/mpd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "mpd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 65,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "startWhenNeeded"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 73,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "musicDirectory"
+          ],
+          "default_source": "\"${cfg.dataDir}/music\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 83,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "playlistDirectory"
+          ],
+          "default_source": "\"${cfg.dataDir}/playlists\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 95,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 107,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/${name}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 118,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 129,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 135,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "network",
+            "listenAddress"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 143,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "network",
+            "port"
+          ],
+          "default_source": "6600",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 153,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "dbFile"
+          ],
+          "default_source": "\"${cfg.dataDir}/tag_cache\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 164,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "credentials"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 174,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "credentials",
+            "passwordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 178,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "fluidsynth"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 225,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "fluidsynth"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 44,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.fluidsynth) ''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 238,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "startWhenNeeded"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 243,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.startWhenNeeded {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "dbFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "dbFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 34,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.dbFile != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "network",
+                    "listenAddress"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "any"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "network",
+              "listenAddress"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 40,
+            "col": 7
+          },
+          "source": "lib.optionalString ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "fluidsynth"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "fluidsynth"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 44,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.fluidsynth) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 238,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "startWhenNeeded"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "startWhenNeeded"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 243,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.startWhenNeeded {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "network",
+                    "listenAddress"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "any"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "network",
+              "listenAddress"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 252,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.network.listenAddress != \"any\") \"${cfg.network.listenAddress}:\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "startWhenNeeded"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "startWhenNeeded"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 259,
+            "col": 18
+          },
+          "source": "lib.optional (!cfg.startWhenNeeded) \"multi-user.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mpd"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 296,
+            "col": 19
+          },
+          "source": "lib.optionalAttrs (cfg.user == name) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mpd"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 306,
+            "col": 20
+          },
+          "source": "lib.optionalAttrs (cfg.group == name) {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 43,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.network.port != 6600) ''port \"${toString cfg.network.port}\"''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "network",
+              "port"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 51,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.credentials != [ ]) (credentialsPlaceholder cfg.credentials)",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "credentials"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 248,
+            "col": 11
+          },
+          "source": "if pkgs.lib.hasPrefix \"/\" cfg.network.listenAddress then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "network",
+              "listenAddress"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 265,
+            "col": 9
+          },
+          "source": "lib.optionalString (cfg.credentials != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "credentials"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 284,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.dataDir == \"/var/lib/${name}\") [ name ]",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dataDir"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 285,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.playlistDirectory == \"/var/lib/${name}/playlists\") [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "playlistDirectory"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/mpd.nix",
+            "line": 289,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.musicDirectory == \"/var/lib/${name}/music\") [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "musicDirectory"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "serverALSA",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/mpd.nix",
+            "line": 66,
+            "col": 5
+          }
+        },
+        {
+          "path": [],
+          "instance": "serverPulseAudio",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/mpd.nix",
+            "line": 85,
+            "col": 5
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "extraConfig"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

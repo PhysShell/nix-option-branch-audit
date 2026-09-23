@@ -1,0 +1,9 @@
+{
+  "pr": 394826,
+  "title": "nixos/hddfancontrol: use attrset for config",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/hddfancontrol.nix"
+  ],
+  "reason": "No nixos/tests file exists for hddfancontrol; real, large removal (disks/pwmPaths/logVerbosity/extraArgs ALL removed via mkRemovedOptionModule, replaced by a settings.<drive-bay-name> attrsOf(submodule)) but untestable."
+}

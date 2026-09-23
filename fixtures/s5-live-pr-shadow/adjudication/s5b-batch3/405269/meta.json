@@ -1,0 +1,37 @@
+{
+  "pr": 405269,
+  "title": "nixos/alloy: add environmentFile option",
+  "applicable": true,
+  "base_sha": "b924f045bbf4f3133eb0828d814e80dd5fabbbed",
+  "head_sha": "cd3824f7bc8eaa57a3d2332a0c0349715c9ea35f",
+  "module_paths": [
+    "nixos/modules/services/monitoring/alloy.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/alloy.nix"
+  ],
+  "reason": "Applicable: real alloy module + wired test. Real diff adds environmentFile mkOption, wired into a real lib.mkIf predicate -- same shape as atuin's own PR464654 this batch.",
+  "targets_toml": "single target alloy, cfg_ident=cfg, option_prefix=[services,alloy], watch=[environmentFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Same TestConfigUnresolved shape as atuin/victoriametrics above, not a new gap."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "pr": 508939,
+  "title": "nixos/{pipewire,wireplumber}: add LADSPA plugin path setup",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/desktops/pipewire/pipewire.nix",
+    "nixos/modules/services/desktops/pipewire/wireplumber.nix"
+  ],
+  "reason": "No nixos/tests file exists for pipewire or wireplumber anywhere in the corpus; real new extraLadspaPackages option added to both files, but untestable."
+}

@@ -1,0 +1,37 @@
+{
+  "pr": 461261,
+  "title": "nixos/wakapi: streamline password salt & smtp password config",
+  "applicable": true,
+  "base_sha": "eabc44e1b4d875705ecfa4c9189454f755fcd0fe",
+  "head_sha": "c5992aba9141f41e0720b5954045797e1504573b",
+  "module_paths": [
+    "nixos/modules/services/web-apps/wakapi.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/wakapi.nix"
+  ],
+  "reason": "Applicable: real wakapi module + wired test. Real diff genuinely REMOVES 4 options (passwordSalt, passwordSaltFile, smtpPassword, smtpPasswordFile) via mkRemovedOptionModule, replaced by a new environmentFiles option.",
+  "targets_toml": "single target wakapi, cfg_ident=cfg, option_prefix=[services,wakapi], watch=[passwordSalt] (the removed option).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "passwordSalt",
+      "base_verdict": "PASS",
+      "head_verdict": "OptionNotFound",
+      "note": "IMPORTANT, DIFFERENT SHAPE than the rendering-gap cases: at base, passwordSalt gets a REAL WITNESSED PASS verdict (a real predicate `mkIf (cfg.passwordSalt != null) \"WAKAPI_PASSWORD_SALT=...\"`, real test evidence at nixos/tests/wakapi.nix line 25 setting a literal string value, witnessed=True) -- the first live PASS verdict encountered anywhere in S5-A so far. At head it correctly transitions to OptionNotFound (the option is genuinely gone). UNLIKE every prior *_not_found<->*_not_found rendering-gap instance, THIS transition DOES render: raw.json shows notable_total=1 with a real 'new_inconclusive' bucket entry (subject=passwordSalt, message='no mkOption declaration found for this watched option'), and summary.md's rendered output genuinely shows a 'NEW INCONCLUSIVE' section -- not all-zero this time. This clarifies the boundary of the rendering gap: transitions INTO or OUT OF a real witnessed PASS/finding DO get surfaced; it's specifically the *_not_found<->*_not_found transitions (neither side ever had a witness) that fall through the renderer's bucket system. Not counting this as notable_actionable_presentations myself since the surfaced item is an honest INCONCLUSIVE disclosure (correct, safe behavior per this project's own CLAUDE.md doctrine), not a finding or PASS claim requiring correctness adjudication -- flagging for the coordinator's own classification call, not presupposing it."
+    }
+  ]
+}

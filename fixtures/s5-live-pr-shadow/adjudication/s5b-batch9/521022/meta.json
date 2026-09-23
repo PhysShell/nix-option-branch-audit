@@ -1,0 +1,43 @@
+{
+  "pr": 521022,
+  "title": "nixos/opensnitch: remove IFD",
+  "applicable": true,
+  "base_sha": "45162c4a6982c7f95c9c01d9964ef7c7faf84c07",
+  "head_sha": "ab474d84bcc7f0dc33ca4fe9783de7c9e382b4e7",
+  "module_paths": [
+    "nixos/modules/services/security/opensnitch.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/opensnitch.nix"
+  ],
+  "reason": "Real, large removal (matching the coordinator's flagged title): Server.{Address,LogFile}, DefaultAction, InterceptUnknown, LogLevel, Stats.{MaxEvents,MaxStats} -- 7 named options -- ALL removed with NO compat shims (the module previously derived its settings.* schema from upstream's default-config.json via import-from-derivation at build time, which is what 'remove IFD' refers to; the new version hand-declares only ProcMonitorMethod/Firewall/Ebpf.ModulesPath as named options plus a new upstreamDefaults/configFile pair).",
+  "targets_toml": "option_prefix=[services,opensnitch,settings], watch=[DefaultAction].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "DefaultAction",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head matches the diff exactly (no successor, no compat shim -- a genuine breaking removal). Base was PredicateNotFound (real option existed but the opensnitch test never set it to a resolvable literal) -- NOT a witnessed PASS. Same non-witnessed-base-removal shape as the round's growing cluster; note this removal is more consequential than most (7 named options gone at once, no deprecation path) even though the analyzer's own read of it is unremarkable."
+    },
+    {
+      "watched_path": "DefaultAction",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

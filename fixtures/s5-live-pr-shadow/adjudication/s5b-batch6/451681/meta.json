@@ -1,0 +1,9 @@
+{
+  "pr": 451681,
+  "title": "nixos/gitwatch: add message option",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/monitoring/gitwatch.nix"
+  ],
+  "reason": "No nixos/tests file exists for gitwatch; real new 'message' option added (nested per-repo submodule), but untestable."
+}

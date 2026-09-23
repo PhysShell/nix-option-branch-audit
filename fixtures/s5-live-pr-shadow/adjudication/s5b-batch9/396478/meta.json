@@ -1,0 +1,43 @@
+{
+  "pr": 396478,
+  "title": "nixos/taskchampion-sync-server: fix start failure",
+  "applicable": true,
+  "base_sha": "8ded8cc14b57512b69c9529f329158dd451c36d8",
+  "head_sha": "badd9d1a70ad3d5a27b6549b7ee2c1ee796cd079",
+  "module_paths": [
+    "nixos/modules/services/misc/taskchampion-sync-server.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/taskchampion-sync-server.nix"
+  ],
+  "reason": "Real new mkOption 'host' added, plus a real fix (--port flag replaced with --listen host:port, addressing the actual start failure named in the title).",
+  "targets_toml": "option_prefix=[services,taskchampion-sync-server], watch=[host].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "host",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "host",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

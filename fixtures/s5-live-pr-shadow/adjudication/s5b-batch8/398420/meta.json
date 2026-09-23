@@ -1,0 +1,43 @@
+{
+  "pr": 398420,
+  "title": "nixos/cross-seed: add 'useGenConfigDefaults'",
+  "applicable": true,
+  "base_sha": "f6b299d7773e318cf1787d5da4b3ef836662a5cd",
+  "head_sha": "9cc26fef84b2deec8ec2e16ce712798662cac524",
+  "module_paths": [
+    "nixos/modules/services/torrent/cross-seed.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/cross-seed.nix"
+  ],
+  "reason": "Real new mkOption 'useGenConfigDefaults' added, matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,cross-seed], watch=[useGenConfigDefaults].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "useGenConfigDefaults",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option, correctly not-found at base, head-side TestConfigUnresolved (real option/predicate, test never sets a resolvable literal) -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "useGenConfigDefaults",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

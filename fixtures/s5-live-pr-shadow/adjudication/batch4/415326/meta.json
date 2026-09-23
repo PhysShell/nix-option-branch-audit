@@ -1,0 +1,37 @@
+{
+  "pr": 415326,
+  "title": "nixos/wstunnel: convert to RFC42-style settings",
+  "applicable": true,
+  "base_sha": "1eeb7b66c44c458c567e8ac15c73e9c40ae664bb",
+  "head_sha": "3c853295d9f45f77e3ddcc945a33f82a9e10f85d",
+  "module_paths": [
+    "nixos/modules/services/networking/wstunnel.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/wstunnel.nix"
+  ],
+  "reason": "Applicable: real wstunnel module + wired test (wstunnel = runTest ./wstunnel.nix; at head). Real diff is a large restructuring: extraArgs, websocketPingInterval, and the hostPortSubmodule pattern are all REMOVED from the shared commonOptions (used by both services.wstunnel.servers.<name> and .clients.<name> wildcard instances), replaced by a new argsFormat/RFC42-style settings approach -- a genuine multi-option lifecycle event across a wildcard-instance module, similar in shape to S4's own frp fixture.",
+  "targets_toml": "single target wstunnel, cfg_ident=cfg, option_prefix=[services,wstunnel,clients,*] (wildcard attrsOf-submodule-instance form, same shape as S4's own frp fixture), watch=[extraArgs] (the removed option, chosen specifically to see how a real removal renders through the wildcard-instance pattern).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraArgs",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "extraArgs genuinely existed at base (declared in commonOptions, merged into every services.wstunnel.clients.<name> instance) but resolves OptionNotFound there too -- NOT a new finding, this is CONSISTENT WITH the already-documented wildcard attrsOf(submodule) discovery gap (S4 final report item 17, previously confirmed recurring at #411705/#507312) -- flagging as a 3rd/4th-ish corroborating recurrence of that KNOWN gap, not a new candidate_capability_gap of its own."
+    }
+  ]
+}

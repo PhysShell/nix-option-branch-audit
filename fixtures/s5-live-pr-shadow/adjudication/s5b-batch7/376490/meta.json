@@ -1,0 +1,43 @@
+{
+  "pr": 376490,
+  "title": "nixos/kanidm: add extraJsonFile option",
+  "applicable": true,
+  "base_sha": "e5fad5185b76efcfc271ba1875ba5fda8f4f79d1",
+  "head_sha": "16cdde80082ea5e2e02a53260ae3ef4e281c309c",
+  "module_paths": [
+    "nixos/modules/services/security/kanidm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/kanidm.nix"
+  ],
+  "reason": "Real new mkOption 'provision.extraJsonFile' added (merges an external JSON file into the provisioning state via jq).",
+  "targets_toml": "Self-corrected: option_prefix=[services,kanidm,provision] (prefix ending at the bare nested attrset 'provision') gave 0 discovered_options -- same class of mistake as porxie/tlsrpt/peertube/beszel-agent this round. Corrected to option_prefix=[services,kanidm], watch=['provision.extraJsonFile'] (dotted-path watch), which correctly found 49 discovered_options.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "provision.extraJsonFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option, correctly not-found at base. Head-side TestConfigUnresolved with 7 real predicate_attempts across the module's several extraJsonFile-conditional assertion sites, all witnessed=false -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "provision.extraJsonFile",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

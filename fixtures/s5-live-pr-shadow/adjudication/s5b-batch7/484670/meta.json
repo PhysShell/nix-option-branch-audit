@@ -1,0 +1,43 @@
+{
+  "pr": 484670,
+  "title": "omnom: 0.7.0 -> 0.9.0; nixos/omnom: add base_url option",
+  "applicable": true,
+  "base_sha": "69459b3b3ea735e9933e1e367db3e68334cce3fe",
+  "head_sha": "cfc02bae23b2bc2bdc30d9c26c7695fbf2ad6d0d",
+  "module_paths": [
+    "nixos/modules/services/misc/omnom.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/omnom/default.nix"
+  ],
+  "reason": "Real new mkOption 'settings.server.base_url' added (internal=true), matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,omnom,settings,server], watch=[base_url].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "base_url",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "base_url",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

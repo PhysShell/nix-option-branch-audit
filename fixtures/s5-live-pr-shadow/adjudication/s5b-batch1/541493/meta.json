@@ -1,0 +1,37 @@
+{
+  "pr": 541493,
+  "title": "nixos/step-ca: add extraArgs option for additional step-ca CLI flags",
+  "applicable": true,
+  "base_sha": "0328abf972281512f9e9cd8305c185915c69d3a8",
+  "head_sha": "8bd1fa478dc05512b6399b57eefbaed846108d4f",
+  "module_paths": [
+    "nixos/modules/services/security/step-ca.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/step-ca.nix"
+  ],
+  "reason": "Applicable: real step-ca module + wired test. Real diff adds a genuinely new extraArgs mkOption (listOf str, default=[]), wired into a real lib.optionalString (cfg.extraArgs != []) predicate in ExecStart construction.",
+  "targets_toml": "single target step-ca, cfg_ident=cfg, option_prefix=[services,step-ca], watch=[extraArgs].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraArgs",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "15th candidate_rendering_gap instance."
+    }
+  ]
+}

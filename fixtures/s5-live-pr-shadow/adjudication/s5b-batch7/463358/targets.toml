@@ -1,0 +1,7 @@
+[[target]]
+name = "463358"
+module = "nixos/modules/services/misc/ollama.nix"
+test = "nixos/tests/ollama.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollama"]
+watch = ["syncModels"]

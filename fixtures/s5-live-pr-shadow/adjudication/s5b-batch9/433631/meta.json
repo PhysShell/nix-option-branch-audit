@@ -1,0 +1,43 @@
+{
+  "pr": 433631,
+  "title": "nixos.enlightenment: add option to exclude packages",
+  "applicable": true,
+  "base_sha": "e3d1ea47847b490cbe30c4b3110384fff8edd067",
+  "head_sha": "ce3007ed6032fdb64d6cc1d0e88f43d74c542638",
+  "module_paths": [
+    "nixos/modules/services/x11/desktop-managers/enlightenment.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/enlightenment.nix"
+  ],
+  "reason": "Real new mkOption 'environment.enlightenment.excludePackages' added, matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,xserver,desktopManager,enlightenment], watch=['environment.enlightenment.excludePackages'].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environment.enlightenment.excludePackages",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "environment.enlightenment.excludePackages",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

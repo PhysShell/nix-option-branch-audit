@@ -1,0 +1,37 @@
+{
+  "pr": 443717,
+  "title": "pgbackrest: 2.55.1 -> 2.56.0",
+  "applicable": true,
+  "base_sha": "8216b012eecdde64717fd6b38ebaa1bb36aae6f6",
+  "head_sha": "49f3a9f7cbb34c23f3d2661d98e6b6bcdc915741",
+  "module_paths": [
+    "nixos/modules/services/backup/pgbackrest.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/pgbackrest/default.nix"
+  ],
+  "reason": "Real new 'commands' option-set added: a per-pgbackrest-CLI-command mkOption block generated via `lib.genAttrs [list of ~19 literal command names] (command: lib.mkOption {...})`. Also a real usage: services.pgbackrest.commands.restore.lock-path is set in this same PR's own config.",
+  "targets_toml": "NEW CAPABILITY GAP CANDIDATE: option_prefix=[services,pgbackrest], watch=[commands] (and also tried watch=['commands.restore.lock-path']) both return 0 discovered_options for the ENTIRE 'commands' branch, at both base and head identically ('unchanged', OptionNotFound both sides). Distinct shape from both mkPackageOption non-discovery and wildcard attrsOf(submodule) non-discovery: here the option set is produced by `lib.genAttrs [literal-name-list] (name: mkOption {...})` -- a computed/generated expression rather than a literal `commands = { restore = mkOption {...}; ... }` attrset, even though the resulting attribute names ARE statically enumerable (they're a literal list). Naming this candidate_capability_gap: genAttrs-computed option set non-discovery -- first instance this round.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "commands",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Total non-discovery of the whole genAttrs-generated 'commands' option set, both sides identical."
+    }
+  ]
+}

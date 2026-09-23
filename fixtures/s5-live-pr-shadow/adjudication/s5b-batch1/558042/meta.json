@@ -1,0 +1,37 @@
+{
+  "pr": 558042,
+  "title": "nixos/headplane: add server.proxy_auth option",
+  "applicable": true,
+  "base_sha": "1640c048f5a62f978a7ca3cc167d25cdc0497c05",
+  "head_sha": "14d7d8501c04516724767150353335df8653cc75",
+  "module_paths": [
+    "nixos/modules/services/networking/headplane.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/headplane.nix"
+  ],
+  "reason": "Applicable: real headplane module + wired test. Real diff adds a genuinely new proxy_auth submodule (enabled/allowed_cidrs/trusted_proxy_cidrs/ip_header) nested under settings.server, wired into a real assertion (cfg.settings.server.proxy_auth == null || !cfg.settings.server.proxy_auth.enabled -> ...).",
+  "targets_toml": "single target headplane, cfg_ident=cfg, option_prefix=[services,headplane,settings,server], watch=[proxy_auth].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "proxy_auth",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY: discovered_options is completely empty (0) for this file at both base and head. headplane.nix declares its own top-level options via the dotted-path form `options.services.headplane = {...}` (confirmed, line 36) -- SAME idiom as wastebin/paretosecurity/sanoid/keycloak. BUT see the batch-level correction note: photoprism/olivetin/hedgedoc/tandoor-recipes ALSO use this exact dotted-path idiom and photoprism/olivetin/hedgedoc work FINE while tandoor-recipes also blacks out -- so dotted-path alone is not the full explanation; my earlier 4-instance tally over-attributed causation to dotted-path specifically. Recording this as a confirmed BLACKOUT instance without asserting the mechanism."
+    }
+  ]
+}

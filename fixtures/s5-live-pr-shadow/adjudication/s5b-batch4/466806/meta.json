@@ -1,0 +1,39 @@
+{
+  "pr": 466806,
+  "title": "nixos/gollum: remove services.gollum.local-time option",
+  "applicable": true,
+  "base_sha": "db4ebe6cca2ecf477e5cf828881db8eff567cd24",
+  "head_sha": "a2ad9d8e6df3095073d839aa3bb5f4b644cd0fec",
+  "module_paths": [
+    "nixos/modules/services/misc/gollum.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/gollum.nix"
+  ],
+  "reason": "Applicable, the coordinator's own flagged case (#79). Real gollum module + wired test. Real diff genuinely removes local-time (mkRemovedOptionModule), which had a real, never-tested predicate.",
+  "targets_toml": "single target gollum, cfg_ident=cfg, option_prefix=[services,gollum], watch=[local-time].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 1,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "B:466806:oba:local-time:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "local-time",
+      "base_verdict": "OBA001",
+      "head_verdict": "OptionNotFound",
+      "note": "EIGHTH REAL ACTIONABLE PRESENTATION. check-base exits 1, finding=1, verdict OBA001, same 'uncovered option branch' class -- both predicate_attempts witnessed=False, real gollum test never sets local-time. At head, genuinely removed -> OptionNotFound, correct."
+    }
+  ]
+}

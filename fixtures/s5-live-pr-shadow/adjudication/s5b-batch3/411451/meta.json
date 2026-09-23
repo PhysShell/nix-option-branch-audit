@@ -1,0 +1,37 @@
+{
+  "pr": 411451,
+  "title": "nixos/dnscrypt-proxy2: add `package` option",
+  "applicable": true,
+  "base_sha": "08d385792359a40bac6873213dc27dd6cffdbc19",
+  "head_sha": "101965187eb19218d061b1ab04da4d76ea8fa66f",
+  "module_paths": [
+    "nixos/modules/services/networking/dnscrypt-proxy2.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/dnscrypt-proxy2.nix"
+  ],
+  "reason": "Applicable: real dnscrypt-proxy2 module + wired test. Real diff (mixed with a with-lib->explicit-lib refactor) adds a genuinely new package mkPackageOption.",
+  "targets_toml": "single target dnscrypt-proxy2, cfg_ident=cfg, option_prefix=[services,dnscrypt-proxy2], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "8th instance of the mkPackageOption non-discovery gap."
+    }
+  ]
+}

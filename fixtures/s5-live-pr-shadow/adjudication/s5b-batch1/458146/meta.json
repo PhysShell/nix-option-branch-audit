@@ -1,0 +1,37 @@
+{
+  "pr": 458146,
+  "title": "trilium: add environmentFile option",
+  "applicable": true,
+  "base_sha": "49f0cbd7f89b87594b41d07d3ab93f15b868ad54",
+  "head_sha": "391bda9e02f09dd18fcd81d5fbcb18e930b43744",
+  "module_paths": [
+    "nixos/modules/services/web-apps/trilium.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/trilium-server.nix"
+  ],
+  "reason": "Applicable: real trilium-server module + wired test. Real diff adds a genuinely new environmentFile mkOption, wired into EnvironmentFile=cfg.environmentFile (a plain value substitution).",
+  "targets_toml": "single target trilium (module named trilium.nix, cfg=config.services.trilium-server), cfg_ident=cfg, option_prefix=[services,trilium-server], watch=[environmentFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY: discovered_options completely empty (0) at both sides. trilium.nix declares `options.services.trilium-server = with lib; {...}` (dotted-path AND an inline `with lib;` right at the assignment) -- this specific with-lib-inline shape also appeared nowhere in the WORKING dotted-path cases I checked (photoprism/olivetin/hedgedoc all use a bare `{` with no inline `with`), a possible distinguishing detail worth the coordinator's own closer look, not asserted as confirmed by me."
+    }
+  ]
+}

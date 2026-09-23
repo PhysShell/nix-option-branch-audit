@@ -1,0 +1,39 @@
+{
+  "pr": 410856,
+  "title": "nixos/vmalert: support multiple instances",
+  "applicable": true,
+  "base_sha": "b79f59cf2ed99803ef8ee6b760f83d8138388f52",
+  "head_sha": "0d46fda9746f50f5e1d69950000b5ff8c6941a28",
+  "module_paths": [
+    "nixos/modules/services/monitoring/vmalert.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/victoriametrics/vmalert.nix"
+  ],
+  "reason": "Applicable: real vmalert module + wired test (nixos/tests/victoriametrics/vmalert.nix, a dedicated file within the victoriametrics test directory). Real diff is a large restructuring: the whole module converts from a single top-level services.vmalert.{enable,package,settings} shape to a per-instance services.vmalert.instances.<name> shape, with package staying top-level (options.services.vmalert.package = ...) but enable genuinely disappearing from the top level entirely.",
+  "targets_toml": "single target vmalert, cfg_ident=cfg, option_prefix=[services,vmalert], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 0,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      "B:410856:oba:enable:PASS"
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "PASS",
+      "head_verdict": "OptionNotFound",
+      "note": "A real, cleanly witnessed materially-relevant PASS at base (check_base exits 0 -- the only fully-clean side this batch): `mkIf cfg.enable {...}` witnessed=True against a real test instance (victoriametrics, enable=true at nixos/tests/victoriametrics/vmalert.nix line 59). At head, the top-level enable is genuinely gone (confirmed: grep for 'enable = mkOption'/'mkEnableOption' at top level of vmalert.nix returns nothing after the restructuring), so OptionNotFound is correct. Flagging per the same rule as wakapi/tayga/yggdrasil's own PASS findings -- a real base-side PASS that then transitions to a genuine removal."
+    }
+  ]
+}

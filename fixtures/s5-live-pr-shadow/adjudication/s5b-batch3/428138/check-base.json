@@ -1,0 +1,544 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "428138",
+      "module": "nixos/modules/services/networking/ncps.nix",
+      "test": "nixos/tests/ncps.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "ncps",
+        "cache"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "ncps",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 64,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "openTelemetry",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 71,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "openTelemetry",
+            "grpcURL"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 73,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "prometheus",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 84,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "logLevel"
+          ],
+          "default_source": "\"info\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "info"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 86,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "allowDeleteVerb"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 97,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "allowPutVerb"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 102,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "hostName"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 107,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "dataPath"
+          ],
+          "default_source": "\"/var/lib/ncps\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/ncps"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 115,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "databaseURL"
+          ],
+          "default_source": "\"sqlite:${cfg.cache.dataPath}/db/db.sqlite\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 123,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "lru",
+            "schedule"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 133,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "lru",
+            "scheduleTimeZone"
+          ],
+          "default_source": "\"Local\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "Local"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 145,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "maxSize"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 157,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "secretKeyPath"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 167,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "tempPath"
+          ],
+          "default_source": "\"/tmp\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/tmp"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 176,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "server",
+            "addr"
+          ],
+          "default_source": "\":8501\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ":8501"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 186,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "upstream",
+            "caches"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 196,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "upstream",
+            "publicKeys"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 204,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "ncps",
+            "netrcFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 216,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "openTelemetry",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 22,
+            "col": 9
+          },
+          "source": "lib.optionals cfg.openTelemetry.enable ("
+        },
+        {
+          "path": [
+            "prometheus",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 30,
+            "col": 9
+          },
+          "source": "lib.optionals cfg.prometheus.enable ["
+        },
+        {
+          "path": [
+            "cache",
+            "allowDeleteVerb"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "lib.optional cfg.cache.allowDeleteVerb \"--cache-allow-delete-verb\""
+        },
+        {
+          "path": [
+            "cache",
+            "allowPutVerb"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 44,
+            "col": 9
+          },
+          "source": "lib.optional cfg.cache.allowPutVerb \"--cache-allow-put-verb\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 228,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 255,
+            "col": 12
+          },
+          "source": "lib.optionalString isSqlite ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "cache",
+              "databaseURL"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 304,
+            "col": 10
+          },
+          "source": "lib.mkIf (isSqlite && !lib.strings.hasPrefix \"/var/lib/ncps\" dbDir) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "cache",
+              "databaseURL"
+            ],
+            [
+              "cache",
+              "databaseURL"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ncps.nix",
+            "line": 350,
+            "col": 40
+          },
+          "source": "lib.optional isSqlite dbDir",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "cache",
+              "databaseURL"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "ncps",
+            "cache",
+            "secretKeyPath"
+          ],
+          "instance": "ncps",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/ncps.nix",
+            "line": 30,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "nix",
+            "settings",
+            "substituters"
+          ],
+          "instance": "client01",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/ncps.nix",
+            "line": 48,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "nix",
+            "settings",
+            "trusted-public-keys"
+          ],
+          "instance": "client01",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/ncps.nix",
+            "line": 49,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "signNarinfo"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

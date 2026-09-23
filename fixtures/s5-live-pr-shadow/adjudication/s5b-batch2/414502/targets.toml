@@ -1,0 +1,7 @@
+[[target]]
+name = "414502"
+module = "nixos/modules/services/web-apps/mastodon.nix"
+test = "nixos/tests/web-apps/mastodon/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mastodon"]
+watch = ["otpSecretFile"]

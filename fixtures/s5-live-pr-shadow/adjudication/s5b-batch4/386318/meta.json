@@ -1,0 +1,38 @@
+{
+  "pr": 386318,
+  "title": "nixos/h2o: add simple listen.host setting, add example",
+  "applicable": true,
+  "base_sha": "3a8ebeb1dfb2cf841ac697d865c656cfc7055ad0",
+  "head_sha": "1e3e30d56649dd3a910da3dc4bc3091f0af68c4d",
+  "module_paths": [
+    "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+    "nixos/modules/services/web-servers/h2o/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-servers/h2o/basic.nix"
+  ],
+  "reason": "Applicable: real h2o module + wired test (same module as batch2's quic PR388953). Real diff adds a new per-vhost host mkOption, wired into a real lib.optionalAttrs predicate.",
+  "targets_toml": "single target h2o, cfg_ident=cfg, option_prefix=[services,h2o,vhosts,*,tls], watch=[host].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "host",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "31st candidate_rendering_gap instance -- NOTE: unlike batch2's own quic case on this same file (which stayed unresolved under this exact option_prefix), `host` resolves cleanly here. Not investigated further given time; flagging as one more data point on this file's own inconsistent resolution."
+    }
+  ]
+}

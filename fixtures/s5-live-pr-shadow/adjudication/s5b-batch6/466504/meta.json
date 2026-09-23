@@ -1,0 +1,43 @@
+{
+  "pr": 466504,
+  "title": "nixos/pulseaudio: add tcp.{port,openFirewall} options",
+  "applicable": true,
+  "base_sha": "0f697360812a0721b65603a1983a80f6105eb69f",
+  "head_sha": "1c77ea5916d409d92131ed82b0e202f1a3fe75a5",
+  "module_paths": [
+    "nixos/modules/services/audio/pulseaudio.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/pulseaudio.nix"
+  ],
+  "reason": "Real new mkOptions tcp.port and tcp.openFirewall added, plus a real assertion requiring port to be set when openFirewall is true.",
+  "targets_toml": "option_prefix=[services,pulseaudio,tcp], watch=[port].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "port",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "port",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "pr": 445176,
+  "title": "nixos/n8n: use env vars instead of config file",
+  "applicable": true,
+  "base_sha": "717111844a0d2d139cdf32a7b5e308e74ee400e4",
+  "head_sha": "f6a4509bfb4785a844b98f043f738dc553c33d37",
+  "module_paths": [
+    "nixos/modules/services/misc/n8n.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/n8n.nix"
+  ],
+  "reason": "Real, large restructuring matching the coordinator's flagged title: BOTH 'settings' (JSON-format config option) AND 'webhookUrl' REMOVED via mkRemovedOptionModule, replaced by a real new structured 'environment' submodule (freeform + GENERIC_TIMEZONE/N8N_PORT/N8N_USER_FOLDER/N8N_DIAGNOSTICS_ENABLED/N8N_VERSION_NOTIFICATIONS_ENABLED). 6th n8n.nix PR referenced this round.",
+  "targets_toml": "option_prefix=[services,n8n], watch=[settings] (primary target). A second ad-hoc probe of 'webhookUrl' (same option_prefix) confirmed the identical pattern: base=PredicateNotFound, head=OptionNotFound.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "settings",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head matches the mkRemovedOptionModule diff exactly. Base was PredicateNotFound (real option existed but the n8n test never set it to a resolvable literal) -- NOT a witnessed PASS."
+    },
+    {
+      "watched_path": "webhookUrl",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Second real removal in the SAME PR, same shape: clean OptionNotFound at head, PredicateNotFound (non-witnessed) at base. Both of this PR's removals are clean, low-stakes, no witnessed base evidence lost."
+    },
+    {
+      "watched_path": "settings",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

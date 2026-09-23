@@ -1,0 +1,7 @@
+[[target]]
+name = "444604"
+module = "nixos/modules/services/networking/yggdrasil.nix"
+test = "nixos/tests/yggdrasil.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "yggdrasil"]
+watch = ["persistentKeys"]

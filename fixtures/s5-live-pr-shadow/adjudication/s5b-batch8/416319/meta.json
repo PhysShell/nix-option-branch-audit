@@ -1,0 +1,9 @@
+{
+  "pr": 416319,
+  "title": "yeahwm: drop",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/x11/window-managers/yeahwm.nix"
+  ],
+  "reason": "Entire module file deleted (real, complete option removal by file deletion -- services.xserver.windowManager.yeahwm.enable no longer exists anywhere); no nixos/tests file ever existed for yeahwm, and the module file itself is gone at head so the module/test pairing cannot even be constructed. Untestable regardless of test existence."
+}

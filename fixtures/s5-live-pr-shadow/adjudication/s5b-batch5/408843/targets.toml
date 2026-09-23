@@ -1,0 +1,7 @@
+[[target]]
+name = "408843"
+module = "nixos/modules/services/web-apps/mealie.nix"
+test = "nixos/tests/mealie.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mealie"]
+watch = ["extraOptions"]

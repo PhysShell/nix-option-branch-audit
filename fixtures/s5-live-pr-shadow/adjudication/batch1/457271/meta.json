@@ -1,0 +1,23 @@
+{
+  "pr": 457271,
+  "title": "nixos/lightdm: fix option type validation",
+  "applicable": true,
+  "base_sha": "f73701131350b69308ceca9c0e052491de8445a0",
+  "head_sha": "bbfceed8eed07a4bffa118b87acd872b604dc657",
+  "module_paths": ["nixos/modules/services/x11/display-managers/lightdm.nix"],
+  "test_paths": ["nixos/tests/lightdm.nix"],
+  "reason": "Applicable: real lightdm module + wired test (nixos/tests/all-tests.nix at head bbfceed8e contains 'lightdm = runTest ./lightdm.nix;', line 858). Real diff changes background's own mkOption `type` field, from `types.strMatching(\"^#[0-9]{6}$\")` to `types.strMatching(\"^#[0-9A-Fa-f]{6}$\")` (case-insensitive hex color now accepted) -- a genuine type-declaration edit inside the option's own declaration.",
+  "targets_toml": "single target lightdm, cfg_ident=cfg (local binding `cfg = xcfg.displayManager.lightdm;`, confirmed by reading the module's own let-block), option_prefix=[services,xserver,displayManager,lightdm], watch=[background].",
+  "run_exit_codes": {"audit_diff": 2, "check_base": 2, "check_head": 2},
+  "tool_error": false,
+  "notable_actionable_presentations": {"count": 0, "identities": []},
+  "pass_verdicts_needing_review": {"count": 0, "identities": []},
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "background",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides, correctly: background is used as a plain value (set via `services.xserver.displayManager.lightdm.background = ...` in config, referenced as a path/string elsewhere), never as a branch/predicate truthiness condition -- there is genuinely no predicate on this option either before or after the PR. The PR's real substance is a regex-pattern (type validation) widening, a type-declaration edit, not a predicate/branch change -- outside this analyzer's predicate-tracing domain by design, not a missed detection."
+    }
+  ]
+}

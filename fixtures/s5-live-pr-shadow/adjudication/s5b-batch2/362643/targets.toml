@@ -1,0 +1,7 @@
+[[target]]
+name = "362643"
+module = "nixos/modules/services/web-apps/mediawiki.nix"
+test = "nixos/tests/mediawiki.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mediawiki"]
+watch = ["path"]

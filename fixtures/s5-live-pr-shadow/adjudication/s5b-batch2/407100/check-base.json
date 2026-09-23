@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "407100",
+      "module": "nixos/modules/services/web-apps/photoprism.nix",
+      "test": "nixos/tests/photoprism.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "photoprism"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 33,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 35,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "address"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 43,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "2342",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 51,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "originalsPath"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 59,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "importPath"
+          ],
+          "default_source": "\"import\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "import"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 68,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "storagePath"
+          ],
+          "default_source": "\"/var/lib/photoprism\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/photoprism"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 76,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 86,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 99,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 99,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 117,
+            "col": 26
+          },
+          "source": "lib.optionalString ("
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 153,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/photoprism.nix",
+            "line": 160,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.passwordFile != null) ''"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "photoprism",
+            "passwordFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/photoprism.nix",
+            "line": 13,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "databasePasswordFile"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

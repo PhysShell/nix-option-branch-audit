@@ -1,0 +1,7 @@
+[[target]]
+name = "498611"
+module = "nixos/modules/services/web-apps/olivetin.nix"
+test = "nixos/tests/olivetin.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "olivetin"]
+watch = ["package"]

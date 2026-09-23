@@ -1,0 +1,7 @@
+[[target]]
+name = "405269"
+module = "nixos/modules/services/monitoring/alloy.nix"
+test = "nixos/tests/alloy.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "alloy"]
+watch = ["environmentFile"]

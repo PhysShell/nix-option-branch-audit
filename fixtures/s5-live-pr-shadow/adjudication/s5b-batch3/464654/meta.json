@@ -1,0 +1,37 @@
+{
+  "pr": 464654,
+  "title": "nixos/atuin: add environmentFile option for secrets",
+  "applicable": true,
+  "base_sha": "ee52b70e0e9ee94b801bb3e7073d7d281a11b0e5",
+  "head_sha": "b44c2a5758c3214a60fbee0299cb6ced0bd7a990",
+  "module_paths": [
+    "nixos/modules/services/misc/atuin.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/atuin.nix"
+  ],
+  "reason": "Applicable: real atuin module + wired test. Real diff adds environmentFile mkOption, wired into a real lib.mkIf predicate.",
+  "targets_toml": "single target atuin, cfg_ident=cfg, option_prefix=[services,atuin], watch=[environmentFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real, correct transition, same TestConfigUnresolved shape as victoriametrics above -- option genuinely added with a real predicate, real test never witnesses it either way."
+    }
+  ]
+}

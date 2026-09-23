@@ -1,0 +1,9 @@
+{
+  "pr": 401132,
+  "title": "nixos: nix.sshServe: add trusted option",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/misc/nix-ssh-serve.nix"
+  ],
+  "reason": "No nixos/tests file exists for nix-ssh-serve (only unrelated 'tmate-ssh-server' present); real new 'trusted' option added, but untestable."
+}

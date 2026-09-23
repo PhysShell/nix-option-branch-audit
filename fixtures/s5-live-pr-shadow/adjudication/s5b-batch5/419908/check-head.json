@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "419908",
+      "module": "nixos/modules/services/databases/victoriametrics.nix",
+      "test": "nixos/tests/victoriametrics/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "victoriametrics"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 37,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "listenAddress"
+          ],
+          "default_source": "\":8428\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ":8428"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 48,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"victoriametrics\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "victoriametrics"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 56,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "retentionPeriod"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 65,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "prometheusConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 77,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraOptions"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 117,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "checkConfig"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 134,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "checkConfig"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 27,
+            "col": 5
+          },
+          "source": "if cfg.checkConfig then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 146,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "retentionPeriod"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "retentionPeriod"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 19,
+            "col": 8
+          },
+          "source": "lib.optionals (cfg.retentionPeriod != null) [ \"-retentionPeriod=${cfg.retentionPeriod}\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "checkConfig"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "checkConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 27,
+            "col": 5
+          },
+          "source": "if cfg.checkConfig then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 146,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 156,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.prometheusConfig != { }) [ \"-promscrape.config=${prometheusConfigYml}\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "prometheusConfig"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/victoriametrics.nix",
+            "line": 207,
+            "col": 14
+          },
+          "source": "lib.optionalString (lib.hasPrefix \":\" cfg.listenAddress) \"127.0.0.1\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "listenAddress"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/victoriametrics/default.nix",
+            "line": 8,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/victoriametrics/default.nix",
+            "line": 9,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/victoriametrics/default.nix",
+            "line": 10,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "checkConfig",
+          "predicate": {
+            "path": [
+              "checkConfig"
+            ],
+            "kind": {
+              "Truthy": "if"
+            },
+            "span": {
+              "file": "nixos/modules/services/databases/victoriametrics.nix",
+              "line": 27,
+              "col": 5
+            },
+            "source": "if cfg.checkConfig then"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "checkConfig"
+                ],
+                "kind": {
+                  "Truthy": "if"
+                },
+                "span": {
+                  "file": "nixos/modules/services/databases/victoriametrics.nix",
+                  "line": 27,
+                  "col": 5
+                },
+                "source": "if cfg.checkConfig then"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "checkConfig"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "checkConfig"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/databases/victoriametrics.nix",
+                  "line": 27,
+                  "col": 5
+                },
+                "source": "if cfg.checkConfig then"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

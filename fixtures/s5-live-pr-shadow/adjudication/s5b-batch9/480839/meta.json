@@ -1,0 +1,38 @@
+{
+  "pr": 480839,
+  "title": "nvidia-container-toolkit: add disable-hooks and enable-hooks options",
+  "applicable": true,
+  "base_sha": "247bdd36b122075f4b091b8d5557f4bc808ce53e",
+  "head_sha": "0420b1de9dff7e2791418e88dc43218d860c2447",
+  "module_paths": [
+    "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+    "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/nvidia-container-toolkit.nix"
+  ],
+  "reason": "Real new mkOptions disable-hooks/enable-hooks added, matching the coordinator's flagged title. 3rd nvidia-container-toolkit default.nix PR this round.",
+  "targets_toml": "option_prefix=[hardware,nvidia-container-toolkit], watch=['disable-hooks'].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "disable-hooks",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "CONSISTENT WITH THE batch8-DOCUMENTED GAP (options-value-wrapped-in-let-binding): total non-discovery both sides ('unchanged'). 3rd confirmed instance of this exact file's gap this round (398993, 401840 from batch8, now 480839)."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "pr": 493887,
+  "title": "wyoming-faster-whisper: 2.5.0 -> 3.1.0",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/home-automation/wyoming/faster-whisper.nix",
+    "nixos/modules/services/home-automation/wyoming/piper.nix"
+  ],
+  "reason": "No nixos/tests/wyoming/faster-whisper.nix exists at this PR's head SHA (still absent, consistent with batch7's 417413 finding at an earlier SHA). Real, substantial content: useTransformers REMOVED (no compat shim) and replaced by a real new sttLibrary enum + zeroconf.{enable,name} submodule; this PR ALSO fixes the real 'initialPromt' typo bug flagged in batch7's meta for PR417413's assertion. piper.nix's own change (zeroconf name default now includes the instance name) is a pure default-value change, not a branch change. All untestable regardless."
+}

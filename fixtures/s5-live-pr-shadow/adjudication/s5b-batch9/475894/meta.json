@@ -1,0 +1,9 @@
+{
+  "pr": 475894,
+  "title": "tlp-pd: init at 1.9.0",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/tlp.nix"
+  ],
+  "reason": "No nixos/tests file exists for tlp/tlp-pd; real new pd.{enable,package} options added plus 2 real new assertions, but untestable."
+}

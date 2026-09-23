@@ -1,0 +1,7 @@
+[[target]]
+name = "398420"
+module = "nixos/modules/services/torrent/cross-seed.nix"
+test = "nixos/tests/cross-seed.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cross-seed"]
+watch = ["useGenConfigDefaults"]

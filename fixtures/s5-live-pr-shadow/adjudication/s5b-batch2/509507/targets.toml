@@ -1,0 +1,7 @@
+[[target]]
+name = "509507"
+module = "nixos/modules/services/networking/ssh/sshd.nix"
+test = "nixos/tests/openssh.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "openssh"]
+watch = ["banner"]

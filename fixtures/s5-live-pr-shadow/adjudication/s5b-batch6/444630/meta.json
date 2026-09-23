@@ -1,0 +1,9 @@
+{
+  "pr": 444630,
+  "title": "nixos/newt: fix cli args",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/networking/newt.nix"
+  ],
+  "reason": "No nixos/tests file exists for newt; real RFC42-style refactor (id/logLevel/endpoint renamed into 'settings') and a real package rename (newt-go -> fosrl-newt), but untestable."
+}

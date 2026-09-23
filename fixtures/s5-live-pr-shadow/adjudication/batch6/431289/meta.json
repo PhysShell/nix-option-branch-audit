@@ -1,0 +1,37 @@
+{
+  "pr": 431289,
+  "title": "nixos/prosody: add muc_moderation",
+  "applicable": true,
+  "base_sha": "b0f1f70924dcb65faa50a0787754de001a784bf8",
+  "head_sha": "cea3dfac9e5a4bcc13100623be892a37b2d80c2b",
+  "module_paths": [
+    "nixos/modules/services/networking/prosody.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/xmpp/prosody.nix"
+  ],
+  "reason": "Applicable: real prosody module + wired test. Real diff adds new `moderation` mkOption inside mucOpts (per-room submodule).",
+  "targets_toml": "single target prosody, cfg_ident=cfg, option_prefix=[services,prosody,muc] (no wildcard '*' -- cfg.muc is a listOf(submodule), not attrsOf, so no per-instance name key), watch=[moderation].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "moderation",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "7th candidate_rendering_gap instance (running tally). Not re-describing mechanism further."
+    }
+  ]
+}

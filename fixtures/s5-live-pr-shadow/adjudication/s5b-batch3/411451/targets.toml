@@ -1,0 +1,7 @@
+[[target]]
+name = "411451"
+module = "nixos/modules/services/networking/dnscrypt-proxy2.nix"
+test = "nixos/tests/dnscrypt-proxy2.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "dnscrypt-proxy2"]
+watch = ["package"]

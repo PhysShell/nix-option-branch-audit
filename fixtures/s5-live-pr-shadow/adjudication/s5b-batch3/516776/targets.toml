@@ -1,0 +1,7 @@
+[[target]]
+name = "516776"
+module = "nixos/modules/services/monitoring/traccar.nix"
+test = "nixos/tests/traccar.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "traccar"]
+watch = ["package"]

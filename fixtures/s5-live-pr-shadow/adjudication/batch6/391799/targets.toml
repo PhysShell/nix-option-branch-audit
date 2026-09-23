@@ -1,0 +1,7 @@
+[[target]]
+name = "paretosecurity"
+module = "nixos/modules/services/security/paretosecurity.nix"
+test = "nixos/tests/paretosecurity.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "paretosecurity"]
+watch = ["trayIcon"]

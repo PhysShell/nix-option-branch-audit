@@ -1,0 +1,43 @@
+{
+  "pr": 427260,
+  "title": "nixos/drupal: add config for private files directory",
+  "applicable": true,
+  "base_sha": "35ecc48f7ea7260459f0395f0be53f37dfc19586",
+  "head_sha": "711f3730a9758ff0c06382dd39cc38f30eb203b9",
+  "module_paths": [
+    "nixos/modules/services/web-apps/drupal.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/drupal.nix"
+  ],
+  "reason": "Real new mkOption 'privateFilesDir' added inside the per-site siteOpts submodule, matching the coordinator's flagged title. 5th drupal.nix PR referenced this round, all via the same consistently-working 'sites' wildcard prefix.",
+  "targets_toml": "option_prefix=[services,drupal,sites], watch=[privateFilesDir].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "privateFilesDir",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head via the consistently-working wildcard sites.<name> prefix but untested -- expected, not a gap. 5th confirmed-working instance of drupal's 'sites' wildcard this round (webRoot, configRoot, configSyncDir, extraConfig, now privateFilesDir)."
+    },
+    {
+      "watched_path": "privateFilesDir",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

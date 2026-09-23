@@ -1,0 +1,37 @@
+{
+  "pr": 471330,
+  "title": "nixos/sshd: add enableRecommendedAlgorithms option",
+  "applicable": true,
+  "base_sha": "4eb3c802539f72fe7538cb049c65ae2cb27a45e6",
+  "head_sha": "41c383338e1881994bf517b4c66aacb30a2410f7",
+  "module_paths": [
+    "nixos/modules/services/networking/ssh/sshd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/openssh.nix"
+  ],
+  "reason": "Applicable, the coordinator's own flagged case (#82). Real sshd module + wired test. Real diff adds enableRecommendedAlgorithms mkOption, wired into a real if/then/else default-computation for KexAlgorithms.",
+  "targets_toml": "single target sshd, cfg_ident=cfg, option_prefix=[services,openssh], watch=[enableRecommendedAlgorithms].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enableRecommendedAlgorithms",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "30th candidate_rendering_gap instance."
+    }
+  ]
+}

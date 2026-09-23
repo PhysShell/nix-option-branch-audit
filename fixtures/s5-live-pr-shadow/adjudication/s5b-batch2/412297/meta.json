@@ -1,0 +1,40 @@
+{
+  "pr": 412297,
+  "title": "nixos/taler: update modules; fix tests",
+  "applicable": true,
+  "base_sha": "7f25223c182ce63a47f68b9d8d4f445497efaaae",
+  "head_sha": "d5f88753ab875cc9afe902336853ea6f43f6a1c7",
+  "module_paths": [
+    "nixos/modules/services/finance/taler/exchange.nix",
+    "nixos/modules/services/finance/taler/common.nix",
+    "nixos/modules/services/finance/libeufin/common.nix",
+    "nixos/modules/services/finance/taler/merchant.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/taler/default.nix"
+  ],
+  "reason": "Applicable: real taler-exchange module + wired test. Real diff adds a genuinely new CURRENCY mkOption (real, no default, nonEmptyStr) plus a real bug fix elsewhere in the same PR (taler/common.nix: `User = name;` -> `User = dbName;`, a real systemd unit User-field correctness fix, disclosed for completeness, not something oba surfaced).",
+  "targets_toml": "single target taler-exchange, cfg_ident=cfg, option_prefix=[services,taler,exchange,settings,exchange], watch=[CURRENCY].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "CURRENCY",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides). taler/exchange.nix declares `options.services.taler.exchange = {...}` -- dotted-path, NO inline with -- CONTRADICTS the with-inline lead from peering-manager/trilium (2 data points supporting it, this one against). Genuinely unresolved, flagging the raw data honestly."
+    }
+  ]
+}

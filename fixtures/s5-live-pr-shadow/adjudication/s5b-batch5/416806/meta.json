@@ -1,0 +1,44 @@
+{
+  "pr": 416806,
+  "title": "nixos/postgresql: fix docs on default package",
+  "applicable": true,
+  "base_sha": "8ca040e9ed7a9ebef8a5e544df90217a405f2d15",
+  "head_sha": "2a6405fb153fab2718a77ad07160e400c6bd8748",
+  "module_paths": [
+    "nixos/modules/services/databases/postgresql.nix",
+    "nixos/modules/services/databases/postgresql.md"
+  ],
+  "test_paths": [
+    "nixos/tests/postgresql/default.nix"
+  ],
+  "reason": "Real, non-cosmetic change: 'package' option converted FROM mkPackageOption TO a plain mkOption with an explicit defaultText (reverse direction of the documented mkPackageOption non-discovery gap).",
+  "targets_toml": "option_prefix=[services,postgresql], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "THIRD controlled mkPackageOption-transition instance (after olivetin S5-A b6 and graylog S5-B b2): base uses mkPackageOption -> OptionNotFound (non-discovery, consistent with the 8 other confirmed mkPackageOption blackout instances); head switches to plain mkOption -> becomes discoverable (PredicateNotFound, not blacked out). Further corroborates the causal link specifically to the mkPackageOption helper, in the mkPackageOption->mkOption direction this time (olivetin's direction), not the reverse (graylog's direction)."
+    },
+    {
+      "watched_path": "package",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

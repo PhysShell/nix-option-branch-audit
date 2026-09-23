@@ -1,0 +1,7 @@
+[[target]]
+name = "428138"
+module = "nixos/modules/services/networking/ncps.nix"
+test = "nixos/tests/ncps.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ncps", "cache"]
+watch = ["signNarinfo"]

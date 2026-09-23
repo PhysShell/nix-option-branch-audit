@@ -1,0 +1,7 @@
+[[target]]
+name = "snapserver"
+module = "nixos/modules/services/audio/snapserver.nix"
+test = "nixos/tests/snapcast.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "snapserver", "settings", "http"]
+watch = ["port"]

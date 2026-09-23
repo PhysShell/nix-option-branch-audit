@@ -1,0 +1,7 @@
+[[target]]
+name = "482512"
+module = "nixos/modules/services/web-servers/traefik.nix"
+test = "nixos/tests/traefik.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "traefik"]
+watch = ["static"]

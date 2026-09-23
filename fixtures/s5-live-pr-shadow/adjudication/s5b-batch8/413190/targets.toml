@@ -1,0 +1,7 @@
+[[target]]
+name = "413190"
+module = "nixos/modules/services/web-apps/lasuite-docs.nix"
+test = "nixos/tests/web-apps/lasuite-docs.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "lasuite-docs"]
+watch = ["collaborationServer.settings.COLLABORATION_SERVER_ORIGIN"]

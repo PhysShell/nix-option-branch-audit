@@ -1,0 +1,9 @@
+{
+  "pr": 408517,
+  "title": "openrgb: add startupProfile option to service",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/openrgb.nix"
+  ],
+  "reason": "No nixos/tests file exists for openrgb (confirmed via all-tests.nix grep and nixos/tests directory listing at head SHA)."
+}

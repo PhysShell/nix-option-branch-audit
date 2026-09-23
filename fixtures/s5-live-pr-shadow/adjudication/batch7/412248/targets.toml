@@ -1,0 +1,7 @@
+[[target]]
+name = "sanoid"
+module = "nixos/modules/services/backup/sanoid.nix"
+test = "nixos/tests/sanoid.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "sanoid", "templates", "*"]
+watch = ["pre_snapshot_script"]

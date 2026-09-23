@@ -1,0 +1,37 @@
+{
+  "pr": 409820,
+  "title": "nixos/dex: add `package` option",
+  "applicable": true,
+  "base_sha": "88d0366acebc9c156a4a1a93525933e44c37ea4e",
+  "head_sha": "68ac9fc75741bf39b59418fd6f7c00deb0937955",
+  "module_paths": [
+    "nixos/modules/services/web-apps/dex.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/dex-oidc.nix"
+  ],
+  "reason": "Applicable: real dex module + wired test (dex-oidc = handleTest ./dex-oidc.nix {}; at head). Real diff adds a genuinely new `package` mkPackageOption declaration (mkPackageOption pkgs \"dex-oidc\" {}), replacing hardcoded pkgs.dex-oidc references with cfg.package throughout.",
+  "targets_toml": "single target dex, cfg_ident=cfg, option_prefix=[services,dex], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "SECOND INSTANCE of the mkPackageOption non-discovery pattern first seen in batch1 PR463848 (gonic): package is declared via `mkPackageOption pkgs \"dex-oidc\" {}` (not a literal mkOption call) and remains OptionNotFound even at head where it genuinely exists -- audit-diff correctly classifies this as unchanged=1 (no transition, both sides identically not-found), so nothing renders as notable, but this is real, reproducible evidence (now 2/2 occurrences) that mkPackageOption declarations specifically are not discovered by the declaration walker. candidate_capability_gap, now with 2 independent corroborating instances."
+    }
+  ]
+}

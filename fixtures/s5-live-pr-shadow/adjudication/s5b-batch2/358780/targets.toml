@@ -1,0 +1,7 @@
+[[target]]
+name = "358780"
+module = "nixos/modules/services/logging/graylog.nix"
+test = "nixos/tests/graylog.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "graylog"]
+watch = ["package"]

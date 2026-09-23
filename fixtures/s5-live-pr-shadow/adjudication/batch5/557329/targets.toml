@@ -1,0 +1,7 @@
+[[target]]
+name = "portmaster"
+module = "nixos/modules/services/networking/portmaster.nix"
+test = "nixos/tests/portmaster.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "portmaster"]
+watch = ["profiles"]

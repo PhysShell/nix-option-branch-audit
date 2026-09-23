@@ -1,0 +1,43 @@
+{
+  "pr": 494127,
+  "title": "nixos/n8n: fix eval error with default values",
+  "applicable": true,
+  "base_sha": "a97eb80b14463bdc47442afab24156a84ff68af6",
+  "head_sha": "5ad853409cf18274ab2b061b2d83231e5a31a3f4",
+  "module_paths": [
+    "nixos/modules/services/misc/n8n.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/n8n.nix"
+  ],
+  "reason": "Real option removal: the internal option taskRunners.environment.N8N_RUNNERS_CONFIG_PATH is removed entirely and replaced with a raw literal merged directly into the systemd environment attrset (part of a fix for a real eval error with null-valued env vars: partitionEnv now filters nulls first). 5th n8n.nix PR referenced this round.",
+  "targets_toml": "Self-corrected: first attempt watched 'environment.N8N_RUNNERS_CONFIG_PATH' (0 discovered, wrong path -- misread the diff's indentation). Real location is nested one level deeper: 'taskRunners.environment.N8N_RUNNERS_CONFIG_PATH'. Corrected and re-ran.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "taskRunners.environment.N8N_RUNNERS_CONFIG_PATH",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head matches the diff exactly (option deleted, replaced by a plain attrset literal). Base was PredicateNotFound (real option existed, internal=true, but the n8n test never set it to a resolvable literal) -- NOT a witnessed PASS. Same shape as the batch5/6 cluster of non-witnessed-base removals (porxie, mpd, postgresql-recoveryConfig, ollama-acceleration): no witnessed base evidence to lose, clean low-stakes removal."
+    },
+    {
+      "watched_path": "taskRunners.environment.N8N_RUNNERS_CONFIG_PATH",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

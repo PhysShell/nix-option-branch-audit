@@ -1,0 +1,7 @@
+[[target]]
+name = "433962"
+module = "nixos/modules/services/display-managers/greetd.nix"
+test = "nixos/tests/greetd-no-shadow.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "greetd"]
+watch = ["useTextGreeter"]

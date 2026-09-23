@@ -1,0 +1,9 @@
+{
+  "pr": 493931,
+  "title": "nixos/athens: remove minio support",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/development/athens.nix"
+  ],
+  "reason": "FLAGGED BY COORDINATOR FOR STANDARD REMOVAL SCRUTINY, but no nixos/tests file exists for athens anywhere in the corpus (confirmed via all-tests.nix and direct directory listing at this exact head SHA) -- genuinely cannot be adjudicated, not skipped carelessly. Real, large removal: storage.minio.{endpoint,key,secret,enableSSL,bucket,region} (6 named options) all removed via mkRemovedOptionModule ('Support for Minio storage backend has been removed, as minio is unmaintained.'), plus 'minio' removed from the storage.type enum and from the example -- but with no test, oba has no mechanism to observe any of this."
+}

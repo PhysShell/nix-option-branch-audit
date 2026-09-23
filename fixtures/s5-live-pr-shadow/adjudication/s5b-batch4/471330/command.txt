@@ -1,0 +1,4 @@
+cd /tmp/s5-adjudication/s5b-batch4/471330
+/tmp/verify-v045-scratch/oba-x86_64-unknown-linux-musl/oba audit-diff --base-root base-root --head-root head-root --targets targets.toml --format json --summary-path summary.md > raw.json
+/tmp/verify-v045-scratch/oba-x86_64-unknown-linux-musl/oba check --root base-root --targets targets.toml --json > check-base.json
+/tmp/verify-v045-scratch/oba-x86_64-unknown-linux-musl/oba check --root head-root --targets targets.toml --json > check-head.json

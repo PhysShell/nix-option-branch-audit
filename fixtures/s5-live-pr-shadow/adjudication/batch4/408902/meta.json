@@ -1,0 +1,37 @@
+{
+  "pr": 408902,
+  "title": "nixos/prowlarr: add configurable dataDir and user/group options",
+  "applicable": true,
+  "base_sha": "5c68d925b545ab6daea44ba1295756bb2493c6af",
+  "head_sha": "cfcf4e8f18ff365c5e549dd5732b715de4bd37c1",
+  "module_paths": [
+    "nixos/modules/services/misc/servarr/prowlarr.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/prowlarr.nix"
+  ],
+  "reason": "Applicable: real prowlarr module + wired test (prowlarr = handleTest ./prowlarr.nix {}; at head). Real diff adds genuinely new dataDir/user/group mkOptions, wired into systemd serviceConfig (User=cfg.user, Group=cfg.group) and ExecStart (-data=cfg.dataDir).",
+  "targets_toml": "single target prowlarr, cfg_ident=cfg, option_prefix=[services,prowlarr], watch=[dataDir] (chosen as the single clearest new declaration among the three added; user/group not separately watched this pass).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "dataDir",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "FOURTH INSTANCE of the candidate_rendering_gap pattern (batch2 PR510900, batch3 PR398885, this batch's own PR484133): correct option_not_found->predicate_not_found transition, changed=1 in raw.json, all-zero in summary.md, notable=[]. Now four independent instances across four different modules -- strong evidence this is systematic, not a fluke."
+    }
+  ]
+}

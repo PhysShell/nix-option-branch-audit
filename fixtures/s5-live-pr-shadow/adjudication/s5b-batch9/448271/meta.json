@@ -1,0 +1,9 @@
+{
+  "pr": 448271,
+  "title": "nixos/serviio: add option to open firewall ports",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/misc/serviio.nix"
+  ],
+  "reason": "No nixos/tests file exists for serviio; real new openFirewall option added (also fixes a real pre-existing bug: firewall ports were previously ALWAYS opened unconditionally, now correctly gated), but untestable."
+}

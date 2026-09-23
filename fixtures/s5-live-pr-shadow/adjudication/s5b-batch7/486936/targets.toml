@@ -1,0 +1,7 @@
+[[target]]
+name = "486936"
+module = "nixos/modules/services/web-apps/pretalx.nix"
+test = "nixos/tests/web-apps/pretalx.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pretalx"]
+watch = ["environmentFiles"]

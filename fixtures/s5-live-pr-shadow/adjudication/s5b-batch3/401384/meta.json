@@ -1,0 +1,39 @@
+{
+  "pr": 401384,
+  "title": "paretosecurity: 0.1.9 -> 0.2.12",
+  "applicable": true,
+  "base_sha": "30a7bc1176cd9cd066cd75b9339872fa985a6379",
+  "head_sha": "f07205812cc90d15bea0b06a313b1c6720416bb5",
+  "module_paths": [
+    "nixos/modules/services/security/paretosecurity.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paretosecurity.nix"
+  ],
+  "reason": "Applicable: real paretosecurity module + wired test. Real diff changes trayIcon's own declaration form from mkEnableOption to a plain mkOption (type=bool, default=true) -- same predicate (lib.mkIf cfg.trayIcon {...}) remains, just at a shifted line.",
+  "targets_toml": "single target paretosecurity, cfg_ident=cfg, option_prefix=[services,paretosecurity], watch=[trayIcon].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 0,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      "B:401384:oba:trayIcon:PASS"
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "trayIcon",
+      "base_verdict": "PASS",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "A real, substantive, and genuinely interesting transition -- NOT an oba gap, a real change in the underlying test. At base, check_base exits 0 cleanly: a real witnessed PASS (mkIf cfg.trayIcon {...} witnessed=True, real test evidence trayIcon=true at the 'xfce' node). At head, the SAME predicate exists (same source text, shifted from line 42 to 46 purely due to the declaration-style change above it) but resolves to TestConfigUnresolved (unwitnessed) instead. Root-caused by direct diff of the real test file: at base, node xfce set `services.paretosecurity = { enable=true; trayIcon=true; };` together; at head, the SAME node only sets `services.paretosecurity.enable = true;` -- trayIcon=true has genuinely moved to a DIFFERENT test node (not xfce) elsewhere in the same test file. This is a real test refactor in the actual nixpkgs PR, and oba correctly, honestly reports that THIS specific predicate/node combination no longer has demonstrating evidence -- a correct behavior, not a false regression, though worth understanding as a real 'evidence can genuinely disappear when a test is restructured, and the tool must not silently keep claiming a stale PASS' case. Flagging the base-side PASS per the same rule as the other real PASSes."
+    }
+  ]
+}

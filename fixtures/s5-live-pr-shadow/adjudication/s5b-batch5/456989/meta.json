@@ -1,0 +1,45 @@
+{
+  "pr": 456989,
+  "title": "nixos/mpd: apply RFC 42",
+  "applicable": true,
+  "base_sha": "815ff90da1ce5742c9b04a0ce0c0eba8e33fdeed",
+  "head_sha": "53943b006f4a493fdeb83f4f8d6b0ec4895dfbc3",
+  "module_paths": [
+    "nixos/modules/services/audio/mpd.nix",
+    "nixos/modules/services/audio/mpdscribble.nix",
+    "nixos/modules/services/audio/ympd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mpd.nix"
+  ],
+  "reason": "Large RFC42 refactor: musicDirectory/playlistDirectory/dbFile/network.listenAddress/network.port renamed into a new 'settings' freeform submodule via mkRenamedOptionModule shims; 'extraConfig' REMOVED entirely via mkRemovedOptionModule (no successor -- users must use 'settings' directly). Removal case flagged by coordinator for standard scrutiny.",
+  "targets_toml": "option_prefix=[services,mpd], watch=[extraConfig] (the clean removal, not the renames, which have backward-compat shims).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraConfig",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head (matches the mkRemovedOptionModule diff, no successor option). Base was PredicateNotFound (option existed but no test assignment ever resolved it) -- NOT a witnessed PASS at base, so unlike sshd's banner or gollum's local-time, there is no witnessed evidence that could have been masked or lost by this removal; the analyzer never claimed anything about extraConfig even before removal. Read as a clean, low-stakes removal, not requiring the sshd/gollum-style masked-relocation scrutiny since there was nothing witnessed to relocate."
+    },
+    {
+      "watched_path": "extraConfig",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

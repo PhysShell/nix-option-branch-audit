@@ -1,0 +1,7 @@
+[[target]]
+name = "gotenberg"
+module = "nixos/modules/services/misc/gotenberg.nix"
+test = "nixos/tests/gotenberg.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gotenberg"]
+watch = ["pdfEngines"]

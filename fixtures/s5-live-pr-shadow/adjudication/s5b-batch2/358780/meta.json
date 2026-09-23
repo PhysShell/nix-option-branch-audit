@@ -1,0 +1,37 @@
+{
+  "pr": 358780,
+  "title": "graylog-5_1: remove",
+  "applicable": true,
+  "base_sha": "8b38173d7288cdca61d6269cb31c078dad9c00f6",
+  "head_sha": "7eed7c8da606a38083a3d750f018236d3484f859",
+  "module_paths": [
+    "nixos/modules/services/logging/graylog.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/graylog.nix"
+  ],
+  "reason": "Applicable: real graylog module + wired test. Real diff changes package's OWN declaration from a plain lib.mkOption (with a version-conditional default) to lib.mkPackageOption -- a clean, controlled natural experiment for the mkPackageOption gap, the OPPOSITE direction of olivetin's own transition (which went mkPackageOption -> plain mkOption).",
+  "targets_toml": "single target graylog, cfg_ident=cfg, option_prefix=[services,graylog], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "STRONG CORROBORATING EVIDENCE for the mkPackageOption gap: the SAME option, in the SAME file, genuinely transitions from found-with-no-predicate (PredicateNotFound, correct) at base -- where it was a plain mkOption -- to completely undiscovered (OptionNotFound) at head, purely because the declaration helper changed to mkPackageOption. This is the cleanest, most controlled data point yet for this specific gap (tally: gonic/dex/n8n non-discovered as mkPackageOption from the start; olivetin went mkPackageOption->mkOption and became discoverable; graylog now shows the reverse transition and becomes undiscoverable) -- 5 total corroborating instances, 2 of them controlled before/after transitions in opposite directions."
+    }
+  ]
+}

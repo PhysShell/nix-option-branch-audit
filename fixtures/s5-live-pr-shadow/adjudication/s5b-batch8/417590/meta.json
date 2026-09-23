@@ -1,0 +1,43 @@
+{
+  "pr": 417590,
+  "title": "nixos/onlyoffice: add wopi setting",
+  "applicable": true,
+  "base_sha": "ac3f8faff5c1a4191489c7b2f006d9adf4797425",
+  "head_sha": "9319694d25812fbf490fef499f117d5d96e8e40d",
+  "module_paths": [
+    "nixos/modules/services/web-apps/onlyoffice.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/onlyoffice.nix"
+  ],
+  "reason": "Real new mkEnableOption 'wopi' added, matching the coordinator's flagged title. 3rd onlyoffice.nix PR this round.",
+  "targets_toml": "option_prefix=[services,onlyoffice], watch=[wopi].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "wopi",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "wopi",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

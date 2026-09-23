@@ -1,0 +1,37 @@
+{
+  "pr": 441245,
+  "title": "nixos/snapserver: migrate to settings option",
+  "applicable": true,
+  "base_sha": "b772b8167c85abc3ad71a8428811a8aeeda6bc08",
+  "head_sha": "b0f63e9173f873a9f7d458154eb86eb27d8082d2",
+  "module_paths": [
+    "nixos/modules/services/audio/snapserver.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/snapcast.nix"
+  ],
+  "reason": "Applicable: real snapserver module + wired test (same module as S5-A batch3's PR444033). Real diff is a large rewrite converting from a manual streamToOption/optionString config-generation approach to a real pkgs.formats.ini settings-based module.",
+  "targets_toml": "single target snapserver, cfg_ident=cfg, option_prefix=[services,snapserver], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "4th instance of the mkPackageOption non-discovery gap (tally: gonic/dex/n8n, this one). Confirmed via discovered_options: 13 real options found (enable, settings.*, openFirewall) but package (a real mkPackageOption declaration, unchanged by this diff) is absent from the list at both sides."
+    }
+  ]
+}

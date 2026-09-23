@@ -1,0 +1,7 @@
+[[target]]
+name = "393943"
+module = "nixos/modules/services/security/cfssl.nix"
+test = "nixos/tests/cfssl.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cfssl"]
+watch = ["disable"]

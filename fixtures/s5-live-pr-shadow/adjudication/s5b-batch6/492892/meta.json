@@ -1,0 +1,39 @@
+{
+  "pr": 492892,
+  "title": "freeipa: Add support for subUIDs and subGIDs",
+  "applicable": true,
+  "base_sha": "1714b4d7fc69faca67c25c6edbb2aa33a155c454",
+  "head_sha": "1d492ae1b22210daa9510afaf013607e68d34b6a",
+  "module_paths": [
+    "nixos/modules/services/misc/sssd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/sssd-ldap.nix"
+  ],
+  "reason": "Coordinator's PR title says 'freeipa' but the real diff (via the Compare API, filtered to nixos/modules/services/) lands entirely in sssd.nix, not a freeipa.nix module -- NixOS's freeipa support is implemented via sssd, so subUID/subGID integration was added there directly as a real new mkOption 'subIDsIntegration'.",
+  "targets_toml": "option_prefix=[services,sssd], watch=[subIDsIntegration]. Test 'sssd-ldap.nix' is the real test that enables services.sssd (no dedicated bare 'sssd.nix' test exists in the corpus; 'sssd-legacy-config.nix' also exists as a sibling).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "492892:oba:subIDsIntegration:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "subIDsIntegration",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'subIDsIntegration' away from its default false. Mechanically verified: two real predicate_attempts (Truthy mkIf form and explicit Eq-true form), both witnessed=false. New OBA001 finding this batch -- the 3rd in this single batch (alongside navidrome's environmentFile and greetd's useTextGreeter)."
+    }
+  ]
+}

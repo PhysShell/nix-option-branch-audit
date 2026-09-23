@@ -1,0 +1,1443 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "413190",
+      "module": "nixos/modules/services/web-apps/lasuite-docs.nix",
+      "test": "nixos/tests/web-apps/lasuite-docs.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "lasuite-docs"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 79,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "bind"
+          ],
+          "default_source": "\"unix:/run/lasuite-docs/gunicorn.sock\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "unix:/run/lasuite-docs/gunicorn.sock"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 85,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableNginx"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 96,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "secretKeyPath"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 100,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "s3Url"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 115,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 123,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 133,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "collaborationServer",
+            "port"
+          ],
+          "default_source": "4444",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 145,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "collaborationServer",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 153,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "collaborationServer",
+            "settings",
+            "PORT"
+          ],
+          "default_source": "toString cfg.collaborationServer.port",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 163,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "collaborationServer",
+            "settings",
+            "COLLABORATION_BACKEND_BASE_URL"
+          ],
+          "default_source": "\"https://${cfg.domain}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 170,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "gunicorn",
+            "extraArgs"
+          ],
+          "default_source": "[\n          \"--name=impress\"\n          \"--workers=3\"\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 193,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "celery",
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 206,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "domain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 215,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 222,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_CONFIGURATION"
+          ],
+          "default_source": "\"Production\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "Production"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 236,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_SETTINGS_MODULE"
+          ],
+          "default_source": "\"impress.settings\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "impress.settings"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 243,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_SECRET_KEY_FILE"
+          ],
+          "default_source": "if cfg.secretKeyPath == null then \"/var/lib/lasuite-docs/django_secret_key\" else cfg.secretKeyPath",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 250,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DATA_DIR"
+          ],
+          "default_source": "\"/var/lib/lasuite-docs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/lasuite-docs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 257,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DJANGO_ALLOWED_HOSTS"
+          ],
+          "default_source": "if cfg.enableNginx then \"localhost,127.0.0.1,${cfg.domain}\" else \"\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 263,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DB_NAME"
+          ],
+          "default_source": "\"lasuite-docs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "lasuite-docs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 272,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DB_USER"
+          ],
+          "default_source": "\"lasuite-docs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "lasuite-docs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 278,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DB_HOST"
+          ],
+          "default_source": "if cfg.postgresql.createLocally then \"/run/postgresql\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 284,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "REDIS_URL"
+          ],
+          "default_source": "if cfg.redis.createLocally then\n                \"unix://${config.services.redis.servers.lasuite-docs.unixSocket}?db=0\"\n              else\n                null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 290,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "CELERY_BROKER_URL"
+          ],
+          "default_source": "if cfg.redis.createLocally then\n                \"redis+socket://${config.services.redis.servers.lasuite-docs.unixSocket}?db=1\"\n              else\n                null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 300,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 327,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 42,
+            "col": 27
+          },
+          "source": "mkIf cfg.redis.createLocally ["
+        },
+        {
+          "path": [
+            "secretKeyPath"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 253,
+            "col": 15
+          },
+          "source": "if cfg.secretKeyPath == null then \"/var/lib/lasuite-docs/django_secret_key\" else cfg.secretKeyPath"
+        },
+        {
+          "path": [
+            "enableNginx"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 265,
+            "col": 23
+          },
+          "source": "if cfg.enableNginx then \"localhost,127.0.0.1,${cfg.domain}\" else \"\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 286,
+            "col": 23
+          },
+          "source": "if cfg.postgresql.createLocally then \"/run/postgresql\" else null"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 293,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 303,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 338,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 343,
+            "col": 13
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 344,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 346,
+            "col": 10
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 347,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 391,
+            "col": 13
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 392,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 394,
+            "col": 10
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 395,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "path": [
+            "postgresql",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 428,
+            "col": 27
+          },
+          "source": "mkIf cfg.postgresql.createLocally {"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 439,
+            "col": 43
+          },
+          "source": "mkIf cfg.redis.createLocally { enable = true; }"
+        },
+        {
+          "path": [
+            "enableNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 441,
+            "col": 22
+          },
+          "source": "mkIf cfg.enableNginx {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 42,
+            "col": 27
+          },
+          "source": "mkIf cfg.redis.createLocally ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "secretKeyPath"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "secretKeyPath"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 253,
+            "col": 15
+          },
+          "source": "if cfg.secretKeyPath == null then \"/var/lib/lasuite-docs/django_secret_key\" else cfg.secretKeyPath"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 265,
+            "col": 23
+          },
+          "source": "if cfg.enableNginx then \"localhost,127.0.0.1,${cfg.domain}\" else \"\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 286,
+            "col": 23
+          },
+          "source": "if cfg.postgresql.createLocally then \"/run/postgresql\" else null"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 293,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 303,
+            "col": 15
+          },
+          "source": "if cfg.redis.createLocally then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 338,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 343,
+            "col": 13
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 344,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 346,
+            "col": 10
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 347,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "secretKeyPath"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "secretKeyPath"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 361,
+            "col": 11
+          },
+          "source": "optionalString (cfg.secretKeyPath == null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 382,
+            "col": 27
+          },
+          "source": "optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 391,
+            "col": 13
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 392,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 394,
+            "col": 10
+          },
+          "source": "optional cfg.postgresql.createLocally \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 395,
+            "col": 13
+          },
+          "source": "optional cfg.redis.createLocally \"redis-lasuite-docs.service\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 411,
+            "col": 27
+          },
+          "source": "optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postgresql",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postgresql",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 428,
+            "col": 27
+          },
+          "source": "mkIf cfg.postgresql.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 439,
+            "col": 43
+          },
+          "source": "mkIf cfg.redis.createLocally { enable = true; }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 441,
+            "col": 22
+          },
+          "source": "mkIf cfg.enableNginx {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 25,
+            "col": 5
+          },
+          "source": "if value == null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 27,
+            "col": 10
+          },
+          "source": "if value == true then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/lasuite-docs.nix",
+            "line": 29,
+            "col": 10
+          },
+          "source": "if value == false then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "virtualisation",
+            "diskSize"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 20,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "virtualisation",
+            "memorySize"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 21,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 25,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-docs"
+          ],
+          "instance": "machine",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 36,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-docs",
+            "settings",
+            "DJANGO_SECRET_KEY_FILE"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 40,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-docs",
+            "settings",
+            "AWS_S3_ACCESS_KEY_ID"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 58,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "lasuite-docs",
+            "settings",
+            "AWS_S3_SECRET_ACCESS_KEY"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/lasuite-docs.nix",
+            "line": 59,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "collaborationServer.settings.COLLABORATION_SERVER_ORIGIN"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

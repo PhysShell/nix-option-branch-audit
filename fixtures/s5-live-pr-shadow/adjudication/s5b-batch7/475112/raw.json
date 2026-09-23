@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->oba001": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 1,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 1,
+    "notable": [
+      {
+        "bucket": "new_finding",
+        "engine": "oba",
+        "subject": "gitHttpBackend.enable",
+        "code": "OBA001",
+        "message": "uncovered option branch: no test assignment provably flips this predicate away from its default",
+        "detail": "test evidence: none flips it",
+        "transition_origin": "origin_unclear"
+      }
+    ]
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/cgit.nix",
+        "test": "nixos/tests/cgit.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "cgit"
+        ],
+        "watched_path": "gitHttpBackend.enable"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "gitHttpBackend.enable"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "gitHttpBackend.enable",
+            "predicate": {
+              "path": [
+                "gitHttpBackend",
+                "enable"
+              ],
+              "kind": {
+                "Truthy": "optionalAttrs"
+              },
+              "span": {
+                "file": "nixos/modules/services/networking/cgit.nix",
+                "line": 308,
+                "col": 16
+              },
+              "source": "lib.optionalAttrs cfg.gitHttpBackend.enable {"
+            },
+            "default_outcome": true,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "gitHttpBackend",
+                    "enable"
+                  ],
+                  "kind": {
+                    "Truthy": "optionalAttrs"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/networking/cgit.nix",
+                    "line": 308,
+                    "col": 16
+                  },
+                  "source": "lib.optionalAttrs cfg.gitHttpBackend.enable {"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

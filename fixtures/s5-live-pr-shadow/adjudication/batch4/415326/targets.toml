@@ -1,0 +1,7 @@
+[[target]]
+name = "wstunnel"
+module = "nixos/modules/services/networking/wstunnel.nix"
+test = "nixos/tests/wstunnel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "wstunnel", "clients", "*"]
+watch = ["extraArgs"]

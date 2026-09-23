@@ -1,0 +1,43 @@
+{
+  "pr": 386345,
+  "title": "nixos/postgresql: allow customisations of SystemCallFilter",
+  "applicable": true,
+  "base_sha": "f176582204e095f1bd023a6f2f8aa8262eb8c045",
+  "head_sha": "6e87867ee3e49ee5199fb48a6cf22958286f3c1d",
+  "module_paths": [
+    "nixos/modules/services/databases/postgresql.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/postgresql/default.nix"
+  ],
+  "reason": "Real new mkOption 'systemCallFilter' added (attrsOf coercedTo bool/submodule, replacing the previously-hardcoded systemd SystemCallFilter list), matching the coordinator's flagged title. 6th postgresql.nix PR referenced this round.",
+  "targets_toml": "option_prefix=[services,postgresql], watch=[systemCallFilter].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "systemCallFilter",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "systemCallFilter",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

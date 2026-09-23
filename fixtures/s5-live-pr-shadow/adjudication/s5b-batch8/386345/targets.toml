@@ -1,0 +1,7 @@
+[[target]]
+name = "386345"
+module = "nixos/modules/services/databases/postgresql.nix"
+test = "nixos/tests/postgresql/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "postgresql"]
+watch = ["systemCallFilter"]

@@ -1,0 +1,9 @@
+{
+  "pr": 421759,
+  "title": "nixos/monero: add environmentFile option",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/networking/monero.nix"
+  ],
+  "reason": "No nixos/tests file exists for monero."
+}

@@ -1,0 +1,9 @@
+{
+  "pr": 521288,
+  "title": "Revert nixos/blueman: Add option to enable Blueman tray applet",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/desktops/blueman.nix"
+  ],
+  "reason": "REAL REVERT, but no nixos/tests file exists for blueman; real removal of withApplet + the blueman-applet systemd unit (cleanly reverts exactly what an earlier PR added, no leftover partial state visible in the diff), but untestable."
+}

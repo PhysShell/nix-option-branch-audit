@@ -1,0 +1,37 @@
+{
+  "pr": 485285,
+  "title": "nixos/n8n: package n8n runners and enable them in the module",
+  "applicable": true,
+  "base_sha": "4dd7177b0e26255cb1960c2794fe7e8bc42f4093",
+  "head_sha": "f8ec773b6058107dffd7f5066961ba280d96dbde",
+  "module_paths": [
+    "nixos/modules/services/misc/n8n.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/n8n.nix"
+  ],
+  "reason": "Applicable: same n8n module as batch6's PR470146 (which found package/mkPackageOption fine). Real diff is a large restructuring adding task-runner support, plus 2 real option removals via mkRemovedOptionModule.",
+  "targets_toml": "single target n8n, cfg_ident=cfg, option_prefix=[services,n8n], watch=[enable] (the module's own basic top-level option, unchanged by this diff, chosen to probe why this file now blacks out).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "SURPRISING TOTAL NON-DISCOVERY (0 discovered options both sides) on the SAME FILE that correctly resolved `package` in batch6 (PR470146) -- an inconsistency of the same character as paretosecurity's own trayIcon(blackout)/users(found) split in batches 6/7 vs batch2. n8n.nix declares `options.services.n8n = {...}` (dotted-path, no inline with), unchanged in kind from before. Did not have time to isolate what changed between the two PRs on the same file that would explain fine-then-blackout -- flagging the raw inconsistency honestly, per the coordinator's own guidance not to force an explanation."
+    }
+  ]
+}

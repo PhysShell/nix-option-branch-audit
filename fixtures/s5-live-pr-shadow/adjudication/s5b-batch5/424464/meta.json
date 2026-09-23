@@ -1,0 +1,43 @@
+{
+  "pr": 424464,
+  "title": "navidrome: introduce plugin infrastructure",
+  "applicable": true,
+  "base_sha": "2f80625df416e89b8b46db93c466d985bfff9ae5",
+  "head_sha": "0541efdcf6cde2010ce6657b4d77e4e5a6b4b0ac",
+  "module_paths": [
+    "nixos/modules/services/audio/navidrome.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/navidrome.nix"
+  ],
+  "reason": "Real new mkOption 'plugins' (listOf addCheck package) added; also a nested settings.Plugins.Enabled option added.",
+  "targets_toml": "option_prefix=[services,navidrome], watch=[plugins].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "plugins",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base (didn't exist), discoverable at head but no test assignment references it -- expected, not a gap."
+    },
+    {
+      "watched_path": "plugins",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

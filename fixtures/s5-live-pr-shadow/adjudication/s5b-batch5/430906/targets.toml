@@ -1,0 +1,7 @@
+[[target]]
+name = "430906"
+module = "nixos/modules/services/misc/homepage-dashboard.nix"
+test = "nixos/tests/homepage-dashboard.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "homepage-dashboard"]
+watch = ["proxmox"]

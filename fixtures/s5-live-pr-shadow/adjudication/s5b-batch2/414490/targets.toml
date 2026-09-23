@@ -1,0 +1,7 @@
+[[target]]
+name = "414490"
+module = "nixos/modules/services/display-managers/ly.nix"
+test = "nixos/tests/ly.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "displayManager", "ly"]
+watch = ["x11Support"]

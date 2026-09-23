@@ -1,0 +1,7 @@
+[[target]]
+name = "dex"
+module = "nixos/modules/services/web-apps/dex.nix"
+test = "nixos/tests/dex-oidc.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "dex"]
+watch = ["package"]

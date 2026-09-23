@@ -1,0 +1,37 @@
+{
+  "pr": 471312,
+  "title": "angrr: 0.1.5 -> 0.2.0",
+  "applicable": true,
+  "base_sha": "ca696276378b844d888872c9045d89e9b58cc85a",
+  "head_sha": "62ea5b9ae7d4329475089f60232ee1426d9547a9",
+  "module_paths": [
+    "nixos/modules/services/misc/angrr.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/angrr.nix"
+  ],
+  "reason": "Large real refactor: 'period', 'removeRoot', 'ownedOnly' ALL removed via mkRemovedOptionModule (3 real removals, no successors), replaced by a new 'settings'/'configFile' TOML-based submodule with its own nested 'temporary-root-policies.<name>.period' field (a DIFFERENT, unrelated option that happens to share the leaf name 'period').",
+  "targets_toml": "option_prefix=[services,angrr], watch=[period].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "period",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "NEW, DISTINCT FINDING -- LEAF-NAME COLLISION MASKS A REAL REMOVAL: raw.json reports this transition as 'unchanged' (PredicateNotFound both sides), which LOOKS like nothing happened. But directly diffing discovered_options confirms the real story: at BASE, a genuine top-level 'services.angrr.period' option exists (bare ['period'] path, PredicateNotFound verdict, real removal target). At HEAD, that top-level option is GONE (real mkRemovedOptionModule removal, confirmed via the diff) -- but a completely unrelated NEW nested option 'settings.temporary-root-policies.<name>.period' now exists deep inside a wildcard attrsOf(submodule), and it ALSO has a bare leaf name 'period'. The watch mechanism's leaf-name match at head silently resolved to THIS unrelated nested option instead of correctly reporting the top-level option as OptionNotFound, producing a false 'unchanged' verdict that completely masks a real, clean option removal. This is a genuinely new gap shape (distinct from mkPackageOption, wildcard attrsOf non-discovery, genAttrs non-discovery, and the rendering gap): a same-leaf-name collision between an unrelated option elsewhere in the same file and the real removed option, which the watch matcher cannot disambiguate. Flagging prominently -- this is a tool-behavior artifact, not a real-world nixpkgs issue, and it is the first confirmed instance of this specific shape."
+    }
+  ]
+}

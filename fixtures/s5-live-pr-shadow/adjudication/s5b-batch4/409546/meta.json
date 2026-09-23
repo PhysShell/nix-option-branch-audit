@@ -1,0 +1,37 @@
+{
+  "pr": 409546,
+  "title": "nixos/frp: add setting",
+  "applicable": true,
+  "base_sha": "f2e05822c7a3a9c50aee464b7e918fa96fb0c5b0",
+  "head_sha": "c546b27a6b70ab7cb90f99a342fc77c6064afce9",
+  "module_paths": [
+    "nixos/modules/services/networking/frp.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/frp.nix"
+  ],
+  "reason": "Applicable: real frp module + wired test (same module as S4's own frp fixture example). Real diff adds environmentFiles mkOption inside the per-instance wildcard submodule, wired into `EnvironmentFile = options.environmentFiles;` -- NOTE: this references `options.environmentFiles`, not `cfg.environmentFiles`/an instance-local binding, which reads like it could be a real bug in the PR itself (referencing the submodule's own raw options metadata rather than a resolved instance value) -- flagging as a raw observation, not asserting it's wrong without deeper Nix-semantics verification I didn't have time for.",
+  "targets_toml": "single target frp, cfg_ident=cfg, option_prefix=[services,frp,instances,*], watch=[environmentFiles].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFiles",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real gap or wildcard-resolution limitation, consistent with the already-documented wildcard attrsOf(submodule) gap class (S4 item 17, wstunnel/S5-A batch4): discovered_options DOES list the real absolute path ['services','frp','instances','environmentFiles'] but the watched verdict still resolves OptionNotFound at both sides under the wildcard option_prefix. candidate_capability_gap, consistent with the known wildcard gap, not a new instance being separately tallied."
+    }
+  ]
+}

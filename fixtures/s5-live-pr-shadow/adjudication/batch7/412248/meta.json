@@ -1,0 +1,37 @@
+{
+  "pr": 412248,
+  "title": "nixos/sanoid: add missing sanoid options regarding script hooks.",
+  "applicable": true,
+  "base_sha": "4b6e5cb1ad64eb5da7bc1e9910d012ec182348ed",
+  "head_sha": "c0066c4316521c971c00168731f1d62a53a383cc",
+  "module_paths": [
+    "nixos/modules/services/backup/sanoid.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/sanoid.nix"
+  ],
+  "reason": "Applicable: real sanoid module + wired test. Real diff adds 6 genuinely new mkOptions (pre_snapshot_script, post_snapshot_script, pruning_script, no_inconsistent_snapshot, force_post_snapshot_script, script_timeout) inside a shared commonOptions attrset spliced into both datasets.<name> and templates.<name> wildcard submodules.",
+  "targets_toml": "single target sanoid, cfg_ident=cfg, option_prefix=[services,sanoid,templates,*], watch=[pre_snapshot_script].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "pre_snapshot_script",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "4th instance of the wastebin-class candidate_capability_gap (tally: wastebin/B3, paretosecurity/B6, this one, keycloak/this same batch). discovered_options is COMPLETELY EMPTY for this file (len=0). Confirmed the cause is the same dotted-path idiom: sanoid.nix declares its own top-level options via `options.services.sanoid = {...};` (line 175), exactly matching wastebin/paretosecurity's own pattern -- not a different root cause from the commonOptions-splicing shape I initially suspected; the total blackout is explained fully by the dotted-path idiom alone."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "389471"
+module = "nixos/modules/services/audio/navidrome.nix"
+test = "nixos/tests/navidrome.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "navidrome"]
+watch = ["environmentFile"]

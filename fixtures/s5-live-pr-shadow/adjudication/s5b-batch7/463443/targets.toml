@@ -1,0 +1,7 @@
+[[target]]
+name = "463443"
+module = "nixos/modules/services/hardware/tuned.nix"
+test = "nixos/tests/tuned.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "tuned"]
+watch = ["recommend"]

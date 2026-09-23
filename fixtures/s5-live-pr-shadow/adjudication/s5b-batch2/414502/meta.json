@@ -1,0 +1,37 @@
+{
+  "pr": 414502,
+  "title": "mastodon: 4.3.8 -> 4.4.0",
+  "applicable": true,
+  "base_sha": "f8e3d1afbb3c784541aa1eab10db8deffb937e16",
+  "head_sha": "704a7b9372e838825b0145fcc124cca434d0c6ae",
+  "module_paths": [
+    "nixos/modules/services/web-apps/mastodon.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/mastodon/default.nix"
+  ],
+  "reason": "Applicable: real mastodon module + wired test. Real diff genuinely removes otpSecretFile (mkRemovedOptionModule, 'OTP_SECRET option was removed from Mastodon in version 4.4.0') plus removes MASTODON_USE_LIBVIPS/imagemagick static config (unrelated, unconditional).",
+  "targets_toml": "single target mastodon, cfg_ident=cfg, option_prefix=[services,mastodon], watch=[otpSecretFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "otpSecretFile",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "21st candidate_rendering_gap instance (option genuinely existed, no predicate, then genuinely removed) -- correct verdicts individually, same silent-transition rendering shape as the other *_not_found<->*_not_found instances this round."
+    }
+  ]
+}

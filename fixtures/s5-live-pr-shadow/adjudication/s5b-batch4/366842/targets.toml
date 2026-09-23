@@ -1,0 +1,7 @@
+[[target]]
+name = "366842"
+module = "nixos/modules/services/networking/networkmanager.nix"
+test = "nixos/tests/networking/networkmanager.nix"
+cfg_ident = "cfg"
+option_prefix = ["networking", "networkmanager"]
+watch = ["enableDefaultPlugins"]

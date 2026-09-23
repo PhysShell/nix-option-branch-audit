@@ -1,0 +1,43 @@
+{
+  "pr": 500388,
+  "title": "nixos/searx: add openFirewall option",
+  "applicable": true,
+  "base_sha": "37623ad7aa9f7c72310fbcf61f9db20f25afea93",
+  "head_sha": "abd4cb9ecfa04cad6147dd6c8a093edd7a9a4add",
+  "module_paths": [
+    "nixos/modules/services/networking/searx.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/searx.nix"
+  ],
+  "reason": "Real new mkOption 'openFirewall' added, plus a real new assertion requiring settings.server.port be set.",
+  "targets_toml": "option_prefix=[services,searx], watch=[openFirewall].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "openFirewall",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option, correctly not-found at base, head-side TestConfigUnresolved (real option/predicate, test never sets a resolvable literal) -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "openFirewall",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

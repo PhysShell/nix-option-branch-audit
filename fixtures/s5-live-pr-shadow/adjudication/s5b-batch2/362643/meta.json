@@ -1,0 +1,37 @@
+{
+  "pr": 362643,
+  "title": "nixos/mediawiki: allow adding programs for extended functionality via `cfg.path`",
+  "applicable": true,
+  "base_sha": "af6e115058bd49e45aa537b80d8c3177c17a8850",
+  "head_sha": "13ccca1c201ce5664577aeee4774a4003fd1aac9",
+  "module_paths": [
+    "nixos/modules/services/web-apps/mediawiki.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mediawiki.nix"
+  ],
+  "reason": "Applicable: real mediawiki module + wired test. Real diff wires the ALREADY-DECLARED `path` option (unchanged by this diff) into a genuinely new toolsPath derivation used in a package-build substituteInPlace step -- not a new declaration, but a real new USE of an existing option.",
+  "targets_toml": "single target mediawiki, cfg_ident=cfg, option_prefix=[services,mediawiki], watch=[path].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "path",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "20th candidate_rendering_gap instance -- interesting that path itself was OptionNotFound at BASE despite being pre-existing/unchanged; did not have time to determine why an unchanged option shows not-found at base too (possibly path is declared in a part of the file not otherwise examined, or the option_prefix needs adjustment) -- noting honestly rather than asserting a cause."
+    }
+  ]
+}

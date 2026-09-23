@@ -1,0 +1,37 @@
+{
+  "pr": 398993,
+  "title": "nvidia-container-toolkit: add suppressNvidiaDriverAssertion option",
+  "applicable": true,
+  "base_sha": "fd15d1aa09a097a609e4258668e1278e2001afbf",
+  "head_sha": "dd30fd1285b12ff942cc98d8a486eeac7b64f1f2",
+  "module_paths": [
+    "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/nvidia-container-toolkit.nix"
+  ],
+  "reason": "Real new mkOption 'suppressNvidiaDriverAssertion' added, matching the coordinator's flagged title. This is a PRE-refactor version of nvidia-container-toolkit/default.nix -- confirming the `options = let ... in {...}` gap first documented in batch8 was already present at this earlier SHA too, not introduced later.",
+  "targets_toml": "option_prefix=[hardware,nvidia-container-toolkit], watch=[suppressNvidiaDriverAssertion].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "suppressNvidiaDriverAssertion",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "CONSISTENT WITH THE batch8-DOCUMENTED GAP (options-value-wrapped-in-let-binding): total non-discovery both sides ('unchanged'), same file, same root cause. Confirms the gap is a structural property of this module file across its whole history in this cohort, not something introduced by a specific PR."
+    }
+  ]
+}

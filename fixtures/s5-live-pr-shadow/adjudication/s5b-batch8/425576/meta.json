@@ -1,0 +1,9 @@
+{
+  "pr": 425576,
+  "title": "nixos/a2boot: init",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/network-filesystems/a2boot.nix"
+  ],
+  "reason": "Brand-new module init; no nixos/tests file exists yet for a2boot."
+}

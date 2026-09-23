@@ -1,0 +1,37 @@
+{
+  "pr": 480700,
+  "title": "nixos/bluesky-pds: prefer goat & add rate limit by default",
+  "applicable": true,
+  "base_sha": "8e13ad6266acf92aa1c61d006f51a30c53d43851",
+  "head_sha": "35b20dfd9ec9a4d8953ffd8877e8c82b801b5bf7",
+  "module_paths": [
+    "nixos/modules/services/web-apps/bluesky-pds.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/bluesky-pds.nix"
+  ],
+  "reason": "Applicable: real bluesky-pds module + wired test. Real diff adds a genuinely new PDS_RATE_LIMITS_ENABLED env-var option and restructures pdsadmin/goat sub-namespaces (goat.enable is new, replacing a shared default derivation), wired into a real lib.optional cfg.goat.enable predicate list construction.",
+  "targets_toml": "single target bluesky-pds, cfg_ident=cfg, option_prefix=[services,bluesky-pds,goat], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY: discovered_options completely empty (0) at both sides. bluesky-pds.nix uses the dotted-path form `options.services.bluesky-pds = {...}` (confirmed, line 49) -- consistent with, but per the batch-level correction, not solely explained by, the dotted-path pattern."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "pr": 429967,
+  "title": "prosody: 0.12.4 -> 13.0.2, fix nixos test",
+  "applicable": true,
+  "base_sha": "1237aac87ac9960ec2926d1519077ba4ca7edf3e",
+  "head_sha": "e42cceb90c490aa5bb0a1c82e9601febadd3f84b",
+  "module_paths": ["nixos/modules/services/networking/prosody.nix"],
+  "test_paths": ["nixos/tests/xmpp/prosody.nix"],
+  "reason": "Applicable: real prosody module + wired test (nixos/tests/all-tests.nix at head e42cceb90 contains 'prosody = handleTest ./xmpp/prosody.nix {};', line 1235). This is a large, complex real-world PR: a full major-version upstream bump (0.12.4 -> 13.0.2) with substantial module restructuring -- the `vcard_muc` mkOption declaration removed entirely, `uploadHttpOpts` submodule removed, `httpFileShareOpts` restructured (gained a `freeformType`, new fields http_host/daily_quota), and `http_files`'s own mkOption default flipped from `true` to `false`. `http_files` was chosen as the primary watched option since it is the single most externally-visible, unambiguous default-value change among several real declaration edits in this diff.",
+  "targets_toml": "single target prosody, cfg_ident=cfg, option_prefix=[services,prosody,modules], watch=[http_files]. NOTE: option_prefix was constructed from the module's own REAL semantic attribute path -- I traced `modules = moduleOpts;` at line 791 inside `options = { services.prosody = { ... modules = moduleOpts; ... }; };` (line 612-613), so http_files genuinely lives at services.prosody.modules.http_files. See additional_raw_facts_for_reviewer for why this still resolved to OptionNotFound.",
+  "run_exit_codes": {"audit_diff": 2, "check_base": 2, "check_head": 2},
+  "tool_error": false,
+  "notable_actionable_presentations": {"count": 0, "identities": []},
+  "pass_verdicts_needing_review": {"count": 0, "identities": []},
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "http_files",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "IMPORTANT STRUCTURAL FINDING, not a construction mistake on my part (verified twice): `moduleOpts` (line 46) is a bare attrset of mkOption declarations (roster, admin_adhoc, http_files, proxy65, ...) -- NOT wrapped in its own `options = {...}` submodule function the way sibling blocks like `sslOpts`/`discoOpts`/`mucOpts` are (those all use the `_: { options = {...}; }` submodule-function idiom). `moduleOpts` is later spliced in directly as the VALUE of `modules = moduleOpts;` inside services.prosody's own real options block. Checking check-head.json's own `discovered_options` list confirms oba's declaration walker resolves http_files (and every other moduleOpts field) as a BARE top-level path (['http_files'], no services/prosody/modules prefix at all) -- distinct from every genuinely-nested services.prosody.* option, which the walker DOES resolve with its full real path (e.g. ['services','prosody','enable']). I tried option_prefix=[] as a diagnostic (not committed as the final targets.toml) and it errored outright (non-JSON output, likely a manifest-validation rejection of an empty prefix) rather than matching the bare path either. This looks like a genuine, real declaration-path-resolution gap specific to this 'shared plain attrset of options merged via a bare identifier' idiom (distinct from the already-documented wildcard-attrsOf and mkPackageOption-adjacent gaps seen elsewhere this batch) -- flagging for the coordinator as a possible new capability-gap candidate, not asserting it myself as confirmed/actionable."
+    }
+  ]
+}

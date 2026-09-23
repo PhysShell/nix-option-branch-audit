@@ -1,0 +1,7 @@
+[[target]]
+name = "442520"
+module = "nixos/modules/services/databases/chromadb.nix"
+test = "nixos/tests/chromadb.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "chromadb"]
+watch = ["logFile"]

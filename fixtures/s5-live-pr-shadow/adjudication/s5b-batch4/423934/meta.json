@@ -1,0 +1,38 @@
+{
+  "pr": 423934,
+  "title": "nixos/nvidia-container-toolkit: add extraArgs option",
+  "applicable": true,
+  "base_sha": "5663dc9a5a520912b3d4563b2eebc00fe0636c77",
+  "head_sha": "73b4810ff3a5a2124e3a0145ffc1060fdf27d732",
+  "module_paths": [
+    "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+    "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/nvidia-container-toolkit.nix"
+  ],
+  "reason": "Applicable: real module (declared under hardware.nvidia-container-toolkit, not services.*, despite the file living under nixos/modules/services/hardware/ -- same file-path-vs-namespace quirk as batch2's tuxclocker) + wired test. Real diff adds a genuinely new extraArgs mkOption in default.nix, wired via cdi-generate.nix into a real command-line construction.",
+  "targets_toml": "single target nvidia-container-toolkit, module=default.nix, cfg_ident=cfg, option_prefix=[hardware,nvidia-container-toolkit], watch=[extraArgs].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraArgs",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "AMBIGUOUS, did not have time to fully resolve: discovered_options for this target shows only 3 entries (['hostPath'],['containerPath'],['mountOptions']) which look like FUNCTION PARAMETERS from a helper in cdi-generate.nix, not real module option declarations from default.nix (the module I actually targeted) -- suggests either a real resolution issue specific to this file pair, or that oba is reading content I did not expect given the two-file structure. Flagging honestly as unresolved rather than asserting a specific cause."
+    }
+  ]
+}

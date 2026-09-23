@@ -1,0 +1,37 @@
+{
+  "pr": 467286,
+  "title": "nixos/postgresql: add freeformType to ensureClauses option",
+  "applicable": true,
+  "base_sha": "8363ade52b617148dc10ca45aba1202ca25074bf",
+  "head_sha": "fcdfa7b5d0bc65ac086a12dd98dd7de82e2d522f",
+  "module_paths": [
+    "nixos/modules/services/databases/postgresql.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/postgresql/default.nix"
+  ],
+  "reason": "Large real removal: the ensureUsers.<n>.ensureClauses submodule's entire fixed schema (7 named options: superuser, createrole, createdb, inherit, login, replication, bypassrls, each with long docs) is REMOVED and replaced by a bare freeformType = attrsOf(oneOf[str,int,bool]) -- i.e. ensureClauses goes from a documented, named, statically-typed submodule to a fully freeform, undocumented attrset. This is the change the PR title names directly.",
+  "targets_toml": "option_prefix=[services,postgresql], watch=[ensureUsers.ensureClauses]. Confirmed discovered_options never enumerates the 7 named sub-fields (superuser, createrole, etc.) at EITHER base or head -- only the parent leaf 'ensureUsers.ensureClauses' itself is visible.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "ensureUsers.ensureClauses",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "NEW STRUCTURAL BLIND SPOT, distinct from prior gap shapes: 'unchanged' both sides, but this masks a real, large removal (7 named options -> freeform) that oba cannot see at ANY point along the way. Root-caused via discovered_options: oba's walker enumerates ensureUsers's own fields (name, ensureDBOwnership, ensureClauses) since ensureUsers is a listOf(submodule) one level deep -- but it does NOT recurse a second level into ensureClauses's OWN nested submodule-with-named-options, at either base (7 named fields) or head (freeform), so the entire schema change is invisible at both ends, not just one. Naming this candidate_capability_gap: submodule discovery does not recurse past one level of nesting under a listOf/attrsOf(submodule) wrapper. This is the second gap of this general 'goes 1 level deep but not 2' shape observed this batch (see also kanidm's provision.groups.<name>.overwriteMembers from batch5, which was total non-discovery from the OUTSIDE of the wrapper; this one is non-discovery from the INSIDE, one level past where the wrapper's own fields ARE visible)."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "pr": 392716,
+  "title": "nxios/cyrus-imap: fix cyrus-imap certs options",
+  "applicable": true,
+  "base_sha": "848d816cf831e9e37125c8734b38a8a43369ee0c",
+  "head_sha": "128bdeb3c5d185af082b8aabd70a99ad1a1466e5",
+  "module_paths": [
+    "nixos/modules/services/mail/cyrus-imap.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/cyrus-imap.nix"
+  ],
+  "reason": "Real, clean rename WITH compat shims: sslCACert/sslServerCert/sslServerKey removed and renamed into imapdSettings.tls_client_ca_file/tls_server_cert/tls_server_key via 3 real mkRenamedOptionModule entries, matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,cyrus-imap], watch=[sslServerCert].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "sslServerCert",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal (renamed-away, with a real compat shim for users) correctly detected: OptionNotFound at head matches the diff exactly. Base was PredicateNotFound (real option existed but the cyrus-imap test never set it to a resolvable literal) -- NOT a witnessed PASS. Same non-witnessed-base-removal shape as the growing cluster across this round."
+    },
+    {
+      "watched_path": "sslServerCert",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

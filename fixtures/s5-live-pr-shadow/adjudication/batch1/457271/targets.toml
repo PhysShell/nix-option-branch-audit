@@ -1,0 +1,7 @@
+[[target]]
+name = "lightdm"
+module = "nixos/modules/services/x11/display-managers/lightdm.nix"
+test = "nixos/tests/lightdm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "displayManager", "lightdm"]
+watch = ["background"]

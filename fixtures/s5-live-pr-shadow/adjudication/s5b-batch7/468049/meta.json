@@ -1,0 +1,39 @@
+{
+  "pr": 468049,
+  "title": "nixos/radicale: allow setting the user on service.radicale",
+  "applicable": true,
+  "base_sha": "38ea428d59463d2bbe552146534035ca25cc209e",
+  "head_sha": "070e821be46816bec0639e4f37983ca5ead713bd",
+  "module_paths": [
+    "nixos/modules/services/networking/radicale.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/radicale.nix"
+  ],
+  "reason": "Real new mkOptions user and group added, matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,radicale], watch=[user].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "468049:oba:user:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "user",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'user' away from its default 'radicale'. Mechanically verified: predicate exists, predicate_attempts witnessed=false. New OBA001 finding this batch -- the 4th in this single batch (alongside fedimintd, cgit; not counting the 2 new TestValueUnresolved near-findings)."
+    }
+  ]
+}

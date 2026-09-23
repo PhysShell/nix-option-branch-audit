@@ -1,0 +1,43 @@
+{
+  "pr": 466004,
+  "title": "nixos/ollama: remove acceleration option in favor of setting package",
+  "applicable": true,
+  "base_sha": "3635c3da55f74817efb43d4af48083d3aaade903",
+  "head_sha": "1aa800def6a24855b809c4bc5b4f51bc7fb3f01c",
+  "module_paths": [
+    "nixos/modules/services/misc/ollama.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/ollama.nix"
+  ],
+  "reason": "Real option removal (flagged by coordinator, standard scrutiny): 'acceleration' removed via mkRemovedOptionModule ('Set services.ollama.package to one of pkgs.ollama[,-vulkan,-rocm,-cuda,-cpu] instead.'); package option's mkPackageOption extraDescription expanded to document the replacement packages.",
+  "targets_toml": "option_prefix=[services,ollama], watch=[acceleration].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "acceleration",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head matches the mkRemovedOptionModule diff exactly. Base was PredicateNotFound (real option/predicate existed -- 'acceleration' feeds cfg.package.override -- but the ollama test suite never set it to a resolvable literal), NOT a witnessed PASS. Same shape as batch5's porxie/mpd/postgresql-recoveryConfig removals: no witnessed base evidence to lose, clean low-stakes removal, no masked-relocation scrutiny needed."
+    },
+    {
+      "watched_path": "acceleration",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

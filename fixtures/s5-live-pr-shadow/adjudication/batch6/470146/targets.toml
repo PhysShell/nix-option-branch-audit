@@ -1,0 +1,7 @@
+[[target]]
+name = "n8n"
+module = "nixos/modules/services/misc/n8n.nix"
+test = "nixos/tests/n8n.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "n8n"]
+watch = ["package"]

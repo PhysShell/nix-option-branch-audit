@@ -1,0 +1,7 @@
+[[target]]
+name = "387829"
+module = "nixos/modules/services/home-automation/evcc.nix"
+test = "nixos/tests/evcc.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "evcc"]
+watch = ["environmentFile"]

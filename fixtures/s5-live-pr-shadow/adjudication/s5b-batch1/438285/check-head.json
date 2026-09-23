@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "438285",
+      "module": "nixos/modules/services/video/frigate.nix",
+      "test": "nixos/tests/frigate.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "frigate",
+        "ffmpeg"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "ffmpeg",
+            "inputs"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 66,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "ffmpeg",
+            "inputs",
+            "path"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 73,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "ffmpeg",
+            "inputs",
+            "roles"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 80,
+            "col": 17
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "checkConfig"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 58,
+            "col": 16
+          },
+          "source": "if cfg.checkConfig then configFileChecked else configFileUnchecked"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 270,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 694,
+            "col": 10
+          },
+          "source": "optionalAttrs withCoral {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "detectors"
+            ],
+            [
+              "settings",
+              "detectors"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 706,
+            "col": 12
+          },
+          "source": "optionals (!stdenv.hostPlatform.isAarch64) [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 727,
+            "col": 47
+          },
+          "source": "optionals withCoral [ \"coral\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "detectors"
+            ],
+            [
+              "settings",
+              "detectors"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/video/frigate.nix",
+            "line": 729,
+            "col": 31
+          },
+          "source": "optionals (elem cfg.vaapiDriver [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "vaapiDriver"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/frigate.nix",
+            "line": 54,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "path"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

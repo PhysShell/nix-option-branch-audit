@@ -1,0 +1,37 @@
+{
+  "pr": 557329,
+  "title": "nixos/portmaster: replace activation script with preStart cleanup",
+  "applicable": true,
+  "base_sha": "997ddc6dc622c35872bd2fb0a123f8cbbbf57a61",
+  "head_sha": "cc39a2d3ab184c175cc88f9b7f32014eace7cdb2",
+  "module_paths": [
+    "nixos/modules/services/networking/portmaster.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/portmaster.nix"
+  ],
+  "reason": "Applicable: real portmaster module + wired test (portmaster = runTest ./portmaster.nix; at head). Real diff moves cleanup logic from a separate system.activationScripts entry into the module's own systemd preStart, restructuring 3 lib.optionalString-guarded chunks (guarded by managesConfig/profilesEnabled, both local derivations of real options cfg.profiles etc.) into one concatenated preStart body -- a genuine predicate-adjacent restructuring, though the predicate itself is a derived local, not a direct mkIf on the watched option.",
+  "targets_toml": "single target portmaster, cfg_ident=cfg, option_prefix=[services,portmaster], watch=[profiles] (profilesEnabled = cfg.profiles != {} is a direct derivation of this option; watched the option itself since the derived local isn't directly targetable).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "profiles",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged, plausibly correct: profiles itself has no DIRECT predicate (profilesEnabled, the derived local actually used in the restructured preStart, is what changed, not profiles' own predicate structure) -- oba's model watches declared options directly, not derived let-bindings, so this is an expected model-boundary miss rather than a gap, similar in spirit to earlier 'PredicateNotFound correctly' cases this round."
+    }
+  ]
+}

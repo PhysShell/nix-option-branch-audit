@@ -1,0 +1,7 @@
+[[target]]
+name = "477894"
+module = "nixos/modules/services/hardware/keyd.nix"
+test = "nixos/tests/keyd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "keyd", "keyboards", "*"]
+watch = ["ids"]

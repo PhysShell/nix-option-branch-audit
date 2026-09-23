@@ -1,0 +1,37 @@
+{
+  "pr": 412480,
+  "title": "nixos/jenkins: Introduce javaPackage option; Bump Java version to 21",
+  "applicable": true,
+  "base_sha": "21391a591d34574cfd1ed22f75c03e3bc862b587",
+  "head_sha": "e3846c4216caf5ea1bcc1d7f69810186d22d1c0e",
+  "module_paths": [
+    "nixos/modules/services/continuous-integration/jenkins/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/jenkins.nix"
+  ],
+  "reason": "Applicable: same jenkins module as batch5's PR501713. Real diff adds javaPackage via mkPackageOption; also changes enable's own declaration from plain mkOption to mkEnableOption (opposite direction of vmalert's earlier mkOption case).",
+  "targets_toml": "single target jenkins, cfg_ident=cfg, option_prefix=[services,jenkins], watch=[javaPackage].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "javaPackage",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "7th instance of the mkPackageOption non-discovery gap."
+    }
+  ]
+}

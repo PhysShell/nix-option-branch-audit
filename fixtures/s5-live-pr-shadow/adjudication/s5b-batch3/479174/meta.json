@@ -1,0 +1,37 @@
+{
+  "pr": 479174,
+  "title": "dokuwiki: add extraConfigs to combine",
+  "applicable": true,
+  "base_sha": "055b001b5319eda15f52e2e5eba08d72bdd8f441",
+  "head_sha": "8b4f523448a2b5fb2f7909ae700ba7dc70579d8b",
+  "module_paths": [
+    "nixos/modules/services/web-apps/dokuwiki.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/dokuwiki.nix"
+  ],
+  "reason": "Applicable: same dokuwiki module as batch5's enable-removal PR391057. Real diff adds a new extraConfigs mkOption inside the per-site wildcard submodule, wired into cfg.package.combine {inherit ... extraConfigs;}.",
+  "targets_toml": "single target dokuwiki, cfg_ident=cfg, option_prefix=[services,dokuwiki,sites,*], watch=[extraConfigs].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraConfigs",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "26th candidate_rendering_gap instance -- also confirms the wildcard sites.* resolution continues to work correctly for this module (consistent with batch5's own enable-removal finding on the same wildcard form)."
+    }
+  ]
+}

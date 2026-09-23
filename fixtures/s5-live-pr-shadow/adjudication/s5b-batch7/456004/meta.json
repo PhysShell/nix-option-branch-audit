@@ -1,0 +1,37 @@
+{
+  "pr": 456004,
+  "title": "nixos/snapserver: migrate options per snapcast 0.33 changes",
+  "applicable": true,
+  "base_sha": "4a0f51b3864351a27c8b47da08de159022c22356",
+  "head_sha": "84881aecea36bd65f3340a07fbda400eac743a86",
+  "module_paths": [
+    "nixos/modules/services/audio/snapserver.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/snapcast.nix"
+  ],
+  "reason": "Real RFC42-style restructuring: settings.stream.{bind_to_address,port,sampleformat,codec,chunk_ms,buffer} renamed into a new settings.tcp-streaming.* group and settings.tcp.* renamed to settings.tcp-control.* (all via mkRenamedOptionModule shims); settings.stream.source stays in place (not renamed) but is relocated within the file and its description typo ('inpuit'->'input') is fixed.",
+  "targets_toml": "Self-corrected: first attempt watched 'tcp-streaming.source' (0 discovered, wrong -- misread the diff; source was never moved to tcp-streaming, only bind_to_address/port/etc were). Corrected to watch=['stream.source'] under option_prefix=[services,snapserver,settings], which found 14 discovered_options.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "stream.source",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real, unchanged option: 'stream.source' was never renamed (unlike its former siblings), just relocated in the file and description-fixed. Correctly PredicateNotFound both sides (real predicate exists, but the snapcast test never sets it to a literal). Renders correctly as 'Unchanged: 1' -- not a rendering gap."
+    }
+  ]
+}

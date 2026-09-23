@@ -1,0 +1,23 @@
+{
+  "pr": 473031,
+  "title": "nixos/roundcube: round max attachment size to next integer",
+  "applicable": true,
+  "base_sha": "3ffc59654f4bbc433cf7202f43360b9d19aed3ea",
+  "head_sha": "74c309162c3bb90ba0101d9b3929d11abfe96b4d",
+  "module_paths": ["nixos/modules/services/mail/roundcube.nix"],
+  "test_paths": ["nixos/tests/roundcube.nix"],
+  "reason": "Applicable: real roundcube module + wired test (nixos/tests/all-tests.nix at head 74c309162 contains 'roundcube = runTest ./roundcube.nix;', line 1363). Real diff edits maxAttachmentSize's own `apply` function inside its mkOption declaration, from a direct `configuredMaxAttachmentSize * 1.37` string interpolation to `builtins.ceil(configuredMaxAttachmentSize * 1.37)` -- a real edit inside the option's own declaration block, borderline between declaration and pure computation, but genuinely inside the mkOption call so included as applicable.",
+  "targets_toml": "single target roundcube, cfg_ident=cfg, option_prefix=[services,roundcube], watch=[maxAttachmentSize].",
+  "run_exit_codes": {"audit_diff": 2, "check_base": 2, "check_head": 2},
+  "tool_error": false,
+  "notable_actionable_presentations": {"count": 0, "identities": []},
+  "pass_verdicts_needing_review": {"count": 0, "identities": []},
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "maxAttachmentSize",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides, correctly: maxAttachmentSize is used only inside a config-file template string interpolation (via its own `apply` function's output), never as a branch/predicate truthiness condition -- there is genuinely no predicate on this option either before or after the PR. The PR's real substance is a rounding-direction fix inside the option's `apply` function, outside this analyzer's declared predicate/branch domain -- not a missed detection."
+    }
+  ]
+}

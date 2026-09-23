@@ -1,0 +1,37 @@
+{
+  "pr": 444033,
+  "title": "nixos/snapserver: fix default http port",
+  "applicable": true,
+  "base_sha": "6c74571490253c4fa200e78947f2d2f4b97341d3",
+  "head_sha": "af89f21de9e4c49853d8737e946ca65f3916db13",
+  "module_paths": [
+    "nixos/modules/services/audio/snapserver.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/snapcast.nix"
+  ],
+  "reason": "Applicable: real snapserver module + wired test (nixos/tests/all-tests.nix at head af89f21de contains 'snapcast = runTest ./snapcast.nix;', which sets services.snapserver's http/tcp/stream ports and checks all 4 listen ports). Real diff flips services.snapserver.settings.http.port's own mkOption default (1705 -> 1780, colliding with the sibling tcp.port default of 1705 -- the PR title 'fix default http port' suggests this fixes a real default-value collision between the two sibling submodules) -- a genuine default-value edit inside a real declaration.",
+  "targets_toml": "single target snapserver, cfg_ident=cfg, option_prefix=[services,snapserver,settings,http], watch=[port]. Verified base line number of the changed default via the real compare-API patch hunk header (@@ -176 ...), matching the http submodule's own port declaration, distinct from the sibling stream.port/tcp.port declarations that were NOT touched by this diff.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "port",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides -- CHECK RESOLVED to some real declaration under option_prefix=[services,snapserver,settings,http] (not OptionNotFound), so my targeting was accepted, but a closer look at check-head.json's own discovered_options list is inconclusive about WHICH declaration it actually matched: the full real path ['services','snapserver','settings','http','port'] is ABSENT from discovered_options, while the two SIBLING submodules' equivalent options ARE present at their full real paths (['services','snapserver','settings','stream','port'], ['services','snapserver','settings','tcp','port']) -- all three submodules (stream/tcp/http) have structurally near-identical shape in the real source. A bare, unqualified ['port'] entry also appears in discovered_options (likely from an unrelated submodule elsewhere in this large multi-option file, same shape as the prosody moduleOpts bare-path pattern from batch 1's PR 429967). Flagging as a possible asymmetric/inconsistent-within-the-same-file declaration-discovery gap for http specifically -- not asserting whether check's own resolution here is matching the true http.port declaration correctly or silently falling back to the unrelated bare 'port' entry; this needs a closer look by the coordinator than I can give it from the outside of the tool. candidate_capability_gap if confirmed as a real miss."
+    }
+  ]
+}

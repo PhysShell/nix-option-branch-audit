@@ -1,0 +1,37 @@
+{
+  "pr": 433539,
+  "title": "nixos/frigate: Add preCheckConfig",
+  "applicable": true,
+  "base_sha": "3113e10e801b36aa9eeba3f815975bf5c788ee34",
+  "head_sha": "b153fe260e0147bf8f31347619f8625161de2ff7",
+  "module_paths": [
+    "nixos/modules/services/video/frigate.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/frigate.nix"
+  ],
+  "reason": "Real new mkOption 'preCheckConfig' added, matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,frigate], watch=[preCheckConfig].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "preCheckConfig",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "NEW GAP INSTANCE, SAME SHAPE AS EVCC (this batch): total non-discovery both sides, with a striking symptom -- discovered_options instead returns 3 entries (ffmpeg.inputs / .path / .roles) belonging to an unrelated, deeply-nested submodule elsewhere in the file, not the real top-level options. Root cause confirmed: the module declares `options.services.frigate = with types; { ... };` -- another instance of the options-value-wrapped-in-`with` shape. 4th confirmed instance of this recurring gap this round (nvidia-container-toolkit x2, evcc, now frigate)."
+    }
+  ]
+}

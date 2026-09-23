@@ -1,0 +1,9 @@
+{
+  "pr": 416212,
+  "title": "nixos/dwm-status: use structured RFC42 style settings",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/misc/dwm-status.nix"
+  ],
+  "reason": "No nixos/tests file exists for dwm-status; real RFC42 refactor (order/extraConfig renamed/removed into a new 'settings' submodule) but untestable."
+}

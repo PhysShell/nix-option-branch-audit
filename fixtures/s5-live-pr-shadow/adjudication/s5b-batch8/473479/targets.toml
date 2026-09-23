@@ -1,0 +1,7 @@
+[[target]]
+name = "473479"
+module = "nixos/modules/services/computing/slurm/slurm.nix"
+test = "nixos/tests/slurm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "slurm", "rest"]
+watch = ["enable"]

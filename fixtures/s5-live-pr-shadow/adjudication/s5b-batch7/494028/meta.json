@@ -1,0 +1,9 @@
+{
+  "pr": 494028,
+  "title": "asusctl: 6.3.2 -> 6.3.3",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/asusd.nix"
+  ],
+  "reason": "No nixos/tests file exists for asusd/asusctl; real option removal (enableUserService removed via mkRemovedOptionModule, 'no longer required') but untestable."
+}

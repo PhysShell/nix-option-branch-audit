@@ -1,0 +1,43 @@
+{
+  "pr": 418136,
+  "title": "nixos/sshd: add generateHostKeys setting",
+  "applicable": true,
+  "base_sha": "367bce84bd1d46008f81e63e7c2c65767156f95e",
+  "head_sha": "375fc85aea9a6328e759bb85729ec7b241b1a236",
+  "module_paths": [
+    "nixos/modules/services/networking/ssh/sshd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/openssh.nix"
+  ],
+  "reason": "Real new mkOption 'generateHostKeys' added, matching the coordinator's flagged title. Module is nixos/modules/services/networking/ssh/sshd.nix but tested under nixos/tests/openssh.nix (cfg=config.services.openssh).",
+  "targets_toml": "option_prefix=[services,openssh], watch=[generateHostKeys].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "generateHostKeys",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "DefaultUnresolved",
+      "note": "NEW VERDICT CLASS observed for the first time this round: 'DefaultUnresolved' (distinct from OBA001/TestConfigUnresolved/TestValueUnresolved -- has NO predicate_attempts or default_outcome fields at all, unlike those). Real option exists with a real predicate (lib.mkIf cfg.generateHostKeys [...]), but its DEFAULT value is a non-literal cross-reference (default = config.services.openssh.enable), which the walker apparently cannot statically resolve to a literal, so it stops before even attempting predicate-coverage analysis. Read as a distinct, likely-correct 'decline to guess a non-literal default' behavior, not a finding -- flagging for the coordinator as a third new verdict shape this round (alongside TestValueUnresolved from batch7)."
+    },
+    {
+      "watched_path": "generateHostKeys",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

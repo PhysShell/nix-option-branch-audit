@@ -1,0 +1,7 @@
+[[target]]
+name = "488515"
+module = "nixos/modules/services/networking/harmonia.nix"
+test = "nixos/tests/harmonia.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "harmonia", "cache"]
+watch = ["enable"]

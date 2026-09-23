@@ -1,0 +1,7 @@
+[[target]]
+name = "443717"
+module = "nixos/modules/services/backup/pgbackrest.nix"
+test = "nixos/tests/pgbackrest/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pgbackrest"]
+watch = ["commands"]

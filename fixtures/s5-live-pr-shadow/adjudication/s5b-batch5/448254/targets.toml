@@ -1,0 +1,7 @@
+[[target]]
+name = "448254"
+module = "nixos/modules/services/networking/avahi-daemon.nix"
+test = "nixos/tests/avahi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "avahi"]
+watch = ["debug"]

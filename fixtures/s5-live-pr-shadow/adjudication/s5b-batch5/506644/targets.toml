@@ -1,0 +1,7 @@
+[[target]]
+name = "506644"
+module = "nixos/modules/services/web-apps/drupal.nix"
+test = "nixos/tests/drupal.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "drupal", "sites"]
+watch = ["webRoot"]

@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "423934",
+      "module": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+      "test": "nixos/tests/nvidia-container-toolkit.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "hardware",
+        "nvidia-container-toolkit"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "hostPath"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 20,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "containerPath"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 24,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "mountOptions"
+          ],
+          "default_source": "[\n              \"ro\"\n              \"nosuid\"\n              \"nodev\"\n              \"bind\"\n            ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 28,
+            "col": 11
+          }
+        }
+      ],
+      "discovered_predicates": [],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 127,
+            "col": 12
+          },
+          "source": "lib.mkIf config.hardware.nvidia-container-toolkit.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 145,
+            "col": 25
+          },
+          "source": "lib.mkIf (lib.versionAtLeast config.virtualisation.docker.package.version \"25\") {",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 150,
+            "col": 9
+          },
+          "source": "lib.mkIf",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 161,
+            "col": 25
+          },
+          "source": "lib.mkIf (!config.hardware.nvidia.datacenter.enable) true",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 190,
+            "col": 12
+          },
+          "source": "lib.mkIf config.hardware.nvidia-container-toolkit.mount-nvidia-executables [",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+            "line": 216,
+            "col": 12
+          },
+          "source": "lib.mkIf config.hardware.nvidia-container-toolkit.mount-nvidia-docker-1-directories [",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/nvidia-container-toolkit.nix",
+            "line": 98,
+            "col": 3
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "one-gpu",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/nvidia-container-toolkit.nix",
+            "line": 121,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "extraArgs"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

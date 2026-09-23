@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "463443",
+      "module": "nixos/modules/services/hardware/tuned.nix",
+      "test": "nixos/tests/tuned.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "tuned"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "main"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 21,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "main",
+            "default"
+          ],
+          "default_source": "\"balanced\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "balanced"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 24,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "main",
+            "battery_detection"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 31,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "profiles"
+          ],
+          "default_source": "{\n          power-saver = \"powersave\";\n          balanced = \"balanced\";\n          performance = \"throughput-performance\";\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 40,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "battery"
+          ],
+          "default_source": "{\n          balanced = \"balanced-battery\";\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 50,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "daemon"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 63,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dynamic_tuning"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 67,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sleep_interval"
+          ],
+          "default_source": "1",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 69,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "update_interval"
+          ],
+          "default_source": "10",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 75,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "recommend_command"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 81,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "reapply_sysctl"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 85,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "default_instance_priority"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 91,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "profile_dirs"
+          ],
+          "default_source": "\"/etc/tuned/profiles\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/etc/tuned/profiles"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 97,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ppdSettings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 113,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ppdSupport"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 120,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "profiles"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 123,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "recommend"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 148,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 180,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 190,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "ppdSupport"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 230,
+            "col": 10
+          },
+          "source": "lib.mkIf cfg.ppdSupport {"
+        },
+        {
+          "path": [
+            "ppdSupport"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 261,
+            "col": 23
+          },
+          "source": "lib.mkIf cfg.ppdSupport true"
+        },
+        {
+          "path": [
+            "ppdSupport"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 272,
+            "col": 21
+          },
+          "source": "lib.mkIf cfg.ppdSupport {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 190,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ppdSupport"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ppdSupport"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 230,
+            "col": 10
+          },
+          "source": "lib.mkIf cfg.ppdSupport {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ppdSupport"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ppdSupport"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 261,
+            "col": 23
+          },
+          "source": "lib.mkIf cfg.ppdSupport true"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ppdSupport"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ppdSupport"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 272,
+            "col": 21
+          },
+          "source": "lib.mkIf cfg.ppdSupport {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/hardware/tuned.nix",
+            "line": 234,
+            "col": 10
+          },
+          "source": "lib.mkIf (cfg.settings.recommend_command && cfg.recommend != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "recommend_command"
+            ],
+            [
+              "recommend"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "machine",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/tuned.nix",
+            "line": 8,
+            "col": 5
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "recommend"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "558042"
+module = "nixos/modules/services/networking/headplane.nix"
+test = "nixos/tests/headplane.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "headplane", "settings", "server"]
+watch = ["proxy_auth"]

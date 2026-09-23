@@ -1,0 +1,37 @@
+{
+  "pr": 436651,
+  "title": "nixos/homebox: update module",
+  "applicable": true,
+  "base_sha": "ec5c5c748e3fdd72de4c6d1b3d9dd3149583804a",
+  "head_sha": "91352f2f836d1469805a484663477b2d840ac919",
+  "module_paths": [
+    "nixos/modules/services/web-apps/homebox.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/homebox.nix"
+  ],
+  "reason": "Applicable: real homebox module + wired test. Real diff adds new user/group mkOptions plus a settings type restructuring.",
+  "targets_toml": "single target homebox, cfg_ident=cfg, option_prefix=[services,homebox], watch=[user].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "user",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real, correct transition: option genuinely added with a real mkIf (cfg.user == defaultUser) predicate, but the real homebox test never sets user to a literal the walker can resolve -- same TestConfigUnresolved shape as several other cases this round, not a new gap."
+    }
+  ]
+}

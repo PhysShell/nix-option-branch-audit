@@ -1,0 +1,43 @@
+{
+  "pr": 517396,
+  "title": "lasuite-meet{,-frontend}: 0.14.0 -> 0.15.0; refactor",
+  "applicable": true,
+  "base_sha": "1dc2eec5bde111a3e20c0c8507e4bd2706b953e5",
+  "head_sha": "06ddcdd6dc380aab0fc1d523440ea3c4cf30a892",
+  "module_paths": [
+    "nixos/modules/services/web-apps/lasuite-meet.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/lasuite-meet.nix"
+  ],
+  "reason": "Real refactor: backendPackage renamed to 'package' (mkRenamedOptionModule); frontendPackage REMOVED entirely via mkRemovedOptionModule with a real typo in its deprecation message ('services.lasuite-mette.package.frotend' -- both 'lasuite-mette' and 'frotend' are misspelled, a real bug in the module's own deprecation message unrelated to oba). Also a real new 'addons' mkOption added (enum list, currently only 'outlook').",
+  "targets_toml": "option_prefix=[services,lasuite-meet], watch=[addons].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "addons",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap. (frontendPackage's removal was not separately targeted this round -- addons was the coordinator-relevant new-option signal for this PR.)"
+    },
+    {
+      "watched_path": "addons",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

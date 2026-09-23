@@ -1,0 +1,43 @@
+{
+  "pr": 425604,
+  "title": "nixos/peertube: only include whisper when transcription is enabled",
+  "applicable": true,
+  "base_sha": "aa1c5760da76b4211ff16ede2b6d4d62efa8f69d",
+  "head_sha": "d9b0f4a6e901c996a8c6d48552a7eb1495428a79",
+  "module_paths": [
+    "nixos/modules/services/web-apps/peertube.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/peertube.nix"
+  ],
+  "reason": "Real new nested mkOption settings.video_transcription.{enabled,engine_path} added inside the settings submodule; also removes a stray mkDefault for engine_path.",
+  "targets_toml": "Self-corrected: first attempt used option_prefix ending at ['services','peertube','settings'] (0 discovered_options, same class of mistake as porxie/tlsrpt in this round -- prefix cannot end at a bare nested-submodule name). Corrected to option_prefix=[services,peertube], watch=['settings.video_transcription.enabled'] (dotted-path watch).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "settings.video_transcription.enabled",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "settings.video_transcription.enabled",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

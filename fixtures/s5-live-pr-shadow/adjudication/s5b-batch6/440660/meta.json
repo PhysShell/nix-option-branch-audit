@@ -1,0 +1,43 @@
+{
+  "pr": 440660,
+  "title": "prosody: allow to specify http_external_url for http_file_share module",
+  "applicable": true,
+  "base_sha": "6b820e99d7d83a00f728590b2a68c78298be9c4e",
+  "head_sha": "91f33137366325a14f45a8ad4622c9c3814b43f6",
+  "module_paths": [
+    "nixos/modules/services/networking/prosody.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/xmpp/prosody.nix"
+  ],
+  "reason": "Real new mkOption 'http_external_url' added inside the httpFileShare submodule.",
+  "targets_toml": "option_prefix=[services,prosody,httpFileShare], watch=[http_external_url].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "http_external_url",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "http_external_url",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

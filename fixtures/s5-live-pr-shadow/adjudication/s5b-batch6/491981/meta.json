@@ -1,0 +1,9 @@
+{
+  "pr": 491981,
+  "title": "nixos/hardware.displaylink: fix unknown driver assertion",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/x11/xserver.nix"
+  ],
+  "reason": "No nixos/tests file exists for xserver.nix or for hardware.displaylink anywhere in the corpus; real new 'externallyConfiguredDrivers' internal option added, but untestable."
+}

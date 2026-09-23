@@ -1,0 +1,41 @@
+{
+  "pr": 391057,
+  "title": "nixos/dokuwiki: Remove unused enable option",
+  "applicable": true,
+  "base_sha": "791ad4fd2abbea68473d551feca324c0dae69e7f",
+  "head_sha": "100559d83c9468a70bb5c711d48af7e9cacef0e3",
+  "module_paths": [
+    "nixos/modules/services/web-apps/dokuwiki.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/dokuwiki.nix"
+  ],
+  "reason": "Applicable, and the coordinator's own flagged case: real dokuwiki module + wired test (dokuwiki = handleTest ./dokuwiki.nix {}; at head). Real diff GENUINELY REMOVES the per-site `enable = mkEnableOption \"DokuWiki web application\";` declaration (services.dokuwiki.sites.<name>.enable, a wildcard-instance option), replacing it with an imports-based throw-on-use deprecation shim plus an assertion -- an unusual removal mechanism (not mkRemovedOptionModule, a custom throw+assertion pattern) but a genuine option lifecycle event, through a wildcard-instance form.",
+  "targets_toml": "single target dokuwiki, cfg_ident=cfg, option_prefix=[services,dokuwiki,sites,*] (wildcard attrsOf-submodule-instance form), watch=[enable] (the removed option, deliberately, to compare against sshd's moduliFile case).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "DIRECT ANSWER to the flagged question: this lands in the SAME rendering-gap bucket as sshd's moduliFile (predicate_not_found->option_not_found), not a different/new class -- raw.json summary shows changed=1 with the correct transition, summary.md is all-zero, notable=[]. Running tally for this specific direction (predicate_not_found->option_not_found): sshd/B2, this one/B5 = 2 instances; combined with the option_not_found->predicate_not_found direction (cockpit/B3, rspamd+prowlarr/B4, onlyoffice-documentserver/B5 = 4), the rendering gap is now at 6 total instances across 6 modules, both transition directions, both plain top-level AND wildcard-instance option forms."
+    },
+    {
+      "watched_path": "enable",
+      "note": "SEPARATE positive data point worth noting: unlike wstunnel's PR415326 (base 4) where a real wildcard-instance option was OptionNotFound at BOTH sides (undetected even at base, consistent with S4's own documented wildcard-attrsOf gap), here at BASE the wildcard resolution correctly found `enable` (PredicateNotFound, not OptionNotFound) -- so wildcard-instance declaration discovery is not uniformly broken, it worked here. Not asserting why the two cases differ (possibly wstunnel's specific commonOptions-merge-into-multiple-parents shape vs dokuwiki's more standard single attrsOf(submodule) siteOpts shape) -- flagging the discrepancy for the coordinator rather than guessing at the mechanism."
+    }
+  ]
+}

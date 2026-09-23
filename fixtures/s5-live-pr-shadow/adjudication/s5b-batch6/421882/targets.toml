@@ -1,0 +1,7 @@
+[[target]]
+name = "421882"
+module = "nixos/modules/services/web-apps/lanraragi.nix"
+test = "nixos/tests/lanraragi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services"]
+watch = ["lanraragi.openFirewall"]

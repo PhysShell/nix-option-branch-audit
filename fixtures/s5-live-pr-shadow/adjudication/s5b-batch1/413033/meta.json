@@ -1,0 +1,37 @@
+{
+  "pr": 413033,
+  "title": "{nixos/,}cockpit: add branding + small fixes",
+  "applicable": true,
+  "base_sha": "610eccade10bb2411a94ebdce09bf355a4488206",
+  "head_sha": "395b4112402c0f069a7cd13810b002c2b7b45223",
+  "module_paths": [
+    "nixos/modules/services/monitoring/cockpit.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/cockpit.nix"
+  ],
+  "reason": "Applicable: real cockpit module + wired test. Real diff adds a genuinely new showBanner mkOption (bool, default=true), wired into two new environment.etc entries' own `enable = cfg.showBanner` fields (a real conditional-inclusion mechanism, structurally a predicate).",
+  "targets_toml": "single target cockpit, cfg_ident=cfg, option_prefix=[services,cockpit], watch=[showBanner].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "showBanner",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "13th candidate_rendering_gap instance."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "pr": 430906,
+  "title": "homepage-dashboard: 1.3.2 -> 1.4.6",
+  "applicable": true,
+  "base_sha": "3f63b0cffc6570dd0a664702e6cd49141c096280",
+  "head_sha": "75ccd1f28868e020ff6d48449380556792d435f8",
+  "module_paths": [
+    "nixos/modules/services/misc/homepage-dashboard.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/homepage-dashboard.nix"
+  ],
+  "reason": "Real new mkOption 'proxmox' added (freeform settings-format option, same shape as existing services/settings/widgets options).",
+  "targets_toml": "option_prefix=[services,homepage-dashboard], watch=[proxmox].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "proxmox",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "proxmox",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

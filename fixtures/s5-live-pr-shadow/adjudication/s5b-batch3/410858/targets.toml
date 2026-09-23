@@ -1,0 +1,7 @@
+[[target]]
+name = "410858"
+module = "nixos/modules/services/network-filesystems/kubo.nix"
+test = "nixos/tests/kubo/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kubo", "settings", "Mounts"]
+watch = ["MFS"]

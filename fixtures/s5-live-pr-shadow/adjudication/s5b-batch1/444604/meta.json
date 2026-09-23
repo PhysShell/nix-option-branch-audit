@@ -1,0 +1,39 @@
+{
+  "pr": 444604,
+  "title": "nixos/yggdrasil: refactor",
+  "applicable": true,
+  "base_sha": "10b48a67e9513a514e03f1046885a3359b3cfb79",
+  "head_sha": "5f0e96d0c333e1313107064f657c594eecabe5c3",
+  "module_paths": [
+    "nixos/modules/services/networking/yggdrasil.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/yggdrasil.nix"
+  ],
+  "reason": "Applicable: real yggdrasil module + wired test. Real diff restructures settings' own type (flat pkgs.formats.json into a submodule with real PrivateKeyPath field) and adds real key-persistence logic (persistentKeyPath/legacyKeysPath/effectiveKeyPath), but the ALREADY-EXISTING persistentKeys mkEnableOption (unchanged by this diff) is real and cleanly tested both before and after.",
+  "targets_toml": "single target yggdrasil, cfg_ident=cfg, option_prefix=[services,yggdrasil], watch=[persistentKeys].",
+  "run_exit_codes": {
+    "audit_diff": 0,
+    "check_base": 0,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      "A:444604:oba:persistentKeys:PASS"
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "persistentKeys",
+      "base_verdict": "PASS",
+      "head_verdict": "PASS",
+      "note": "A real, cleanly witnessed materially-relevant PASS on BOTH sides -- the only fully-clean audit-diff (exit 0, no inconclusive on either side) in this batch. Real predicate at base (`lib.mkIf cfg.persistentKeys {...}`, 1 test instance witnessing true) and at head (`if cfg.persistentKeys then ...`, 3 test instances witnessing true, plus new mkIf/optional sites) -- the predicate MECHANISM changed shape (mkIf -> plain if/then/else, matching this PR's own restructuring) but remains correctly witnessed throughout. Flagging per the same rule as wakapi/tayga's own PASS findings."
+    }
+  ]
+}

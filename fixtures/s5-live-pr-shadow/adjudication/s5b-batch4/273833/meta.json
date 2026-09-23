@@ -1,0 +1,37 @@
+{
+  "pr": 273833,
+  "title": "nixos/keycloak: add realmFiles option",
+  "applicable": true,
+  "base_sha": "742b17f589944371b5c058b17900d78e38c0f7ea",
+  "head_sha": "cd10f9a8745bd688b8a02c1a1d4808c412137ca7",
+  "module_paths": [
+    "nixos/modules/services/web-apps/keycloak.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/keycloak.nix"
+  ],
+  "reason": "Applicable: same keycloak module as batch7's own blackout finding (PR472219). Real diff adds realmFiles mkOption.",
+  "targets_toml": "single target keycloak, cfg_ident=cfg, option_prefix=[services,keycloak], watch=[realmFiles].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "realmFiles",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "3rd confirmed blackout on this exact file (consistent with batch7's own useSSL finding) -- a real, now-repeated instance, not a fluke for THIS specific module at least."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "pr": 433962,
+  "title": "nixos/greetd: avoid systemd boot messages interrupt greetd",
+  "applicable": true,
+  "base_sha": "e4958d0080a66416dcc344632055d2f1bd7b8569",
+  "head_sha": "1ee66ce836d4bcc4b55d900a0128df63f73ff9dd",
+  "module_paths": [
+    "nixos/modules/services/display-managers/greetd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/greetd-no-shadow.nix"
+  ],
+  "reason": "Real new mkOption 'useTextGreeter' added, adjusting systemd service hardening/TTY settings when set.",
+  "targets_toml": "option_prefix=[services,greetd], watch=[useTextGreeter]. Only test that exercises services.greetd anywhere in the corpus is 'greetd-no-shadow.nix' (a specific scenario test, not a bare 'greetd.nix'); used as the real test pairing.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "433962:oba:useTextGreeter:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "useTextGreeter",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'useTextGreeter' away from its default false. Mechanically verified: two real predicate_attempts (a Truthy optionalAttrs form and an explicit Eq-true form), both witnessed=false. New OBA001 finding this batch."
+    }
+  ]
+}

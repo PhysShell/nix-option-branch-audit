@@ -1,0 +1,43 @@
+{
+  "pr": 448254,
+  "title": "nixos/avahi: add debug option",
+  "applicable": true,
+  "base_sha": "d1e1f0580a86f29b80fb8cfcf98195e6f0846550",
+  "head_sha": "2eceead9e744c2b86014e990f8c2b677351e1929",
+  "module_paths": [
+    "nixos/modules/services/networking/avahi-daemon.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/avahi.nix"
+  ],
+  "reason": "Real new mkEnableOption 'debug' added, appends --debug to avahi-daemon ExecStart when enabled.",
+  "targets_toml": "option_prefix=[services,avahi], watch=[debug].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "debug",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option; head-side TestConfigUnresolved (real option/predicate, test never sets it to a resolvable literal) -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "debug",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

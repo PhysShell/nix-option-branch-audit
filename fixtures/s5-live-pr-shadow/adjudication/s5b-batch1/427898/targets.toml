@@ -1,0 +1,7 @@
+[[target]]
+name = "427898"
+module = "nixos/modules/services/web-apps/hedgedoc.nix"
+test = "nixos/tests/hedgedoc.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "hedgedoc"]
+watch = ["configureNginx"]

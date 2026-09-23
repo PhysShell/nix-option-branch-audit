@@ -1,0 +1,7 @@
+[[target]]
+name = "roundcube"
+module = "nixos/modules/services/mail/roundcube.nix"
+test = "nixos/tests/roundcube.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "roundcube"]
+watch = ["maxAttachmentSize"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "461327"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent", "environment"]
+watch = ["SKIP_SYSTEMD"]

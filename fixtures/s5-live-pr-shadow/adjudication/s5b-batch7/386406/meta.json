@@ -1,0 +1,43 @@
+{
+  "pr": 386406,
+  "title": "nixos/frp: support multiple instances",
+  "applicable": true,
+  "base_sha": "976294211357efd854b0bcf4233fbda3653aadea",
+  "head_sha": "67d9b4b947f8b87eefbf6a182ee48db2dba08f27",
+  "module_paths": [
+    "nixos/modules/services/networking/frp.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/frp.nix"
+  ],
+  "reason": "Real, large restructuring: single-instance enable/role/settings converted to a new instances.<name>.{enable,role,settings} wildcard attrsOf(submodule), with mkRenamedOptionModule shims for the old flat paths using an empty-string instance key (['services','frp','instances','','role'], etc). Same frp.nix file already flagged in an earlier batch for the wildcard environmentFiles gap.",
+  "targets_toml": "Self-corrected: initial watch attempts used a literal empty-string array entry (watch = ['']) mirroring the module's own mkRenamedOptionModule empty-key convention -- oba's TOML parser REJECTS this outright ('TOOL_ERROR: invalid targets manifest: target 386406: watch contains an empty entry'), not a silent gap. Corrected to option_prefix=[services,frp,instances], watch=[role] (a real field name, not an instance key).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "role",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new nested-under-wildcard option, correctly not-found at base (old flat 'services.frp.role' path doesn't match the new nested query), discoverable at head (4 discovered_options) but untested -- expected, not a gap. Another same-shape-but-working wildcard attrsOf(submodule) instance this batch, alongside fedimintd's 'instances' and drupal's 'sites'."
+    },
+    {
+      "watched_path": "role",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

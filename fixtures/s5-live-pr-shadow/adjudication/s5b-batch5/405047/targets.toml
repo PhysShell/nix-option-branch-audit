@@ -1,0 +1,7 @@
+[[target]]
+name = "405047"
+module = "nixos/modules/services/misc/gitlab.nix"
+test = "nixos/tests/gitlab.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gitlab", "secrets"]
+watch = ["activeRecordPrimaryKeyFile"]

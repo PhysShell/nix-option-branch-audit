@@ -1,0 +1,7 @@
+[[target]]
+name = "471312"
+module = "nixos/modules/services/misc/angrr.nix"
+test = "nixos/tests/angrr.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "angrr"]
+watch = ["period"]

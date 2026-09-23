@@ -1,0 +1,7 @@
+[[target]]
+name = "prosody"
+module = "nixos/modules/services/networking/prosody.nix"
+test = "nixos/tests/xmpp/prosody.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "prosody"]
+watch = ["authentication"]

@@ -1,0 +1,40 @@
+{
+  "pr": 462487,
+  "title": "nixos/guacamole: client option defined in server module",
+  "applicable": true,
+  "base_sha": "3db8153243db1455a18da92119581d0580dd70b8",
+  "head_sha": "598f6dd4fc046410bb2719227d5d48e927e7d39b",
+  "module_paths": [
+    "nixos/modules/services/web-apps/guacamole-client.nix",
+    "nixos/modules/services/web-apps/guacamole-server.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/guacamole-server.nix"
+  ],
+  "reason": "Applicable: real guacamole-server module + wired test (guacamole-server = runTest ./guacamole-server.nix;). Real diff MOVES logbackXml/userMappingXml FROM guacamole-server.nix TO guacamole-client.nix via two mkRenamedOptionModule entries -- a real cross-FILE, cross-MODULE option relocation (not just an intra-module rename), a genuinely new shape not seen elsewhere this round.",
+  "targets_toml": "single target guacamole-server (module=guacamole-server.nix, the one with the wired test), cfg_ident=cfg, option_prefix=[services,guacamole-server], watch=[logbackXml] (the OLD, pre-move location, deliberately, to see how a cross-module relocation renders).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 1,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "A:462487:oba:logbackXml:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "logbackXml",
+      "base_verdict": "OBA001",
+      "head_verdict": "OptionNotFound",
+      "note": "SECOND REAL ACTIONABLE PRESENTATION this batch, same OBA001 'uncovered option branch' class as prosody's checkConfig above. check-base.json exit code is 1, finding=1. At base, logbackXml genuinely existed (default=null) with a real `lib.mkIf (cfg.logbackXml != null) {...}` predicate (line 65) that the real nixos/tests/guacamole-server.nix test never witnesses either way (confirmed: grep for logbackXml/userMappingXml in that test file returns nothing) -- so this is a real, provable 'non-default branch never tested' finding, same shape and same apparent correctness as prosody's. At head, the option is genuinely gone from guacamole-server (moved to guacamole-client via mkRenamedOptionModule), so the finding correctly resolves to OptionNotFound -- rendered in summary.md as 'FINDING BECAME INCONCLUSIVE', which DOES surface correctly (transitions into/out of a real witnessed finding render fine, consistent with the boundary already established via wakapi's PASS transition -- only pure *_not_found<->*_not_found transitions are silently lost)."
+    }
+  ]
+}

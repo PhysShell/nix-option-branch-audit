@@ -1,0 +1,7 @@
+[[target]]
+name = "514026"
+module = "nixos/modules/services/security/spire/agent.nix"
+test = "nixos/tests/spire.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "spire", "agent", "settings", "agent"]
+watch = ["trust_domain"]

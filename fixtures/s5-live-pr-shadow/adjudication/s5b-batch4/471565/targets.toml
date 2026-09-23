@@ -1,0 +1,7 @@
+[[target]]
+name = "471565"
+module = "nixos/modules/services/misc/homepage-dashboard.nix"
+test = "nixos/tests/homepage-dashboard.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "homepage-dashboard"]
+watch = ["environmentFiles"]

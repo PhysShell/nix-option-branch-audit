@@ -1,0 +1,7 @@
+[[target]]
+name = "458146"
+module = "nixos/modules/services/web-apps/trilium.nix"
+test = "nixos/tests/trilium-server.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "trilium-server"]
+watch = ["environmentFile"]

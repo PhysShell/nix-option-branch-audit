@@ -1,0 +1,37 @@
+{
+  "pr": 432756,
+  "title": "nixos/paretosecurity: Add support for declarative linking",
+  "applicable": true,
+  "base_sha": "a218601fcd8824913c5a8a1c26b718aaa94f896c",
+  "head_sha": "93403bdacd38d36f4a8f2c7397d6bf1a9faf6210",
+  "module_paths": [
+    "nixos/modules/services/security/paretosecurity.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paretosecurity.nix"
+  ],
+  "reason": "Applicable: real paretosecurity module + wired test (same module as batch6's trayIcon PR391799). Real diff adds a genuinely new `users` mkOption (attrsOf submodule with inviteId).",
+  "targets_toml": "single target paretosecurity, cfg_ident=cfg, option_prefix=[services,paretosecurity], watch=[users].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "users",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "SURPRISING RESULT given this module's own established total-blackout history (391799 in batch6, 432756... wait this IS 432756): users genuinely resolves (OptionNotFound->PredicateNotFound), NOT a repeat blackout, contradicting the expectation from the earlier trayIcon finding on the SAME module. Did not have time to determine why this specific option resolves while trayIcon (batch6) did not on the same file/idiom -- flagging the inconsistency honestly, consistent with the coordinator's guidance not to force a premature explanation."
+    }
+  ]
+}

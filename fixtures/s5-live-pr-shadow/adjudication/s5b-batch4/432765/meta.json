@@ -1,0 +1,37 @@
+{
+  "pr": 432765,
+  "title": "nixos/kanidm: add support for kanidm unixd config v2",
+  "applicable": true,
+  "base_sha": "28474d1da8cd0f6e78a01a44a211c2c14f511d0b",
+  "head_sha": "e00fd16309633aaaf30a79df3b0a70ef37c11ded",
+  "module_paths": [
+    "nixos/modules/services/security/kanidm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/kanidm.nix"
+  ],
+  "reason": "Applicable: real kanidm module + wired test (first confirmed test for kanidm itself, despite this module appearing many times across the round). Real diff genuinely renames pam_allowed_login_groups -> kanidm.pam_allowed_login_groups (one level deeper nesting) plus a real new assertion.",
+  "targets_toml": "single target kanidm, cfg_ident=cfg, option_prefix=[services,kanidm,unixSettings], watch=[pam_allowed_login_groups].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "pam_allowed_login_groups",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides), a new blackout instance on a very large, complex module file -- not investigated further for idiom given time constraints."
+    }
+  ]
+}

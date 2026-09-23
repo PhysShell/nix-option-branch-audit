@@ -1,0 +1,43 @@
+{
+  "pr": 446006,
+  "title": "angrr: 0.1.1 -> 0.1.3",
+  "applicable": true,
+  "base_sha": "fafe4b8d9ffdee81b1fbeccff1ab6549eb3211dd",
+  "head_sha": "c45673a6235dbf9881b9c67f1d0a1ba044c91796",
+  "module_paths": [
+    "nixos/modules/services/misc/angrr.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/angrr.nix"
+  ],
+  "reason": "COORDINATOR-FLAGGED SANITY CHECK: this is an early angrr PR (0.1.1->0.1.3) that PREDATES the 0.2.0 settings restructuring seen in batch6's PR471312 (the one with the confirmed false-Unchanged 'period' leaf-name-collision bug). Confirmed via direct file inspection that at this SHA, 'period'/'removeRoot'/'ownedOnly' are still simple top-level mkOptions with no nested 'settings.temporary-root-policies.<name>.period' collision anywhere in the file. Real new content in this PR itself: programs.direnv.angrr.{enable,autoUse} added (direnv integration).",
+  "targets_toml": "TWO targets: (1) 'period' at option_prefix=[services,angrr] -- the coordinator's requested sanity check; (2) 'autoUse' at option_prefix=[programs,direnv,angrr] -- the PR's own real new content.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "period",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "SANITY CHECK PASSED: 'period' behaves exactly as expected for this pre-restructuring version -- a clean, real, unwitnessed PredicateNotFound both sides, correctly rendered as 'Unchanged: 1'. NO collision, NO false-Unchanged surprise -- confirms the leaf-name-collision bug found in batch6's 471312 is specific to that later PR's introduction of the colliding nested option, not a property of angrr.nix in general."
+    },
+    {
+      "watched_path": "autoUse",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option (this PR's own actual content), correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    }
+  ]
+}

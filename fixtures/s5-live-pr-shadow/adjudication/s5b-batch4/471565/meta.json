@@ -1,0 +1,37 @@
+{
+  "pr": 471565,
+  "title": "nixos/homepage-dashboard: Allow multiple environmentFiles",
+  "applicable": true,
+  "base_sha": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+  "head_sha": "d57c48cd2c62154f76eca9ee91fba70197724199",
+  "module_paths": [
+    "nixos/modules/services/misc/homepage-dashboard.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/homepage-dashboard.nix"
+  ],
+  "reason": "Applicable: same homepage-dashboard module as batch6's PR399179 (allowedHosts, resolved fine). Real diff genuinely changes environmentFile (str) -> environmentFiles (listOf path) via a real mkChangedOptionModule.",
+  "targets_toml": "single target homepage-dashboard, cfg_ident=cfg, option_prefix=[services,homepage-dashboard], watch=[environmentFiles].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFiles",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "34th candidate_rendering_gap instance -- consistent with batch6's own working finding on this file."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "484670"
+module = "nixos/modules/services/misc/omnom.nix"
+test = "nixos/tests/omnom/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "omnom", "settings", "server"]
+watch = ["base_url"]

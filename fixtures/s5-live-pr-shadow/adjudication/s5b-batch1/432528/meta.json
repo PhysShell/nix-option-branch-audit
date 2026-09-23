@@ -1,0 +1,39 @@
+{
+  "pr": 432528,
+  "title": "tayga: 0.9.2 -> 0.9.5",
+  "applicable": true,
+  "base_sha": "d905dba83fc239994167ac8f24790e55b3e26542",
+  "head_sha": "4548324aae5650a39e9a77816f6f2de4f16e0ed6",
+  "module_paths": [
+    "nixos/modules/services/networking/tayga.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/tayga.nix"
+  ],
+  "reason": "Applicable: real tayga module + wired test. Real diff adds a genuinely new `wkpfStrict` mkOption (bool, default=true) wired into a real `if cfg.wkpfStrict then \"yes\" else \"no\"` predicate in the generated config file.",
+  "targets_toml": "single target tayga, cfg_ident=cfg, option_prefix=[services,tayga], watch=[wkpfStrict].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 0
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      "A:432528:oba:wkpfStrict:PASS"
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "wkpfStrict",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PASS",
+      "note": "A real, cleanly witnessed materially-relevant PASS (check_head exits 0, no inconclusive at all): the predicate `if cfg.wkpfStrict then \"yes\" else \"no\"` is witnessed=True against two real test instances (router_systemd, router_nixos), both explicitly setting wkpfStrict=false at nixos/tests/tayga.nix lines 147/220, matching default_outcome=True (the branch is genuinely exercised on its non-default path). Flagging per the same rule as wakapi's own PASS -- a materially relevant PASS needs independent review, not my own classification."
+    }
+  ]
+}

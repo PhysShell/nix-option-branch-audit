@@ -1,0 +1,38 @@
+{
+  "pr": 401840,
+  "title": "nixos/nvidia-container-toolkit: allow to provide CSV files",
+  "applicable": true,
+  "base_sha": "425237e23b0ea9e63d1fb01072f38fbaf3404ed9",
+  "head_sha": "1948ad4bb5aa16054e07cbfd0b585bd58763965b",
+  "module_paths": [
+    "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+    "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/nvidia-container-toolkit.nix"
+  ],
+  "reason": "Real new mkOptions discovery-mode and csv-files added, plus a real new assertion linking them; rest is a cosmetic reorder of suppressNvidiaDriverAssertion/device-name-strategy plus internal function-arg renames in cdi-generate.nix (deviceNameStrategy -> device-name-strategy etc, not NixOS options).",
+  "targets_toml": "option_prefix=[hardware,nvidia-container-toolkit], watch=[discovery-mode].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "discovery-mode",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "NEW STRUCTURAL GAP CANDIDATE: total non-discovery of the REAL hardware.nvidia-container-toolkit.* options at both base and head ('unchanged'), but with a striking symptom -- discovered_options instead returns 3 entries (hostPath, containerPath, mountOptions) that belong to a completely unrelated LOCALLY-SCOPED helper submodule ('mountType', defined in a `let` block used only for the 'mounts' option's element type), not to the real top-level options at all. Root cause: the module's `options = let mountType = {...}; in { hardware.nvidia-container-toolkit = {...}; };` wraps the entire options attrset in a `let ... in {}` expression rather than a bare attrset literal -- the walker appears to misattribute the `let`-bound helper's own fields as if they were the target options. Naming this candidate_capability_gap: options-value-wrapped-in-let-binding causes total non-discovery with spurious substitution of an unrelated local helper's fields. First instance this round; distinct from all previously catalogued gap shapes."
+    }
+  ]
+}

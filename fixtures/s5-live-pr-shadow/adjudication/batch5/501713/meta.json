@@ -1,0 +1,37 @@
+{
+  "pr": 501713,
+  "title": "nixos/jenkins: Drop default packages from `package` option",
+  "applicable": true,
+  "base_sha": "feb49e9a9db9c96bde1b7db057eb1ff7367e8e64",
+  "head_sha": "4273fc60d7f5bf1436d8885ff2e88a2b8d8221d5",
+  "module_paths": [
+    "nixos/modules/services/continuous-integration/jenkins/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/jenkins.nix"
+  ],
+  "reason": "Applicable: real jenkins module + wired test (jenkins = runTest ./jenkins.nix; at head). Real diff flips packages' own mkOption default from a real package list to [] -- a genuine default-value edit inside a real declaration.",
+  "targets_toml": "single target jenkins, cfg_ident=cfg, option_prefix=[services,jenkins], watch=[packages].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "packages",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides, correctly: packages' value is spliced into a PATH-like list, never used as a branch/predicate condition -- no predicate exists on it either before or after. The real substance (a default-value change) isn't reflected in the verdict class, same 'correct nothing-to-find, default-only change invisible to check' shape as wastebin/snapserver from earlier batches -- not re-flagging as a new gap, same known limitation of the predicate-only verdict model."
+    }
+  ]
+}

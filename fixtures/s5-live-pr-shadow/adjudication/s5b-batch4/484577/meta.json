@@ -1,0 +1,37 @@
+{
+  "pr": 484577,
+  "title": "nixos/n8n: add custom nodes option",
+  "applicable": true,
+  "base_sha": "332ed114efcf99d73edbf6da01be07dba719ade3",
+  "head_sha": "267c9bbb92dfcc15b7a48807f3b68c04c395f3bb",
+  "module_paths": [
+    "nixos/modules/services/misc/n8n.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/n8n.nix"
+  ],
+  "reason": "Applicable: same n8n module as batch3's own blackout finding (PR485285) and batch6's working package finding (PR470146). Real diff adds customNodes mkOption.",
+  "targets_toml": "single target n8n, cfg_ident=cfg, option_prefix=[services,n8n], watch=[customNodes].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "customNodes",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "32nd candidate_rendering_gap instance -- IMPORTANT: this resolves FINE, unlike batch3's own PR485285 (enable, total blackout) on the exact same file. Same file, 3 different PRs, 2 different results (working here and in batch6, blackout in batch3) -- a real, now well-evidenced inconsistency on this specific file across time, still not explained. Flagging raw, not theorizing."
+    }
+  ]
+}

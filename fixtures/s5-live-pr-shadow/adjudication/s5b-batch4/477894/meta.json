@@ -1,0 +1,37 @@
+{
+  "pr": 477894,
+  "title": "keyd: cleanup, nixos/keyd: cleanup",
+  "applicable": true,
+  "base_sha": "da1a98afa33751284b2ece09b1fd9f5f5e7372e9",
+  "head_sha": "f7eefe7eb2ccae6148e218fbd165c246b2a1b236",
+  "module_paths": [
+    "nixos/modules/services/hardware/keyd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/keyd.nix"
+  ],
+  "reason": "Applicable: real keyd module + wired test. Real diff is mostly a with-lib->explicit-imports refactor of the keyboardOptions wildcard submodule; ids (pre-existing, unchanged) used as a regression check.",
+  "targets_toml": "single target keyd, cfg_ident=cfg, option_prefix=[services,keyd,keyboards,*], watch=[ids].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "ids",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides, correctly -- confirms the wildcard keyboards.* resolution stays stable across this refactor."
+    }
+  ]
+}

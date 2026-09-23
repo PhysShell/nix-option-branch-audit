@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "524915",
+      "module": "nixos/modules/services/search/nominatim.nix",
+      "test": "nixos/tests/nominatim.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "nominatim",
+        "ui"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/search/nominatim.nix",
+            "line": 169,
+            "col": 5
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "ui",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/search/nominatim.nix",
+            "line": 284,
+            "col": 28
+          },
+          "source": "lib.mkIf cfg.ui.enable ''"
+        },
+        {
+          "path": [
+            "ui",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/search/nominatim.nix",
+            "line": 311,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.ui.enable ''"
+        },
+        {
+          "path": [
+            "ui",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/search/nominatim.nix",
+            "line": 317,
+            "col": 31
+          },
+          "source": "lib.mkIf cfg.ui.enable ''"
+        },
+        {
+          "path": [
+            "ui",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/search/nominatim.nix",
+            "line": 323,
+            "col": 24
+          },
+          "source": "lib.mkIf cfg.ui.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "postgresql",
+            "authentication"
+          ],
+          "instance": "nominatim",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/nominatim.nix",
+            "line": 45,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enable"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

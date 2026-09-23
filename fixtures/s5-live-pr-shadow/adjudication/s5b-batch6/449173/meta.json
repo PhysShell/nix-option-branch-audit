@@ -1,0 +1,39 @@
+{
+  "pr": 449173,
+  "title": "nixos/dolibarr: support PostgreSQL + H2O",
+  "applicable": true,
+  "base_sha": "6e5eda48223d33804ddea974ccf606a25a449b72",
+  "head_sha": "9427b8aeda4276cc36aad2e2b9b9076f912eb042",
+  "module_paths": [
+    "nixos/modules/services/web-apps/dolibarr.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/dolibarr.nix"
+  ],
+  "reason": "Real new mkOption 'database.type' (enum mysql/postgresql) added, plus a real new 'h2o' submodule option and large restructuring to support both PostgreSQL and the H2O web server alongside the existing MySQL/nginx defaults.",
+  "targets_toml": "option_prefix=[services,dolibarr], watch=[database.type].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 1,
+    "identities": [
+      "449173:oba:database.type:PASS"
+    ]
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "database.type",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PASS",
+      "note": "REAL MATERIALLY-RELEVANT PASS, flagged for independent review (same class as batch1-4's wakapi/tayga/yggdrasil/vmalert): a clean, witnessed PASS at head. predicate_attempts shows BOTH mkIf branches (database.type==mysql and database.type==postgresql) witnessed=True, with real test evidence at nixos/tests/dolibarr.nix:31 setting database.type='postgresql' in the 'h2o_postgresql' test instance. Base correctly OptionNotFound (option didn't exist yet). This is a clean, well-formed new-option-with-real-test-coverage case -- the positive counterpart to the many untested new-option additions in this round."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "pr": 437310,
+  "title": "nixos/crowdsec: init module",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/security/crowdsec.nix"
+  ],
+  "reason": "Brand-new module init; no nixos/tests file exists yet for crowdsec."
+}

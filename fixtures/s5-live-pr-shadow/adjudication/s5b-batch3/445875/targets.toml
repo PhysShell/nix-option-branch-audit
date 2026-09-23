@@ -1,0 +1,7 @@
+[[target]]
+name = "445875"
+module = "nixos/modules/services/networking/ncps.nix"
+test = "nixos/tests/ncps.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ncps"]
+watch = ["netrcFile"]

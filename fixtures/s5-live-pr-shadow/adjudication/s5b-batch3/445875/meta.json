@@ -1,0 +1,39 @@
+{
+  "pr": 445875,
+  "title": "ncps: add support to the --netrc-file flag",
+  "applicable": true,
+  "base_sha": "ce4335d74c98d0825ef71424a5964f62c8e5dafe",
+  "head_sha": "09f91985f60e9868aabb3e5950767e673910677e",
+  "module_paths": [
+    "nixos/modules/services/networking/ncps.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/ncps.nix"
+  ],
+  "reason": "Applicable: real ncps module + wired test (multiple test variants). Real diff adds a genuinely new netrcFile mkOption, wired into a real lib.optional (cfg.netrcFile != null) predicate.",
+  "targets_toml": "single target ncps, cfg_ident=cfg, option_prefix=[services,ncps], watch=[netrcFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 1
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "B:445875:oba:netrcFile:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "netrcFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "SEVENTH REAL ACTIONABLE PRESENTATION. check-head exits 1, finding=1, verdict OBA001, same 'uncovered option branch' class -- the real ncps test suite never sets netrcFile either way."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "456004"
+module = "nixos/modules/services/audio/snapserver.nix"
+test = "nixos/tests/snapcast.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "snapserver", "settings"]
+watch = ["stream.source"]

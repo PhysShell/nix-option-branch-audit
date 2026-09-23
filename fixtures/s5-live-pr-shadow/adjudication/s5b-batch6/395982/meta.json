@@ -1,0 +1,37 @@
+{
+  "pr": 395982,
+  "title": "services: openvpn: servers: authUserPass: allow to be a path",
+  "applicable": true,
+  "base_sha": "55d6dd76b3f36614e13e37f23f7c255238de29d1",
+  "head_sha": "5f33d95144f8a41401609c6956486d4025d24817",
+  "module_paths": [
+    "nixos/modules/services/networking/openvpn.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/initrd-network-openvpn/default.nix"
+  ],
+  "reason": "Real type widening: authUserPass changes from submodule-only to oneOf[singleLineStr, submodule] (accepts a bare credentials-file path OR the existing username/password attrset).",
+  "targets_toml": "option_prefix=[services,openvpn,servers], watch=['testserver.authUserPass']. 'servers' is attrsOf(submodule) -- the real test instance name 'testserver' only exists in nixos/tests/initrd-network-openvpn/default.nix's config, not in the base module, so it cannot be statically enumerated from the module alone.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "testserver.authUserPass",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "CONSISTENT WITH PRE-EXISTING DOCUMENTED GAP (not new): 'servers' is types.attrsOf(types.submodule(...)) -- the same wildcard attrsOf(submodule) shape already catalogued at wstunnel, frp, and kanidm's provision.groups. Total non-discovery both sides, unchanged transition. NOT tallied as a new gap. Confirmed the real test does exercise services.openvpn.servers.testserver (a real module+test pairing exists, hence applicable), it just never sets authUserPass."
+    }
+  ]
+}

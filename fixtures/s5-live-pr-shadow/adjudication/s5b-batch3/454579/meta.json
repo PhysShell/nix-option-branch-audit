@@ -1,0 +1,37 @@
+{
+  "pr": 454579,
+  "title": "nixos/kubo: add Mounts.FuseAllowOther setting for better documentation",
+  "applicable": true,
+  "base_sha": "f991670eceab6a7dcbb8caea67051b983ed5b031",
+  "head_sha": "e4cdf3a3a19d74f283ef13aed8b7e1e6073835e3",
+  "module_paths": [
+    "nixos/modules/services/network-filesystems/kubo.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/kubo/default.nix"
+  ],
+  "reason": "Applicable: same kubo module as PR410858 above. Real diff adds Mounts.FuseAllowOther mkOption (moving its default INTO the declaration itself, same 'default moved into declaration' pattern as mysql's dataDir case in batch2), and changes the real predicate from lib.mkIf cfg.autoMount to lib.mkIf (cfg.autoMount && cfg.settings.Mounts.FuseAllowOther) -- a genuine predicate-condition strengthening.",
+  "targets_toml": "single target kubo, cfg_ident=cfg, option_prefix=[services,kubo,settings,Mounts], watch=[FuseAllowOther].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "FuseAllowOther",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "28th candidate_rendering_gap instance."
+    }
+  ]
+}

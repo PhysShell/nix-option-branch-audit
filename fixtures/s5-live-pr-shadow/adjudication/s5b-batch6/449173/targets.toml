@@ -1,0 +1,7 @@
+[[target]]
+name = "449173"
+module = "nixos/modules/services/web-apps/dolibarr.nix"
+test = "nixos/tests/dolibarr.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "dolibarr"]
+watch = ["database.type"]

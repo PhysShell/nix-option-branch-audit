@@ -1,0 +1,23 @@
+{
+  "pr": 494314,
+  "title": "nixos/prosody: add ldap authentication option",
+  "applicable": true,
+  "base_sha": "881516049dba80b44917ec96e7b76fdeb52dca50",
+  "head_sha": "28d2f3ce12d1352ae3d684d5959254986253cee6",
+  "module_paths": ["nixos/modules/services/networking/prosody.nix"],
+  "test_paths": ["nixos/tests/xmpp/prosody.nix"],
+  "reason": "Applicable: real prosody module + wired test (nixos/tests/all-tests.nix at head 28d2f3ce1 contains 'prosody = runTest ./xmpp/prosody.nix;'). Real diff widens `authentication`'s own mkOption type declaration (types.enum [...]) by adding a new \"ldap\" allowed value -- a genuine type-declaration edit.",
+  "targets_toml": "single target prosody, cfg_ident=cfg, option_prefix=[services,prosody] (authentication is declared directly under services.prosody's main options block, NOT inside the moduleOpts submodule seen in PR 429967 from batch 1), watch=[authentication].",
+  "run_exit_codes": {"audit_diff": 2, "check_base": 2, "check_head": 2},
+  "tool_error": false,
+  "notable_actionable_presentations": {"count": 0, "identities": []},
+  "pass_verdicts_needing_review": {"count": 0, "identities": []},
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "authentication",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides, correctly: authentication's value is substituted directly into the generated Lua config (via toLua cfg.authentication), never used as a branch/predicate truthiness condition -- there is genuinely no predicate on this option. The PR's real substance is a type-enum widening (adding an allowed string value), not a predicate/branch change -- outside this analyzer's predicate-tracing domain by design."
+    }
+  ]
+}

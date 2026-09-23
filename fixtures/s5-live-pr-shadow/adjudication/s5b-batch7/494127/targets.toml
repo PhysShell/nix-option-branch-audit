@@ -1,0 +1,7 @@
+[[target]]
+name = "494127"
+module = "nixos/modules/services/misc/n8n.nix"
+test = "nixos/tests/n8n.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "n8n"]
+watch = ["taskRunners.environment.N8N_RUNNERS_CONFIG_PATH"]

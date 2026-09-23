@@ -1,0 +1,43 @@
+{
+  "pr": 480468,
+  "title": "nixos/mediawiki: Fix support for SQLite (#266761)",
+  "applicable": true,
+  "base_sha": "5571d2bb61a577ac18a8914a8e88edc71b2d0b5f",
+  "head_sha": "e034c48ed000c4d9c4dcd759a7e108eb80170992",
+  "module_paths": [
+    "nixos/modules/services/web-apps/mediawiki.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mediawiki.nix"
+  ],
+  "reason": "Real new mkOption 'database.path' added (SQLite-only), plus database.type gains 'sqlite' and host/port/user/passwordFile/socket become nullOr with SQLite-conditional defaults, plus 3 new real warnings.",
+  "targets_toml": "option_prefix=[services,mediawiki,database], watch=[path].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "path",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "path",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "pr": 501095,
+  "title": "programs.nix-required-mounts.presets.zluda.enable: init",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/amdgpu.nix"
+  ],
+  "reason": "PR title references programs.nix-required-mounts (outside nixos/modules/services/, not fetched), but the real services-path content lands in amdgpu.nix: real new zluda.{enable,package} options added. No nixos/tests file exists for amdgpu, so untestable regardless."
+}

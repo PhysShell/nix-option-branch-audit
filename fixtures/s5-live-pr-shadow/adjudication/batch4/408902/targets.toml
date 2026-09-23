@@ -1,0 +1,7 @@
+[[target]]
+name = "prowlarr"
+module = "nixos/modules/services/misc/servarr/prowlarr.nix"
+test = "nixos/tests/prowlarr.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "prowlarr"]
+watch = ["dataDir"]

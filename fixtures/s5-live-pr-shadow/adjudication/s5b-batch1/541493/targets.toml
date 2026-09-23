@@ -1,0 +1,7 @@
+[[target]]
+name = "541493"
+module = "nixos/modules/services/security/step-ca.nix"
+test = "nixos/tests/step-ca.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "step-ca"]
+watch = ["extraArgs"]

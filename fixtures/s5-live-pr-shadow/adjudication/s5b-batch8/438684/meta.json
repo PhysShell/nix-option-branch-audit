@@ -1,0 +1,39 @@
+{
+  "pr": 438684,
+  "title": "ncps: Update the module for ncps v0.3.0",
+  "applicable": true,
+  "base_sha": "c46f18dfb2f01caf2adca479e8076147bef63069",
+  "head_sha": "414c23faccf416ff4995ca999de620597ab8c1c5",
+  "module_paths": [
+    "nixos/modules/services/networking/ncps.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/ncps.nix"
+  ],
+  "reason": "Real new mkOption 'prometheus.enable' added, plus real cache.tempPath option and associated directory-creation logic. 2nd ncps.nix PR referenced this round (previously had a real netrcFile OBA001 finding in an earlier batch).",
+  "targets_toml": "option_prefix=[services,ncps], watch=['prometheus.enable'].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "438684:oba:prometheus.enable:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "prometheus.enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'prometheus.enable' away from its default false. Mechanically verified: predicate exists (lib.optionals cfg.prometheus.enable [...]), predicate_attempts witnessed=false. New OBA001 finding this batch -- the same ncps.nix file that already had a confirmed real OBA001 finding (netrcFile) earlier in the round."
+    }
+  ]
+}

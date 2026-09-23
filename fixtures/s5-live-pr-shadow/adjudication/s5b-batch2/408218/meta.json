@@ -1,0 +1,37 @@
+{
+  "pr": 408218,
+  "title": "nixos/bazarr: add dataDir option",
+  "applicable": true,
+  "base_sha": "389c8cec6ba42a5fdb38acd8570da4e345b8a101",
+  "head_sha": "d62c17d97ef9a9af21aacb254b6561c22157d84b",
+  "module_paths": [
+    "nixos/modules/services/misc/bazarr.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/bazarr.nix"
+  ],
+  "reason": "Applicable: real bazarr module + wired test. Real diff adds a genuinely new dataDir mkOption, wired into ExecStart/tmpfiles config (value substitution, no predicate).",
+  "targets_toml": "single target bazarr, cfg_ident=cfg, option_prefix=[services,bazarr], watch=[dataDir].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "dataDir",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "19th candidate_rendering_gap instance."
+    }
+  ]
+}

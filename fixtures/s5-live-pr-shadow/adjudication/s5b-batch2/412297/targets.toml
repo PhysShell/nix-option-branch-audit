@@ -1,0 +1,7 @@
+[[target]]
+name = "412297"
+module = "nixos/modules/services/finance/taler/exchange.nix"
+test = "nixos/tests/taler/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "taler", "exchange", "settings", "exchange"]
+watch = ["CURRENCY"]

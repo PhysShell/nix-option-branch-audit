@@ -1,0 +1,7 @@
+[[target]]
+name = "458481"
+module = "nixos/modules/services/web-apps/writefreely.nix"
+test = "nixos/tests/web-apps/writefreely.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "writefreely"]
+watch = ["email.smtpPasswordFile"]

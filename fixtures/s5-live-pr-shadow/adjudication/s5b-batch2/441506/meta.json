@@ -1,0 +1,37 @@
+{
+  "pr": 441506,
+  "title": "audit: 4.1.1-unstable-2025-08-01 -> 4.1.2, cleanup",
+  "applicable": true,
+  "base_sha": "83413ceb781ef03b5d4efb9b48c22c6782ee7d55",
+  "head_sha": "d4ebfe389fb23492887e76ae05bdeafb0bc937e0",
+  "module_paths": [
+    "nixos/modules/services/security/opensnitch.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/opensnitch.nix"
+  ],
+  "reason": "Applicable: real opensnitch module + wired test. Real diff adds a genuinely new Audit.AudispSocketPath mkOption (a real declaration nested under settings.Audit) with a plain path default -- no predicate.",
+  "targets_toml": "single target opensnitch, cfg_ident=cfg, option_prefix=[services,opensnitch,settings,Audit], watch=[AudispSocketPath]. SELF-CAUGHT CONTENT-FETCH ERROR: the first run against this target used base-root/head-root content fetched at mediawiki's (PR362643) commit SHAs by mistake (a copy-paste error in the per-PR fetch commands, distinct from and in addition to the module-diffs.json compare-API fetch, which always used the correct SHAs and was what my applicability/targeting judgment was based on). Caught via the routine post-batch base_sha/head_sha reconciliation against s5b-frozen-order.json, re-fetched with the CORRECT SHAs, and re-ran oba fully -- the result below is from the corrected, real content.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "AudispSocketPath",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "22nd candidate_rendering_gap instance (CORRECTED from an earlier wrong-content run that had shown 'PredicateNotFound both sides, unremarkable' -- that earlier result is void, this is the real one)."
+    }
+  ]
+}

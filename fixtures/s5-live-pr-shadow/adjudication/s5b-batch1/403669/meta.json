@@ -1,0 +1,37 @@
+{
+  "pr": 403669,
+  "title": "nixos/tandoor-recipes: add 'database.createLocally'",
+  "applicable": true,
+  "base_sha": "26b45ca359b25487a23933719620ace9485f99e6",
+  "head_sha": "edbd8e3ff6615dc28f1b43788669df659ba79444",
+  "module_paths": [
+    "nixos/modules/services/misc/tandoor-recipes.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/tandoor-recipes.nix"
+  ],
+  "reason": "Applicable: real tandoor-recipes module + wired test. Real diff adds a genuinely new database.createLocally mkOption, wired into a real systemd unit requires/after predicate (lib.optional cfg.database.createLocally \"postgresql.target\") WITHIN this same module.",
+  "targets_toml": "single target tandoor-recipes, cfg_ident=cfg, option_prefix=[services,tandoor-recipes,database], watch=[createLocally].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "createLocally",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides). tandoor-recipes.nix uses `options.services.tandoor-recipes = {...}` (dotted-path, bare, no inline with) -- SAME surface shape as the WORKING photoprism/olivetin/hedgedoc cases, yet this one blacks out completely. This is the clearest evidence yet that dotted-path form alone does not explain the gap; some other factor differentiates tandoor-recipes from photoprism/olivetin/hedgedoc that I was not able to isolate in the time available this batch. SEPARATE REAL FACT WORTH FLAGGING, unrelated to oba: the same real diff also writes `services.paperless.settings = lib.mkIf cfg.database.createLocally {...}` -- a genuine cross-module copy-paste bug in the actual nixpkgs PR (should be services.tandoor-recipes.settings, not services.paperless.settings) -- noted for completeness, not something oba's own analysis surfaced or that I am asking you to adjudicate."
+    }
+  ]
+}

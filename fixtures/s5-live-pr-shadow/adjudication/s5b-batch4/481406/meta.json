@@ -1,0 +1,37 @@
+{
+  "pr": 481406,
+  "title": "vikunja: add address option",
+  "applicable": true,
+  "base_sha": "6ea793840a9f18a6183cd2f080f6bf2e716f2860",
+  "head_sha": "b7786d98437402888599667bdba0876cc6f39500",
+  "module_paths": [
+    "nixos/modules/services/web-apps/vikunja.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/vikunja.nix"
+  ],
+  "reason": "Applicable: real vikunja module + wired test. Real diff adds a genuinely new address mkOption, wired into a real value substitution (interface = \"${cfg.address}:${...}\";).",
+  "targets_toml": "single target vikunja, cfg_ident=cfg, option_prefix=[services,vikunja], watch=[address].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "address",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides), a new blackout instance -- not investigated further for idiom given time constraints, raw fact only."
+    }
+  ]
+}

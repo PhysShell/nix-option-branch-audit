@@ -1,0 +1,14 @@
+[[target]]
+name = "490920-traefik"
+module = "nixos/modules/services/web-servers/traefik.nix"
+test = "nixos/tests/traefik.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "traefik"]
+watch = ["staticConfigFile"]
+[[target]]
+name = "490920-pangolin"
+module = "nixos/modules/services/networking/pangolin.nix"
+test = "nixos/tests/pangolin.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "traefik"]
+watch = ["group"]

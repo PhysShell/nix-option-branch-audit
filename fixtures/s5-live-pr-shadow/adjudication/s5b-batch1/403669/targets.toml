@@ -1,0 +1,7 @@
+[[target]]
+name = "403669"
+module = "nixos/modules/services/misc/tandoor-recipes.nix"
+test = "nixos/tests/tandoor-recipes.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "tandoor-recipes", "database"]
+watch = ["createLocally"]

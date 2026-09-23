@@ -1,0 +1,37 @@
+{
+  "pr": 472219,
+  "title": "keycloak: add plugin, updates, and support for Unix socket auth",
+  "applicable": true,
+  "base_sha": "8a5613be5c32e5ca0b8a20afdf644c69c6080fc0",
+  "head_sha": "3d00fdf5d7290167b3d351152d7a9a3700d3b79a",
+  "module_paths": [
+    "nixos/modules/services/web-apps/keycloak.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/keycloak.nix"
+  ],
+  "reason": "Applicable: real keycloak module + wired test (keycloak = discoverTests (import ./keycloak.nix);). Real diff changes useSSL's own default EXPRESSION (adds a new `&& !hasPrefix \"/\" cfg.database.host` conjunct) and passwordFile's type (path -> nullOr path, default null).",
+  "targets_toml": "single target keycloak, cfg_ident=cfg, option_prefix=[services,keycloak,database] (useSSL is declared inside the database={} submodule, not directly under services.keycloak -- confirmed by reading the real file structure before targeting, first attempt with option_prefix=[services,keycloak] alone also returned OptionNotFound, corrected), watch=[useSSL].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "useSSL",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "5th instance of the wastebin-class candidate_capability_gap. discovered_options is COMPLETELY EMPTY for this file even with the corrected option_prefix. Confirmed cause: keycloak.nix declares its own top-level options via `options.services.keycloak =` (line 80, dotted-path form), same idiom as wastebin/paretosecurity/sanoid. Tally now: wastebin/B3, paretosecurity/B6, sanoid+keycloak/this batch = 4 confirmed instances."
+    }
+  ]
+}

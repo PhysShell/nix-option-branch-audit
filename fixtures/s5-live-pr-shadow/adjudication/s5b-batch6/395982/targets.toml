@@ -1,0 +1,7 @@
+[[target]]
+name = "395982"
+module = "nixos/modules/services/networking/openvpn.nix"
+test = "nixos/tests/initrd-network-openvpn/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "openvpn", "servers"]
+watch = ["testserver.authUserPass"]

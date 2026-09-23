@@ -1,0 +1,7 @@
+[[target]]
+name = "489143"
+module = "nixos/modules/services/mail/stalwart.nix"
+test = "nixos/tests/stalwart/stalwart.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "stalwart"]
+watch = ["stateVersion"]

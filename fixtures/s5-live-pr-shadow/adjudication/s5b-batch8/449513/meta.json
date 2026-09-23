@@ -1,0 +1,37 @@
+{
+  "pr": 449513,
+  "title": "nixos/pgadmin: Use lib.mkEnableOption where possible",
+  "applicable": true,
+  "base_sha": "d9907011a51e72d7e62630e4a2071d0abbe68292",
+  "head_sha": "cc38ed4577517666fd52b6d832b638702d1b1f89",
+  "module_paths": [
+    "nixos/modules/services/admin/pgadmin.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/pgadmin4.nix"
+  ],
+  "reason": "Real declaration-style change: emailServer.enable/useSSL/useTLS converted from plain mkOption(bool) to mkEnableOption (matches the coordinator's flagged title exactly). No functional/branch change, same option names and semantics.",
+  "targets_toml": "Self-corrected: option_prefix=[services,pgadmin,emailServer] (prefix ending at the bare nested attrset 'emailServer') gave 0 discovered_options -- same class of mistake seen repeatedly this round. Corrected to option_prefix=[services,pgadmin], watch=['emailServer.enable'], which found 15 discovered_options.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "emailServer.enable",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "CONTROLLED DECLARATION-STYLE INSTANCE (mkOption->mkEnableOption, distinct from mkPackageOption): unlike mkPackageOption's proven non-discovery regression, converting a plain mkOption(bool) to mkEnableOption here caused NO discoverability change at all -- identical TestConfigUnresolved verdict, identical 4 real predicate_attempts (same 3 use-sites, all witnessed=false), both before and after. This is useful negative evidence: not every declaration-style change causes the mkPackageOption-style blackout; mkEnableOption itself does not regress discovery."
+    }
+  ]
+}

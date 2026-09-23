@@ -1,0 +1,37 @@
+{
+  "pr": 353770,
+  "title": "nixos/syncthing: declare ignore patterns (resolves #268282)",
+  "applicable": true,
+  "base_sha": "b619339061dc3e2273c9b89dce30460ae11bc0f0",
+  "head_sha": "7a223b26858aaebb44009c8966a1756918e936e3",
+  "module_paths": [
+    "nixos/modules/services/networking/syncthing.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/syncthing/main.nix"
+  ],
+  "reason": "Applicable: real syncthing module + wired test (6 real test variants). Real diff adds a genuinely new ignorePatterns mkOption inside the folders wildcard submodule, wired into a real curl POST predicate branch (lib.optionalString (conf_type==\"dirs\" && new_cfg.ignorePatterns != null)).",
+  "targets_toml": "single target syncthing, cfg_ident=cfg, option_prefix=[services,syncthing,settings,folders], watch=[ignorePatterns]. First attempt with option_prefix=[services,syncthing] alone returned OptionNotFound both sides -- self-caught via discovered_options (40 real options found, ignorePatterns present at the corrected nested path), corrected before finalizing.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "ignorePatterns",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "12th candidate_rendering_gap instance, after self-correcting my own initial targeting mistake."
+    }
+  ]
+}

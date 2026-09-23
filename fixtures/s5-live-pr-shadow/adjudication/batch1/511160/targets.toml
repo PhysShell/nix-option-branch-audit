@@ -1,0 +1,7 @@
+[[target]]
+name = "goupile"
+module = "nixos/modules/services/web-apps/goupile.nix"
+test = "nixos/tests/web-apps/goupile/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "goupile"]
+watch = ["hostName"]

@@ -1,0 +1,678 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "473479",
+      "module": "nixos/modules/services/computing/slurm/slurm.nix",
+      "test": "nixos/tests/slurm.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "slurm",
+        "rest"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "slurm",
+            "server",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 76,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "dbdserver",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 89,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "dbdserver",
+            "dbdHost"
+          ],
+          "default_source": "config.networking.hostName",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 91,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "dbdserver",
+            "storageUser"
+          ],
+          "default_source": "cfg.user",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 101,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "dbdserver",
+            "storagePassFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 110,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "dbdserver",
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 119,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "client",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 130,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "enableStools"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 133,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "controlMachine"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 152,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "controlAddr"
+          ],
+          "default_source": "cfg.controlMachine",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 163,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "clusterName"
+          ],
+          "default_source": "\"default\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "default"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 174,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "nodeName"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 183,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "partitionName"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 194,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "enableSrunX11"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 204,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "procTrackType"
+          ],
+          "default_source": "\"proctrack/linuxproc\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "proctrack/linuxproc"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 222,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "stateSaveLocation"
+          ],
+          "default_source": "\"/var/spool/slurmctld\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/spool/slurmctld"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 232,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "user"
+          ],
+          "default_source": "defaultUser",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 240,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 251,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "mpi",
+            "PmixCliTmpDirBase"
+          ],
+          "default_source": "\"/tmp/pmix\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/tmp/pmix"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 261,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "mpi",
+            "extraMpiConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 269,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "extraPlugstackConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 278,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "extraCgroupConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 286,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "extraConfigPaths"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 295,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "slurm",
+            "etcSlurm"
+          ],
+          "default_source": "etcSlurm",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 306,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enableSrunX11"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 30,
+            "col": 7
+          },
+          "source": "lib.optionalString cfg.enableSrunX11 \"optional ${pkgs.slurm-spank-x11}/lib/x11.so\""
+        },
+        {
+          "path": [
+            "client",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 377,
+            "col": 33
+          },
+          "source": "lib.mkIf (cfg.client.enable) {"
+        },
+        {
+          "path": [
+            "enableSrunX11"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 384,
+            "col": 14
+          },
+          "source": "lib.optional cfg.enableSrunX11 slurm-spank-x11"
+        },
+        {
+          "path": [
+            "client",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 406,
+            "col": 32
+          },
+          "source": "lib.optionals cfg.client.enable ["
+        },
+        {
+          "path": [
+            "client",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 411,
+            "col": 49
+          },
+          "source": "lib.mkIf cfg.client.enable (lib.mkDefault true)"
+        },
+        {
+          "path": [
+            "server",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 413,
+            "col": 36
+          },
+          "source": "lib.mkIf (cfg.server.enable) {"
+        },
+        {
+          "path": [
+            "enableSrunX11"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 421,
+            "col": 14
+          },
+          "source": "lib.optional cfg.enableSrunX11 slurm-spank-x11"
+        },
+        {
+          "path": [
+            "dbdserver",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/computing/slurm/slurm.nix",
+            "line": 448,
+            "col": 9
+          },
+          "source": "lib.mkIf (cfg.dbdserver.enable) {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "control",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 86,
+            "col": 11
+          }
+        },
+        {
+          "path": [],
+          "instance": "submit",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 95,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "package"
+          ],
+          "instance": "dbd",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 117,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "initialScript"
+          ],
+          "instance": "dbd",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 118,
+            "col": 13
+          }
+        },
+        {
+          "path": [],
+          "instance": "node1",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 134,
+            "col": 7
+          }
+        },
+        {
+          "path": [],
+          "instance": "node2",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 135,
+            "col": 7
+          }
+        },
+        {
+          "path": [],
+          "instance": "node3",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/slurm.nix",
+            "line": 136,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enable"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

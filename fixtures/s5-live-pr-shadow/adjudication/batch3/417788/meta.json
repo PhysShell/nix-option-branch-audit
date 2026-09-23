@@ -1,0 +1,37 @@
+{
+  "pr": 417788,
+  "title": "nixos/wastebin: update default POST size to match upstream",
+  "applicable": true,
+  "base_sha": "831d935f8d4b97f2699c2a86323d698cfc9a5d59",
+  "head_sha": "5034dd73846be1264d9f44114da5b6a88494e2fc",
+  "module_paths": [
+    "nixos/modules/services/misc/wastebin.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/wastebin.nix"
+  ],
+  "reason": "Applicable: real wastebin module + wired test (nixos/tests/all-tests.nix at head 5034dd738 contains 'wastebin = runTest ./wastebin.nix;'). Real diff flips WASTEBIN_MAX_BODY_SIZE's own mkOption default (1024 -> 1048576) -- a genuine default-value edit inside a real declaration.",
+  "targets_toml": "single target wastebin, cfg_ident=cfg, option_prefix=[services,wastebin,settings], watch=[WASTEBIN_MAX_BODY_SIZE].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "WASTEBIN_MAX_BODY_SIZE",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "FLAGGING PROMINENTLY, candidate_capability_gap (a real DETECTION gap, distinct from the batch-2/3 rendering-gap finds): check-head.json's own discovered_options list is COMPLETELY EMPTY ([]) for this module -- not just WASTEBIN_MAX_BODY_SIZE, but also enable/package/stateDir/secretFile/settings, every single real mkOption/mkEnableOption/mkPackageOption declaration in the file, none discovered at all. Yet discovered_predicates DOES correctly find `mkIf cfg.enable {` (line 141) -- so the walker parses SOME of this file correctly, just not any declarations. The one thing structurally different about this file versus every other module examined this round: wastebin.nix declares its options via the DOTTED-PATH form `options.services.wastebin = { ... };` (confirmed at line 25), rather than the nested-attrset form `options = { services.wastebin = { ... }; };` every other module in this batch/prior batches uses. This looks like a real, previously-undocumented declaration-walker gap specific to the dotted-attribute-path options-block idiom -- a real, fairly common alternative Nix module-authoring style, not a rare edge case. Not asserting this as confirmed myself; flagging with full evidence for the coordinator/reviewer."
+    }
+  ]
+}

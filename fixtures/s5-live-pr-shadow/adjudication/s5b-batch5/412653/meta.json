@@ -1,0 +1,39 @@
+{
+  "pr": 412653,
+  "title": "nixos/filebrowser: add user and group options",
+  "applicable": true,
+  "base_sha": "58a28f6e2131b0a983b4ca121444b43207a9ee80",
+  "head_sha": "c7ddf0b314ca1139015cef4cfea5d8b36477675c",
+  "module_paths": [
+    "nixos/modules/services/web-apps/filebrowser.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/filebrowser.nix"
+  ],
+  "reason": "Real new mkOption 'user' (and 'group') added, replacing DynamicUser=true with explicit User/Group in the systemd service.",
+  "targets_toml": "option_prefix=[services,filebrowser], watch=[user].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "412653:oba:user:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "user",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'user' away from its default 'filebrowser'. Mechanically verified: predicate exists, predicate_attempts all witnessed=false. This is the 8th real OBA001 finding confirmed in S5-B (after prosody, guacamole, sshd, photoprism, mihomo, ncps, gollum)."
+    }
+  ]
+}

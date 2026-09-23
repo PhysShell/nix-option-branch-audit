@@ -1,0 +1,7 @@
+[[target]]
+name = "gonic"
+module = "nixos/modules/services/audio/gonic.nix"
+test = "nixos/tests/gonic.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gonic"]
+watch = ["package"]

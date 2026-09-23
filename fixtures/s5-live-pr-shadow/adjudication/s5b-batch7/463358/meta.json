@@ -1,0 +1,43 @@
+{
+  "pr": 463358,
+  "title": "nixos/ollama: add syncModels to remove models not defined in loadModels",
+  "applicable": true,
+  "base_sha": "409eb4f09136d38112ab22f4faf81deb8441e621",
+  "head_sha": "b61914ea6eec15d4b634717992da794fdfa67703",
+  "module_paths": [
+    "nixos/modules/services/misc/ollama.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/ollama.nix"
+  ],
+  "reason": "Real new mkOption 'syncModels' added (removes installed-but-undeclared ollama models); 4th ollama.nix PR this round.",
+  "targets_toml": "option_prefix=[services,ollama], watch=[syncModels].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "syncModels",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestValueUnresolved",
+      "note": "NEW VERDICT CLASS observed for the first time this round: 'TestValueUnresolved' (distinct from both TestConfigUnresolved and OBA001). Real option/predicate exists, but it feeds ONE value ('syncModels') that is referenced across MULTIPLE structurally distinct predicate sites (systemd.services.ollama-model-loader's mkIf condition, plus the script-generation lib.optionalString), all with predicate_attempts witnessed=false. Flagging this verdict shape for the coordinator -- unclear whether it should be treated as functionally equivalent to an OBA001 finding (uncovered branch) or is a distinct, intentionally-separate classification for 'value referenced at multiple sites, none witnessed'."
+    },
+    {
+      "watched_path": "syncModels",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

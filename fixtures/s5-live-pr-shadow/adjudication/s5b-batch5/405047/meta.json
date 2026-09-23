@@ -1,0 +1,43 @@
+{
+  "pr": 405047,
+  "title": "nixos/gitlab: add activeRecord key files",
+  "applicable": true,
+  "base_sha": "5da2cb42752803610c597f8eec20f91c52463a00",
+  "head_sha": "a95a530883f1c7cd408b823bba87ea17093301ea",
+  "module_paths": [
+    "nixos/modules/services/misc/gitlab.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/gitlab.nix"
+  ],
+  "reason": "Real new mkOptions secrets.activeRecordPrimaryKeyFile / secrets.activeRecordDeterministicKeyFile / secrets.activeRecordSaltFile added, plus real assertions requiring them to be set.",
+  "targets_toml": "option_prefix=[services,gitlab,secrets], watch=[activeRecordPrimaryKeyFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "activeRecordPrimaryKeyFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested (real assertions require it be set at eval time, but the test's config apparently sets it via a path the walker can't resolve to a literal, or the test doesn't exercise this codepath) -- expected, not a gap."
+    },
+    {
+      "watched_path": "activeRecordPrimaryKeyFile",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

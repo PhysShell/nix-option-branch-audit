@@ -1,0 +1,7 @@
+[[target]]
+name = "417467"
+module = "nixos/modules/services/misc/renovate.nix"
+test = "nixos/tests/renovate.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "renovate"]
+watch = ["environment"]

@@ -1,0 +1,41 @@
+name: S5 live-round self-tests
+
+# Real-data checks against the completed S5 adjudication round -- no
+# `oba` invocation (the round is complete, its evidence is committed),
+# no network. Proves the final report/gate verdict is reproducible
+# from the committed ledger alone, on every push.
+
+on:
+  push:
+    paths:
+      - "fixtures/s5-live-pr-shadow/**"
+      - "fixtures/s5-design/gate.py"
+      - "fixtures/s5-design/s5a-frozen-order.json"
+      - "fixtures/s5-design/s5b-frozen-order.json"
+      - ".github/workflows/s5-live.yml"
+  pull_request:
+    paths:
+      - "fixtures/s5-live-pr-shadow/**"
+      - "fixtures/s5-design/gate.py"
+      - "fixtures/s5-design/s5a-frozen-order.json"
+      - "fixtures/s5-design/s5b-frozen-order.json"
+      - ".github/workflows/s5-live.yml"
+
+jobs:
+  ledger-and-report-checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Ledger invariant self-tests (real data)
+        run: python3 fixtures/s5-live-pr-shadow/test_s5_final_ledger.py
+      - name: Recompute the final report from the committed ledger and diff against committed output
+        run: |
+          cd fixtures/s5-live-pr-shadow
+          python3 generate-report.py > /tmp/s5-report.log
+          git diff --exit-code s5-final-report.json || {
+            echo "::error::s5-final-report.json is not reproducible from the committed ledger -- regenerate and commit"
+            exit 1
+          }

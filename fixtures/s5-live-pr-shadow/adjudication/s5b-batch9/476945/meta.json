@@ -1,0 +1,9 @@
+{
+  "pr": 476945,
+  "title": "mullvad, nixos/mullvad-vpn: Match upstream config",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/networking/mullvad-vpn.nix"
+  ],
+  "reason": "No nixos/tests file exists for mullvad-vpn; real new enableEarlyBootBlocking option and a real new early-boot systemd unit added, but untestable."
+}

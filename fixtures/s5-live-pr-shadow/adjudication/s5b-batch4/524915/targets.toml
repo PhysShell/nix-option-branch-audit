@@ -1,0 +1,7 @@
+[[target]]
+name = "524915"
+module = "nixos/modules/services/search/nominatim.nix"
+test = "nixos/tests/nominatim.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nominatim", "ui"]
+watch = ["enable"]

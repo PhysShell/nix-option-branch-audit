@@ -1,0 +1,7 @@
+[[target]]
+name = "388978"
+module = "nixos/modules/services/databases/mysql.nix"
+test = "nixos/tests/mysql/mariadb-galera.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mysql", "galeraCluster"]
+watch = ["enable"]

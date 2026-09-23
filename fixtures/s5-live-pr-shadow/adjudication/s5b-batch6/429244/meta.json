@@ -1,0 +1,43 @@
+{
+  "pr": 429244,
+  "title": "nixos/tlsrpt: configure explicit http_script",
+  "applicable": true,
+  "base_sha": "ad7560d70c227a218a8a6c75bd8580fa1cd45c6b",
+  "head_sha": "e0308144468a25644ee59c9ea7c90ee424419e99",
+  "module_paths": [
+    "nixos/modules/services/mail/tlsrpt.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/tlsrpt.nix"
+  ],
+  "reason": "Real new mkOption 'reportd.settings.http_script' added, giving an explicit default HTTP client invocation instead of relying on an implicit one.",
+  "targets_toml": "Self-corrected: first attempt used option_prefix=[services,tlsrpt,reportd] (prefix ending at the bare nested attrset 'reportd') giving 0 discovered_options -- same class of mistake as porxie/peertube in this round. Corrected to option_prefix=[services,tlsrpt], watch=['reportd.settings.http_script'] (dotted-path watch), which correctly found 21 discovered_options including the target.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "reportd.settings.http_script",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "reportd.settings.http_script",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

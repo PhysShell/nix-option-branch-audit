@@ -1,0 +1,7 @@
+[[target]]
+name = "433631"
+module = "nixos/modules/services/x11/desktop-managers/enlightenment.nix"
+test = "nixos/tests/enlightenment.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xserver", "desktopManager", "enlightenment"]
+watch = ["environment.enlightenment.excludePackages"]

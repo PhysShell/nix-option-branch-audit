@@ -1,0 +1,43 @@
+{
+  "pr": 428153,
+  "title": "nixos/drupal: config extend",
+  "applicable": true,
+  "base_sha": "332e97d4a8d5742707b5d27a9a529b5a1d95ef2e",
+  "head_sha": "ed758199980ee3bb0aa77b0f7db16d7add39d35b",
+  "module_paths": [
+    "nixos/modules/services/web-apps/drupal.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/drupal.nix"
+  ],
+  "reason": "Real new mkOptions configSyncDir and extraConfig added inside the per-site siteOpts submodule; third drupal.nix PR this round (after batch5's 506644 and batch6's 508427), all via the same working 'sites' wildcard prefix.",
+  "targets_toml": "option_prefix=[services,drupal,sites], watch=[configSyncDir].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "configSyncDir",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head via the working wildcard sites.<name> prefix but untested -- expected, not a gap. Fourth confirmed-working instance of drupal's 'sites' wildcard (webRoot, configRoot, now configSyncDir + extraConfig)."
+    },
+    {
+      "watched_path": "configSyncDir",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

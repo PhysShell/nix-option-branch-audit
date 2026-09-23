@@ -1,0 +1,41 @@
+{
+  "pr": 510900,
+  "title": "nixos/sshd: remove 'moduliFile' option, in favour of settings.ModuliFile",
+  "applicable": true,
+  "base_sha": "932dff418878f70715f86221d2fedb2a07f181bb",
+  "head_sha": "c571adaefb071b8f9a08cbf1e7343153d1288019",
+  "module_paths": [
+    "nixos/modules/services/networking/ssh/sshd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/openssh.nix"
+  ],
+  "reason": "Applicable: real sshd module + wired test (nixos/tests/all-tests.nix at head c571adaef contains 'openssh = runTest ./openssh.nix;'). Real diff GENUINELY REMOVES the top-level `moduliFile` mkOption declaration and replaces it with a new `services.openssh.settings.ModuliFile` option inside the settings submodule, wired via a real `lib.mkRenamedOptionModule [\"services\" \"openssh\" \"moduliFile\"] [\"services\" \"openssh\" \"settings\" \"ModuliFile\"]` -- a genuine option lifecycle (removal+rename) event, flagged by the coordinator in advance as worth examining closely for how oba represents a watched option going from existing to genuinely gone.",
+  "targets_toml": "single target sshd, cfg_ident=cfg, option_prefix=[services,openssh], watch=[moduliFile] (the OLD path -- deliberately watching the pre-rename location to see how its own disappearance is represented, not the new settings.ModuliFile location).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "moduliFile",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "REAL, DISTINCT BASE/HEAD VERDICTS -- exactly the case flagged in advance. At base, moduliFile genuinely existed as a real mkOption (its own value was used as a plain path substitution -- `\"ssh/moduli\".source = cfg.moduliFile;` -- never as a branch/predicate condition, hence PredicateNotFound, a CORRECT 'exists but no predicate' verdict). At head, moduliFile is genuinely gone (renamed away via lib.mkRenamedOptionModule), so OptionNotFound is also a CORRECT verdict on its own terms. So neither individual verdict is wrong -- the concern is entirely about REPRESENTATION of the base->head TRANSITION, not either endpoint."
+    },
+    {
+      "watched_path": "moduliFile",
+      "note": "MOST IMPORTANT FINDING THIS BATCH, flagging with maximum prominence per the coordinator's explicit instruction: audit-diff's own raw.json DOES correctly detect and classify this transition -- summary.unchanged=0, summary.changed=1, and summary.oba_verdict_transitions = {'predicate_not_found->option_not_found': 1} are all present and correct in the JSON. BUT the rendered, maintainer-facing summary.md table shows ALL-ZERO across every one of its named rows (New findings 0, Resolved findings 0, Findings became inconclusive 0, New inconclusives 0, Resolved inconclusives 0, Removed subjects with a finding 0, Evidence-only changes 0, Unchanged 0) -- there is NO row in the rendered table that this specific verdict-transition class (predicate_not_found->option_not_found) maps onto, so a maintainer reading ONLY summary.md would see a report that looks like nothing happened at all, despite raw.json's own summary.changed field being 1 and a real option-declaration removal having genuinely occurred. Additionally, raw.json's own summary.notable_total=0 and summary.notable=[] -- oba itself does not surface this transition as a 'notable'/actionable presentation candidate either, despite having detected and internally classified it as 'changed'. This is why notable_actionable_presentations above is correctly 0 (nothing was actually PRESENTED to review, by the tool's own current behavior) even though real, detected, structured change data exists in the JSON that a maintainer never sees rendered anywhere. I am not asserting this is a bug or a correctness failure myself -- that determination belongs to the coordinator/reviewer -- but the raw JSON-vs-rendered-summary discrepancy, and the silent non-surfacing of a genuine option-removal transition as 'notable', both seem squarely worth a close look."
+    }
+  ]
+}

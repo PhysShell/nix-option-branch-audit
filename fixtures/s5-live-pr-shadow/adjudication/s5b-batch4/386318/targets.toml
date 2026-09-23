@@ -1,0 +1,7 @@
+[[target]]
+name = "386318"
+module = "nixos/modules/services/web-servers/h2o/vhost-options.nix"
+test = "nixos/tests/web-servers/h2o/basic.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "h2o", "vhosts", "*", "tls"]
+watch = ["host"]

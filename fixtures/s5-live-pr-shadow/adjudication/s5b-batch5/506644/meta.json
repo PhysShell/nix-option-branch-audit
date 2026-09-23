@@ -1,0 +1,43 @@
+{
+  "pr": 506644,
+  "title": "nixos/drupal: refactor sites dir interface",
+  "applicable": true,
+  "base_sha": "d9673dc9c0682fe350da00c259243fb00ff3a9ac",
+  "head_sha": "f2cfbe07c39918fbd16ecec4802ac65ccf688a34",
+  "module_paths": [
+    "nixos/modules/services/web-apps/drupal.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/drupal.nix"
+  ],
+  "reason": "Real new mkOption 'webRoot' added inside the per-site siteOpts submodule (services.drupal.sites.<name>.webRoot), plus a real installPhase/nginx path refactor.",
+  "targets_toml": "option_prefix=[services,drupal,sites], watch=[webRoot]. NOTE: 'sites' is itself an attrsOf(submodule) (one entry per virtual host) -- same wildcard shape as kanidm's provision.groups in this same batch -- yet this one DID resolve (23 discovered_options at the sites-nested prefix), unlike kanidm's total non-discovery. Logging as a further 'same-file'/same-shape-but-different-outcome instance of the wildcard attrsOf(submodule) inconsistency, raw, no theory forced.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "webRoot",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head (via the wildcard sites.<name> prefix, which worked here) but untested -- expected, not a gap. Notable for corroborating that wildcard attrsOf(submodule) discovery is inconsistent across modules (works here, fails totally for kanidm's provision.groups in this same batch) -- raw data point for the wildcard-gap dataset, not a new capability gap itself."
+    },
+    {
+      "watched_path": "webRoot",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

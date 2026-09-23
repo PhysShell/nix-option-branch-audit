@@ -1,0 +1,37 @@
+{
+  "pr": 461327,
+  "title": "nixos/beszel-agent: Enable systemd monitoring",
+  "applicable": true,
+  "base_sha": "dda3bd1c541f08f081c866a2d67b9b07f57ea0a5",
+  "head_sha": "d4282ed5a1b82474dbcc8adf7a9011f66a0a1c2d",
+  "module_paths": [
+    "nixos/modules/services/monitoring/beszel-agent.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/beszel.nix"
+  ],
+  "reason": "Applicable: real beszel-agent module + wired test. Real diff restructures environment's own type from plain attrsOf str to a submodule with a real new SKIP_SYSTEMD field, wired into a real lib.optionals (!cfg.environment.SKIP_SYSTEMD) predicate.",
+  "targets_toml": "single target beszel-agent, cfg_ident=cfg, option_prefix=[services,beszel,agent,environment], watch=[SKIP_SYSTEMD].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "SKIP_SYSTEMD",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides). beszel-agent.nix declares `options.services.beszel.agent = {...}` -- dotted-path, no inline with. Same shape as several other blackout cases, no new lead."
+    }
+  ]
+}

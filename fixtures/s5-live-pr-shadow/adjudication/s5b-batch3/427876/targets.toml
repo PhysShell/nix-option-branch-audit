@@ -1,0 +1,7 @@
+[[target]]
+name = "427876"
+module = "nixos/modules/services/hardware/lact.nix"
+test = "nixos/tests/lact.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "lact"]
+watch = ["settings"]

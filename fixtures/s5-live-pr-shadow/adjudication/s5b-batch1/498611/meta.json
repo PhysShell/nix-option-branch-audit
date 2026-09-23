@@ -1,0 +1,37 @@
+{
+  "pr": 498611,
+  "title": "olivetin-3k: init at 3000.11.3, olivetin: update gen hash, refactor",
+  "applicable": true,
+  "base_sha": "b442309475987e40b670840495fb133ed00737a7",
+  "head_sha": "059e991229cc8dd5f38553a5b9227bbba9b6194f",
+  "module_paths": [
+    "nixos/modules/services/web-apps/olivetin.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/olivetin.nix"
+  ],
+  "reason": "Applicable: real olivetin module + wired test. Real diff changes package's OWN declaration from mkPackageOption to a plain mkOption with a real version-gated default (stateVersion>=26.05 -> olivetin-3k, else olivetin) -- REMOVING the mkPackageOption helper call, a useful natural experiment against the mkPackageOption-non-discovery tally.",
+  "targets_toml": "single target olivetin, cfg_ident=cfg, option_prefix=[services,olivetin], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "14th candidate_rendering_gap instance -- IMPORTANT DATA POINT for the mkPackageOption gap: package genuinely resolves as found here (OptionNotFound->PredicateNotFound, not undiscovered-both-sides) precisely because this diff REMOVES the mkPackageOption call and replaces it with a plain mkOption -- corroborates that the gap tally elsewhere (gonic/dex/n8n) is specific to the mkPackageOption helper call itself, not to package-option semantics in general."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "pr": 387829,
+  "title": "evcc: add envsubst secret support",
+  "applicable": true,
+  "base_sha": "e31a8ecf35dbf4bb1c8ca45100c79072f8a1e536",
+  "head_sha": "067732921fae5a44f91e47d7bb9e2b9596a9f053",
+  "module_paths": [
+    "nixos/modules/services/home-automation/evcc.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/evcc.nix"
+  ],
+  "reason": "Real new mkOption 'environmentFile' added, matching the coordinator's flagged title exactly, plus a real package option added and real systemd hardening reordering.",
+  "targets_toml": "option_prefix=[services,evcc], watch=[environmentFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "NEW STRUCTURAL GAP -- THIRD CONFIRMED INSTANCE OF A RECURRING SHAPE THIS ROUND: total non-discovery, both sides, 0 discovered_options. Root cause: the module declares `options.services.evcc = with lib.types; { ... };` -- the options attrset is wrapped directly in a `with <namespace>; {...}` expression rather than being a bare attrset literal. This is the SAME general shape as batch8's nvidia-container-toolkit `options = let ... in {...}` gap (a non-literal wrapper immediately around the options value), just using `with` instead of `let...in`. Confirmed as a real, reproducible pattern this batch: also seen at frigate (433539, this same batch) and consistent again at nvidia-container-toolkit (398993/480839, this same batch). Naming this candidate_capability_gap: options-value-wrapped-in-non-literal-expression (with/let) causes total non-discovery -- now a well-characterized, recurring shape with 4+ instances across 2 batches, not a one-off."
+    }
+  ]
+}

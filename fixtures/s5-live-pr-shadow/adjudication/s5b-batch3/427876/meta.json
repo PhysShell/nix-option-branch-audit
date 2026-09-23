@@ -1,0 +1,37 @@
+{
+  "pr": 427876,
+  "title": "nixos/lact: allow configuring declaratively",
+  "applicable": true,
+  "base_sha": "54260f5b36f6136fc2f71629fb8d2c8c7158f140",
+  "head_sha": "e2a516cf97ad85b5252cddacca6595e1e67d3e96",
+  "module_paths": [
+    "nixos/modules/services/hardware/lact.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/lact.nix"
+  ],
+  "reason": "Applicable: real lact module + wired test. Real diff adds a genuinely new settings mkOption, wired into a real lib.mkIf (cfg.settings != {}) predicate.",
+  "targets_toml": "single target lact, cfg_ident=cfg, option_prefix=[services,lact], watch=[settings].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "settings",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "25th candidate_rendering_gap instance."
+    }
+  ]
+}

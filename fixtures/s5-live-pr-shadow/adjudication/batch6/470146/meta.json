@@ -1,0 +1,37 @@
+{
+  "pr": 470146,
+  "title": "nixos/n8n: add package option",
+  "applicable": true,
+  "base_sha": "b00b0e5d230b246bf6aa130ee4ad5e6072c3637c",
+  "head_sha": "eed3706aa7c780557974796ccc1df73200f13fd1",
+  "module_paths": [
+    "nixos/modules/services/misc/n8n.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/n8n.nix"
+  ],
+  "reason": "Applicable: real n8n module + wired test. Real diff adds `package = lib.mkPackageOption pkgs \"n8n\" {};`.",
+  "targets_toml": "single target n8n, cfg_ident=cfg, option_prefix=[services,n8n], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "3rd candidate_capability_gap instance of mkPackageOption non-discovery (tally: gonic/B1, dex/B4, this one/B6)."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "pr": 446440,
+  "title": "nixos/factorio: add extraArgs option",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/games/factorio.nix"
+  ],
+  "reason": "No nixos/tests file exists for factorio; real new extraArgs option added, but untestable."
+}

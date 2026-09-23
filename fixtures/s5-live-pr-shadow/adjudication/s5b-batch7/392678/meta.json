@@ -1,0 +1,9 @@
+{
+  "pr": 392678,
+  "title": "nixos/archtika: fix module and package",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/web-apps/archtika.nix"
+  ],
+  "reason": "COSMETIC ONLY: the only change to the nixos/ module is a description-text edit on mkEnableOption ('Whether to enable the archtika service' -> 'the archtika CMS'); no option-branch content change at all. Not applicable regardless of test existence."
+}

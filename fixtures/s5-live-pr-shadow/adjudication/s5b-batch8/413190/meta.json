@@ -1,0 +1,43 @@
+{
+  "pr": 413190,
+  "title": "nixos/lasuite-docs: Set collaboration server allowed origins",
+  "applicable": true,
+  "base_sha": "62bdbeee5fdb5578dc2459046409fe182d58ec1e",
+  "head_sha": "04a5cb63b3ed911fbee602c0abcef3bd29572a69",
+  "module_paths": [
+    "nixos/modules/services/web-apps/lasuite-docs.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/lasuite-docs.nix"
+  ],
+  "reason": "Real new mkOption 'collaborationServer.settings.COLLABORATION_SERVER_ORIGIN' added, matching the coordinator's flagged title.",
+  "targets_toml": "Self-corrected: initial watch guessed the wrong submodule name ('collaboration' instead of the real 'collaborationServer'), giving 0 discovered_options. Corrected to option_prefix=[services,lasuite-docs], watch=['collaborationServer.settings.COLLABORATION_SERVER_ORIGIN'], which found 27 discovered_options.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "collaborationServer.settings.COLLABORATION_SERVER_ORIGIN",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "collaborationServer.settings.COLLABORATION_SERVER_ORIGIN",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

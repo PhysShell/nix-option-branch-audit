@@ -1,0 +1,7 @@
+[[target]]
+name = "460724"
+module = "nixos/modules/services/backup/btrbk.nix"
+test = "nixos/tests/btrbk.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "btrbk", "sshAccess"]
+watch = ["extraArgs"]

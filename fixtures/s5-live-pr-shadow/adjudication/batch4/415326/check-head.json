@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "wstunnel",
+      "module": "nixos/modules/services/networking/wstunnel.nix",
+      "test": "nixos/tests/wstunnel.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "wstunnel",
+        "clients",
+        "*"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "listen"
+          ],
+          "default_source": "{ config, ... }:\n            {\n              host = \"0.0.0.0\";\n              port = if config.enableHTTPS then 443 else 80;\n            }",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 101,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "listen",
+            "host"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 109,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "listen",
+            "port"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 113,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "listen",
+            "enableHTTPS"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 117,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "useACMEHost"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 139,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 149,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "restrict-to"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 154,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "restrict-to",
+            "host"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 158,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "restrict-to",
+            "port"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 162,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "connectTo"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 236,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "addNetBind"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 242,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 244,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "http-headers"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 249,
+            "col": 15
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 443,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 443,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 128,
+            "col": 22
+          },
+          "source": "if config.enableHTTPS then 443 else 80",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 198,
+            "col": 20
+          },
+          "source": "lib.mkIf (config.useACMEHost != null) {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 293,
+            "col": 20
+          },
+          "source": "lib.optional serverCfg.autoStart \"multi-user.target\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 297,
+            "col": 29
+          },
+          "source": "lib.optional (serverCfg.environmentFile != null) serverCfg.environmentFile",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 299,
+            "col": 33
+          },
+          "source": "lib.optional (serverCfg.useACMEHost != null) certConfig.group",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 301,
+            "col": 33
+          },
+          "source": "lib.optionals (serverCfg.listen.port < 1024) [ \"CAP_NET_BIND_SERVICE\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 334,
+            "col": 19
+          },
+          "source": "if serverCfg.listen.enableHTTPS then \"wss\" else \"ws\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 353,
+            "col": 18
+          },
+          "source": "lib.optional clientCfg.autoStart \"multi-user.target\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 357,
+            "col": 27
+          },
+          "source": "lib.optional (clientCfg.environmentFile != null) clientCfg.environmentFile",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 361,
+            "col": 12
+          },
+          "source": "lib.optionals clientCfg.addNetBind [ \"CAP_NET_BIND_SERVICE\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/wstunnel.nix",
+            "line": 362,
+            "col": 15
+          },
+          "source": "lib.optionals ((clientCfg.settings.socket-so-mark or null) != null) [ \"CAP_NET_ADMIN\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "extraArgs"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

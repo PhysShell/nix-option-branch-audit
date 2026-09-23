@@ -1,0 +1,37 @@
+{
+  "pr": 438285,
+  "title": "frigate: pin joserfc at 1.1.0; ffmpeg flavor selection",
+  "applicable": true,
+  "base_sha": "776c94a900e4a278ae057c1ed71bb6387869d75c",
+  "head_sha": "6c4b1800989fcd82bca51f7ba8a72439cfe84c3c",
+  "module_paths": [
+    "nixos/modules/services/video/frigate.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/frigate.nix"
+  ],
+  "reason": "Applicable: real frigate module + wired test. Real diff adds a genuinely new ffmpeg.path mkOption (coercedTo package toString str, default pkgs.ffmpeg-headless), a top-level field distinct from the pre-existing per-camera ffmpeg.inputs.path.",
+  "targets_toml": "single target frigate, cfg_ident=cfg, option_prefix=[services,frigate,ffmpeg], watch=[path].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "path",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "NEAR-TOTAL non-discovery: only 3 real options found in this large file, all under ffmpeg.inputs.* (a DIFFERENT, pre-existing nested path from the one this PR actually adds, services.frigate.ffmpeg.path). frigate.nix declares its own top-level options via `options.services.frigate = with types; {...}` (dotted-path plus an inline `with types;`) -- did not have time to fully isolate whether the near-total (not complete) blackout here is the same mechanism as headplane/bluesky-pds's complete blackout or a related-but-distinct partial case; flagging the raw asymmetry rather than asserting the cause."
+    }
+  ]
+}

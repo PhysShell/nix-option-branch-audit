@@ -1,0 +1,7 @@
+[[target]]
+name = "395732"
+module = "nixos/modules/services/misc/docling-serve.nix"
+test = "nixos/tests/docling-serve.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "docling-serve"]
+watch = ["stateDir"]

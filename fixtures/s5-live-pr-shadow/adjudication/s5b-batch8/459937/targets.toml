@@ -1,0 +1,7 @@
+[[target]]
+name = "459937"
+module = "nixos/modules/services/x11/xscreensaver.nix"
+test = "nixos/tests/xscreensaver.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "xscreensaver"]
+watch = ["hooks"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "onlyoffice"
+module = "nixos/modules/services/web-apps/onlyoffice.nix"
+test = "nixos/tests/onlyoffice.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "onlyoffice"]
+watch = ["loglevel"]

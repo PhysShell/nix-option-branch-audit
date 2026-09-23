@@ -1,0 +1,9 @@
+{
+  "pr": 480156,
+  "title": "nixos/services.picom: use libconfig to generate the config",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/x11/picom.nix"
+  ],
+  "reason": "No nixos/tests file exists for picom; real internal type-representation change (custom libConfig type -> pkgs.formats.libconfig) but the 'settings' option itself is unchanged in name/shape and untestable regardless."
+}

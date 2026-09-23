@@ -1,0 +1,37 @@
+{
+  "pr": 524915,
+  "title": "nixos/nominatim: make UI optional",
+  "applicable": true,
+  "base_sha": "2477ee9f4b4b6f1972ad4f9467e292688d3fdf90",
+  "head_sha": "a3d43e3230b80fe7b8213d5f91d484275fc35c98",
+  "module_paths": [
+    "nixos/modules/services/search/nominatim.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/nominatim.nix"
+  ],
+  "reason": "Applicable: real nominatim module + wired test. Real diff adds a genuinely new ui.enable mkOption, wired into multiple real lib.mkIf cfg.ui.enable predicates (nginx config generation).",
+  "targets_toml": "single target nominatim, cfg_ident=cfg, option_prefix=[services,nominatim,ui], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "TOTAL NON-DISCOVERY (0 discovered options both sides), a new blackout instance -- not investigated further for idiom given time constraints."
+    }
+  ]
+}

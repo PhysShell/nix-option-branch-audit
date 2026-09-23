@@ -1,0 +1,9 @@
+{
+  "pr": 412693,
+  "title": "nixos/murmur: Get rid of global lib expansion",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/networking/murmur.nix"
+  ],
+  "reason": "No nixos/tests file exists for murmur (only unrelated 'umurmur' test present); diff is mostly mechanical with-lib->lib. rewrite plus mkOption->mkEnableOption declaration-style changes for bonjour/clientCertRequired/enable/openFirewall, but with no test there is no applicability."
+}

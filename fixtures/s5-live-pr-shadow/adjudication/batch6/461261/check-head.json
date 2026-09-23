@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "wakapi",
+      "module": "nixos/modules/services/web-apps/wakapi.nix",
+      "test": "nixos/tests/wakapi.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "wakapi"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 50,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/wakapi\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/wakapi"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 52,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 61,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 71,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 80,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "dialect"
+          ],
+          "default_source": "cfg.settings.db.dialect or null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 88,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "cfg.settings.db.name or \"wakapi\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 108,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "cfg.settings.db.user or \"wakapi\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 120,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 134,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 134,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "dialect"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgres"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "dialect"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 140,
+            "col": 10
+          },
+          "source": "optional (cfg.database.dialect == \"postgres\") \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "dialect"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgres"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "dialect"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 144,
+            "col": 10
+          },
+          "source": "optional (cfg.database.dialect == \"postgres\") \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "settings",
+                        "db",
+                        "dialect"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "postgres"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "settings",
+              "db",
+              "dialect"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 200,
+            "col": 8
+          },
+          "source": "lib.optionalString (cfg.database.createLocally && cfg.settings.db.dialect != \"postgres\") ''"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "dialect"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgres"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "dialect"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/wakapi.nix",
+            "line": 217,
+            "col": 27
+          },
+          "source": "mkIf (cfg.database.createLocally && cfg.database.dialect == \"postgres\") {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "passwordSalt"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

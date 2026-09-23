@@ -1,0 +1,37 @@
+{
+  "pr": 397130,
+  "title": "kanidm-provision: 1.1.2 -> 1.2.0, modernize",
+  "applicable": true,
+  "base_sha": "df46c58b4151565a48d740748ba8684e9923f88f",
+  "head_sha": "ee84ec39e94cfcc8fa28ca914772d77c014172a5",
+  "module_paths": [
+    "nixos/modules/services/security/kanidm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/kanidm-provisioning.nix"
+  ],
+  "reason": "Real new mkOption 'imageFile' added inside the per-oauth2-client submodule (services.kanidm.provision.systems.oauth2.<name>.imageFile).",
+  "targets_toml": "option_prefix=[services,kanidm,provision,systems,oauth2], watch=[imageFile]. 'systems.oauth2' is types.attrsOf(types.submodule(...)) -- same wildcard shape as kanidm's provision.groups from batch5.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "imageFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "CONSISTENT WITH PRE-EXISTING DOCUMENTED GAP (not new): total non-discovery both sides via the wildcard attrsOf(submodule) 'systems.oauth2', same shape as kanidm's own provision.groups (batch5), wstunnel, frp, and openvpn's servers (batch6). Renders correctly as 'Unchanged: 1' -- not a rendering gap either."
+    }
+  ]
+}

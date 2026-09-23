@@ -1,0 +1,37 @@
+{
+  "pr": 428138,
+  "title": "nixos/ncps: support sign narinfo option",
+  "applicable": true,
+  "base_sha": "aaa9838faee87663d68d5fb494fd0fa62426d4f1",
+  "head_sha": "3bd3493d361e66a59ea6f59f4ed69beb480bcba8",
+  "module_paths": [
+    "nixos/modules/services/networking/ncps.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/ncps.nix"
+  ],
+  "reason": "Applicable: real ncps module + wired test. Real diff adds signNarinfo mkOption, wired into a real predicate.",
+  "targets_toml": "single target ncps, cfg_ident=cfg, option_prefix=[services,ncps], watch=[signNarinfo].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "signNarinfo",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "23rd candidate_rendering_gap instance."
+    }
+  ]
+}

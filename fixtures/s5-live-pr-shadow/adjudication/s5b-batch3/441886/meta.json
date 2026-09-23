@@ -1,0 +1,37 @@
+{
+  "pr": 441886,
+  "title": "nixos/victoriametrics: Add ability to pass basicAuthPasswordFile",
+  "applicable": true,
+  "base_sha": "db3febbe9694345760424d51f7dd15710a643fe8",
+  "head_sha": "dcf2b9c0a0b992bf41b281472c0ebd402bd7b85f",
+  "module_paths": [
+    "nixos/modules/services/databases/victoriametrics.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/victoriametrics/default.nix"
+  ],
+  "reason": "Applicable: real victoriametrics module + wired test. Real diff adds basicAuthUsername/basicAuthPasswordFile mkOptions plus a real assertion requiring both-or-neither.",
+  "targets_toml": "single target victoriametrics, cfg_ident=cfg, option_prefix=[services,victoriametrics], watch=[basicAuthPasswordFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "basicAuthPasswordFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real, correct transition: option genuinely added (OptionNotFound at base), predicate genuinely exists at head but the real test never sets basicAuthPasswordFile to a literal value the walker can resolve -- same 'default-only/unresolved test evidence' shape as several other TestConfigUnresolved cases this round, not a new gap."
+    }
+  ]
+}

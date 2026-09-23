@@ -1,0 +1,39 @@
+{
+  "pr": 492341,
+  "title": "music-assistant: replace all pre-compiled binaries",
+  "applicable": true,
+  "base_sha": "c207940c56176cf7b7d5b523a86a2cfb364b9957",
+  "head_sha": "fbe6eb952a657ef372548a6fa45d9da9ded13de8",
+  "module_paths": [
+    "nixos/modules/services/audio/music-assistant.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/music-assistant.nix"
+  ],
+  "reason": "Real new mkOption 'openFirewall' added, plus real airplay/sendspin firewall port logic and avahi publishing for airplay_receiver provider.",
+  "targets_toml": "option_prefix=[services,music-assistant], watch=[openFirewall].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "492341:oba:openFirewall:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "openFirewall",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'openFirewall' away from its default false. Mechanically verified: predicate exists, predicate_attempts witnessed=false. New OBA001 finding this batch."
+    }
+  ]
+}

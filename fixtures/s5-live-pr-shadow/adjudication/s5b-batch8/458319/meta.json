@@ -1,0 +1,43 @@
+{
+  "pr": 458319,
+  "title": "nixos/clickhouse: allow configuring with Nix attribute set",
+  "applicable": true,
+  "base_sha": "37e6ac33c04e19f8081b6baa925b8017a0026ac6",
+  "head_sha": "ddac798a5a8cf52f820e0da180f870452714f075",
+  "module_paths": [
+    "nixos/modules/services/databases/clickhouse.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/clickhouse/default.nix"
+  ],
+  "reason": "Real new mkOptions serverConfig/usersConfig/extraServerConfig/extraUsersConfig added (structured YAML config generation replacing bare XML-only extra config), matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,clickhouse], watch=[serverConfig].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "serverConfig",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "serverConfig",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

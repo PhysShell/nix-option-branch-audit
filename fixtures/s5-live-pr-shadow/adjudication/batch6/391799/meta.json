@@ -1,0 +1,37 @@
+{
+  "pr": 391799,
+  "title": "paretosecurity: 0.0.89 -> 0.0.91, nixos/paretosecurity: add trayIcon option",
+  "applicable": true,
+  "base_sha": "a2ee1a50f0334c1e993bd94fec7736c8b36f2d0f",
+  "head_sha": "8dbf318cea018fc1c4babdf3b3876d8fa315af96",
+  "module_paths": [
+    "nixos/modules/services/security/paretosecurity.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paretosecurity.nix"
+  ],
+  "reason": "Applicable: real paretosecurity module + wired test. Real diff is the ORIGINAL introduction of trayIcon (a new mkEnableOption, plus a new lib.mkIf cfg.trayIcon {} systemd unit) -- the PR that the later batch2 restructurings (393366/397890) build on top of.",
+  "targets_toml": "single target paretosecurity, cfg_ident=cfg, option_prefix=[services,paretosecurity], watch=[trayIcon].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "trayIcon",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "3rd instance of the wastebin-class candidate_capability_gap (tally: wastebin/B3, this one). check-head.json's discovered_options is COMPLETELY EMPTY for this file (same total-non-discovery shape as wastebin, not just the watched option) -- confirmed the cause is the SAME dotted-path declaration idiom: paretosecurity.nix declares `options.services.paretosecurity = { enable = ...; package = ...; trayIcon = ...; };` (dotted-path form), matching wastebin's own `options.services.wastebin = {...}` exactly. This is now 3 modules sharing this exact idiom and this exact total-non-discovery symptom -- strong, repeated evidence this is a real, systematic gap."
+    }
+  ]
+}

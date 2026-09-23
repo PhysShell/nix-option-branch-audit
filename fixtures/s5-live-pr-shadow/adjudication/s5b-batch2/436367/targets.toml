@@ -1,0 +1,7 @@
+[[target]]
+name = "436367"
+module = "nixos/modules/services/networking/mihomo.nix"
+test = "nixos/tests/mihomo.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mihomo"]
+watch = ["processesInfo"]

@@ -1,0 +1,43 @@
+{
+  "pr": 393943,
+  "title": "nixos/cfssl: Add Disable Option",
+  "applicable": true,
+  "base_sha": "6f1396f7dc459dce81252622acc156ffdf7bafde",
+  "head_sha": "4392f03db71ed9dc3f2dcb476a7c4fd643af0bb5",
+  "module_paths": [
+    "nixos/modules/services/security/cfssl.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/cfssl.nix"
+  ],
+  "reason": "Real new mkOption 'disable' added (comma-separated endpoint disable list).",
+  "targets_toml": "option_prefix=[services,cfssl], watch=[disable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "disable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested by the test suite -- expected, not a gap."
+    },
+    {
+      "watched_path": "disable",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

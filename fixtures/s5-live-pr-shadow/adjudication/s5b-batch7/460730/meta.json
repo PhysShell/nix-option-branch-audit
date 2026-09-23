@@ -1,0 +1,43 @@
+{
+  "pr": 460730,
+  "title": "nixos/beszel: allow S.M.A.R.T monitoring",
+  "applicable": true,
+  "base_sha": "9a0b5314e988375390f4f72218ad5e87b5726f24",
+  "head_sha": "a11465f820a394d784fff6a78fa5fe37af242e7c",
+  "module_paths": [
+    "nixos/modules/services/monitoring/beszel-agent.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/beszel.nix"
+  ],
+  "reason": "Real new smartmon.{enable,package,deviceAllow} submodule added, plus real systemd hardening/capability adjustments (AmbientCapabilities, DeviceAllow, NoNewPrivileges, PrivateDevices, PrivateUsers all conditioned on smartmon.enable). File was previously logged as a 'pure blackout, no resolved lead' instance earlier in the S5-B round -- this PR retests it with a fresh option.",
+  "targets_toml": "Self-corrected: option_prefix=[services,beszel,agent,smartmon] (prefix ending at the bare nested attrset 'smartmon') gave 0 discovered_options -- same class of mistake as porxie/tlsrpt/peertube/kanidm this round. Corrected to option_prefix=[services,beszel,agent], watch=['smartmon.enable'], which found 6 discovered_options.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "smartmon.enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestValueUnresolved",
+      "note": "SECOND instance of the new 'TestValueUnresolved' verdict class this batch (see also ollama's syncModels): real option/predicate exists, referenced across 5 distinct predicate sites (optionalString for udev rules, plus 4 separate optionals/mkIf sites for path/capabilities/DeviceAllow), all predicate_attempts witnessed=false. Importantly, this file is NOT a blackout this time -- with correct targeting the option IS discovered; the earlier 'pure blackout' logging for beszel-agent may itself have been a targeting artifact rather than a real tool gap, worth revisiting if this file recurs."
+    },
+    {
+      "watched_path": "smartmon.enable",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

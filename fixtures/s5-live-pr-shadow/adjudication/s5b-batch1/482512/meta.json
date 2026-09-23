@@ -1,0 +1,37 @@
+{
+  "pr": 482512,
+  "title": "nixos/traefik: refactor",
+  "applicable": true,
+  "base_sha": "59915114d14c6d77a91745f6b9424d9c6fd1bad4",
+  "head_sha": "8fecfdbd99b10f6d28d9023c9fff2e275f2a185b",
+  "module_paths": [
+    "nixos/modules/services/web-servers/traefik.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/traefik.nix"
+  ],
+  "reason": "Applicable: real traefik module + wired test. Real diff is a very large restructuring: staticConfigOptions/dynamicConfigOptions renamed+restructured into static.settings/dynamic.files.<name>.settings via real mkRenamedOptionModule entries, format engine changed toml->json.",
+  "targets_toml": "single target traefik, cfg_ident=cfg, option_prefix=[services,traefik], watch=[static].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "static",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "NOT a blackout -- 13 real options ARE discovered for this file (enable, static.file, static.settings, dynamic.*, dataDir, user, group, ...). `static` itself resolves not-found only because it is a submodule CONTAINER (its own leaves static.file/static.settings are found individually), same correct-by-construction shape as gotenberg's pdfEngines in S5-A batch7 -- not a gap, a targeting-granularity artifact of watching a container name instead of one of its leaves."
+    }
+  ]
+}

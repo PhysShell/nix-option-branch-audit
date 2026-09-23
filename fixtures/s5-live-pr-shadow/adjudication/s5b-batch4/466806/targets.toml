@@ -1,0 +1,7 @@
+[[target]]
+name = "466806"
+module = "nixos/modules/services/misc/gollum.nix"
+test = "nixos/tests/gollum.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gollum"]
+watch = ["local-time"]

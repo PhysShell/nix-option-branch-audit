@@ -1,0 +1,7 @@
+[[target]]
+name = "wakapi"
+module = "nixos/modules/services/web-apps/wakapi.nix"
+test = "nixos/tests/wakapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "wakapi"]
+watch = ["passwordSalt"]

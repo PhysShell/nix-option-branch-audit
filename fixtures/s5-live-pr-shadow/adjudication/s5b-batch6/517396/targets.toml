@@ -1,0 +1,7 @@
+[[target]]
+name = "517396"
+module = "nixos/modules/services/web-apps/lasuite-meet.nix"
+test = "nixos/tests/web-apps/lasuite-meet.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "lasuite-meet"]
+watch = ["addons"]

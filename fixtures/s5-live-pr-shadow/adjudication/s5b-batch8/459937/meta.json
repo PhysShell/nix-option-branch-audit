@@ -1,0 +1,43 @@
+{
+  "pr": 459937,
+  "title": "nixos/xscreensaver: init hooks options",
+  "applicable": true,
+  "base_sha": "640fe994e5d7815f1dccbc3f84316ff3b0cbd7a1",
+  "head_sha": "eec3fb0c3a5d7b3852a9f60d37bab1d424555733",
+  "module_paths": [
+    "nixos/modules/services/x11/xscreensaver.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/xscreensaver.nix"
+  ],
+  "reason": "Real new mkOption 'hooks' added (attrsOf lines, runs commands on xscreensaver events via a new xscreensaver-hooks systemd unit).",
+  "targets_toml": "option_prefix=[services,xscreensaver], watch=[hooks].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "hooks",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "hooks",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

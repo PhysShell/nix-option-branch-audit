@@ -1,0 +1,7 @@
+[[target]]
+name = "464654"
+module = "nixos/modules/services/misc/atuin.nix"
+test = "nixos/tests/atuin.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "atuin"]
+watch = ["environmentFile"]

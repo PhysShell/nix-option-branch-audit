@@ -1,0 +1,7 @@
+[[target]]
+name = "446598"
+module = "nixos/modules/services/audio/mopidy.nix"
+test = "nixos/tests/mopidy.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mopidy"]
+watch = ["configuration"]

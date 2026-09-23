@@ -1,0 +1,43 @@
+{
+  "pr": 347209,
+  "title": "nixos/onlyoffice: add allowLocalConnections option",
+  "applicable": true,
+  "base_sha": "2629605ab2d1fe8217367cea0ca7551d1cdc1316",
+  "head_sha": "cd8540da55892dd6f6e3d795de759daee82cbb8c",
+  "module_paths": [
+    "nixos/modules/services/web-apps/onlyoffice.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/onlyoffice.nix"
+  ],
+  "reason": "Real new mkOption 'allowLocalConnections' added (allows private-IP downloads via request-filtering-agent), matching the coordinator's flagged title.",
+  "targets_toml": "option_prefix=[services,onlyoffice], watch=[allowLocalConnections].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "allowLocalConnections",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option, correctly not-found at base, head-side TestConfigUnresolved (real option/predicate, test never sets a resolvable literal) -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "allowLocalConnections",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

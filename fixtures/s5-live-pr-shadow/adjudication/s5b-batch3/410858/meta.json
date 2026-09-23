@@ -1,0 +1,37 @@
+{
+  "pr": 410858,
+  "title": "kubo: 0.34.1 -> 0.35.0",
+  "applicable": true,
+  "base_sha": "6eaed15add429ab4dbeb216425d1bc237100f74e",
+  "head_sha": "27ab7b4f770980a98c8ca74e81c731a66c109cfa",
+  "module_paths": [
+    "nixos/modules/services/network-filesystems/kubo.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/kubo/default.nix"
+  ],
+  "reason": "Applicable: real kubo module + wired test (directory-form test target). Real diff adds Mounts.MFS mkOption, wired into a real lib.mkIf (cfg.autoMount) predicate for tmpfiles.",
+  "targets_toml": "single target kubo, cfg_ident=cfg, option_prefix=[services,kubo,settings,Mounts], watch=[MFS].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "MFS",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "27th candidate_rendering_gap instance."
+    }
+  ]
+}

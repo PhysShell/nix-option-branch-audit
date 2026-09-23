@@ -1,0 +1,39 @@
+{
+  "pr": 407100,
+  "title": "photoprism: 250321-57590c48b -> 250426-27ec7a128",
+  "applicable": true,
+  "base_sha": "b0c26f67c3b9482c10e2c94f80130c77e7264f5b",
+  "head_sha": "4a14d1e05d434a820e78e06ef1592eb2360baeeb",
+  "module_paths": [
+    "nixos/modules/services/web-apps/photoprism.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/photoprism.nix"
+  ],
+  "reason": "Applicable: real photoprism module + wired test (same module as S5-B batch1's PR438467). Real diff adds a genuinely new databasePasswordFile mkOption, wired into a real lib.optionalString predicate (3 sites) for LoadCredential/config generation.",
+  "targets_toml": "single target photoprism, cfg_ident=cfg, option_prefix=[services,photoprism], watch=[databasePasswordFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 1
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "B:407100:oba:databasePasswordFile:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "databasePasswordFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "FOURTH REAL ACTIONABLE PRESENTATION. check-head exits 1, finding=1, verdict OBA001, same 'uncovered option branch' class -- all 3 predicate_attempts witnessed=False (the real photoprism test never sets databasePasswordFile)."
+    }
+  ]
+}

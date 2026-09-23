@@ -1,0 +1,37 @@
+{
+  "pr": 442520,
+  "title": "nixos/chromadb: deprecate logPath option",
+  "applicable": true,
+  "base_sha": "b0998a53ed83c1424d9fa396e556cc163eca2a41",
+  "head_sha": "e9010614129c6bf749be8c1ac37fe09f9b43f843",
+  "module_paths": [
+    "nixos/modules/services/databases/chromadb.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/chromadb.nix"
+  ],
+  "reason": "Applicable: real chromadb module + wired test. Real diff genuinely removes logFile (mkRemovedOptionModule).",
+  "targets_toml": "single target chromadb, cfg_ident=cfg, option_prefix=[services,chromadb], watch=[logFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "logFile",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "18th candidate_rendering_gap instance."
+    }
+  ]
+}

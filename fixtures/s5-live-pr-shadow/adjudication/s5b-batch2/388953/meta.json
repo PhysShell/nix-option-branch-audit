@@ -1,0 +1,38 @@
+{
+  "pr": 388953,
+  "title": "nixos/h2o: enable HTTP/3 via QUIC",
+  "applicable": true,
+  "base_sha": "f68ad5cc5ff24efb3dedc5a5b1e70ee9bff4e294",
+  "head_sha": "75545814743d6bc3c378f39bdb3e5fc7e512734e",
+  "module_paths": [
+    "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+    "nixos/modules/services/web-servers/h2o/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-servers/h2o/basic.nix"
+  ],
+  "reason": "Applicable: real h2o module + wired test (multi-file test target). Real diff adds a genuinely new quic mkOption nested under each per-vhost tls submodule, wired into a real lib.optional (value.tls.quic != null) predicate.",
+  "targets_toml": "single target h2o (module=vhost-options.nix, the per-vhost submodule file), cfg_ident=cfg, option_prefix=[services,h2o,vhosts,*,tls], watch=[quic]. Two option_prefix depths tried (with and without the trailing tls segment); discovered_options consistently lists the real declaration as a 2-segment relative path ['tls','quic'] regardless of which option_prefix depth was used, suggesting discovered_options may not be reported strictly relative to option_prefix the way I assumed -- did not fully resolve the ambiguity in the time available.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "quic",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "AMBIGUOUS -- quic IS a real, present declaration (confirmed via discovered_options showing ['tls','quic'] under the per-vhost submodule) but my watch targeting could not get it to resolve as found under either of the two option_prefix depths tried. Possibly a genuine wildcard/nested-submodule resolution limitation (a shape somewhat like the wstunnel/S4-batch4 wildcard-attrsOf gap, but one level deeper: wildcard-instance -> nested-submodule -> leaf), possibly my own targeting limitation given ambiguity about how oba's watch/option_prefix interact for doubly-nested paths under a wildcard. Flagging honestly as unresolved rather than asserting either way."
+    }
+  ]
+}

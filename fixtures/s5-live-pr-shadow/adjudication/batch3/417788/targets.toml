@@ -1,0 +1,7 @@
+[[target]]
+name = "wastebin"
+module = "nixos/modules/services/misc/wastebin.nix"
+test = "nixos/tests/wastebin.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "wastebin", "settings"]
+watch = ["WASTEBIN_MAX_BODY_SIZE"]

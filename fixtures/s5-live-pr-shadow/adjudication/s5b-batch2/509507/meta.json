@@ -1,0 +1,39 @@
+{
+  "pr": 509507,
+  "title": "nixos/sshd: remove 'banner' option, in favour of settings.Banner",
+  "applicable": true,
+  "base_sha": "c763082f22d4da96fa678d5fdcbed27da01f311e",
+  "head_sha": "667a124021ed1d8bbdb1cf66a61499f4fdd7afcd",
+  "module_paths": [
+    "nixos/modules/services/networking/ssh/sshd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/openssh.nix"
+  ],
+  "reason": "Applicable, the coordinator's own flagged case (#35). Real sshd module + wired test. Real diff removes `banner` (mkRemovedOptionModule), replaced by settings.Banner -- another real option-lifecycle event on the same module as S5-A's own moduliFile case.",
+  "targets_toml": "single target sshd, cfg_ident=cfg, option_prefix=[services,openssh], watch=[banner].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 1,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "B:509507:oba:banner:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "banner",
+      "base_verdict": "OBA001",
+      "head_verdict": "OptionNotFound",
+      "note": "THIRD REAL ACTIONABLE PRESENTATION (after prosody checkConfig, guacamole logbackXml). check-base exits 1, finding=1, verdict OBA001 'uncovered option branch: no test assignment provably flips this predicate away from its default' on the real `if cfg.banner == null then ... else ...` predicate (line 889) -- both predicate_attempts witnessed=False, real and mechanically consistent with the other two OBA001 instances. At head, banner genuinely removed -> OptionNotFound. This is a DIFFERENT verdict-transition shape than S5-A's own moduliFile case (there, moduliFile was PredicateNotFound at base since it had NO real predicate; here banner DOES have a real predicate that's real but untested)."
+    }
+  ]
+}

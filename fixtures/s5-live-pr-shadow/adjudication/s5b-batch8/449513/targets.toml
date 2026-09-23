@@ -1,0 +1,7 @@
+[[target]]
+name = "449513"
+module = "nixos/modules/services/admin/pgadmin.nix"
+test = "nixos/tests/pgadmin4.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pgadmin"]
+watch = ["emailServer.enable"]

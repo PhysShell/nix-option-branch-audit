@@ -1,0 +1,7 @@
+[[target]]
+name = "397967"
+module = "nixos/modules/services/networking/fedimintd.nix"
+test = "nixos/tests/fedimintd.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "fedimintd"]
+watch = ["api_ws.openFirewall"]

@@ -1,0 +1,9 @@
+{
+  "pr": 445279,
+  "title": "nixos/newt: declarative resource management",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/networking/newt.nix"
+  ],
+  "reason": "No nixos/tests file exists for newt at this later head SHA either (consistent with batch6's PR444630 finding at an earlier SHA -- newt has never had a test anywhere in this round's sampled history). Real new 'blueprint' option added, but untestable."
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "441886"
+module = "nixos/modules/services/databases/victoriametrics.nix"
+test = "nixos/tests/victoriametrics/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "victoriametrics"]
+watch = ["basicAuthPasswordFile"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "keycloak"
+module = "nixos/modules/services/web-apps/keycloak.nix"
+test = "nixos/tests/keycloak.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "keycloak", "database"]
+watch = ["useSSL"]

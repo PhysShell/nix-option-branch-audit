@@ -1,0 +1,7 @@
+[[target]]
+name = "396478"
+module = "nixos/modules/services/misc/taskchampion-sync-server.nix"
+test = "nixos/tests/taskchampion-sync-server.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "taskchampion-sync-server"]
+watch = ["host"]

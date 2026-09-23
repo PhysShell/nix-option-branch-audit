@@ -1,0 +1,7 @@
+[[target]]
+name = "466504"
+module = "nixos/modules/services/audio/pulseaudio.nix"
+test = "nixos/tests/pulseaudio.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "pulseaudio", "tcp"]
+watch = ["port"]

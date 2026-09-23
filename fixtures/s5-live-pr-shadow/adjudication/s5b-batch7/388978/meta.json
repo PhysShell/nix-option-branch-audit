@@ -1,0 +1,43 @@
+{
+  "pr": 388978,
+  "title": "nixos/services.mysql: add galera cluster options",
+  "applicable": true,
+  "base_sha": "7afd4512ca2c0e8885697903d77f47b670c1a7e4",
+  "head_sha": "4e64bf159143b7f47ce7f13f6cbfa7b7d714c3ed",
+  "module_paths": [
+    "nixos/modules/services/databases/mysql.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mysql/mariadb-galera.nix"
+  ],
+  "reason": "Real new galeraCluster.{enable,package,name,sstMethod,localName,localAddress,nodeAddresses,clusterPassword,clusterAddress} submodule added, plus 4 real assertions and firewall port opening.",
+  "targets_toml": "Self-corrected: initial test path guess 'mysql-galera.nix' didn't exist in the real nixos/tests/mysql/ directory listing (real file is 'mariadb-galera.nix'); fixed after checking the directory contents. option_prefix=[services,mysql,galeraCluster], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "Real new option, correctly not-found at base, head-side TestConfigUnresolved (real option/predicate exists, but the galera test never sets a resolvable literal) -- non-gap, correct decline-to-guess."
+    },
+    {
+      "watched_path": "enable",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

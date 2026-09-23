@@ -1,0 +1,39 @@
+{
+  "pr": 389471,
+  "title": "nixos/navidrome: Add environmentFile config option",
+  "applicable": true,
+  "base_sha": "0d54c58e683512c29493ef6e4283c978f6534859",
+  "head_sha": "20c9782e2fc4f0b24b6c1b364eb46cbfe9ebc160",
+  "module_paths": [
+    "nixos/modules/services/audio/navidrome.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/navidrome.nix"
+  ],
+  "reason": "Real new mkOption 'environmentFile' added. Same file (navidrome.nix) as batch5's PR424464 (plugins option) -- a different PR, another same-file data point.",
+  "targets_toml": "option_prefix=[services,navidrome], watch=[environmentFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "389471:oba:environmentFile:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'environmentFile' away from its default null. Mechanically verified: predicate exists (lib.mkIf (cfg.environmentFile != null) [ cfg.environmentFile ]), predicate_attempts witnessed=false. This is a new real OBA001 finding this batch."
+    }
+  ]
+}

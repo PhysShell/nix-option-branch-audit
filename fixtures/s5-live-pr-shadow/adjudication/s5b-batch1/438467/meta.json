@@ -1,0 +1,37 @@
+{
+  "pr": 438467,
+  "title": "nixos/photoprism: add run config options",
+  "applicable": true,
+  "base_sha": "91d78878903c163055eaa882e36e9a45d49b66bb",
+  "head_sha": "af4ba50fbfc4c1abee31db65754c701aed777e95",
+  "module_paths": [
+    "nixos/modules/services/web-apps/photoprism.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/photoprism.nix"
+  ],
+  "reason": "Applicable: real photoprism module + wired test. Real diff adds genuinely new user/group mkOptions, wired into serviceConfig User/Group (replacing hardcoded strings) plus storagePath used for WorkingDirectory.",
+  "targets_toml": "single target photoprism, cfg_ident=cfg, option_prefix=[services,photoprism], watch=[user].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "user",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "11th candidate_rendering_gap instance. Confirms photoprism.nix's own dotted-path options.services.photoprism={...} declaration form works fine here -- see batch-level note on the corrected/retracted dotted-path hypothesis."
+    }
+  ]
+}

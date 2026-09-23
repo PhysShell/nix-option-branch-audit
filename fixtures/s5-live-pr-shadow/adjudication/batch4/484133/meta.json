@@ -1,0 +1,37 @@
+{
+  "pr": 484133,
+  "title": "nixos/rspamd: Add extraArgs option to rspamd module",
+  "applicable": true,
+  "base_sha": "534541bbb0513299c11d08005d66fb50b3977b28",
+  "head_sha": "39105a7501f7408ae73082af9bcd496c566f2aab",
+  "module_paths": [
+    "nixos/modules/services/mail/rspamd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/rspamd.nix"
+  ],
+  "reason": "Applicable: real rspamd module + wired test (rspamd = handleTest ./rspamd.nix {}; at head). Real diff adds a genuinely new `extraArgs` mkOption (listOf str, default=[]), spliced into ExecStart via escapeShellArgs.",
+  "targets_toml": "single target rspamd, cfg_ident=cfg, option_prefix=[services,rspamd], watch=[extraArgs].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraArgs",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "THIRD INSTANCE of the candidate_rendering_gap pattern (batch2 PR510900 sshd, batch3 PR398885 cockpit): a real, correct option_not_found->predicate_not_found transition (extraArgs genuinely added, used only as a value splice never a predicate) shows changed=1 with the correct transition in raw.json's summary, but summary.md's rendered table is all-zero and notable=[] again. Tagging candidate_rendering_gap."
+    }
+  ]
+}

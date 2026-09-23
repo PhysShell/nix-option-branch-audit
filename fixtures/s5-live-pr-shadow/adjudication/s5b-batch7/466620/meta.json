@@ -1,0 +1,43 @@
+{
+  "pr": 466620,
+  "title": "llama-swap: 165 -> 176",
+  "applicable": true,
+  "base_sha": "80da349c36121606a8cad534ce822d1c2b837177",
+  "head_sha": "ab961b8547947a2850bc9a95a30e4977b486f4ef",
+  "module_paths": [
+    "nixos/modules/services/networking/llama-swap.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-servers/llama-swap.nix"
+  ],
+  "reason": "Real new mkOptions listenAddress and tls.{enable,certFile,keyFile} added, plus 2 real assertions requiring cert/key when TLS is enabled.",
+  "targets_toml": "option_prefix=[services,llama-swap], watch=[listenAddress]. Real test path is nixos/tests/web-servers/llama-swap.nix, not a bare nixos/tests/llama-swap.nix.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "listenAddress",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "listenAddress",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

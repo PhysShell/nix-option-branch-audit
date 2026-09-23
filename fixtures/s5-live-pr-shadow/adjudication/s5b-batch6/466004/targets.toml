@@ -1,0 +1,7 @@
+[[target]]
+name = "466004"
+module = "nixos/modules/services/misc/ollama.nix"
+test = "nixos/tests/ollama.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollama"]
+watch = ["acceleration"]

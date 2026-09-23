@@ -1,0 +1,7 @@
+[[target]]
+name = "433539"
+module = "nixos/modules/services/video/frigate.nix"
+test = "nixos/tests/frigate.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "frigate"]
+watch = ["preCheckConfig"]

@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "358780",
+      "module": "nixos/modules/services/logging/graylog.nix",
+      "test": "nixos/tests/graylog.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "graylog"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 39,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "if lib.versionOlder config.system.stateVersion \"23.05\" then pkgs.graylog-3_3 else pkgs.graylog-5_1",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 41,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"graylog\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "graylog"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 54,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "isMaster"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 60,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nodeIdFile"
+          ],
+          "default_source": "\"/var/lib/graylog/server/node-id\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/graylog/server/node-id"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 66,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "passwordSecret"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 72,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "rootUsername"
+          ],
+          "default_source": "\"admin\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "admin"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 80,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "rootPasswordSha2"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 86,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "elasticsearchHosts"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 99,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/graylog/data\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/graylog/data"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 105,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "messageJournalDir"
+          ],
+          "default_source": "\"/var/lib/graylog/data/journal\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/graylog/data/journal"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 111,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "mongodbUri"
+          ],
+          "default_source": "\"mongodb://localhost/graylog\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mongodb://localhost/graylog"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 117,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 123,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 129,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 140,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 140,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "graylog"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 142,
+            "col": 19
+          },
+          "source": "lib.mkIf (cfg.user == \"graylog\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "graylog"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 149,
+            "col": 20
+          },
+          "source": "lib.mkIf (cfg.user == \"graylog\") { graylog = { }; }"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 44,
+            "col": 11
+          },
+          "source": "if lib.versionOlder config.system.stateVersion \"23.05\" then pkgs.graylog-3_3 else pkgs.graylog-5_1",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/logging/graylog.nix",
+            "line": 46,
+            "col": 11
+          },
+          "source": "if lib.versionOlder config.system.stateVersion \"23.05\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "virtualisation",
+            "diskSize"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/graylog.nix",
+            "line": 11,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "package"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

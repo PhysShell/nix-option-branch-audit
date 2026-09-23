@@ -1,0 +1,37 @@
+{
+  "pr": 421882,
+  "title": "nixos/LANraragi: Add openFirewall option",
+  "applicable": true,
+  "base_sha": "864c9c70a5a61bbf493909284a1b64e38555e5a1",
+  "head_sha": "f7e134def959e06f0f2eed5a9d157aab8a5faa2a",
+  "module_paths": [
+    "nixos/modules/services/web-apps/lanraragi.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/lanraragi.nix"
+  ],
+  "reason": "Real new mkEnableOption 'openFirewall' added.",
+  "targets_toml": "TOTAL NON-DISCOVERY: option_prefix=[services,lanraragi], watch=[openFirewall] gave 0 discovered_options despite discovered_predicates correctly finding 'enable's mkIf predicate. Retried at option_prefix=[services], watch=['lanraragi.openFirewall'] -- still 0 discovered_options, both base and head identical (OptionNotFound both sides, 'unchanged'). The module declares its options via `options.services = { lanraragi = { ... }; };` (one dotted segment 'services', then a NESTED attrset for the leaf module name 'lanraragi') -- a THIRD declaration-shape variant distinct from both the fully-dotted `options.services.lanraragi = {...}` (which usually resolves fine, e.g. photoprism/olivetin/hedgedoc) and the fully-nested `options = { services.lanraragi = {...}; }` documented earlier. Logging as new raw data for the 'blackout' dataset -- NOT asserting this is the cause, since prior fully-dotted and fully-nested variants have both shown inconsistent results too.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "lanraragi.openFirewall",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Total non-discovery, both sides identical ('unchanged'). See targets_toml self-correction note for the declaration-shape observation."
+    }
+  ]
+}

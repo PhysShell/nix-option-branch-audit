@@ -1,0 +1,27 @@
+{
+  "pr": 463848,
+  "title": "nixos/gonic: fix writeability of paths from config",
+  "applicable": true,
+  "base_sha": "e2e2ccdbf102da63f59b5d9735ab627889910b16",
+  "head_sha": "68daa1c784bb4dc0062ced1118305c892a788c75",
+  "module_paths": ["nixos/modules/services/audio/gonic.nix"],
+  "test_paths": ["nixos/tests/gonic.nix"],
+  "reason": "Applicable: real gonic module + wired test (nixos/tests/all-tests.nix at head 68daa1c78 contains 'gonic = runTest ./gonic.nix;', line 667). Real diff adds a genuinely new `package = lib.mkPackageOption pkgs \"gonic\" {}` declaration and changes ExecStart's predicate/config-generation from a hardcoded `pkgs.gonic` reference plus `DynamicUser = true` to `lib.getExe cfg.package` (DynamicUser removed) -- a real option-declaration + config-generation change.",
+  "targets_toml": "single target gonic, cfg_ident=cfg, option_prefix=[services,gonic], watch=[package] (the PR's own new declaration).",
+  "run_exit_codes": {"audit_diff": 2, "check_base": 2, "check_head": 2},
+  "tool_error": false,
+  "notable_actionable_presentations": {"count": 0, "identities": []},
+  "pass_verdicts_needing_review": {"count": 0, "identities": []},
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Unchanged (OptionNotFound both sides), so audit-diff correctly reports 0 new/resolved findings, unchanged=1 -- no actionable presentation. But this looks like a real declaration-recognition gap, not a semantically correct 'not found': at HEAD, `package` is declared via `lib.mkPackageOption pkgs \"gonic\" {}` (nixpkgs' own standardized package-option helper), not a literal `mkOption {...}` call, and oba's own discovered_options walker does not list it among gonic's discovered options at head even though it plainly exists. This may be a real walker coverage gap specific to the `mkPackageOption` helper form, distinct from the already-documented wildcard-attrsOf gap. Flagging for the coordinator/reviewer, not making a correctness judgment -- this did not produce a materially-relevant PASS or an actionable presentation either way given both sides show the identical OptionNotFound verdict, but is worth carrying forward as a possible new capability-gap candidate if it recurs."
+    },
+    {
+      "watched_path": "package",
+      "note": "check-head.json also reports a `test_config_opacity` entry: cfg.package's use in nixos/tests/gonic.nix (instance 'default_cache_dir', line 21) is opaque to the walker ('value is not a literal (alias, function call, or similar)') -- consistent with, not independent of, the same mkPackageOption-related non-literal-value pattern above."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "pr": 398885,
+  "title": "cockpit: fix sudo login",
+  "applicable": true,
+  "base_sha": "1052d81a4ae020f3c576d91d7e3ff04706969606",
+  "head_sha": "51ac5d673e3de02326de991e673d01d84cfb5505",
+  "module_paths": [
+    "nixos/modules/services/monitoring/cockpit.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/cockpit.nix"
+  ],
+  "reason": "Applicable: real cockpit module + wired test (nixos/tests/all-tests.nix at head 51ac5d673 contains 'cockpit = handleTest ./cockpit.nix {};'). Real diff adds a genuinely new `allowed-origins` mkOption declaration (type=listOf str, default=[]), wires it into `security.pam.services.cockpit.startSession = true;` (a real security-relevant fix, matching the PR title 'fix sudo login') and into `services.cockpit.settings.WebService.Origins`.",
+  "targets_toml": "single target cockpit, cfg_ident=cfg, option_prefix=[services,cockpit], watch=[allowed-origins].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "allowed-origins",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "A REAL, CORRECT transition at the per-verdict level: OptionNotFound at base (didn't exist) -> PredicateNotFound at head (genuinely exists now, correctly discovered via the ordinary nested options={...} declaration form, but has no predicate/branch tied to it -- its value is only used in a plain string concatenation, `builtins.concatStringsSep \" \" config.services.cockpit.allowed-origins`)."
+    },
+    {
+      "watched_path": "allowed-origins",
+      "note": "SECOND INSTANCE of the same rendering/categorization gap flagged in batch 2's PR 510900 (sshd moduliFile), this time in the OPPOSITE transition direction. raw.json's own summary is fully correct: changed=1, oba_verdict_transitions={'option_not_found->predicate_not_found': 1}. But summary.md's rendered table again shows ALL-ZERO across every named row (Unchanged: 0 included -- there is truly no row anywhere that represents this transition), and notable_total=0 / notable=[]. Per the coordinator's own naming convention introduced after batch 2, tagging this candidate_rendering_gap (detection succeeded -- the JSON correctly has the real transition -- but the human-facing summary renderer has no bucket for either *_not_found<->*_not_found transition direction, so a maintainer reading only summary.md would see nothing happened here either, despite a real option having been genuinely added)."
+    }
+  ]
+}

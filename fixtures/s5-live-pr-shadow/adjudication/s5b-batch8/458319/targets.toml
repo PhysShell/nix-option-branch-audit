@@ -1,0 +1,7 @@
+[[target]]
+name = "458319"
+module = "nixos/modules/services/databases/clickhouse.nix"
+test = "nixos/tests/clickhouse/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "clickhouse"]
+watch = ["serverConfig"]

@@ -1,0 +1,37 @@
+{
+  "pr": 389428,
+  "title": "nixos/searx: add option for favicons settings",
+  "applicable": true,
+  "base_sha": "f1a7026e80ac6072ff674a983f1ac4026daa7ac5",
+  "head_sha": "461be7d8c880c757eaa9713d4ce08cd9e12beb53",
+  "module_paths": [
+    "nixos/modules/services/networking/searx.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/searx.nix"
+  ],
+  "reason": "Applicable: real searx module + wired test. Real diff adds faviconsSettings mkOption.",
+  "targets_toml": "single target searx, cfg_ident=cfg, option_prefix=[services,searx], watch=[faviconsSettings].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "faviconsSettings",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "24th candidate_rendering_gap instance."
+    }
+  ]
+}

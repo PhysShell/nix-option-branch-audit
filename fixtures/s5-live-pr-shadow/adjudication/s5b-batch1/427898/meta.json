@@ -1,0 +1,37 @@
+{
+  "pr": 427898,
+  "title": "nixos/hedgedoc: add configureNginx option",
+  "applicable": true,
+  "base_sha": "bd59d6740b8b3b587b0cb2a56fd7569bf259418b",
+  "head_sha": "7259b7ca67392490f869013e27155553ba950ea7",
+  "module_paths": [
+    "nixos/modules/services/web-apps/hedgedoc.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/hedgedoc.nix"
+  ],
+  "reason": "Applicable: real hedgedoc module + wired test. Real diff adds configureNginx, but with a REAL BUG in the PR itself: configureNginx is declared as a plain `lib.mkOption {type=lib.types.bool; default=false;}` (a scalar bool, no sub-attributes) yet USED as `lib.mkIf cfg.configureNginx.enable {...}` (as if it were a submodule with an .enable field) -- this is a genuine declaration/usage type mismatch in the real nixpkgs PR, distinct from anything oba itself is being evaluated on.",
+  "targets_toml": "single target hedgedoc, cfg_ident=cfg, option_prefix=[services,hedgedoc], watch=[configureNginx].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "configureNginx",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "16th candidate_rendering_gap instance -- but genuinely worth double-checking given the real declaration/usage bug noted above: oba resolved configureNginx (the scalar bool) as PredicateNotFound at head, meaning it found the real bool declaration and correctly determined there's no predicate ON THE BOOL ITSELF (the buggy `.enable` sub-access is a separate, different reference oba's declaration-walker apparently doesn't conflate with the real top-level configureNginx option -- did not verify whether oba attempted to resolve `configureNginx.enable` at all or whether this real bug would itself ever surface through this tool; flagging the presence of the bug for completeness, not making a claim about whether oba should or shouldn't have caught it."
+    }
+  ]
+}

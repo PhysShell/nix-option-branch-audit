@@ -1,0 +1,7 @@
+[[target]]
+name = "481406"
+module = "nixos/modules/services/web-apps/vikunja.nix"
+test = "nixos/tests/vikunja.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "vikunja"]
+watch = ["address"]

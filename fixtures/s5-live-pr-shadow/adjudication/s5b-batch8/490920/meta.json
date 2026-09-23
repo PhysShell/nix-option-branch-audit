@@ -1,0 +1,47 @@
+{
+  "pr": 490920,
+  "title": "[Revert]: nixos/traefik: refactor due to issues with complex config",
+  "applicable": true,
+  "base_sha": "d1c15b7d5806069da59e819999d70e1cec0760bf",
+  "head_sha": "b898b53e2c0ade92cfcaab4beb088b67bd66831a",
+  "module_paths": [
+    "nixos/modules/services/web-servers/traefik.nix",
+    "nixos/modules/services/networking/pangolin.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/traefik.nix",
+    "nixos/tests/pangolin.nix"
+  ],
+  "reason": "FLAGGED REAL REVERT (coordinator: 'check whether reverted content genuinely returns to base-equivalent state or something subtler'). Base has the prior refactor: static.{file,settings} / dynamic.{file,dir,files,settings} nested options with 6 real assertions and mkRenamedOptionModule shims for the OLDER flat names. Head is NOT a bare git-revert of that refactor commit -- it is a fresh, independently-written flat module: static.{file,settings} and dynamic.{file,dir,files,settings} are ALL GONE (no mkRenamedOptionModule shims at all, a genuine removal, not a rename-back), replaced by flat staticConfigFile/staticConfigOptions/dynamicConfigFile/dynamicConfigOptions (matching pre-refactor naming but with different internal plumbing: TOML format instead of JSON, no 'user' option -- hardcoded to 'traefik' now, systemd hardening settings changed e.g. ProtectSystem 'strict'->'full', TasksMax->LimitNPROC, Type notify->simple). Consuming module pangolin.nix updates in lockstep: supplementaryGroups->group, static.settings->staticConfigOptions, dynamic.files.'pangolin'.settings->dynamicConfigOptions.",
+  "targets_toml": "TWO targets under this PR: (1) traefik.nix itself, option_prefix=[services,traefik], watch=[staticConfigFile]; (2) pangolin.nix's consuming-side change, option_prefix=[services,traefik] (same prefix, cross-referenced from pangolin's config), watch=[group].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "490920:oba:staticConfigFile:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "staticConfigFile",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING on the REVERT itself: staticConfigFile is a real option in the post-revert (head) module, predicate exists (if cfg.staticConfigFile == null then...), predicate_attempts witnessed=false, default_outcome=true. This is exactly the scrutiny the coordinator asked for -- the revert reintroduces a real option whose branch coverage is untested, mechanically identical to any other new-option OBA001 case, not a rename or shim, since the pre-refactor mkRenamedOptionModule compat shims are ALSO gone in this revert (no soft landing for anyone who adopted the intermediate refactor's static/dynamic naming)."
+    },
+    {
+      "watched_path": "group (via pangolin.nix)",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "'unchanged' both sides: pangolin.nix's real supplementaryGroups->group migration doesn't materially change traefik.nix's own option-branch discoverability for 'group' (which existed at both base and head as a plain mkOption, unaffected by the revert). No gap."
+    }
+  ]
+}

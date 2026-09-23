@@ -1,0 +1,9 @@
+{
+  "pr": 506376,
+  "title": "nixos/buffyboard: fixes for 3.5.1",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/buffyboard.nix"
+  ],
+  "reason": "No nixos/tests file exists for buffyboard (haptic_feedback/sticky_shift options added but untestable)."
+}

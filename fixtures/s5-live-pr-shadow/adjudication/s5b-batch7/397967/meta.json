@@ -1,0 +1,39 @@
+{
+  "pr": 397967,
+  "title": "fedimint: 0.5.1 -> 0.7.1",
+  "applicable": true,
+  "base_sha": "6990f4ce664f97b0ded551dbc9d4cccc7940d08d",
+  "head_sha": "c0f52c28cd3551ca5df9b574ff27e05dc6c40d7a",
+  "module_paths": [
+    "nixos/modules/services/networking/fedimintd.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/fedimintd.nix"
+  ],
+  "reason": "Real, substantial restructuring: the single 'api' section is split into 'api_ws' (renamed/renarrowed) and a brand new 'api_iroh' section, plus a brand new 'ui' section (all real new mkOptions), and nginx path options renamed (path -> path_ui/path_ws).",
+  "targets_toml": "option_prefix=[services,fedimintd], watch=[api_ws.openFirewall]. 'services.fedimintd' is itself types.attrsOf(types.submodule(...)) (per-instance config), but unlike kanidm's wildcards, fields within it ARE discoverable here (28 discovered_options) -- another same-shape-but-working wildcard instance, alongside drupal's sites and frp's instances.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "397967:oba:api_ws.openFirewall:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "api_ws.openFirewall",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'api_ws.openFirewall' away from its default false. Mechanically verified: predicate exists (lib.optional cfg.api_ws.openFirewall cfg.api_ws.port), predicate_attempts witnessed=false. New OBA001 finding this batch."
+    }
+  ]
+}

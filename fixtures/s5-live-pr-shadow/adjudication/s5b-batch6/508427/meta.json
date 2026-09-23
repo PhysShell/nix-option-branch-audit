@@ -1,0 +1,43 @@
+{
+  "pr": 508427,
+  "title": "nixos/drupal: synchronize config sync yamls from src into drupal state dir",
+  "applicable": true,
+  "base_sha": "93b719e82d8c5c0285cb1b87f190f2d367fc6e05",
+  "head_sha": "08a81f0e1060f76b78f368b2b2b95f4691d3456e",
+  "module_paths": [
+    "nixos/modules/services/web-apps/drupal.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/drupal.nix"
+  ],
+  "reason": "Real new mkOption 'configRoot' added inside the per-site siteOpts submodule; same drupal.nix file as batch5's PR506644 and batch6's own recurring 'sites' wildcard.",
+  "targets_toml": "option_prefix=[services,drupal,sites], watch=[configRoot] (same wildcard-but-working prefix as webRoot in batch5's 506644).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "configRoot",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head (again via the working wildcard sites.<name> prefix) but untested -- expected, not a gap. Further corroborates that drupal's 'sites' wildcard resolves consistently (3rd instance: webRoot in batch5, configRoot here)."
+    },
+    {
+      "watched_path": "configRoot",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

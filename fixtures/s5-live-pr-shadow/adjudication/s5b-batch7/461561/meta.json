@@ -1,0 +1,9 @@
+{
+  "pr": 461561,
+  "title": "nixos/onlyoffice: allow specifying a nonce",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/web-apps/onlyoffice.nix"
+  ],
+  "reason": "TEMPORAL NOTE: onlyoffice.nix DOES have a real test at other points in this same round's history (e.g. sibling PR 347209 in this same batch, head 2026-03-30), but this PR's own head SHA (acad2ac..., dated 2025-11-13, chronologically much earlier despite its later frozen-order position) predates the test's introduction -- confirmed absent via all-tests.nix and directory listing at this exact SHA. Real new securityNonceFile option added, but untestable at this PR's point in history."
+}

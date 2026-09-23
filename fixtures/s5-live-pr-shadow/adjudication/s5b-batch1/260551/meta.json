@@ -1,0 +1,39 @@
+{
+  "pr": 260551,
+  "title": "nixos/prosody: add config check option",
+  "applicable": true,
+  "base_sha": "f8a3116347dbec8df87c3ec6d8058d6bc3fe104e",
+  "head_sha": "0a92661ec32d274258dc038dd1064eb92af0f0df",
+  "module_paths": [
+    "nixos/modules/services/networking/prosody.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/xmpp/prosody.nix"
+  ],
+  "reason": "Applicable: real prosody module + wired test. Real diff (a) purely syntactically unwraps sslOpts/mucOpts from `{...}: {options={...};}` to `_: {options={...};}` (no semantic change), and (b) adds a genuinely new `checkConfig` mkOption (default true) plus a real Nix-level `if cfg.checkConfig then <build-time validation via prosodyctl check config> else <skip>` predicate.",
+  "targets_toml": "single target prosody, cfg_ident=cfg, option_prefix=[services,prosody], watch=[checkConfig].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 1
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "A:260551:oba:checkConfig:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "checkConfig",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "FIRST REAL ACTIONABLE PRESENTATION in the entire S5 round (S5-A + S5-B so far). check-head.json exit code is 1 (not the usual 2), summary={'pass':0,'finding':1,'inconclusive':0,'unavailable':0}. summary.md genuinely renders a 'NEWLY OBSERVABLE FINDING (ORIGIN UNCLEAR)' section: verdict OBA001 on checkConfig, message 'uncovered option branch: no test assignment provably flips this predicate away from its default', detail 'test evidence: none flips it'. Verified this is REAL and mechanically correct, not a targeting artifact: checkConfig is a genuinely new option in this PR (default=true), its predicate `if cfg.checkConfig then ... else ...` is real (line 958), and nixos/tests/xmpp/prosody.nix genuinely never sets checkConfig to any value (both predicate_attempts show witnessed=False) -- so the non-default (checkConfig=false, skip-validation) branch of this new predicate is genuinely, provably untested by the real test suite. This looks like oba correctly doing exactly what it claims to do (surface an option branch the test suite never exercises), not a false positive on its face -- but correctness/framing adjudication is explicitly not my call to make in this pass. Flagging for your independent review process, same as wakapi."
+    }
+  ]
+}

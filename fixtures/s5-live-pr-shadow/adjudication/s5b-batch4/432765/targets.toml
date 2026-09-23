@@ -1,0 +1,7 @@
+[[target]]
+name = "432765"
+module = "nixos/modules/services/security/kanidm.nix"
+test = "nixos/tests/kanidm.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kanidm", "unixd", "settings", "kanidm"]
+watch = ["pam_allowed_login_groups"]

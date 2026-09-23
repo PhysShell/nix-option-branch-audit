@@ -1,0 +1,37 @@
+{
+  "pr": 374017,
+  "title": "nixos/k3s: add `autoDeployCharts` option and use systemd-tmpfiles for chart deployment",
+  "applicable": true,
+  "base_sha": "4f570c5acd35e777e7f9f382f8cf2c141de85d0b",
+  "head_sha": "d3cd8299b44e829500c9237554a90121c3f47ada",
+  "module_paths": [
+    "nixos/modules/services/cluster/k3s/default.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/k3s/default.nix"
+  ],
+  "reason": "Applicable: real k3s module + wired test (k3s = handleTest ./k3s {};). Real diff adds a genuinely new autoDeployCharts mkOption plus substantial new Helm/YAML manifest machinery and assertions.",
+  "targets_toml": "single target k3s, cfg_ident=cfg, option_prefix=[services,k3s], watch=[autoDeployCharts].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "autoDeployCharts",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "10th candidate_rendering_gap instance. Not re-describing mechanism further."
+    }
+  ]
+}

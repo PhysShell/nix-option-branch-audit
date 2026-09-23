@@ -1,0 +1,7 @@
+[[target]]
+name = "524728"
+module = "nixos/modules/services/networking/porxie.nix"
+test = "nixos/tests/porxie.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "porxie"]
+watch = ["settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "436651"
+module = "nixos/modules/services/web-apps/homebox.nix"
+test = "nixos/tests/homebox.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "homebox"]
+watch = ["user"]

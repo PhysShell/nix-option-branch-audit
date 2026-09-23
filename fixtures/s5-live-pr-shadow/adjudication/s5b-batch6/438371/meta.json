@@ -1,0 +1,9 @@
+{
+  "pr": 438371,
+  "title": "nixos/postgresql-backup: add pgdumpAllOptions",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/backup/postgresql-backup.nix"
+  ],
+  "reason": "No nixos/tests file exists for postgresqlBackup (confirmed absent via all-tests.nix and nixos/tests directory listing); real new pgdumpAllOptions option added, plus a real bug fix (backupAll branch was using pgdumpOptions instead of pgdumpAllOptions), but untestable."
+}

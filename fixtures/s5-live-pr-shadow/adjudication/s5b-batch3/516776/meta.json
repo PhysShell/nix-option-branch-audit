@@ -1,0 +1,37 @@
+{
+  "pr": 516776,
+  "title": "traccar: 6.15.2 -> 6.15.3",
+  "applicable": true,
+  "base_sha": "c7b78a8e1839dc59a8fe550c1bdd71a0823f3991",
+  "head_sha": "5a8fac718920cfe2121eb54361615c0abe76df2c",
+  "module_paths": [
+    "nixos/modules/services/monitoring/traccar.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/traccar.nix"
+  ],
+  "reason": "Applicable: real traccar module + wired test. Real diff adds package via mkPackageOption plus a new environment mkOption.",
+  "targets_toml": "single target traccar, cfg_ident=cfg, option_prefix=[services,traccar], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "6th instance of the mkPackageOption non-discovery gap."
+    }
+  ]
+}

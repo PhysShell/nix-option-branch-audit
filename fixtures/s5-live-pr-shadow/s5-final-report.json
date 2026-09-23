@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "baseline": {
+    "release": "v0.4.5",
+    "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+    "artifact_sha256": "c07bed6c37fa3e0f1885099bb3dfc7a7b741531e8a156dc4fa8a7a160bd45800"
+  },
+  "reconciliation": {
+    "s5a_positions_unbroken_150": true,
+    "s5b_positions_unbroken_219": true,
+    "s5a_mismatches_vs_frozen_order": 0,
+    "s5b_mismatches_vs_frozen_order": 0,
+    "s5a_duplicate_prs": false,
+    "s5b_duplicate_prs": false
+  },
+  "s5a": {
+    "n": 150,
+    "applicable": 31,
+    "applicable_rate": 0.2067,
+    "tool_error_count": 0,
+    "actionable_presentation_count": 0,
+    "pass_verdict_count": 0,
+    "manual_effort_distribution": {
+      "<2": 119,
+      "2-10": 31
+    }
+  },
+  "s5b": {
+    "n": 219,
+    "applicable": 149,
+    "applicable_rate": 0.6804,
+    "tool_error_count": 0,
+    "actionable_presentation_count": 17,
+    "pass_verdict_count": 5,
+    "manual_effort_distribution": {
+      "<2": 152,
+      "2-10": 67
+    }
+  },
+  "pr_level_precision": {
+    "distinct_actionable_prs_total": 18,
+    "distinct_actionable_prs_correct": 15,
+    "distinct_actionable_prs_incorrect": 3,
+    "incorrect_pr_numbers": [
+      462487,
+      471312,
+      475112
+    ],
+    "target": 30,
+    "target_reached": false,
+    "one_sided_95_lower_bound": null
+  },
+  "false_pass_count": 0,
+  "unresolved_disagreement_count": 0,
+  "path_overlap_diagnostics": {
+    "actionable_prs_total": 18,
+    "actionable_prs_overlapping_s4_path": 3,
+    "actionable_prs_path_novel": 15,
+    "overlap_correct": 2,
+    "novel_correct": 13,
+    "distinct_service_paths_among_actionable": [
+      "nixos/modules/services/audio/music-assistant.nix",
+      "nixos/modules/services/audio/navidrome.nix",
+      "nixos/modules/services/display-managers/greetd.nix",
+      "nixos/modules/services/misc/angrr.nix",
+      "nixos/modules/services/misc/gollum.nix",
+      "nixos/modules/services/misc/sssd.nix",
+      "nixos/modules/services/networking/cgit.nix",
+      "nixos/modules/services/networking/fedimintd.nix",
+      "nixos/modules/services/networking/mihomo.nix",
+      "nixos/modules/services/networking/ncps.nix",
+      "nixos/modules/services/networking/pangolin.nix",
+      "nixos/modules/services/networking/prosody.nix",
+      "nixos/modules/services/networking/radicale.nix",
+      "nixos/modules/services/networking/ssh/sshd.nix",
+      "nixos/modules/services/web-apps/filebrowser.nix",
+      "nixos/modules/services/web-apps/guacamole-client.nix",
+      "nixos/modules/services/web-apps/guacamole-server.nix",
+      "nixos/modules/services/web-apps/photoprism.nix",
+      "nixos/modules/services/web-servers/traefik.nix"
+    ]
+  },
+  "gate": {
+    "verdict": "FAIL",
+    "reasons": [
+      "PR #462487: incorrect presentation(s) ['B:462487:oba:logbackXml:finding_became_inconclusive:1']",
+      "PR #471312: incorrect presentation(s) ['B:471312:oba:period:unchanged:1']",
+      "PR #475112: incorrect presentation(s) ['B:475112:oba:gitHttpBackend.enable:new_finding:1']"
+    ],
+    "round_complete": true
+  }
+}

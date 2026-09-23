@@ -1,0 +1,7 @@
+[[target]]
+name = "468049"
+module = "nixos/modules/services/networking/radicale.nix"
+test = "nixos/tests/radicale.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "radicale"]
+watch = ["user"]

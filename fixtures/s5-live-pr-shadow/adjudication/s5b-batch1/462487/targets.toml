@@ -1,0 +1,7 @@
+[[target]]
+name = "462487"
+module = "nixos/modules/services/web-apps/guacamole-server.nix"
+test = "nixos/tests/guacamole-server.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "guacamole-server"]
+watch = ["logbackXml"]

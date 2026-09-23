@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "498611",
+      "module": "nixos/modules/services/web-apps/olivetin.nix",
+      "test": "nixos/tests/olivetin.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "olivetin"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 18,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "if lib.versionAtLeast config.system.stateVersion \"26.05\" then pkgs.olivetin-3k else pkgs.olivetin",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 20,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"olivetin\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "olivetin"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 32,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"olivetin\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "olivetin"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 38,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "path"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 44,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 59,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "ListenAddressSingleHTTPFrontend"
+          ],
+          "default_source": "\"127.0.0.1:8000\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1:8000"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 69,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "extraConfigFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 81,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 93,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 93,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "olivetin"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 139,
+            "col": 19
+          },
+          "source": "lib.mkIf (cfg.user == \"olivetin\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "olivetin"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 146,
+            "col": 20
+          },
+          "source": "lib.mkIf (cfg.group == \"olivetin\") { olivetin = { }; }"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/olivetin.nix",
+            "line": 24,
+            "col": 9
+          },
+          "source": "if lib.versionAtLeast config.system.stateVersion \"26.05\" then pkgs.olivetin-3k else pkgs.olivetin",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/olivetin.nix",
+            "line": 30,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "package"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

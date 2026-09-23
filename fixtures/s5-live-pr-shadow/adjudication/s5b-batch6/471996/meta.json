@@ -1,0 +1,43 @@
+{
+  "pr": 471996,
+  "title": "nixos/slurm: add extraFlags option to slurmctld service",
+  "applicable": true,
+  "base_sha": "905105f25fcc57e2f6fa96cef09a7899870cb08a",
+  "head_sha": "b740fb3106c5a63ed6dd2b6d368b6e57303bb2b7",
+  "module_paths": [
+    "nixos/modules/services/computing/slurm/slurm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/slurm.nix"
+  ],
+  "reason": "Real new mkOption 'server.flags' (attrsOf str/bool/float/int, passed as slurmctld CLI flags) added.",
+  "targets_toml": "option_prefix=[services,slurm,server], watch=[flags].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "flags",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "flags",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

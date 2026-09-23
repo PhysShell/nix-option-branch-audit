@@ -1,0 +1,37 @@
+{
+  "pr": 489143,
+  "title": "nixos/stalwart: add module-specific stateVersion, clean up and switch",
+  "applicable": true,
+  "base_sha": "bdab6d6d27074f1ca86a4923279c1b606f391f88",
+  "head_sha": "28a9274f560b33bd05365c4c47c6c0248b68a4bc",
+  "module_paths": [
+    "nixos/modules/services/mail/stalwart.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/stalwart/stalwart.nix"
+  ],
+  "reason": "Applicable: real stalwart module + wired test. Real diff adds a genuinely new stateVersion mkOption.",
+  "targets_toml": "single target stalwart, cfg_ident=cfg, option_prefix=[services,stalwart], watch=[stateVersion].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "stateVersion",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "33rd candidate_rendering_gap instance."
+    }
+  ]
+}

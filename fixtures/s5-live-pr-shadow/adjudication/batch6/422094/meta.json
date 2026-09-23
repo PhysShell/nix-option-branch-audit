@@ -1,0 +1,37 @@
+{
+  "pr": 422094,
+  "title": "nixos/syncthing: get systemd units from cfg.package & install syncthing.help",
+  "applicable": true,
+  "base_sha": "7948541068f5acd759057a6b1dd515913fae2c4d",
+  "head_sha": "de0be57ef745e7fb7fa67141e0a97f578f5c1cfe",
+  "module_paths": [
+    "nixos/modules/services/networking/syncthing.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/syncthing.nix"
+  ],
+  "reason": "Applicable: real syncthing module + wired test (6 test variants). Real diff replaces hardcoded pkgs.syncthing with the already-declared cfg.package in systemPackages/systemd.packages -- another declared-but-previously-unused package option bug fix, same shape as sillytavern (batch5) but this one HAS a wired test.",
+  "targets_toml": "single target syncthing, cfg_ident=cfg, option_prefix=[services,syncthing], watch=[package].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "package",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "package's own declaration (likely mkPackageOption or equivalent, unchanged by this diff -- package already existed at base too, this PR only fixes its USE) also goes undiscovered at both sides. Did not further investigate whether syncthing.nix's package declaration is itself a mkPackageOption call (consistent with the known gap) or something else, given time; flagging as consistent with, not necessarily confirming, the mkPackageOption tally."
+    }
+  ]
+}

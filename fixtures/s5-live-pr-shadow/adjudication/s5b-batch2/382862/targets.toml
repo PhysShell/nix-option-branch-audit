@@ -1,0 +1,7 @@
+[[target]]
+name = "382862"
+module = "nixos/modules/services/web-apps/peering-manager.nix"
+test = "nixos/tests/web-apps/peering-manager.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "peering-manager"]
+watch = ["environmentFile"]

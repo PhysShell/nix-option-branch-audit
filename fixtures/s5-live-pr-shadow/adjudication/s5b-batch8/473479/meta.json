@@ -1,0 +1,43 @@
+{
+  "pr": 473479,
+  "title": "nixos/slurm: add rest options",
+  "applicable": true,
+  "base_sha": "d7547a7ed4d0bedcd73c64b2b854426ab55da543",
+  "head_sha": "f83670934aa00de5f23fcf9a38a8e4f8608ff7f6",
+  "module_paths": [
+    "nixos/modules/services/computing/slurm/slurm.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/slurm.nix"
+  ],
+  "reason": "Real new rest.{enable,options,environment.SLURM_JWT/SLURMRESTD_LISTEN/SLURMRESTD_DEBUG} submodule added (slurmrestd daemon support). 3rd slurm.nix PR this round.",
+  "targets_toml": "option_prefix=[services,slurm,rest], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "enable",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

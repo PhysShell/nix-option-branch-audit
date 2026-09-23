@@ -1,0 +1,7 @@
+[[target]]
+name = "dokuwiki"
+module = "nixos/modules/services/web-apps/dokuwiki.nix"
+test = "nixos/tests/dokuwiki.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "dokuwiki", "sites", "*"]
+watch = ["enable"]

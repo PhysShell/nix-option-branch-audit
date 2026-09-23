@@ -1,0 +1,7 @@
+[[target]]
+name = "401840"
+module = "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix"
+test = "nixos/tests/nvidia-container-toolkit.nix"
+cfg_ident = "cfg"
+option_prefix = ["hardware", "nvidia-container-toolkit"]
+watch = ["discovery-mode"]

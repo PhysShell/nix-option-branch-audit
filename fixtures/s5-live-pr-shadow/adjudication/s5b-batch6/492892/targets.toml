@@ -1,0 +1,7 @@
+[[target]]
+name = "492892"
+module = "nixos/modules/services/misc/sssd.nix"
+test = "nixos/tests/sssd-ldap.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "sssd"]
+watch = ["subIDsIntegration"]

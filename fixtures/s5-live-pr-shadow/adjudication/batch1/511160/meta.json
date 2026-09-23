@@ -1,0 +1,23 @@
+{
+  "pr": 511160,
+  "title": "goupile: 3.12.4 -> 3.12.5",
+  "applicable": true,
+  "base_sha": "6d66bd1fb6178294b84859a446689bb1a932d044",
+  "head_sha": "31c5329d4da0ad3b40677daa899ee969ba01e02d",
+  "module_paths": ["nixos/modules/services/web-apps/goupile.nix"],
+  "test_paths": ["nixos/tests/web-apps/goupile/default.nix", "nixos/tests/web-apps/goupile/basic_interaction_test.py"],
+  "reason": "Applicable: real goupile module + wired test (nixos/tests/all-tests.nix at head 31c5329d4 contains 'goupile = runTest ./web-apps/goupile;', line 682 -- a directory-form test, targeted here via its own default.nix entry point). Real diff changes `hostName`'s mkOption default from a literal \"goupile\" to `config.networking.fqdnOrHostName` (plus a new defaultText), and separately changes the nginx virtualHost's own proxyPass target from `cfg.hostName` to a hardcoded `127.0.0.1`.",
+  "targets_toml": "single target goupile, cfg_ident=cfg, option_prefix=[services,goupile], watch=[hostName].",
+  "run_exit_codes": {"audit_diff": 2, "check_base": 2, "check_head": 2},
+  "tool_error": false,
+  "notable_actionable_presentations": {"count": 0, "identities": []},
+  "pass_verdicts_needing_review": {"count": 0, "identities": []},
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "hostName",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides -- this looks like a CORRECT 'nothing to find' result rather than a gap: hostName is used as a plain string substitution (virtualHosts.${cfg.hostName}, and formerly the proxyPass target), never as a branch/predicate truthiness condition, so there is genuinely no predicate for the walker to find on this option either before or after the PR. The PR's real substance (proxyPass target changing from cfg.hostName to a hardcoded 127.0.0.1) is a config-generation VALUE-substitution-site change, not an option-branch predicate change -- outside this analyzer's declared domain by design, not a missed detection. Flagging as a raw fact, not a correctness judgment."
+    }
+  ]
+}

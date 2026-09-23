@@ -1,0 +1,43 @@
+{
+  "pr": 408843,
+  "title": "nixos/mealie: add extraOptions to allow setting trusted proxies",
+  "applicable": true,
+  "base_sha": "55abd9841e394d3149e8a895c458d7808830a7dd",
+  "head_sha": "a7f40a2648fe922f00d83491b605e3bec292e940",
+  "module_paths": [
+    "nixos/modules/services/web-apps/mealie.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mealie.nix"
+  ],
+  "reason": "Real new mkOption 'extraOptions' (listOf str, passed as extra gunicorn CLI args) added.",
+  "targets_toml": "option_prefix=[services,mealie], watch=[extraOptions].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraOptions",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "extraOptions",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

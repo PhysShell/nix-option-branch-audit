@@ -1,0 +1,43 @@
+{
+  "pr": 446598,
+  "title": "mopidy: migrate to rfc42",
+  "applicable": true,
+  "base_sha": "4b8ce46647bf2e03f0d6b19ea969fdf8ffa4f52f",
+  "head_sha": "87897caee2d7d31fa2f870c38070dd05f47e77ce",
+  "module_paths": [
+    "nixos/modules/services/audio/mopidy.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/mopidy.nix"
+  ],
+  "reason": "Real RFC42-style migration: 'configuration' (raw lines-type config) REMOVED via mkRemovedOptionModule ('Use RFC42-style services.mopidy.settings instead.'), replaced by a real new structured 'settings' option (INI format).",
+  "targets_toml": "option_prefix=[services,mopidy], watch=[configuration].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "configuration",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head matches the mkRemovedOptionModule diff exactly. Base was PredicateNotFound (real option existed but the mopidy test never set it to a resolvable literal) -- NOT a witnessed PASS. Same shape as the growing cluster of non-witnessed-base removals across this round (porxie, mpd, postgresql-recoveryConfig, ollama-acceleration, n8n's N8N_RUNNERS_CONFIG_PATH): no witnessed base evidence to lose, clean low-stakes removal."
+    },
+    {
+      "watched_path": "configuration",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

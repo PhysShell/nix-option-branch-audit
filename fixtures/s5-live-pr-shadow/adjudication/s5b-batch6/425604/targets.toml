@@ -1,0 +1,7 @@
+[[target]]
+name = "425604"
+module = "nixos/modules/services/web-apps/peertube.nix"
+test = "nixos/tests/web-apps/peertube.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "peertube"]
+watch = ["settings.video_transcription.enabled"]

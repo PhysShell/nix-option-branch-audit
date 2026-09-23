@@ -1,0 +1,7 @@
+[[target]]
+name = "mysql"
+module = "nixos/modules/services/databases/mysql.nix"
+test = "nixos/tests/mysql/mysql.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "mysql"]
+watch = ["dataDir"]

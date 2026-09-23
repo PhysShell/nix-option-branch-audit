@@ -1,0 +1,43 @@
+{
+  "pr": 524728,
+  "title": "porxie: 0.3.1 -> 0.3.3, nixos/porxie: update options for version",
+  "applicable": true,
+  "base_sha": "e4f7995bc4fbc2537c64ed9558ba33c895777606",
+  "head_sha": "e244279d81644dc1fcd06772e75b2850cbcc6a79",
+  "module_paths": [
+    "nixos/modules/services/networking/porxie.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/porxie.nix"
+  ],
+  "reason": "Real option removal: settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT and 4 sibling *_HTTP_*_TIMEOUT options removed from the freeform settings submodule; rest of diff is description-text-only changes.",
+  "targets_toml": "Self-corrected twice: first attempt option_prefix=[services,porxie,settings] watch=[PORXIE_BLOB_HTTP_CONNECT_TIMEOUT] returned 0 discovered_options (wrong -- settings submodule not walkable when named directly as the prefix tail). Second attempt option_prefix=[services,porxie] with watch as two separate array entries incorrectly targeted PORXIE_BLOB_HTTP_CONNECT_TIMEOUT as a TOP-LEVEL option (not nested under settings), giving false OptionNotFound at BOTH base and head. Final corrected form: option_prefix=[services,porxie], watch=['settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT'] (single dotted-path watch string) -- this correctly resolved the nested submodule option. All prior (wrong) targeting attempts and their outputs are VOID.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "Real option removal, correctly detected. Base was never witnessed (predicate exists but no test assignment resolves it) -- a clean removal with no witnessed base evidence to lose, structurally distinct from sshd/gollum-style removals that had witnessed base state."
+    },
+    {
+      "watched_path": "settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

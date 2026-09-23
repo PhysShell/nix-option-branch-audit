@@ -1,0 +1,37 @@
+{
+  "pr": 379377,
+  "title": "gotenberg: 8.9.1 -> 8.16.0; update and fix module options",
+  "applicable": true,
+  "base_sha": "06c3a28f6356830667387ca2e720140a06574106",
+  "head_sha": "31aedcfbee577d8118709cbfd1ecc0d61ff49f82",
+  "module_paths": [
+    "nixos/modules/services/misc/gotenberg.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/gotenberg.nix"
+  ],
+  "reason": "Applicable: real gotenberg module + wired test (gotenberg = handleTest ./gotenberg.nix {};). Real diff restructures pdfEngines from a flat listOf option into a submodule with sub-fields (merge/convert/readMetadata/writeMetadata), plus new downloadFrom.{allowList,maxRetries,denyList} options and a new pdfEngines.disableRoutes predicate.",
+  "targets_toml": "single target gotenberg, cfg_ident=cfg, option_prefix=[services,gotenberg], watch=[pdfEngines] (the restructured top-level option).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "pdfEngines",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "OptionNotFound",
+      "note": "9th candidate_rendering_gap instance -- correct verdicts individually (base: real flat option, no predicate; head: the leaf path genuinely no longer exists as a scalar option, replaced by a submodule container), changed=1 in raw.json, notable=[]. Not re-describing mechanism further."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "pr": 439761,
+  "title": "espeak-ng: 1.51.1 -> 1.52.0; piper-tts, etc",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/home-automation/wyoming/piper.nix"
+  ],
+  "reason": "useCUDA option added to wyoming/piper.nix; no nixos/tests/wyoming directory or piper test file exists."
+}

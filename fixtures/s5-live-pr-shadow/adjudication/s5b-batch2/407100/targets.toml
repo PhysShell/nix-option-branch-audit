@@ -1,0 +1,7 @@
+[[target]]
+name = "407100"
+module = "nixos/modules/services/web-apps/photoprism.nix"
+test = "nixos/tests/photoprism.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "photoprism"]
+watch = ["databasePasswordFile"]

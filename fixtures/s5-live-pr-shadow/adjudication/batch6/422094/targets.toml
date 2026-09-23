@@ -1,0 +1,7 @@
+[[target]]
+name = "syncthing"
+module = "nixos/modules/services/networking/syncthing.nix"
+test = "nixos/tests/syncthing.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "syncthing"]
+watch = ["package"]

@@ -1,0 +1,43 @@
+{
+  "pr": 405610,
+  "title": "nixos/paperless: expose manage package",
+  "applicable": true,
+  "base_sha": "93bf311f43952c22f93cc76b68fc5076c143997e",
+  "head_sha": "998fe3a6473c6373306895b3d0cd11698b6141c1",
+  "module_paths": [
+    "nixos/modules/services/misc/paperless.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paperless.nix"
+  ],
+  "reason": "Real new read-only mkOption 'manage' added (exposes the paperless-manage wrapper package for other modules). Distinct PR from the earlier paperless PR 367545 seen in S5-A batch2.",
+  "targets_toml": "option_prefix=[services,paperless], watch=[manage].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "manage",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "manage",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

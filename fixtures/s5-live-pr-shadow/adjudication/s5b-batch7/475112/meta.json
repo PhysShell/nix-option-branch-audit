@@ -1,0 +1,39 @@
+{
+  "pr": 475112,
+  "title": "nixos/cgit: add gitHttpBackend options",
+  "applicable": true,
+  "base_sha": "308f82252459d32a68cfbbec3af672e5867ff994",
+  "head_sha": "a722a999d1af37d9f3760680dc50fc598fce01a6",
+  "module_paths": [
+    "nixos/modules/services/networking/cgit.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/cgit.nix"
+  ],
+  "reason": "Real new mkOptions gitHttpBackend.{enable,checkExportOkFiles} added (nested per-vhost), plus 2 real new assertions and a real nginx behavior change (GIT_HTTP_EXPORT_ALL now conditional).",
+  "targets_toml": "option_prefix=[services,cgit], watch=[gitHttpBackend.enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 1,
+    "identities": [
+      "475112:oba:gitHttpBackend.enable:OBA001"
+    ]
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "gitHttpBackend.enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "OBA001",
+      "note": "REAL ACTIONABLE FINDING: uncovered option branch, no test assignment flips 'gitHttpBackend.enable' away from its default true (note: unusually this option DEFAULTS to true, so the uncovered branch is effectively the negative/off case). Mechanically verified: predicate exists (lib.optionalAttrs cfg.gitHttpBackend.enable {...} for the nginx location merge), predicate_attempts witnessed=false, default_outcome=true. New OBA001 finding this batch."
+    }
+  ]
+}

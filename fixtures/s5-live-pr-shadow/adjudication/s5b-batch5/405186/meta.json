@@ -1,0 +1,43 @@
+{
+  "pr": 405186,
+  "title": "nixos/postgresql: remove recoveryConfig option",
+  "applicable": true,
+  "base_sha": "8b9086b2dd2a98b282c5c111d18e08dd65eab37a",
+  "head_sha": "7d0363742c496b33c202895c54cee5f46b23d9a0",
+  "module_paths": [
+    "nixos/modules/services/databases/postgresql.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/postgresql/default.nix"
+  ],
+  "reason": "Real option removal (flagged by coordinator, 'another removal case worth the standard scrutiny'): 'recoveryConfig' removed via mkRemovedOptionModule ('PostgreSQL v12+ doesn't support recovery.conf.'), including removal of the recovery.conf symlink logic from the service's preStart.",
+  "targets_toml": "option_prefix=[services,postgresql], watch=[recoveryConfig].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "recoveryConfig",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "OptionNotFound",
+      "note": "Real, clean option removal correctly detected: OptionNotFound at head matches the mkRemovedOptionModule diff exactly, no successor option (unlike mpd's settings-based renames in this same batch, this one has no replacement at all). Base was TestConfigUnresolved (real option/predicate existed, but the postgresql test suite never set recoveryConfig to a resolvable literal) -- NOT a witnessed PASS at base, so like porxie's and mpd's removals in this same batch, there is no witnessed base evidence that could have been masked or lost; this reads as a clean, low-stakes removal not requiring sshd/gollum-style masked-relocation scrutiny."
+    },
+    {
+      "watched_path": "recoveryConfig",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

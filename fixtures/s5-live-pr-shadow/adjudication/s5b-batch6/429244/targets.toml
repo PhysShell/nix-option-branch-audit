@@ -1,0 +1,7 @@
+[[target]]
+name = "429244"
+module = "nixos/modules/services/mail/tlsrpt.nix"
+test = "nixos/tests/tlsrpt.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "tlsrpt"]
+watch = ["reportd.settings.http_script"]

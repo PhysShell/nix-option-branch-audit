@@ -1,0 +1,43 @@
+{
+  "pr": 488515,
+  "title": "harmonia: 2.1.0 -> 3.0.0",
+  "applicable": true,
+  "base_sha": "917fec990948658ef1ccd07cef2a1ef060786846",
+  "head_sha": "b5a97873d917d0ef43b2d13eba6a72bb38c2a3cd",
+  "module_paths": [
+    "nixos/modules/services/networking/harmonia.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/harmonia.nix"
+  ],
+  "reason": "Real, large restructuring WITH real compat shims (unlike traefik's revert in batch8): flat harmonia.{enable,signKeyPath,signKeyPaths,settings} renamed into harmonia.cache.* via 4 real mkRenamedOptionModule entries; brand new harmonia.daemon.{enable,socketPath,storeDir,dbPath,logLevel} section added (a new Nix daemon protocol server). Package option deliberately stays at the top level (noted in a real comment).",
+  "targets_toml": "option_prefix=[services,harmonia,cache], watch=[enable].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "enable",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real renamed-in option (moved under 'cache'), correctly not-found at base under the new nested path, discoverable at head but untested -- expected, not a gap. (Old flat 'services.harmonia.enable' not separately targeted, but the rename is real and has a working compat shim, unlike traefik's revert.)"
+    },
+    {
+      "watched_path": "enable",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and related unwitnessed) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

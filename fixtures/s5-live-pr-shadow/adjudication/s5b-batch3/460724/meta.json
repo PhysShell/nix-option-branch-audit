@@ -1,0 +1,37 @@
+{
+  "pr": 460724,
+  "title": "nixos/btrbk: add extraArgs option",
+  "applicable": true,
+  "base_sha": "67e26173dfd8752cc33425a0beda31f7b68c66d3",
+  "head_sha": "22f19b998281032b29dbb3f6f368870429a66d32",
+  "module_paths": [
+    "nixos/modules/services/backup/btrbk.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/btrbk.nix"
+  ],
+  "reason": "Applicable: real btrbk module + wired test (4 test variants). Real diff adds extraArgs mkOption inside the sshAccess wildcard submodule, wired into escapeShellArgs v.extraArgs (value substitution).",
+  "targets_toml": "single target btrbk, cfg_ident=cfg, option_prefix=[services,btrbk,sshAccess], watch=[extraArgs]. First attempt with option_prefix=[services,btrbk] alone returned OptionNotFound both sides -- self-caught via discovered_options (12 real options found, extraArgs present at the corrected nested path under sshAccess), corrected before finalizing, same discipline as syncthing's own self-correction in batch1.",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "extraArgs",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "29th candidate_rendering_gap instance, after self-correcting my own initial targeting mistake."
+    }
+  ]
+}

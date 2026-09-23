@@ -1,0 +1,7 @@
+[[target]]
+name = "414697"
+module = "nixos/modules/services/security/kanidm.nix"
+test = "nixos/tests/kanidm-provisioning.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "kanidm", "provision", "groups"]
+watch = ["overwriteMembers"]

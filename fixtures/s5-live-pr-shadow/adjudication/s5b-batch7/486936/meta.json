@@ -1,0 +1,43 @@
+{
+  "pr": 486936,
+  "title": "nixos/pretalx: Add support for secrets",
+  "applicable": true,
+  "base_sha": "49016f2147dc637b76f7990c5ac82cb2e2384dba",
+  "head_sha": "188bcbd94981706d94883939a4b0ffae4c506db4",
+  "module_paths": [
+    "nixos/modules/services/web-apps/pretalx.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/web-apps/pretalx.nix"
+  ],
+  "reason": "Real new mkOption environmentFiles (listOf path) added, sourced into the pretalx-manage script and passed as systemd EnvironmentFile.",
+  "targets_toml": "option_prefix=[services,pretalx], watch=[environmentFiles].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "environmentFiles",
+      "base_verdict": "OptionNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Real new option, correctly not-found at base, discoverable at head but untested -- expected, not a gap."
+    },
+    {
+      "watched_path": "environmentFiles",
+      "base_verdict": null,
+      "head_verdict": null,
+      "note": "candidate_rendering_gap: raw.json summary is correct (changed:1, correct oba_verdict_transitions) but rendered summary.md shows all New findings/Resolved/etc = 0 with no notable entries -- specific to *_not_found <-> *_not_found (and now also PredicateNotFound<->TestValueUnresolved / TestConfigUnresolved) style transitions where neither side has witnessed evidence."
+    }
+  ]
+}

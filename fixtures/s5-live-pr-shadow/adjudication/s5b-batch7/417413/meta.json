@@ -1,0 +1,9 @@
+{
+  "pr": 417413,
+  "title": "wyoming-faster-whisper: 2.4.0 -> 2.5.0",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/home-automation/wyoming/faster-whisper.nix"
+  ],
+  "reason": "No nixos/tests/wyoming/faster-whisper.nix or nixos/tests/wyoming-faster-whisper.nix exists at this PR's head SHA; real new useTransformers option added (plus a real typo bug in the module's own new assertion: 'initialPromt' instead of 'initialPrompt', which would itself cause an eval error if ever exercised), but untestable."
+}

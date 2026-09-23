@@ -1,0 +1,37 @@
+{
+  "pr": 450453,
+  "title": "nixos/searx: fix config file locations, modernize and harden service",
+  "applicable": true,
+  "base_sha": "93b9af4f8d0380d23de2e299108de7a217ee7e9d",
+  "head_sha": "d78b9e46d5d606347b022a1b7104e15641a9e57a",
+  "module_paths": [
+    "nixos/modules/services/networking/searx.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/searx.nix"
+  ],
+  "reason": "Applicable: same searx module as batch3's PR389428. Real diff is mostly a with-lib->explicit-lib refactor plus a real config-generation format change (JSON string building -> native pkgs.formats.yaml), no new option declaration itself but faviconsSettings (from batch3) is present and unchanged.",
+  "targets_toml": "single target searx, cfg_ident=cfg, option_prefix=[services,searx], watch=[faviconsSettings] (unchanged by this diff, used as a regression check against batch3's own finding on the same file).",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "faviconsSettings",
+      "base_verdict": "PredicateNotFound",
+      "head_verdict": "PredicateNotFound",
+      "note": "Unchanged both sides, correctly -- confirms searx.nix's own declaration resolution stays stable/working across this refactor-heavy PR, consistent with batch3's own finding on the same option."
+    }
+  ]
+}

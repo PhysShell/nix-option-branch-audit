@@ -1,0 +1,37 @@
+{
+  "pr": 367545,
+  "title": "nixos/paperless: mirror upstream admin user creation more closely",
+  "applicable": true,
+  "base_sha": "da0b46eab12c8812b59c6bf8689dfdd9b6b26e1c",
+  "head_sha": "7afa349ea8b05e500c37e72e5e70f15e35a242eb",
+  "module_paths": [
+    "nixos/modules/services/misc/paperless.nix"
+  ],
+  "test_paths": [
+    "nixos/tests/paperless.nix"
+  ],
+  "reason": "Applicable: real paperless module + wired test (nixos/tests/all-tests.nix at head 7afa349ea contains 'paperless = handleTest ./paperless.nix {};'). Real diff genuinely restructures a Nix-level predicate into a runtime one: BEFORE, the whole superuser-bootstrap bash block was wrapped in `lib.optionalString (cfg.passwordFile != null) ''...''` -- a Nix-BUILD-TIME predicate that OMITS the block entirely from the generated preStart script when passwordFile is unset. AFTER, the block is unconditionally emitted, with an internal bash-level `if ${lib.boolToString (cfg.passwordFile != null)} || [[ -n $PAPERLESS_ADMIN_PASSWORD ]]; then ... fi` runtime check instead -- passwordFile's own declared mkOption (line 176) is unchanged, but where/how its truthiness gates behavior moved from Nix-evaluation-time to systemd-runtime, and gained a second OR'd condition (a runtime env var) that Nix-level analysis cannot see at all.",
+  "targets_toml": "single target paperless, cfg_ident=cfg, option_prefix=[services,paperless], watch=[passwordFile].",
+  "run_exit_codes": {
+    "audit_diff": 2,
+    "check_base": 2,
+    "check_head": 2
+  },
+  "tool_error": false,
+  "notable_actionable_presentations": {
+    "count": 0,
+    "identities": []
+  },
+  "pass_verdicts_needing_review": {
+    "count": 0,
+    "identities": []
+  },
+  "additional_raw_facts_for_reviewer": [
+    {
+      "watched_path": "passwordFile",
+      "base_verdict": "TestConfigUnresolved",
+      "head_verdict": "TestConfigUnresolved",
+      "note": "FLAGGING PROMINENTLY: audit-diff's own rendered summary.md classifies this as 'Unchanged: 1' (the verdict STRING 'TestConfigUnresolved' is identical both sides), but the raw predicate_attempts arrays underneath are NOT identical: base shows 2 predicate sites referencing `passwordFile != null` (line 417 -- an unrelated, unchanged lib.optionalString elsewhere in the file -- and line 454, the one this PR actually restructured), while head shows only 1 (line 417 only; the line-454 site is genuinely gone from head, replaced by the runtime bash conditional described above). So the underlying EVIDENCE changed (a predicate site was structurally removed from the Nix-evaluable surface) even though the top-level verdict CLASS did not, and audit-diff's own 'Unchanged' classification does not surface this to a maintainer reading only the rendered summary. Both base and head are TestConfigUnresolved rather than a concrete witness because the real nixos/tests/paperless.nix test does not set passwordFile to a literal Nix-visible value (likely a generated secrets file or similar, opaque to the walker) -- not making a correctness judgment on whether 'Unchanged' is the RIGHT classification here, just flagging that the raw evidence underneath a verdict class that looks stable is not actually stable, which seems like exactly the kind of case a maintainer-facing summary could mislead on."
+    }
+  ]
+}

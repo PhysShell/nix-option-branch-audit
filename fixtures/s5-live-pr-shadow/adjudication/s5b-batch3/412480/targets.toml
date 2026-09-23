@@ -1,0 +1,7 @@
+[[target]]
+name = "412480"
+module = "nixos/modules/services/continuous-integration/jenkins/default.nix"
+test = "nixos/tests/jenkins.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "jenkins"]
+watch = ["javaPackage"]

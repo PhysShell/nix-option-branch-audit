@@ -1,0 +1,7 @@
+[[target]]
+name = "450453"
+module = "nixos/modules/services/networking/searx.nix"
+test = "nixos/tests/searx.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "searx"]
+watch = ["faviconsSettings"]

@@ -1,0 +1,9 @@
+{
+  "pr": 455593,
+  "title": "pkgs/buffybox: 3.3.0 -> 3.4.2-unstable-2025-10-25",
+  "applicable": false,
+  "module_paths": [
+    "nixos/modules/services/hardware/buffyboard.nix"
+  ],
+  "reason": "Same file as PR 506376 in this batch (buffyboard.nix); quirks.ignore_unused_terminals option added; no nixos/tests file exists for buffyboard."
+}

@@ -1,0 +1,7 @@
+[[target]]
+name = "441506"
+module = "nixos/modules/services/security/opensnitch.nix"
+test = "nixos/tests/opensnitch.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "opensnitch", "settings", "Audit"]
+watch = ["AudispSocketPath"]
