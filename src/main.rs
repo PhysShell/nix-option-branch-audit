@@ -1348,16 +1348,75 @@ fn resolve_type_reference(ident_node: &SyntaxNode) -> Option<SyntaxNode> {
 /// inside the type expression is a candidate, exactly the "AST/type
 /// machinery establishing the relationship more generally" this fix is
 /// required to prefer over a textual wrapper-name allowlist).
+///
+/// S5-F1C-B: a resolved reference isn't always the submodule itself --
+/// portmaster's real `packages = mkOption { type = listOf
+/// profilePackageType; };` resolves to `profilePackageType`, itself just
+/// `types.coercedTo types.package (package: {inherit package;})
+/// packageMatchType` -- a pure type-expression/alias step, not a
+/// submodule declaration, that itself references `packageMatchType`,
+/// the REAL submodule. `collect_type_reference_ranges_rec` follows such
+/// a chain transitively: after resolving and recording a reference, if
+/// the resolved value does NOT itself directly contain an `options =
+/// {...}` block (`find_nested_options_block`, the SAME check
+/// `walk_options_block`'s own inline-submodule handling already uses --
+/// i.e. it's not itself a submodule declaration, just another
+/// expression), it's treated as a transparent alias step and recursed
+/// into. A resolved value that DOES contain its own `options = {...}`
+/// block is a genuine submodule -- recursion deliberately stops there;
+/// its own internal declarations are handled separately, by the
+/// existing (one-hop-capped) promoted-candidate walk in `scan_options`,
+/// not by this alias-following recursion. This distinction is the whole
+/// safety property: recursing into a genuine submodule's own body here
+/// too would functionally remove the one-hop cap and reintroduce
+/// angrr's own defect (`settingsOptions`, itself a genuine submodule
+/// referenced with no `with` at all, would recurse straight into its own
+/// `temporary-root-policies` field and, combined with F1C-A's own
+/// with-transparency, promote `temporaryRootPolicyOptions` two hops from
+/// the true root) -- verified against that exact shape in
+/// `scan_options_angrr_two_hop_defect_stays_excluded_under_combined_with_and_alias_resolution`.
 fn collect_type_reference_ranges(
     type_expr: &SyntaxNode,
     into: &mut std::collections::HashSet<rowan::TextRange>,
+) {
+    let mut visited = std::collections::HashSet::new();
+    collect_type_reference_ranges_rec(type_expr, into, &mut visited);
+}
+
+/// The recursive worker behind `collect_type_reference_ranges`. `visited`
+/// is a single cycle-detection set threaded through this one top-level
+/// call's own entire recursion only -- each fresh `collect_type_reference_ranges`
+/// call (one per real declaration's own `type =` field) gets its own,
+/// so one declaration's alias chain can never suppress an unrelated
+/// sibling declaration's identical chain. Termination is guaranteed by
+/// `visited` alone (a resolved range can be entered at most once across
+/// the whole recursion, and the AST is finite), not by an arbitrary
+/// depth cap -- `A -> B -> A` (or `A -> A` directly) simply stops the
+/// moment the cycle closes, the same way `resolve_alias_recursively`'s
+/// own `AliasChain`-based cycle detection already works for predicate
+/// aliasing elsewhere in this file, applied here to `TextRange`s instead
+/// of names (so it stays correct across the same name reused in
+/// different lexical scopes, which the name-based `AliasChain` alone
+/// wouldn't distinguish).
+fn collect_type_reference_ranges_rec(
+    type_expr: &SyntaxNode,
+    into: &mut std::collections::HashSet<rowan::TextRange>,
+    visited: &mut std::collections::HashSet<rowan::TextRange>,
 ) {
     for node in type_expr.descendants() {
         if node.kind() != NODE_IDENT {
             continue;
         }
-        if let Some(resolved) = resolve_type_reference(&node) {
-            into.insert(resolved.text_range());
+        let Some(resolved) = resolve_type_reference(&node) else {
+            continue;
+        };
+        let range = resolved.text_range();
+        if !visited.insert(range) {
+            continue;
+        }
+        into.insert(range);
+        if find_nested_options_block(&resolved).is_none() {
+            collect_type_reference_ranges_rec(&resolved, into, visited);
         }
     }
 }
@@ -8423,6 +8482,401 @@ mod tests {
             !opts.iter().any(|o| path_eq(&o.path, &["prefixLength"])),
             "addrOpts (hop 2 via pool) must stay excluded -- documenting the compound-cause boundary, \
              not a claim this fix resolves tayga fully; got {opts:?}"
+        );
+    }
+
+    // --- S5-F1C-B: recursive pure alias-chain resolution ---------------
+    //
+    // F1B-R's own real finding (portmaster.nix, PR #557329): `packages`
+    // (a real, true-root-anchored declaration)'s own `type =` field
+    // references `profilePackageType`, a named `let`-binding whose own
+    // value is a pure type-expression/alias step (`types.coercedTo
+    // types.package (package: {inherit package;}) packageMatchType`),
+    // not itself a submodule -- it in turn references `packageMatchType`,
+    // the real submodule. `collect_type_reference_ranges`'s own single
+    // scan of `packages`'s type field never saw `packageMatchType` at
+    // all (only `profilePackageType`); this fix follows the chain
+    // transitively through any number of such alias steps.
+
+    #[test]
+    fn scan_options_resolves_a_single_alias_hop() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              realSubmodule = {
+                options = {
+                  leaf = lib.mkOption { default = "from-real"; };
+                };
+              };
+              aliasType = lib.types.submodule realSubmodule;
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = aliasType;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "one alias hop (aliasType -> realSubmodule) must resolve; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_resolves_multiple_alias_hops() {
+        // A -> B -> C -> the real submodule -- three pure alias steps,
+        // not just one.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              realSubmodule = {
+                options = {
+                  leaf = lib.mkOption { default = "from-real"; };
+                };
+              };
+              aliasC = lib.types.submodule realSubmodule;
+              aliasB = lib.types.nullOr aliasC;
+              aliasA = lib.types.coercedTo lib.types.str (x: x) aliasB;
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = aliasA;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "a three-hop pure alias chain (aliasA -> aliasB -> aliasC -> realSubmodule) must resolve \
+             transitively; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_real_portmaster_alias_chain_resolves() {
+        // Integration anchor: the real F1B-R counterexample. `profilePackageType`
+        // is a pure alias step (`types.coercedTo types.package (package:
+        // {inherit package;}) packageMatchType`), not itself a submodule;
+        // `packageMatchType` is the real one.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.portmaster;
+              packageMatchType = lib.types.submodule (
+                { ... }: {
+                  options = {
+                    directory = lib.mkOption { type = lib.types.str; default = ""; };
+                    name = lib.mkOption { type = lib.types.nullOr lib.types.str; default = null; };
+                    package = lib.mkOption { type = lib.types.package; };
+                    strictHead = lib.mkOption { type = lib.types.bool; default = false; };
+                    strictLast = lib.mkOption { type = lib.types.bool; default = true; };
+                    storeNameRegex = lib.mkOption { type = lib.types.nullOr lib.types.str; default = null; };
+                    wrapped = lib.mkOption { type = lib.types.bool; default = false; };
+                  };
+                }
+              );
+              profilePackageType = lib.types.coercedTo lib.types.package (package: { inherit package; }) packageMatchType;
+            in
+            {
+              options.services.portmaster = {
+                profiles = lib.mkOption {
+                  type = lib.types.attrsOf (
+                    lib.types.submodule (
+                      { name, ... }: {
+                        options = {
+                          name = lib.mkOption { type = lib.types.str; default = name; };
+                          packages = lib.mkOption {
+                            type = lib.types.listOf profilePackageType;
+                            default = [ ];
+                          };
+                        };
+                      }
+                    )
+                  );
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "portmaster".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        for leaf in ["directory", "package", "strictHead", "strictLast", "storeNameRegex", "wrapped"] {
+            assert!(
+                opts.iter().any(|o| path_eq(&o.path, &[leaf])),
+                "packageMatchType's own {leaf}, reachable only via the profilePackageType alias step, \
+                 must resolve; got {opts:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn scan_options_alias_cycle_terminates_as_unresolved() {
+        // `aliasA -> aliasB -> aliasA` -- a genuine cycle spanning two
+        // hops. Must terminate deterministically (never hang, never
+        // stack-overflow) and treat the cycle as unresolved, not silently
+        // pick a partial result.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              aliasA = lib.types.nullOr aliasB;
+              aliasB = lib.types.nullOr aliasA;
+              realSubmodule = {
+                options = {
+                  leaf = lib.mkOption { default = "from-real"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = aliasA;
+                  default = { };
+                };
+                unrelatedAnchor = lib.mkOption {
+                  type = lib.types.submodule realSubmodule;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        // Must simply return (no hang / no stack overflow) -- the real
+        // assertion here IS that this line completes at all.
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "unrelated realSubmodule (reached via a completely separate, non-cyclic anchor) must still \
+             resolve normally -- the cycle in aliasA/aliasB must not corrupt unrelated resolution; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_alias_self_cycle_terminates_as_unresolved() {
+        // `aliasA -> aliasA` directly (references itself in its own
+        // value) -- the simplest possible cycle shape.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              aliasA = lib.types.nullOr aliasA;
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = aliasA;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["thing"])),
+            "a self-referencing alias must not hang or crash scan_options -- the true-root `thing` \
+             declaration itself must still be recorded; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_alias_into_unsupported_expression_stays_unresolved() {
+        // An alias step whose own value is genuinely unsupported (e.g. a
+        // `with someDynamicExpression;`-wrapped reference) must not be
+        // silently treated as resolved -- the chain simply stops there,
+        // exactly as a single-hop unsupported reference already would.
+        let src = r#"
+            { config, lib, pkgs, ... }:
+            let
+              cfg = config.services.widget;
+              realSubmodule = {
+                options = {
+                  leaf = lib.mkOption { default = "from-real"; };
+                };
+              };
+              unsupportedAlias = with pkgs; lib.types.nullOr realSubmodule;
+              aliasA = lib.types.nullOr unsupportedAlias;
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = aliasA;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "unsupportedAlias's own value is `with pkgs;`-wrapped (unrecognized with-source) -- \
+             realSubmodule must NOT resolve through it; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_two_aliases_same_name_different_lexical_scopes_each_resolve_to_their_own_target() {
+        // Two DIFFERENT `helperAlias` bindings, in disjoint scopes, each
+        // aliasing a DIFFERENT real submodule -- confirms alias-chain
+        // following is scope-correct (uses `resolve_ident_binding`'s own
+        // existing shadowing-aware walk), not a flat name-to-node map
+        // that would conflate the two.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              realA = {
+                options = {
+                  leafA = lib.mkOption { default = "from-A"; };
+                };
+              };
+              realB = {
+                options = {
+                  leafB = lib.mkOption { default = "from-B"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thingA = lib.mkOption {
+                  type =
+                    let helperAlias = lib.types.submodule realA; in
+                    helperAlias;
+                  default = { };
+                };
+                thingB = lib.mkOption {
+                  type =
+                    let helperAlias = lib.types.submodule realB; in
+                    helperAlias;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["leafA"])), "thingA's own helperAlias must resolve to realA; got {opts:?}");
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["leafB"])), "thingB's own helperAlias must resolve to realB; got {opts:?}");
+    }
+
+    #[test]
+    fn scan_options_alias_chain_interacts_correctly_with_with_scoped_resolution() {
+        // F1C-A + F1C-B composition: an alias step reached NORMALLY
+        // (dotted, no with) whose OWN value is `with lib.types;`-wrapped,
+        // referencing the real submodule -- both fixes must compose.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              realSubmodule = {
+                options = {
+                  leaf = lib.mkOption { default = "from-real"; };
+                };
+              };
+              aliasA = with lib.types; nullOr (submodule realSubmodule);
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = aliasA;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "aliasA is reached with a plain dotted reference (no with); ITS OWN value is with-wrapped -- \
+             recursing into it must reuse F1C-A's own with-transparency; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_angrr_two_hop_defect_stays_excluded_under_combined_with_and_alias_resolution() {
+        // The decisive combined-safety test: with BOTH F1C-A (with-
+        // transparency) AND F1C-B (alias-chain recursion) active
+        // together, angrr's real defect must STILL stay excluded.
+        // `settingsOptions` is a genuine submodule (has its own `options
+        // = {...}` block directly) -- `find_nested_options_block` on its
+        // resolved value returns `Some`, so F1C-B's own recursion
+        // deliberately does NOT descend into it looking for further
+        // references. Its own internal `temporary-root-policies` field
+        // (which DOES reference `temporaryRootPolicyOptions`, `with
+        // lib.types;`-wrapped) is instead only reachable via the
+        // existing, unrelated, one-hop-capped promoted-candidate walk,
+        // which uses a throwaway reference set -- so even though F1C-A
+        // would now happily resolve that with-wrapped reference in
+        // isolation, it never reaches the SHARED set this decision is
+        // made from.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.angrr;
+              temporaryRootPolicyOptions = {
+                options = {
+                  period = lib.mkOption { default = "unrelated-period"; };
+                };
+              };
+              settingsOptions = {
+                options = {
+                  temporary-root-policies = lib.mkOption {
+                    type = with lib.types; attrsOf (submodule temporaryRootPolicyOptions);
+                    default = { };
+                  };
+                };
+              };
+            in
+            {
+              options.services.angrr = {
+                settings = lib.mkOption {
+                  type = lib.types.submodule settingsOptions;
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "angrr".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["temporary-root-policies"])),
+            "settingsOptions (hop 1, no local with) must still promote; got {opts:?}"
+        );
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["period"])),
+            "temporaryRootPolicyOptions must stay excluded even with BOTH F1C-A and F1C-B active \
+             together -- settingsOptions is a genuine submodule, not an alias, so F1C-B's own \
+             recursion correctly does not descend into it; got {opts:?}"
         );
     }
 
