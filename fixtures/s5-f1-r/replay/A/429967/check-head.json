@@ -1,0 +1,638 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "test": "nixos/tests/xmpp/prosody.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "prosody",
+        "modules"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "prosody",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 614,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "checkConfig"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 620,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "xmppComplianceSuite"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 627,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/prosody\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/prosody"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 657,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "disco_items"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 668,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "user"
+          ],
+          "default_source": "\"prosody\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "prosody"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 674,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "group"
+          ],
+          "default_source": "\"prosody\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "prosody"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 688,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "allowRegistration"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 702,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "httpPorts"
+          ],
+          "default_source": "[ 5280 ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 709,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "httpInterfaces"
+          ],
+          "default_source": "[\n          \"*\"\n          \"::\"\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 715,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "httpsPorts"
+          ],
+          "default_source": "[ 5281 ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 724,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "httpsInterfaces"
+          ],
+          "default_source": "[\n          \"*\"\n          \"::\"\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 730,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "c2sRequireEncryption"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 739,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "s2sRequireEncryption"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 748,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "s2sSecureAuth"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 758,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "s2sInsecureDomains"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 769,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "s2sSecureDomains"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 781,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "extraModules"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 793,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "extraPluginPaths"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 799,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "httpFileShare"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 805,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "muc"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 818,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "virtualHosts"
+          ],
+          "default_source": "{\n          localhost = {\n            domain = \"localhost\";\n            enabled = true;\n          };\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 829,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "ssl"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 851,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "admins"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 857,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "authentication"
+          ],
+          "default_source": "\"internal_hashed\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "internal_hashed"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 867,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 879,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "prosody",
+            "log"
+          ],
+          "default_source": "''\"*syslog\"''",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "\"*syslog\""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 885,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "modules",
+            "mam"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 570,
+            "col": 34
+          },
+          "source": "optionalString cfg.modules.mam ''\" muc_mam\",''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 904,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "checkConfig"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 942,
+            "col": 7
+          },
+          "source": "if cfg.checkConfig then"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 266,
+            "col": 5
+          },
+          "source": "if builtins.isString x then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 268,
+            "col": 10
+          },
+          "source": "if builtins.isBool x then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 270,
+            "col": 10
+          },
+          "source": "if builtins.isInt x then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 272,
+            "col": 10
+          },
+          "source": "if builtins.isList x then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 537,
+            "col": 42
+          },
+          "source": "optionalString val \"${toLua name};\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 570,
+            "col": 83
+          },
+          "source": "optionalString muc.allowners_muc ''\" muc_allowners\",''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/prosody.nix",
+            "line": 605,
+            "col": 15
+          },
+          "source": "optionalString (v.ssl != null) (createSSLOptsStr v.ssl)",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "http_files"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

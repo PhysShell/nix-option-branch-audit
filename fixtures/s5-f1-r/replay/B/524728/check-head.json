@@ -1,0 +1,424 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "524728",
+      "module": "nixos/modules/services/networking/porxie.nix",
+      "test": "nixos/tests/porxie.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "porxie"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 12,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 16,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 25,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_SERVER_ADDRESS"
+          ],
+          "default_source": "\"ip:127.0.0.1:6314\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "ip:127.0.0.1:6314"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 49,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_SERVER_ADMIN_PASSWORD"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 59,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_BLOB_ALLOWED_MIMETYPES"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 74,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_BLOB_MAX_SIZE"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 87,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_BLOB_CACHE_HEADER"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 96,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_BLOB_PROCESSING_TIMEOUT"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 106,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_BLOB_HTTP_TIMEOUT"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 111,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_IDENTITY_PLC_URL"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 118,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_CACHE_ALLOCATION"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 125,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_CACHE_BLOB_TTI"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 139,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_CACHE_OWNERSHIP_TTL"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 144,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_CACHE_POLICY_TTL"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 149,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_CACHE_IDENTITY_TTL"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 154,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_POLICY_URL"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 161,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_POLICY_REQUEST_HEADERS"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 170,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PORXIE_POLICY_FAIL_OPEN"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 184,
+            "col": 11
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 200,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 200,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 77,
+            "col": 24
+          },
+          "source": "if v != null then lib.concatStringsSep \",\" v else null",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 173,
+            "col": 24
+          },
+          "source": "if v != null then lib.concatStringsSep \"|\" v else null",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/porxie.nix",
+            "line": 187,
+            "col": 24
+          },
+          "source": "if v != null then lib.boolToString v else null",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

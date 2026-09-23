@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "458319",
+      "module": "nixos/modules/services/databases/clickhouse.nix",
+      "test": "nixos/tests/clickhouse/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "clickhouse"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 24,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "serverConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 30,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "usersConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 58,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraServerConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 80,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraUsersConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 92,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 113,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 113,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extraServerConfig"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extraServerConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 164,
+            "col": 9
+          },
+          "source": "lib.mkIf (cfg.extraServerConfig != \"\")"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extraUsersConfig"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extraUsersConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 170,
+            "col": 9
+          },
+          "source": "lib.mkIf (cfg.extraUsersConfig != \"\")"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 155,
+            "col": 67
+          },
+          "source": "lib.mkIf (cfg.serverConfig != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "serverConfig"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/clickhouse.nix",
+            "line": 159,
+            "col": 66
+          },
+          "source": "lib.mkIf (cfg.usersConfig != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "usersConfig"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/clickhouse/default.nix",
+            "line": 7,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/clickhouse/default.nix",
+            "line": 13,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/clickhouse/default.nix",
+            "line": 19,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/clickhouse/default.nix",
+            "line": 25,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "serverConfig"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

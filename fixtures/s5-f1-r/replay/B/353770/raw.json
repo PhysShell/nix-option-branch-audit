@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->predicate_not_found": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/syncthing.nix",
+        "test": "nixos/tests/syncthing/main.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "syncthing",
+          "settings",
+          "folders"
+        ],
+        "watched_path": "ignorePatterns"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "ignorePatterns"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "ignorePatterns"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

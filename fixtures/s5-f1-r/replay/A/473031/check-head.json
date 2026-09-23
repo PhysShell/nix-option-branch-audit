@@ -1,0 +1,830 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "roundcube",
+      "module": "nixos/modules/services/mail/roundcube.nix",
+      "test": "nixos/tests/roundcube.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "roundcube"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 16,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "hostName"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 28,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "database",
+            "username"
+          ],
+          "default_source": "\"roundcube\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "roundcube"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 39,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 47,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "password"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 57,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 62,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "dbname"
+          ],
+          "default_source": "\"roundcube\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "roundcube"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 76,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 83,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dicts"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 91,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "maxAttachmentSize"
+          ],
+          "default_source": "18",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 100,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 117,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 123,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 130,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 177,
+            "col": 22
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 130,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "localhost"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "password"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": ""
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "password"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 132,
+            "col": 48
+          },
+          "source": "lib.mkIf (!localDB && cfg.database.password != \"\") ("
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "localhost"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "password"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": ""
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "password"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 136,
+            "col": 7
+          },
+          "source": "lib.optional (!localDB && cfg.database.password != \"\")"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "localhost"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 142,
+            "col": 9
+          },
+          "source": "lib.optionalString (!localDB) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "localhost"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 152,
+            "col": 9
+          },
+          "source": "lib.optionalString (!localDB) \":' . $password . '\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 153,
+            "col": 11
+          },
+          "source": "if localDB then \"unix(/run/postgresql)\" else cfg.database.host"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 177,
+            "col": 22
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 227,
+            "col": 27
+          },
+          "source": "lib.mkIf localDB {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 238,
+            "col": 27
+          },
+          "source": "lib.mkIf localDB {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 243,
+            "col": 28
+          },
+          "source": "lib.mkIf localDB { }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 246,
+            "col": 14
+          },
+          "source": "if localDB then user else \"nginx\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 276,
+            "col": 8
+          },
+          "source": "lib.mkIf localDB {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 286,
+            "col": 12
+          },
+          "source": "if localDB then config.services.postgresql.package else pkgs.postgresql"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "localhost"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 290,
+            "col": 23
+          },
+          "source": "lib.optionalString (!localDB) \"PGPASSFILE=${cfg.database.passwordFile}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "localhost"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 291,
+            "col": 15
+          },
+          "source": "lib.optionalString (!localDB) \"-h ${cfg.database.host} -U ${cfg.database.username} \""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "host"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "localhost"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 312,
+            "col": 18
+          },
+          "source": "if localDB then user else \"nginx\""
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/roundcube.nix",
+            "line": 161,
+            "col": 40
+          },
+          "source": "if cfg.dicts == [ ] then \"false\" else \"true\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dicts"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "roundcube",
+            "package"
+          ],
+          "instance": "roundcube",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/roundcube.nix",
+            "line": 16,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "roundcube",
+            "dicts"
+          ],
+          "instance": "roundcube",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/roundcube.nix",
+            "line": 18,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "maxAttachmentSize"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

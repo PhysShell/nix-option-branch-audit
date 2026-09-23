@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "392716",
+      "module": "nixos/modules/services/mail/cyrus-imap.nix",
+      "test": "nixos/tests/cyrus-imap.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "cyrus-imap"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 90,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 91,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "listenQueue"
+          ],
+          "default_source": "32",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 93,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "tmpDBDir"
+          ],
+          "default_source": "\"/run/cyrus/db\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/cyrus/db"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 101,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "cyrusSettings"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "cyrusSettings",
+            "START"
+          ],
+          "default_source": "{\n              recover = {\n                cmd = [\n                  \"ctl_cyrusdb\"\n                  \"-r\"\n                ];\n              };\n            }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 119,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "cyrusSettings",
+            "SERVICES"
+          ],
+          "default_source": "{\n              imap = {\n                cmd = [ \"imapd\" ];\n                listen = \"imap\";\n                prefork = 0;\n              };\n              pop3 = {\n                cmd = [ \"pop3d\" ];\n                listen = \"pop3\";\n                prefork = 0;\n              };\n              lmtpunix = {\n                cmd = [ \"lmtpd\" ];\n                listen = \"/run/cyrus/lmtp\";\n                prefork = 0;\n              };\n              notify = {\n                cmd = [ \"notifyd\" ];\n                listen = \"/run/cyrus/notify\";\n                proto = \"udp\";\n                prefork = 0;\n              };\n            }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 134,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "cyrusSettings",
+            "EVENTS"
+          ],
+          "default_source": "{\n              tlsprune = {\n                cmd = [ \"tls_prune\" ];\n                at = 400;\n              };\n              delprune = {\n                cmd = [\n                  \"cyr_expire\"\n                  \"-E\"\n                  \"3\"\n                ];\n                at = 400;\n              };\n              deleteprune = {\n                cmd = [\n                  \"cyr_expire\"\n                  \"-E\"\n                  \"4\"\n                  \"-D\"\n                  \"28\"\n                ];\n                at = 430;\n              };\n              expungeprune = {\n                cmd = [\n                  \"cyr_expire\"\n                  \"-E\"\n                  \"4\"\n                  \"-X\"\n                  \"28\"\n                ];\n                at = 445;\n              };\n              checkpoint = {\n                cmd = [\n                  \"ctl_cyrusdb\"\n                  \"-c\"\n                ];\n                period = 30;\n              };\n            }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 162,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "cyrusSettings",
+            "DAEMON"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 208,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "imapdSettings"
+          ],
+          "default_source": "{\n        admins = [ \"cyrus\" ];\n        allowplaintext = true;\n        defaultdomain = \"localhost\";\n        defaultpartition = \"default\";\n        duplicate_db_path = \"/run/cyrus/db/deliver.db\";\n        hashimapspool = true;\n        httpmodules = [\n          \"carddav\"\n          \"caldav\"\n        ];\n        mboxname_lockpath = \"/run/cyrus/lock\";\n        partition-default = \"/var/lib/cyrus/storage\";\n        popminpoll = 1;\n        proc_path = \"/run/cyrus/proc\";\n        ptscache_db_path = \"/run/cyrus/db/ptscache.db\";\n        sasl_auto_transition = true;\n        sasl_pwcheck_method = [ \"saslauthd\" ];\n        sievedir = \"/var/lib/cyrus/sieve\";\n        statuscache_db_path = \"/run/cyrus/db/statuscache.db\";\n        syslog_prefix = \"cyrus\";\n        tls_client_ca_dir = \"/etc/ssl/certs\";\n        tls_session_timeout = 1440;\n        tls_sessions_db_path = \"/run/cyrus/db/tls_sessions.db\";\n        virtdomains = \"on\";\n      }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 218,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "imapdSettings",
+            "configdirectory"
+          ],
+          "default_source": "\"/var/lib/cyrus\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/cyrus"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 227,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "imapdSettings",
+            "lmtpsocket"
+          ],
+          "default_source": "\"/run/cyrus/lmtp\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/cyrus/lmtp"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 234,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "imapdSettings",
+            "idlesocket"
+          ],
+          "default_source": "\"/run/cyrus/idle\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/cyrus/idle"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 241,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "imapdSettings",
+            "notifysocket"
+          ],
+          "default_source": "\"/run/cyrus/notify\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/cyrus/notify"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 248,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 286,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 292,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "imapdConfigFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 298,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "cyrusConfigFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 305,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 313,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 337,
+            "col": 25
+          },
+          "source": "mkIf cfg.debug \"1\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 313,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 314,
+            "col": 25
+          },
+          "source": "optionalAttrs (cfg.user == null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 317,
+            "col": 15
+          },
+          "source": "optionalString (cfg.group == null) \"cyrus\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 320,
+            "col": 26
+          },
+          "source": "optionalAttrs (cfg.group == null) { }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debug"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debug"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 337,
+            "col": 25
+          },
+          "source": "mkIf cfg.debug \"1\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 341,
+            "col": 16
+          },
+          "source": "if (cfg.user == null) then \"cyrus\" else cfg.user"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 342,
+            "col": 17
+          },
+          "source": "if (cfg.group == null) then \"cyrus\" else cfg.group"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 39,
+            "col": 11
+          },
+          "source": "if (q != null) then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 40,
+            "col": 13
+          },
+          "source": "if builtins.isInt q then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 43,
+            "col": 25
+          },
+          "source": "if builtins.isList q then (concatStringsSep \" \" q) else q",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 65,
+            "col": 11
+          },
+          "source": "if builtins.isBool v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 66,
+            "col": 13
+          },
+          "source": "if v then \"yes\" else \"no\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 67,
+            "col": 16
+          },
+          "source": "if builtins.isList v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 302,
+            "col": 18
+          },
+          "source": "if v != null then v else pkgs.writeText \"imapd.conf\" imapdConfig",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/cyrus-imap.nix",
+            "line": 309,
+            "col": 18
+          },
+          "source": "if v != null then v else pkgs.writeText \"cyrus.conf\" cyrusConfig",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/cyrus-imap.nix",
+            "line": 12,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "sslServerCert"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

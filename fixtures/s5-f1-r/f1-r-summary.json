@@ -1,0 +1,63 @@
+{
+  "candidate_commit": "cdfb4cac31b7346d925a28eb2c4e5c280aeac95d",
+  "baseline_commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+  "s5_r0_commit": "28a1d58",
+  "corpus_total": 369,
+  "not_applicable_trivially_unchanged": 189,
+  "applicable_replayed": 180,
+  "replay_incomplete": 0,
+  "replay_identical": 158,
+  "replay_changed": 22,
+  "classification_counts": {
+    "expected_target_correction": 1,
+    "same_root_cause_correction": 0,
+    "unexpected_semantic_delta": 21
+  },
+  "expected_target_correction_prs": [
+    471312
+  ],
+  "same_root_cause_correction_prs": [],
+  "unexpected_semantic_delta_prs": [
+    429967,
+    494314,
+    484133,
+    557329,
+    431289,
+    374017,
+    260551,
+    432528,
+    438285,
+    423934,
+    506644,
+    508427,
+    440660,
+    428153,
+    463443,
+    397967,
+    401840,
+    427260,
+    398993,
+    480839,
+    433539
+  ],
+  "real_watched_verdict_regressions": [
+    431289,
+    506644,
+    508427,
+    440660,
+    428153,
+    397967,
+    427260
+  ],
+  "anchor_checks": {
+    "pr_471312_angrr_corrected": true,
+    "pr_475112_cgit_unchanged": true,
+    "pr_462487_guacamole_unchanged": true,
+    "tool_errors_across_replay": 0
+  },
+  "gate_verdict": "FAIL",
+  "gate_reasons": [
+    "7 PRs show a real watched-verdict regression outside the demonstrated F1 causal class (over-exclusion of a legitimately option_prefix-anchored named let/rec-bound submodule, not a false-collision resolution): [431289, 506644, 508427, 440660, 428153, 397967, 427260]",
+    "14 additional PRs show a cosmetic-only (discovered_options-list) delta from the same over-exclusion mechanism, not affecting their own watched verdict but still a real, disclosed deviation from historical byte-identical reproducibility"
+  ]
+}

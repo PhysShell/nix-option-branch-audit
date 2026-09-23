@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "489143",
+      "module": "nixos/modules/services/mail/stalwart.nix",
+      "test": "nixos/tests/stalwart/stalwart.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "stalwart"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 33,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateVersion"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 35,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 46,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 55,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/${stalwartIdentifier}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 66,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "stalwartIdentifier",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 75,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "stalwartIdentifier",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 84,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "credentials"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 93,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 109,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 109,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 13,
+            "col": 24
+          },
+          "source": "if pre2605 then \"stalwart-mail\" else \"stalwart\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 131,
+            "col": 9
+          },
+          "source": "if pre2605 then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 149,
+            "col": 9
+          },
+          "source": "if useLegacyStorage then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 167,
+            "col": 37
+          },
+          "source": "if useLegacyStorage then \"fs\" else \"db\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 184,
+            "col": 22
+          },
+          "source": "lib.mkIf hasHttpListener (lib.mkDefault \"file://${cfg.package.webadmin}/webadmin.zip\")",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings",
+              "server",
+              "listener"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 193,
+            "col": 16
+          },
+          "source": "lib.mkIf (cfg.group == stalwartIdentifier) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "group"
+            ],
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 196,
+            "col": 15
+          },
+          "source": "lib.mkIf (cfg.user == stalwartIdentifier) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "user"
+            ],
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 228,
+            "col": 13
+          },
+          "source": "if useLegacyStorage then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "stateVersion"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/stalwart.nix",
+            "line": 297,
+            "col": 7
+          },
+          "source": "lib.mkIf (cfg.openFirewall && (builtins.hasAttr \"listener\" cfg.settings.server))",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "openFirewall"
+            ],
+            [
+              "settings",
+              "server"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "main",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/stalwart/stalwart.nix",
+            "line": 16,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "stateVersion"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

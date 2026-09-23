@@ -1,0 +1,16 @@
+{
+  "candidate_commit": "cdfb4cac31b7346d925a28eb2c4e5c280aeac95d",
+  "candidate_commit_short": "cdfb4ca",
+  "built_from": "clean git clone + checkout, verified `git status --short` empty and `git rev-parse HEAD == cdfb4cac31b7346d925a28eb2c4e5c280aeac95d` before building -- never the working tree used for editing",
+  "clean_checkout_path": "/tmp/f1r-clean-checkout/repo",
+  "binary_path": "/tmp/f1r-clean-checkout/target/release/oba",
+  "binary_sha256": "10563c648967ce68e7b03f81817d176d92aa3312be2cd4432fb334fa6f091462",
+  "self_reported_tool_version": "0.4.5",
+  "note": "Cargo.toml version is unchanged (no version bump, per S5-F1's own scope constraints) -- the candidate binary self-reports the SAME 'tool.version: 0.4.5' string as the historical S5 baseline binary. This is expected and does not indicate the wrong binary was used; candidate identity is established by this file's own binary_sha256 and candidate_commit, not by the self-reported version string.",
+  "baseline_for_comparison": {
+    "release": "v0.4.5",
+    "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+    "artifact_sha256": "c07bed6c37fa3e0f1885099bb3dfc7a7b741531e8a156dc4fa8a7a160bd45800",
+    "note": "the ORIGINAL S5 round's own binary, whose outputs are the historical ground truth this replay compares against -- fixtures/s5-live-pr-shadow/adjudication/**/*.json, untouched by this replay"
+  }
+}

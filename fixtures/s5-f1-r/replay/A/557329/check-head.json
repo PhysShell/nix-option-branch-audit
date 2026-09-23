@@ -1,0 +1,947 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "portmaster",
+      "module": "nixos/modules/services/networking/portmaster.nix",
+      "test": "nixos/tests/portmaster.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "portmaster"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 474,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/portmaster\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/portmaster"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 478,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 485,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settingsFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 521,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "secretsFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 531,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "profilePrefix"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 541,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "profiles"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 548,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "profiles",
+            "name"
+          ],
+          "default_source": "name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 554,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "profiles",
+            "packages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 560,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "profiles",
+            "fingerprints"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 583,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "profiles",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 603,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 648,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 660,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "settingsFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "settingsFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 273,
+            "col": 8
+          },
+          "source": "optional (cfg.settingsFile != null) cfg.settingsFile"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "secretsFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "secretsFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 274,
+            "col": 8
+          },
+          "source": "optional (cfg.secretsFile != null) cfg.secretsFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 660,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 169,
+            "col": 8
+          },
+          "source": "optionalAttrs ((fingerprint.key or null) != null) {",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 196,
+            "col": 9
+          },
+          "source": "if packageMatch.storeNameRegex == null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 203,
+            "col": 8
+          },
+          "source": "lib.optionalString packageMatch.strictHead \"^\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 207,
+            "col": 8
+          },
+          "source": "lib.optionalString (packageMatch.directory != \"\") \"/${escapeRegex packageMatch.directory}\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 210,
+            "col": 9
+          },
+          "source": "if name == null then",
+          "failure": {
+            "UnsupportedScope": "inherit"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 212,
+            "col": 14
+          },
+          "source": "if packageMatch.wrapped then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 217,
+            "col": 8
+          },
+          "source": "lib.optionalString packageMatch.strictLast \"$\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 228,
+            "col": 5
+          },
+          "source": "if",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 236,
+            "col": 10
+          },
+          "source": "if",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 266,
+            "col": 5
+          },
+          "source": "optionalAttrs (shouldGenerateManagedConfig && !builtins.hasAttr \"core/devMode\" cfg.settings) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 272,
+            "col": 5
+          },
+          "source": "optionals shouldGenerateManagedConfig [ generatedManagedConfigFile ]",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 314,
+            "col": 11
+          },
+          "source": "if packageMatch.name == null && packageMatch.strictLast then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 322,
+            "col": 9
+          },
+          "source": "if rawFingerprints == [ ] then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 324,
+            "col": 14
+          },
+          "source": "if packageErrors != [ ] then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 326,
+            "col": 14
+          },
+          "source": "if fingerprintErrors != [ ] then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 341,
+            "col": 7
+          },
+          "source": "if resolution.error != null then \"`${logicalName}`: ${resolution.error}\" else null",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 356,
+            "col": 7
+          },
+          "source": "if resolution.error == null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 402,
+            "col": 7
+          },
+          "source": "lib.optionalString profilesEnabled ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 448,
+            "col": 7
+          },
+          "source": "lib.optionalString profilesEnabled ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 454,
+            "col": 9
+          },
+          "source": "lib.optionalString profilesEnabled ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 661,
+            "col": 18
+          },
+          "source": "optional profilesEnabled {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 705,
+            "col": 11
+          },
+          "source": "lib.optionalString (!managesConfig) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settings",
+              "devmode"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "secretsFile"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 710,
+            "col": 13
+          },
+          "source": "lib.optionalString (!profilesEnabled) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 713,
+            "col": 13
+          },
+          "source": "lib.optionalString managesConfig ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settings",
+              "devmode"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "secretsFile"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 725,
+            "col": 27
+          },
+          "source": "optional (!managesConfig && cfg.settings.devmode) \"--devmode\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "profiles"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settings",
+              "devmode"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "settingsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "secretsFile"
+            ],
+            [
+              "settings",
+              "devmode"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/portmaster.nix",
+            "line": 764,
+            "col": 46
+          },
+          "source": "mkIf profilesEnabled {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "profiles"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "package"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 93,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster"
+          ],
+          "instance": "machine",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 94,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "profiles"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 183,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "settings"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 194,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "settingsFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 195,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "secretsFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 196,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "profiles"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 197,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "settings"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 201,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "settingsFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 202,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "secretsFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 203,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "portmaster",
+            "profiles"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/portmaster.nix",
+            "line": 204,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "profiles"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

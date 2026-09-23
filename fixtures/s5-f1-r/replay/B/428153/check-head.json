@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "428153",
+      "module": "nixos/modules/services/web-apps/drupal.nix",
+      "test": "nixos/tests/drupal.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "drupal",
+        "sites"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "drupal",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 280,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "drupal",
+            "sites"
+          ],
+          "default_source": "{\n          \"localhost\" = {\n            enable = true;\n          };\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 283,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "drupal",
+            "webserver"
+          ],
+          "default_source": "\"nginx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "nginx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 293,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 312,
+            "col": 12
+          },
+          "source": "mkIf (cfg.enable) (mkMerge ["
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 325,
+            "col": 24
+          },
+          "source": "mkIf (any (v: v.database.createLocally) (attrValues eachSite)) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "sites"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 426,
+            "col": 10
+          },
+          "source": "optionalAttrs (any (v: v.database.createLocally) (attrValues eachSite)) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "sites"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "inherit binding at test spec root -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/drupal.nix",
+            "line": 58,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "configSyncDir"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

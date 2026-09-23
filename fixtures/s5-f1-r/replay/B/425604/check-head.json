@@ -1,0 +1,1621 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "425604",
+      "module": "nixos/modules/services/web-apps/peertube.nix",
+      "test": "nixos/tests/web-apps/peertube.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "peertube"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 107,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"peertube\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "peertube"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"peertube\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "peertube"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 115,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "localDomain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 121,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "listenHttp"
+          ],
+          "default_source": "9000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 127,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "listenWeb"
+          ],
+          "default_source": "9000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 133,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableWebHttps"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 139,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDirs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 145,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "serviceEnvironmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 155,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 166,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "video_transcription",
+            "enabled"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 173,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "video_transcription",
+            "engine_path"
+          ],
+          "default_source": "if config.video_transcription.enabled then\n                    lib.getExe pkgs.whisper-ctranslate2\n                  else\n                    # This will be in the error message when someone enables\n                    # transcription manually in the web UI and tries to run a\n                    # transcription job.\n                    \"Set `services.peertube.settings.video_transcription.enabled = true`.\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 178,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 218,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "secrets",
+            "secretsFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 225,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 237,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "if cfg.database.createLocally then \"/run/postgresql\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 243,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "5432",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 255,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"peertube\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "peertube"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 261,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "\"peertube\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "peertube"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 267,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 273,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 282,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "host"
+          ],
+          "default_source": "if cfg.redis.createLocally && !cfg.redis.enableUnixSocket then \"127.0.0.1\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 288,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "port"
+          ],
+          "default_source": "if cfg.redis.createLocally && cfg.redis.enableUnixSocket then null else 31638",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 299,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 310,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "enableUnixSocket"
+          ],
+          "default_source": "cfg.redis.createLocally",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 317,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 326,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 332,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "pkgs.peertube",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 340,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 245,
+            "col": 19
+          },
+          "source": "if cfg.database.createLocally then \"/run/postgresql\" else null"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 348,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableWebHttps"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 413,
+            "col": 20
+          },
+          "source": "if cfg.enableWebHttps then true else false"
+        },
+        {
+          "path": [
+            "redis",
+            "enableUnixSocket"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 460,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.redis.enableUnixSocket {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 474,
+            "col": 41
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 512,
+            "col": 12
+          },
+          "source": "lib.optional cfg.redis.createLocally \"redis-peertube.service\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 513,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.database.createLocally ["
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 518,
+            "col": 9
+          },
+          "source": "lib.optional cfg.redis.createLocally \"redis-peertube.service\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 519,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.database.createLocally ["
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 598,
+            "col": 22
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 951,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 956,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.redis.createLocally {"
+        },
+        {
+          "path": [
+            "smtp",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 969,
+            "col": 24
+          },
+          "source": "lib.mkIf cfg.smtp.createLocally {"
+        },
+        {
+          "path": [
+            "redis",
+            "enableUnixSocket"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 986,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.redis.enableUnixSocket {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 993,
+            "col": 19
+          },
+          "source": "lib.optional cfg.configureNginx config.services.nginx.user"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 245,
+            "col": 19
+          },
+          "source": "if cfg.database.createLocally then \"/run/postgresql\" else null"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "redis",
+                        "enableUnixSocket"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 290,
+            "col": 19
+          },
+          "source": "if cfg.redis.createLocally && !cfg.redis.enableUnixSocket then \"127.0.0.1\" else null"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "enableUnixSocket"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 301,
+            "col": 19
+          },
+          "source": "if cfg.redis.createLocally && cfg.redis.enableUnixSocket then null else 31638"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 348,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableWebHttps"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableWebHttps"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 413,
+            "col": 20
+          },
+          "source": "if cfg.enableWebHttps then true else false"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "redis",
+                    "port"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "redis",
+              "port"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 425,
+            "col": 19
+          },
+          "source": "lib.optionalString (cfg.redis.port != null) cfg.redis.port"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "enableUnixSocket"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 460,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.redis.enableUnixSocket {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 474,
+            "col": 41
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 512,
+            "col": 12
+          },
+          "source": "lib.optional cfg.redis.createLocally \"redis-peertube.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 513,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.database.createLocally ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 518,
+            "col": 9
+          },
+          "source": "lib.optional cfg.redis.createLocally \"redis-peertube.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 519,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.database.createLocally ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "secrets",
+                    "secretsFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "secrets",
+              "secretsFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 537,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.secrets.secretsFile != null) ''"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "createLocally"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "passwordFile"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 541,
+            "col": 11
+          },
+          "source": "lib.optionalString ((!cfg.database.createLocally) && (cfg.database.passwordFile != null)) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "redis",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "redis",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 545,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.redis.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "smtp",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "smtp",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 549,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.smtp.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 598,
+            "col": 22
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 951,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.database.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 956,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.redis.createLocally {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "redis",
+                        "enableUnixSocket"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 959,
+            "col": 8
+          },
+          "source": "lib.mkIf (cfg.redis.createLocally && !cfg.redis.enableUnixSocket) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "enableUnixSocket"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 963,
+            "col": 8
+          },
+          "source": "lib.mkIf (cfg.redis.createLocally && cfg.redis.enableUnixSocket) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smtp",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smtp",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 969,
+            "col": 24
+          },
+          "source": "lib.mkIf cfg.smtp.createLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "peertube"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 975,
+            "col": 8
+          },
+          "source": "lib.mkIf (cfg.user == \"peertube\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redis",
+                  "enableUnixSocket"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 986,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.redis.enableUnixSocket {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 993,
+            "col": 19
+          },
+          "source": "lib.optional cfg.configureNginx config.services.nginx.user"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 73,
+            "col": 42
+          },
+          "source": "lib.optional (value != null) ''${name}=\"${toString value}\"''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 85,
+            "col": 5
+          },
+          "source": "lib.optionalString config.services.nginx.virtualHosts.${cfg.localDomain}.forceSSL ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "localDomain"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 89,
+            "col": 7
+          },
+          "source": "lib.optionalString",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "localDomain"
+            ],
+            [
+              "localDomain"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/peertube.nix",
+            "line": 181,
+            "col": 19
+          },
+          "source": "if config.video_transcription.enabled then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "postgresql",
+            "initialScript"
+          ],
+          "instance": "database",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/peertube.nix",
+            "line": 37,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "settings.video_transcription.enabled"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

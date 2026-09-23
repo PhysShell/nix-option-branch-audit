@@ -1,0 +1,524 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 1,
+    "inconclusive": 0,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "468049",
+      "module": "nixos/modules/services/networking/radicale.nix",
+      "test": "nixos/tests/radicale.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "radicale"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 32,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 34,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "config"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 43,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 54,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "rights"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 77,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 106,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"radicale\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "radicale"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 112,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"radicale\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "radicale"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 118,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "package"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 17,
+            "col": 9
+          },
+          "source": "if cfg.package == null then pkgs.radicale else cfg.package"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 125,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "package"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "package"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 17,
+            "col": 9
+          },
+          "source": "if cfg.package == null then pkgs.radicale else cfg.package"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 125,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "config"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "config"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 158,
+            "col": 10
+          },
+          "source": "optional (cfg.config != \"\") ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "radicale"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 170,
+            "col": 19
+          },
+          "source": "mkIf (cfg.user == \"radicale\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "radicale"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 177,
+            "col": 20
+          },
+          "source": "mkIf (cfg.group == \"radicale\") {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 20,
+            "col": 5
+          },
+          "source": "if cfg.settings == { } then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 145,
+            "col": 7
+          },
+          "source": "optional (cfg.package == null && versionOlder config.system.stateVersion \"17.09\") ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 152,
+            "col": 10
+          },
+          "source": "optional (cfg.package == null && versionOlder config.system.stateVersion \"20.09\") ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 163,
+            "col": 41
+          },
+          "source": "mkIf (cfg.rights != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "rights"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 206,
+            "col": 26
+          },
+          "source": "mkIf bindLocalhost \"localhost\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 207,
+            "col": 25
+          },
+          "source": "mkIf bindLocalhost \"any\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/radicale.nix",
+            "line": 224,
+            "col": 26
+          },
+          "source": "lib.optional (hasAttrByPath [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "radicale",
+            "settings",
+            "storage"
+          ],
+          "instance": "machine",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/radicale.nix",
+            "line": 27,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "etc",
+            "radicale/users",
+            "source"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/radicale.nix",
+            "line": 50,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OBA001",
+          "option": "user",
+          "predicate": {
+            "ir": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "user"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "radicale"
+                  }
+                }
+              ]
+            },
+            "refs": [
+              [
+                "user"
+              ]
+            ],
+            "span": {
+              "file": "nixos/modules/services/networking/radicale.nix",
+              "line": 170,
+              "col": 19
+            },
+            "source": "mkIf (cfg.user == \"radicale\") {"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "user"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "radicale"
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "user"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/radicale.nix",
+                  "line": 170,
+                  "col": 19
+                },
+                "source": "mkIf (cfg.user == \"radicale\") {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

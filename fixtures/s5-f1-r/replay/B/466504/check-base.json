@@ -1,0 +1,548 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "466504",
+      "module": "nixos/modules/services/audio/pulseaudio.nix",
+      "test": "nixos/tests/pulseaudio.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "pulseaudio",
+        "tcp"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 100,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "systemWide"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 108,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "support32Bit"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 123,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "configFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 132,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 141,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "extraClientConf"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 150,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "package"
+          ],
+          "default_source": "if config.services.jack.jackd.enable then pkgs.pulseaudioFull else pkgs.pulseaudio",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 158,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "extraModules"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 170,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "daemon",
+            "logLevel"
+          ],
+          "default_source": "\"notice\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "notice"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 183,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "daemon",
+            "config"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 192,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "zeroconf",
+            "discovery",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 201,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pulseaudio",
+            "zeroconf",
+            "publish",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 202,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 207,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "anonymousClients",
+            "allowAll"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 210,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "anonymousClients",
+            "allowedIpRanges"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 211,
+            "col": 11
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "tcp",
+            "anonymousClients",
+            "allowAll"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 33,
+            "col": 17
+          },
+          "source": "lib.optional cfg.tcp.anonymousClients.allowAll \"auth-anonymous=1\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 226,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "zeroconf",
+            "publish",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 279,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.zeroconf.publish.enable {"
+        },
+        {
+          "path": [
+            "systemWide"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 305,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.systemWide {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 18,
+            "col": 5
+          },
+          "source": "lib.optionalAttrs hasZeroconf { zeroconfSupport = true; }",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "zeroconf"
+            ],
+            [
+              "zeroconf"
+            ],
+            [
+              "zeroconf",
+              "publish",
+              "enable"
+            ],
+            [
+              "zeroconf",
+              "discovery",
+              "enable"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 32,
+            "col": 32
+          },
+          "source": "lib.optionalString cond \"load-module ${mod}\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 38,
+            "col": 9
+          },
+          "source": "lib.optional (a != [ ]) ''auth-ip-acl=${lib.concatStringsSep \";\" a}''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "tcp",
+              "anonymousClients",
+              "allowedIpRanges"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 76,
+            "col": 9
+          },
+          "source": "lib.optionalString enable32BitAlsaPlugins \"libs.32Bit = ${pkgs.pkgsi686Linux.alsa-plugins}/lib/alsa-lib/libasound_module_pcm_pulse.so ;\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "support32Bit"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 84,
+            "col": 9
+          },
+          "source": "lib.optionalString enable32BitAlsaPlugins \"libs.32Bit = ${pkgs.pkgsi686Linux.alsa-plugins}/lib/alsa-lib/libasound_module_ctl_pulse.so ;\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "support32Bit"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 160,
+            "col": 19
+          },
+          "source": "if config.services.jack.jackd.enable then pkgs.pulseaudioFull else pkgs.pulseaudio",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 262,
+            "col": 8
+          },
+          "source": "lib.mkIf (cfg.extraModules != [ ]) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "extraModules"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 276,
+            "col": 8
+          },
+          "source": "lib.mkIf hasZeroconf {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "zeroconf"
+            ],
+            [
+              "zeroconf"
+            ],
+            [
+              "zeroconf",
+              "publish",
+              "enable"
+            ],
+            [
+              "zeroconf",
+              "discovery",
+              "enable"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/pulseaudio.nix",
+            "line": 296,
+            "col": 14
+          },
+          "source": "lib.optionalAttrs config.services.jack.jackd.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/pulseaudio.nix",
+            "line": 91,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "port"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

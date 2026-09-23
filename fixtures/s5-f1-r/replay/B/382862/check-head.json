@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "382862",
+      "module": "nixos/modules/services/web-apps/peering-manager.nix",
+      "test": "nixos/tests/web-apps/peering-manager.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "peering-manager"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enableLdap"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 30,
+            "col": 9
+          },
+          "source": "lib.optionalString cfg.enableLdap ''"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 200,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableLdap"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 233,
+            "col": 23
+          },
+          "source": "lib.optionals cfg.enableLdap [ ps.django-auth-ldap ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 23,
+            "col": 5
+          },
+          "source": "if (cfg.environmentFile != null) then \"/var/lib/peering-manager/configuration.py\" else configFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLdap"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLdap"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 30,
+            "col": 9
+          },
+          "source": "lib.optionalString cfg.enableLdap ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 200,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "peeringdbApiKeyFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "peeringdbApiKeyFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 228,
+            "col": 9
+          },
+          "source": "lib.optionalString (cfg.peeringdbApiKeyFile != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableLdap"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableLdap"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 233,
+            "col": 23
+          },
+          "source": "lib.optionals cfg.enableLdap [ ps.django-auth-ldap ]"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 280,
+            "col": 34
+          },
+          "source": "lib.mkIf (cfg.environmentFile != null) ("
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 295,
+            "col": 19
+          },
+          "source": "lib.mkIf (cfg.environmentFile != null) [ \"peering-manager-config.service\" ]"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/peering-manager.nix",
+            "line": 308,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.environmentFile != null) [ \"peering-manager-config.service\" ]"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "peering-manager",
+            "secretKeyFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/peering-manager.nix",
+            "line": 14,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "environmentFile"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

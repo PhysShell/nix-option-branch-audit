@@ -1,0 +1,2539 @@
+[
+  {
+    "cohort": "A",
+    "position": 2,
+    "pr": 463848,
+    "base_sha": "e2e2ccdbf102da63f59b5d9735ab627889910b16",
+    "head_sha": "68daa1c784bb4dc0062ced1118305c892a788c75",
+    "module_paths": [
+      "nixos/modules/services/audio/gonic.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gonic.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch1/463848"
+  },
+  {
+    "cohort": "A",
+    "position": 11,
+    "pr": 511160,
+    "base_sha": "6d66bd1fb6178294b84859a446689bb1a932d044",
+    "head_sha": "31c5329d4da0ad3b40677daa899ee969ba01e02d",
+    "module_paths": [
+      "nixos/modules/services/web-apps/goupile.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/goupile/default.nix",
+      "nixos/tests/web-apps/goupile/basic_interaction_test.py"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch1/511160"
+  },
+  {
+    "cohort": "A",
+    "position": 12,
+    "pr": 473031,
+    "base_sha": "3ffc59654f4bbc433cf7202f43360b9d19aed3ea",
+    "head_sha": "74c309162c3bb90ba0101d9b3929d11abfe96b4d",
+    "module_paths": [
+      "nixos/modules/services/mail/roundcube.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/roundcube.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch1/473031"
+  },
+  {
+    "cohort": "A",
+    "position": 13,
+    "pr": 457271,
+    "base_sha": "f73701131350b69308ceca9c0e052491de8445a0",
+    "head_sha": "bbfceed8eed07a4bffa118b87acd872b604dc657",
+    "module_paths": [
+      "nixos/modules/services/x11/display-managers/lightdm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/lightdm.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch1/457271"
+  },
+  {
+    "cohort": "A",
+    "position": 14,
+    "pr": 429967,
+    "base_sha": "1237aac87ac9960ec2926d1519077ba4ca7edf3e",
+    "head_sha": "e42cceb90c490aa5bb0a1c82e9601febadd3f84b",
+    "module_paths": [
+      "nixos/modules/services/networking/prosody.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/xmpp/prosody.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch1/429967"
+  },
+  {
+    "cohort": "A",
+    "position": 16,
+    "pr": 494314,
+    "base_sha": "881516049dba80b44917ec96e7b76fdeb52dca50",
+    "head_sha": "28d2f3ce12d1352ae3d684d5959254986253cee6",
+    "module_paths": [
+      "nixos/modules/services/networking/prosody.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/xmpp/prosody.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch2/494314"
+  },
+  {
+    "cohort": "A",
+    "position": 29,
+    "pr": 367545,
+    "base_sha": "da0b46eab12c8812b59c6bf8689dfdd9b6b26e1c",
+    "head_sha": "7afa349ea8b05e500c37e72e5e70f15e35a242eb",
+    "module_paths": [
+      "nixos/modules/services/misc/paperless.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paperless.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch2/367545"
+  },
+  {
+    "cohort": "A",
+    "position": 30,
+    "pr": 510900,
+    "base_sha": "932dff418878f70715f86221d2fedb2a07f181bb",
+    "head_sha": "c571adaefb071b8f9a08cbf1e7343153d1288019",
+    "module_paths": [
+      "nixos/modules/services/networking/ssh/sshd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/openssh.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch2/510900"
+  },
+  {
+    "cohort": "A",
+    "position": 36,
+    "pr": 417788,
+    "base_sha": "831d935f8d4b97f2699c2a86323d698cfc9a5d59",
+    "head_sha": "5034dd73846be1264d9f44114da5b6a88494e2fc",
+    "module_paths": [
+      "nixos/modules/services/misc/wastebin.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/wastebin.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch3/417788"
+  },
+  {
+    "cohort": "A",
+    "position": 41,
+    "pr": 444033,
+    "base_sha": "6c74571490253c4fa200e78947f2d2f4b97341d3",
+    "head_sha": "af89f21de9e4c49853d8737e946ca65f3916db13",
+    "module_paths": [
+      "nixos/modules/services/audio/snapserver.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/snapcast.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch3/444033"
+  },
+  {
+    "cohort": "A",
+    "position": 43,
+    "pr": 398885,
+    "base_sha": "1052d81a4ae020f3c576d91d7e3ff04706969606",
+    "head_sha": "51ac5d673e3de02326de991e673d01d84cfb5505",
+    "module_paths": [
+      "nixos/modules/services/monitoring/cockpit.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cockpit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch3/398885"
+  },
+  {
+    "cohort": "A",
+    "position": 53,
+    "pr": 484133,
+    "base_sha": "534541bbb0513299c11d08005d66fb50b3977b28",
+    "head_sha": "39105a7501f7408ae73082af9bcd496c566f2aab",
+    "module_paths": [
+      "nixos/modules/services/mail/rspamd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/rspamd.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch4/484133"
+  },
+  {
+    "cohort": "A",
+    "position": 56,
+    "pr": 409820,
+    "base_sha": "88d0366acebc9c156a4a1a93525933e44c37ea4e",
+    "head_sha": "68ac9fc75741bf39b59418fd6f7c00deb0937955",
+    "module_paths": [
+      "nixos/modules/services/web-apps/dex.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/dex-oidc.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch4/409820"
+  },
+  {
+    "cohort": "A",
+    "position": 64,
+    "pr": 415326,
+    "base_sha": "1eeb7b66c44c458c567e8ac15c73e9c40ae664bb",
+    "head_sha": "3c853295d9f45f77e3ddcc945a33f82a9e10f85d",
+    "module_paths": [
+      "nixos/modules/services/networking/wstunnel.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/wstunnel.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch4/415326"
+  },
+  {
+    "cohort": "A",
+    "position": 70,
+    "pr": 408902,
+    "base_sha": "5c68d925b545ab6daea44ba1295756bb2493c6af",
+    "head_sha": "cfcf4e8f18ff365c5e549dd5732b715de4bd37c1",
+    "module_paths": [
+      "nixos/modules/services/misc/servarr/prowlarr.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/prowlarr.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch4/408902"
+  },
+  {
+    "cohort": "A",
+    "position": 71,
+    "pr": 557329,
+    "base_sha": "997ddc6dc622c35872bd2fb0a123f8cbbbf57a61",
+    "head_sha": "cc39a2d3ab184c175cc88f9b7f32014eace7cdb2",
+    "module_paths": [
+      "nixos/modules/services/networking/portmaster.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/portmaster.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch5/557329"
+  },
+  {
+    "cohort": "A",
+    "position": 72,
+    "pr": 473316,
+    "base_sha": "66e4702809d69d9e71ad582c58ce98c7b6df4add",
+    "head_sha": "75cf04564d59c4c8cb6f9c305a326f444bfe885b",
+    "module_paths": [
+      "nixos/modules/services/web-apps/onlyoffice.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/onlyoffice.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch5/473316"
+  },
+  {
+    "cohort": "A",
+    "position": 81,
+    "pr": 501713,
+    "base_sha": "feb49e9a9db9c96bde1b7db057eb1ff7367e8e64",
+    "head_sha": "4273fc60d7f5bf1436d8885ff2e88a2b8d8221d5",
+    "module_paths": [
+      "nixos/modules/services/continuous-integration/jenkins/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/jenkins.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch5/501713"
+  },
+  {
+    "cohort": "A",
+    "position": 86,
+    "pr": 391057,
+    "base_sha": "791ad4fd2abbea68473d551feca324c0dae69e7f",
+    "head_sha": "100559d83c9468a70bb5c711d48af7e9cacef0e3",
+    "module_paths": [
+      "nixos/modules/services/web-apps/dokuwiki.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/dokuwiki.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch5/391057"
+  },
+  {
+    "cohort": "A",
+    "position": 96,
+    "pr": 431289,
+    "base_sha": "b0f1f70924dcb65faa50a0787754de001a784bf8",
+    "head_sha": "cea3dfac9e5a4bcc13100623be892a37b2d80c2b",
+    "module_paths": [
+      "nixos/modules/services/networking/prosody.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/xmpp/prosody.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch6/431289"
+  },
+  {
+    "cohort": "A",
+    "position": 100,
+    "pr": 470146,
+    "base_sha": "b00b0e5d230b246bf6aa130ee4ad5e6072c3637c",
+    "head_sha": "eed3706aa7c780557974796ccc1df73200f13fd1",
+    "module_paths": [
+      "nixos/modules/services/misc/n8n.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/n8n.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch6/470146"
+  },
+  {
+    "cohort": "A",
+    "position": 101,
+    "pr": 422094,
+    "base_sha": "7948541068f5acd759057a6b1dd515913fae2c4d",
+    "head_sha": "de0be57ef745e7fb7fa67141e0a97f578f5c1cfe",
+    "module_paths": [
+      "nixos/modules/services/networking/syncthing.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/syncthing.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch6/422094"
+  },
+  {
+    "cohort": "A",
+    "position": 102,
+    "pr": 461261,
+    "base_sha": "eabc44e1b4d875705ecfa4c9189454f755fcd0fe",
+    "head_sha": "c5992aba9141f41e0720b5954045797e1504573b",
+    "module_paths": [
+      "nixos/modules/services/web-apps/wakapi.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/wakapi.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch6/461261"
+  },
+  {
+    "cohort": "A",
+    "position": 109,
+    "pr": 391799,
+    "base_sha": "a2ee1a50f0334c1e993bd94fec7736c8b36f2d0f",
+    "head_sha": "8dbf318cea018fc1c4babdf3b3876d8fa315af96",
+    "module_paths": [
+      "nixos/modules/services/security/paretosecurity.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paretosecurity.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch6/391799"
+  },
+  {
+    "cohort": "A",
+    "position": 117,
+    "pr": 399179,
+    "base_sha": "005c8291f3b20a67f5414f8b532413eb0b46d514",
+    "head_sha": "f7c0ca4a82dffe40329d70c1489e5e1a74033c38",
+    "module_paths": [
+      "nixos/modules/services/misc/homepage-dashboard.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homepage-dashboard.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch6/399179"
+  },
+  {
+    "cohort": "A",
+    "position": 125,
+    "pr": 379377,
+    "base_sha": "06c3a28f6356830667387ca2e720140a06574106",
+    "head_sha": "31aedcfbee577d8118709cbfd1ecc0d61ff49f82",
+    "module_paths": [
+      "nixos/modules/services/misc/gotenberg.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gotenberg.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch7/379377"
+  },
+  {
+    "cohort": "A",
+    "position": 132,
+    "pr": 374017,
+    "base_sha": "4f570c5acd35e777e7f9f382f8cf2c141de85d0b",
+    "head_sha": "d3cd8299b44e829500c9237554a90121c3f47ada",
+    "module_paths": [
+      "nixos/modules/services/cluster/k3s/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/k3s/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch7/374017"
+  },
+  {
+    "cohort": "A",
+    "position": 138,
+    "pr": 464621,
+    "base_sha": "de3255d9ebab95d73cef7167991a8098083541a9",
+    "head_sha": "b80c547be836f80040791c6a8a269ea7c6226235",
+    "module_paths": [
+      "nixos/modules/services/databases/mysql.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mysql/mysql.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch7/464621"
+  },
+  {
+    "cohort": "A",
+    "position": 139,
+    "pr": 412248,
+    "base_sha": "4b6e5cb1ad64eb5da7bc1e9910d012ec182348ed",
+    "head_sha": "c0066c4316521c971c00168731f1d62a53a383cc",
+    "module_paths": [
+      "nixos/modules/services/backup/sanoid.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/sanoid.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch7/412248"
+  },
+  {
+    "cohort": "A",
+    "position": 140,
+    "pr": 472219,
+    "base_sha": "8a5613be5c32e5ca0b8a20afdf644c69c6080fc0",
+    "head_sha": "3d00fdf5d7290167b3d351152d7a9a3700d3b79a",
+    "module_paths": [
+      "nixos/modules/services/web-apps/keycloak.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/keycloak.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch7/472219"
+  },
+  {
+    "cohort": "A",
+    "position": 145,
+    "pr": 506239,
+    "base_sha": "7bf1f7ec252aad5a2a72068acfcbec7998e4ff2d",
+    "head_sha": "d965362c0d1633423a88e644b4e620bd22f8ef06",
+    "module_paths": [
+      "nixos/modules/services/mail/roundcube.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/roundcube.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/batch7/506239"
+  },
+  {
+    "cohort": "B",
+    "position": 2,
+    "pr": 438467,
+    "base_sha": "91d78878903c163055eaa882e36e9a45d49b66bb",
+    "head_sha": "af4ba50fbfc4c1abee31db65754c701aed777e95",
+    "module_paths": [
+      "nixos/modules/services/web-apps/photoprism.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/photoprism.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/438467"
+  },
+  {
+    "cohort": "B",
+    "position": 3,
+    "pr": 353770,
+    "base_sha": "b619339061dc3e2273c9b89dce30460ae11bc0f0",
+    "head_sha": "7a223b26858aaebb44009c8966a1756918e936e3",
+    "module_paths": [
+      "nixos/modules/services/networking/syncthing.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/syncthing/main.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/353770"
+  },
+  {
+    "cohort": "B",
+    "position": 4,
+    "pr": 413033,
+    "base_sha": "610eccade10bb2411a94ebdce09bf355a4488206",
+    "head_sha": "395b4112402c0f069a7cd13810b002c2b7b45223",
+    "module_paths": [
+      "nixos/modules/services/monitoring/cockpit.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cockpit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/413033"
+  },
+  {
+    "cohort": "B",
+    "position": 5,
+    "pr": 260551,
+    "base_sha": "f8a3116347dbec8df87c3ec6d8058d6bc3fe104e",
+    "head_sha": "0a92661ec32d274258dc038dd1064eb92af0f0df",
+    "module_paths": [
+      "nixos/modules/services/networking/prosody.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/xmpp/prosody.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/260551"
+  },
+  {
+    "cohort": "B",
+    "position": 7,
+    "pr": 558042,
+    "base_sha": "1640c048f5a62f978a7ca3cc167d25cdc0497c05",
+    "head_sha": "14d7d8501c04516724767150353335df8653cc75",
+    "module_paths": [
+      "nixos/modules/services/networking/headplane.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/headplane.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/558042"
+  },
+  {
+    "cohort": "B",
+    "position": 8,
+    "pr": 480700,
+    "base_sha": "8e13ad6266acf92aa1c61d006f51a30c53d43851",
+    "head_sha": "35b20dfd9ec9a4d8953ffd8877e8c82b801b5bf7",
+    "module_paths": [
+      "nixos/modules/services/web-apps/bluesky-pds.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/bluesky-pds.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/480700"
+  },
+  {
+    "cohort": "B",
+    "position": 10,
+    "pr": 482512,
+    "base_sha": "59915114d14c6d77a91745f6b9424d9c6fd1bad4",
+    "head_sha": "8fecfdbd99b10f6d28d9023c9fff2e275f2a185b",
+    "module_paths": [
+      "nixos/modules/services/web-servers/traefik.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/traefik.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/482512"
+  },
+  {
+    "cohort": "B",
+    "position": 11,
+    "pr": 498611,
+    "base_sha": "b442309475987e40b670840495fb133ed00737a7",
+    "head_sha": "059e991229cc8dd5f38553a5b9227bbba9b6194f",
+    "module_paths": [
+      "nixos/modules/services/web-apps/olivetin.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/olivetin.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/498611"
+  },
+  {
+    "cohort": "B",
+    "position": 12,
+    "pr": 462487,
+    "base_sha": "3db8153243db1455a18da92119581d0580dd70b8",
+    "head_sha": "598f6dd4fc046410bb2719227d5d48e927e7d39b",
+    "module_paths": [
+      "nixos/modules/services/web-apps/guacamole-client.nix",
+      "nixos/modules/services/web-apps/guacamole-server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/guacamole-server.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/462487"
+  },
+  {
+    "cohort": "B",
+    "position": 13,
+    "pr": 444604,
+    "base_sha": "10b48a67e9513a514e03f1046885a3359b3cfb79",
+    "head_sha": "5f0e96d0c333e1313107064f657c594eecabe5c3",
+    "module_paths": [
+      "nixos/modules/services/networking/yggdrasil.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/yggdrasil.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/444604"
+  },
+  {
+    "cohort": "B",
+    "position": 17,
+    "pr": 432528,
+    "base_sha": "d905dba83fc239994167ac8f24790e55b3e26542",
+    "head_sha": "4548324aae5650a39e9a77816f6f2de4f16e0ed6",
+    "module_paths": [
+      "nixos/modules/services/networking/tayga.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/tayga.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/432528"
+  },
+  {
+    "cohort": "B",
+    "position": 21,
+    "pr": 438285,
+    "base_sha": "776c94a900e4a278ae057c1ed71bb6387869d75c",
+    "head_sha": "6c4b1800989fcd82bca51f7ba8a72439cfe84c3c",
+    "module_paths": [
+      "nixos/modules/services/video/frigate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/frigate.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/438285"
+  },
+  {
+    "cohort": "B",
+    "position": 22,
+    "pr": 458146,
+    "base_sha": "49f0cbd7f89b87594b41d07d3ab93f15b868ad54",
+    "head_sha": "391bda9e02f09dd18fcd81d5fbcb18e930b43744",
+    "module_paths": [
+      "nixos/modules/services/web-apps/trilium.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/trilium-server.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/458146"
+  },
+  {
+    "cohort": "B",
+    "position": 23,
+    "pr": 403669,
+    "base_sha": "26b45ca359b25487a23933719620ace9485f99e6",
+    "head_sha": "edbd8e3ff6615dc28f1b43788669df659ba79444",
+    "module_paths": [
+      "nixos/modules/services/misc/tandoor-recipes.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/tandoor-recipes.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/403669"
+  },
+  {
+    "cohort": "B",
+    "position": 24,
+    "pr": 541493,
+    "base_sha": "0328abf972281512f9e9cd8305c185915c69d3a8",
+    "head_sha": "8bd1fa478dc05512b6399b57eefbaed846108d4f",
+    "module_paths": [
+      "nixos/modules/services/security/step-ca.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/step-ca.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/541493"
+  },
+  {
+    "cohort": "B",
+    "position": 25,
+    "pr": 427898,
+    "base_sha": "bd59d6740b8b3b587b0cb2a56fd7569bf259418b",
+    "head_sha": "7259b7ca67392490f869013e27155553ba950ea7",
+    "module_paths": [
+      "nixos/modules/services/web-apps/hedgedoc.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/hedgedoc.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch1/427898"
+  },
+  {
+    "cohort": "B",
+    "position": 26,
+    "pr": 388953,
+    "base_sha": "f68ad5cc5ff24efb3dedc5a5b1e70ee9bff4e294",
+    "head_sha": "75545814743d6bc3c378f39bdb3e5fc7e512734e",
+    "module_paths": [
+      "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+      "nixos/modules/services/web-servers/h2o/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-servers/h2o/basic.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/388953"
+  },
+  {
+    "cohort": "B",
+    "position": 27,
+    "pr": 441245,
+    "base_sha": "b772b8167c85abc3ad71a8428811a8aeeda6bc08",
+    "head_sha": "b0f63e9173f873a9f7d458154eb86eb27d8082d2",
+    "module_paths": [
+      "nixos/modules/services/audio/snapserver.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/snapcast.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/441245"
+  },
+  {
+    "cohort": "B",
+    "position": 28,
+    "pr": 414490,
+    "base_sha": "77215bbae4a3847d2aa39d9a164ca1c0a84d7be7",
+    "head_sha": "17260c31264ea0de35594e9bb28770972cdb74d0",
+    "module_paths": [
+      "nixos/modules/services/display-managers/ly.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ly.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/414490"
+  },
+  {
+    "cohort": "B",
+    "position": 29,
+    "pr": 382862,
+    "base_sha": "dc71c8cc49eb48aadb244c15cab3bca1820b24e1",
+    "head_sha": "1918e3ced1882d3a31f3ba0753abe78fa84781e4",
+    "module_paths": [
+      "nixos/modules/services/web-apps/peering-manager.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/peering-manager.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/382862"
+  },
+  {
+    "cohort": "B",
+    "position": 30,
+    "pr": 412297,
+    "base_sha": "7f25223c182ce63a47f68b9d8d4f445497efaaae",
+    "head_sha": "d5f88753ab875cc9afe902336853ea6f43f6a1c7",
+    "module_paths": [
+      "nixos/modules/services/finance/taler/exchange.nix",
+      "nixos/modules/services/finance/taler/common.nix",
+      "nixos/modules/services/finance/libeufin/common.nix",
+      "nixos/modules/services/finance/taler/merchant.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/taler/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/412297"
+  },
+  {
+    "cohort": "B",
+    "position": 33,
+    "pr": 407100,
+    "base_sha": "b0c26f67c3b9482c10e2c94f80130c77e7264f5b",
+    "head_sha": "4a14d1e05d434a820e78e06ef1592eb2360baeeb",
+    "module_paths": [
+      "nixos/modules/services/web-apps/photoprism.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/photoprism.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/407100"
+  },
+  {
+    "cohort": "B",
+    "position": 34,
+    "pr": 358780,
+    "base_sha": "8b38173d7288cdca61d6269cb31c078dad9c00f6",
+    "head_sha": "7eed7c8da606a38083a3d750f018236d3484f859",
+    "module_paths": [
+      "nixos/modules/services/logging/graylog.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/graylog.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/358780"
+  },
+  {
+    "cohort": "B",
+    "position": 35,
+    "pr": 509507,
+    "base_sha": "c763082f22d4da96fa678d5fdcbed27da01f311e",
+    "head_sha": "667a124021ed1d8bbdb1cf66a61499f4fdd7afcd",
+    "module_paths": [
+      "nixos/modules/services/networking/ssh/sshd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/openssh.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/509507"
+  },
+  {
+    "cohort": "B",
+    "position": 36,
+    "pr": 441506,
+    "base_sha": "83413ceb781ef03b5d4efb9b48c22c6782ee7d55",
+    "head_sha": "d4ebfe389fb23492887e76ae05bdeafb0bc937e0",
+    "module_paths": [
+      "nixos/modules/services/security/opensnitch.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/opensnitch.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/441506"
+  },
+  {
+    "cohort": "B",
+    "position": 37,
+    "pr": 362643,
+    "base_sha": "af6e115058bd49e45aa537b80d8c3177c17a8850",
+    "head_sha": "13ccca1c201ce5664577aeee4774a4003fd1aac9",
+    "module_paths": [
+      "nixos/modules/services/web-apps/mediawiki.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mediawiki.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/362643"
+  },
+  {
+    "cohort": "B",
+    "position": 40,
+    "pr": 514026,
+    "base_sha": "cf929aef5b6b3610e024147a535ef17fed77cc5f",
+    "head_sha": "e27ef5378cdea60940f246675e7f663cb76ac5e3",
+    "module_paths": [
+      "nixos/modules/services/security/spire/agent.nix",
+      "nixos/modules/services/security/spire/agent-tpm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/spire.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/514026"
+  },
+  {
+    "cohort": "B",
+    "position": 42,
+    "pr": 436367,
+    "base_sha": "80bdc1e5ce51f56b19791b52b2901187931f5353",
+    "head_sha": "46f22dc20ad86d7520aef0544120d46a4a990972",
+    "module_paths": [
+      "nixos/modules/services/networking/mihomo.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mihomo.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/436367"
+  },
+  {
+    "cohort": "B",
+    "position": 44,
+    "pr": 442520,
+    "base_sha": "b0998a53ed83c1424d9fa396e556cc163eca2a41",
+    "head_sha": "e9010614129c6bf749be8c1ac37fe09f9b43f843",
+    "module_paths": [
+      "nixos/modules/services/databases/chromadb.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/chromadb.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/442520"
+  },
+  {
+    "cohort": "B",
+    "position": 45,
+    "pr": 432756,
+    "base_sha": "a218601fcd8824913c5a8a1c26b718aaa94f896c",
+    "head_sha": "93403bdacd38d36f4a8f2c7397d6bf1a9faf6210",
+    "module_paths": [
+      "nixos/modules/services/security/paretosecurity.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paretosecurity.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/432756"
+  },
+  {
+    "cohort": "B",
+    "position": 46,
+    "pr": 410856,
+    "base_sha": "b79f59cf2ed99803ef8ee6b760f83d8138388f52",
+    "head_sha": "0d46fda9746f50f5e1d69950000b5ff8c6941a28",
+    "module_paths": [
+      "nixos/modules/services/monitoring/vmalert.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/victoriametrics/vmalert.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/410856"
+  },
+  {
+    "cohort": "B",
+    "position": 47,
+    "pr": 408218,
+    "base_sha": "389c8cec6ba42a5fdb38acd8570da4e345b8a101",
+    "head_sha": "d62c17d97ef9a9af21aacb254b6561c22157d84b",
+    "module_paths": [
+      "nixos/modules/services/misc/bazarr.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/bazarr.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/408218"
+  },
+  {
+    "cohort": "B",
+    "position": 48,
+    "pr": 396915,
+    "base_sha": "134bc9de5348cc783b4cb3283ea9b920d92cf2d6",
+    "head_sha": "52cb257ea6b3da911b134143117d9c7480c4a312",
+    "module_paths": [
+      "nixos/modules/services/web-apps/homebox.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homebox.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/396915"
+  },
+  {
+    "cohort": "B",
+    "position": 49,
+    "pr": 414502,
+    "base_sha": "f8e3d1afbb3c784541aa1eab10db8deffb937e16",
+    "head_sha": "704a7b9372e838825b0145fcc124cca434d0c6ae",
+    "module_paths": [
+      "nixos/modules/services/web-apps/mastodon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/mastodon/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch2/414502"
+  },
+  {
+    "cohort": "B",
+    "position": 52,
+    "pr": 428138,
+    "base_sha": "aaa9838faee87663d68d5fb494fd0fa62426d4f1",
+    "head_sha": "3bd3493d361e66a59ea6f59f4ed69beb480bcba8",
+    "module_paths": [
+      "nixos/modules/services/networking/ncps.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ncps.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/428138"
+  },
+  {
+    "cohort": "B",
+    "position": 53,
+    "pr": 445875,
+    "base_sha": "ce4335d74c98d0825ef71424a5964f62c8e5dafe",
+    "head_sha": "09f91985f60e9868aabb3e5950767e673910677e",
+    "module_paths": [
+      "nixos/modules/services/networking/ncps.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ncps.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/445875"
+  },
+  {
+    "cohort": "B",
+    "position": 54,
+    "pr": 460724,
+    "base_sha": "67e26173dfd8752cc33425a0beda31f7b68c66d3",
+    "head_sha": "22f19b998281032b29dbb3f6f368870429a66d32",
+    "module_paths": [
+      "nixos/modules/services/backup/btrbk.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/btrbk.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/460724"
+  },
+  {
+    "cohort": "B",
+    "position": 57,
+    "pr": 401384,
+    "base_sha": "30a7bc1176cd9cd066cd75b9339872fa985a6379",
+    "head_sha": "f07205812cc90d15bea0b06a313b1c6720416bb5",
+    "module_paths": [
+      "nixos/modules/services/security/paretosecurity.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paretosecurity.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/401384"
+  },
+  {
+    "cohort": "B",
+    "position": 58,
+    "pr": 389428,
+    "base_sha": "f1a7026e80ac6072ff674a983f1ac4026daa7ac5",
+    "head_sha": "461be7d8c880c757eaa9713d4ce08cd9e12beb53",
+    "module_paths": [
+      "nixos/modules/services/networking/searx.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/searx.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/389428"
+  },
+  {
+    "cohort": "B",
+    "position": 59,
+    "pr": 464654,
+    "base_sha": "ee52b70e0e9ee94b801bb3e7073d7d281a11b0e5",
+    "head_sha": "b44c2a5758c3214a60fbee0299cb6ced0bd7a990",
+    "module_paths": [
+      "nixos/modules/services/misc/atuin.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/atuin.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/464654"
+  },
+  {
+    "cohort": "B",
+    "position": 60,
+    "pr": 461327,
+    "base_sha": "dda3bd1c541f08f081c866a2d67b9b07f57ea0a5",
+    "head_sha": "d4282ed5a1b82474dbcc8adf7a9011f66a0a1c2d",
+    "module_paths": [
+      "nixos/modules/services/monitoring/beszel-agent.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/beszel.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/461327"
+  },
+  {
+    "cohort": "B",
+    "position": 62,
+    "pr": 516776,
+    "base_sha": "c7b78a8e1839dc59a8fe550c1bdd71a0823f3991",
+    "head_sha": "5a8fac718920cfe2121eb54361615c0abe76df2c",
+    "module_paths": [
+      "nixos/modules/services/monitoring/traccar.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/traccar.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/516776"
+  },
+  {
+    "cohort": "B",
+    "position": 63,
+    "pr": 427876,
+    "base_sha": "54260f5b36f6136fc2f71629fb8d2c8c7158f140",
+    "head_sha": "e2a516cf97ad85b5252cddacca6595e1e67d3e96",
+    "module_paths": [
+      "nixos/modules/services/hardware/lact.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/lact.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/427876"
+  },
+  {
+    "cohort": "B",
+    "position": 64,
+    "pr": 441886,
+    "base_sha": "db3febbe9694345760424d51f7dd15710a643fe8",
+    "head_sha": "dcf2b9c0a0b992bf41b281472c0ebd402bd7b85f",
+    "module_paths": [
+      "nixos/modules/services/databases/victoriametrics.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/victoriametrics/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/441886"
+  },
+  {
+    "cohort": "B",
+    "position": 65,
+    "pr": 412480,
+    "base_sha": "21391a591d34574cfd1ed22f75c03e3bc862b587",
+    "head_sha": "e3846c4216caf5ea1bcc1d7f69810186d22d1c0e",
+    "module_paths": [
+      "nixos/modules/services/continuous-integration/jenkins/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/jenkins.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/412480"
+  },
+  {
+    "cohort": "B",
+    "position": 66,
+    "pr": 411451,
+    "base_sha": "08d385792359a40bac6873213dc27dd6cffdbc19",
+    "head_sha": "101965187eb19218d061b1ab04da4d76ea8fa66f",
+    "module_paths": [
+      "nixos/modules/services/networking/dnscrypt-proxy2.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/dnscrypt-proxy2.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/411451"
+  },
+  {
+    "cohort": "B",
+    "position": 69,
+    "pr": 479174,
+    "base_sha": "055b001b5319eda15f52e2e5eba08d72bdd8f441",
+    "head_sha": "8b4f523448a2b5fb2f7909ae700ba7dc70579d8b",
+    "module_paths": [
+      "nixos/modules/services/web-apps/dokuwiki.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/dokuwiki.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/479174"
+  },
+  {
+    "cohort": "B",
+    "position": 70,
+    "pr": 485285,
+    "base_sha": "4dd7177b0e26255cb1960c2794fe7e8bc42f4093",
+    "head_sha": "f8ec773b6058107dffd7f5066961ba280d96dbde",
+    "module_paths": [
+      "nixos/modules/services/misc/n8n.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/n8n.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/485285"
+  },
+  {
+    "cohort": "B",
+    "position": 71,
+    "pr": 410858,
+    "base_sha": "6eaed15add429ab4dbeb216425d1bc237100f74e",
+    "head_sha": "27ab7b4f770980a98c8ca74e81c731a66c109cfa",
+    "module_paths": [
+      "nixos/modules/services/network-filesystems/kubo.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kubo/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/410858"
+  },
+  {
+    "cohort": "B",
+    "position": 72,
+    "pr": 454579,
+    "base_sha": "f991670eceab6a7dcbb8caea67051b983ed5b031",
+    "head_sha": "e4cdf3a3a19d74f283ef13aed8b7e1e6073835e3",
+    "module_paths": [
+      "nixos/modules/services/network-filesystems/kubo.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kubo/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/454579"
+  },
+  {
+    "cohort": "B",
+    "position": 73,
+    "pr": 405269,
+    "base_sha": "b924f045bbf4f3133eb0828d814e80dd5fabbbed",
+    "head_sha": "cd3824f7bc8eaa57a3d2332a0c0349715c9ea35f",
+    "module_paths": [
+      "nixos/modules/services/monitoring/alloy.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/alloy.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch3/405269"
+  },
+  {
+    "cohort": "B",
+    "position": 76,
+    "pr": 423934,
+    "base_sha": "5663dc9a5a520912b3d4563b2eebc00fe0636c77",
+    "head_sha": "73b4810ff3a5a2124e3a0145ffc1060fdf27d732",
+    "module_paths": [
+      "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+      "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/nvidia-container-toolkit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/423934"
+  },
+  {
+    "cohort": "B",
+    "position": 79,
+    "pr": 466806,
+    "base_sha": "db4ebe6cca2ecf477e5cf828881db8eff567cd24",
+    "head_sha": "a2ad9d8e6df3095073d839aa3bb5f4b644cd0fec",
+    "module_paths": [
+      "nixos/modules/services/misc/gollum.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gollum.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/466806"
+  },
+  {
+    "cohort": "B",
+    "position": 80,
+    "pr": 386318,
+    "base_sha": "3a8ebeb1dfb2cf841ac697d865c656cfc7055ad0",
+    "head_sha": "1e3e30d56649dd3a910da3dc4bc3091f0af68c4d",
+    "module_paths": [
+      "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+      "nixos/modules/services/web-servers/h2o/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-servers/h2o/basic.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/386318"
+  },
+  {
+    "cohort": "B",
+    "position": 82,
+    "pr": 471330,
+    "base_sha": "4eb3c802539f72fe7538cb049c65ae2cb27a45e6",
+    "head_sha": "41c383338e1881994bf517b4c66aacb30a2410f7",
+    "module_paths": [
+      "nixos/modules/services/networking/ssh/sshd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/openssh.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/471330"
+  },
+  {
+    "cohort": "B",
+    "position": 83,
+    "pr": 436651,
+    "base_sha": "ec5c5c748e3fdd72de4c6d1b3d9dd3149583804a",
+    "head_sha": "91352f2f836d1469805a484663477b2d840ac919",
+    "module_paths": [
+      "nixos/modules/services/web-apps/homebox.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homebox.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/436651"
+  },
+  {
+    "cohort": "B",
+    "position": 84,
+    "pr": 484577,
+    "base_sha": "332ed114efcf99d73edbf6da01be07dba719ade3",
+    "head_sha": "267c9bbb92dfcc15b7a48807f3b68c04c395f3bb",
+    "module_paths": [
+      "nixos/modules/services/misc/n8n.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/n8n.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/484577"
+  },
+  {
+    "cohort": "B",
+    "position": 85,
+    "pr": 450453,
+    "base_sha": "93b9af4f8d0380d23de2e299108de7a217ee7e9d",
+    "head_sha": "d78b9e46d5d606347b022a1b7104e15641a9e57a",
+    "module_paths": [
+      "nixos/modules/services/networking/searx.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/searx.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/450453"
+  },
+  {
+    "cohort": "B",
+    "position": 87,
+    "pr": 366842,
+    "base_sha": "b34038394e39f0c60cc73dadba5e2bf76fc4baef",
+    "head_sha": "98c23a61c3d0cce6bdfd12c76a5d72f4983a3a6d",
+    "module_paths": [
+      "nixos/modules/services/networking/networkmanager.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/networking/networkmanager.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/366842"
+  },
+  {
+    "cohort": "B",
+    "position": 88,
+    "pr": 409546,
+    "base_sha": "f2e05822c7a3a9c50aee464b7e918fa96fb0c5b0",
+    "head_sha": "c546b27a6b70ab7cb90f99a342fc77c6064afce9",
+    "module_paths": [
+      "nixos/modules/services/networking/frp.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/frp.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/409546"
+  },
+  {
+    "cohort": "B",
+    "position": 89,
+    "pr": 489143,
+    "base_sha": "bdab6d6d27074f1ca86a4923279c1b606f391f88",
+    "head_sha": "28a9274f560b33bd05365c4c47c6c0248b68a4bc",
+    "module_paths": [
+      "nixos/modules/services/mail/stalwart.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/stalwart/stalwart.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/489143"
+  },
+  {
+    "cohort": "B",
+    "position": 92,
+    "pr": 481406,
+    "base_sha": "6ea793840a9f18a6183cd2f080f6bf2e716f2860",
+    "head_sha": "b7786d98437402888599667bdba0876cc6f39500",
+    "module_paths": [
+      "nixos/modules/services/web-apps/vikunja.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/vikunja.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/481406"
+  },
+  {
+    "cohort": "B",
+    "position": 93,
+    "pr": 432765,
+    "base_sha": "28474d1da8cd0f6e78a01a44a211c2c14f511d0b",
+    "head_sha": "e00fd16309633aaaf30a79df3b0a70ef37c11ded",
+    "module_paths": [
+      "nixos/modules/services/security/kanidm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kanidm.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/432765"
+  },
+  {
+    "cohort": "B",
+    "position": 94,
+    "pr": 477894,
+    "base_sha": "da1a98afa33751284b2ece09b1fd9f5f5e7372e9",
+    "head_sha": "f7eefe7eb2ccae6148e218fbd165c246b2a1b236",
+    "module_paths": [
+      "nixos/modules/services/hardware/keyd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/keyd.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/477894"
+  },
+  {
+    "cohort": "B",
+    "position": 95,
+    "pr": 471565,
+    "base_sha": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+    "head_sha": "d57c48cd2c62154f76eca9ee91fba70197724199",
+    "module_paths": [
+      "nixos/modules/services/misc/homepage-dashboard.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homepage-dashboard.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/471565"
+  },
+  {
+    "cohort": "B",
+    "position": 97,
+    "pr": 273833,
+    "base_sha": "742b17f589944371b5c058b17900d78e38c0f7ea",
+    "head_sha": "cd10f9a8745bd688b8a02c1a1d4808c412137ca7",
+    "module_paths": [
+      "nixos/modules/services/web-apps/keycloak.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/keycloak.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/273833"
+  },
+  {
+    "cohort": "B",
+    "position": 98,
+    "pr": 524915,
+    "base_sha": "2477ee9f4b4b6f1972ad4f9467e292688d3fdf90",
+    "head_sha": "a3d43e3230b80fe7b8213d5f91d484275fc35c98",
+    "module_paths": [
+      "nixos/modules/services/search/nominatim.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/nominatim.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch4/524915"
+  },
+  {
+    "cohort": "B",
+    "position": 101,
+    "pr": 424464,
+    "base_sha": "2f80625df416e89b8b46db93c466d985bfff9ae5",
+    "head_sha": "0541efdcf6cde2010ce6657b4d77e4e5a6b4b0ac",
+    "module_paths": [
+      "nixos/modules/services/audio/navidrome.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/navidrome.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/424464"
+  },
+  {
+    "cohort": "B",
+    "position": 103,
+    "pr": 524728,
+    "base_sha": "e4f7995bc4fbc2537c64ed9558ba33c895777606",
+    "head_sha": "e244279d81644dc1fcd06772e75b2850cbcc6a79",
+    "module_paths": [
+      "nixos/modules/services/networking/porxie.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/porxie.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/524728"
+  },
+  {
+    "cohort": "B",
+    "position": 104,
+    "pr": 412653,
+    "base_sha": "58a28f6e2131b0a983b4ca121444b43207a9ee80",
+    "head_sha": "c7ddf0b314ca1139015cef4cfea5d8b36477675c",
+    "module_paths": [
+      "nixos/modules/services/web-apps/filebrowser.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/filebrowser.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/412653"
+  },
+  {
+    "cohort": "B",
+    "position": 108,
+    "pr": 416806,
+    "base_sha": "8ca040e9ed7a9ebef8a5e544df90217a405f2d15",
+    "head_sha": "2a6405fb153fab2718a77ad07160e400c6bd8748",
+    "module_paths": [
+      "nixos/modules/services/databases/postgresql.nix",
+      "nixos/modules/services/databases/postgresql.md"
+    ],
+    "test_paths": [
+      "nixos/tests/postgresql/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/416806"
+  },
+  {
+    "cohort": "B",
+    "position": 109,
+    "pr": 393943,
+    "base_sha": "6f1396f7dc459dce81252622acc156ffdf7bafde",
+    "head_sha": "4392f03db71ed9dc3f2dcb476a7c4fd643af0bb5",
+    "module_paths": [
+      "nixos/modules/services/security/cfssl.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cfssl.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/393943"
+  },
+  {
+    "cohort": "B",
+    "position": 111,
+    "pr": 419908,
+    "base_sha": "cc80af1b81627d5a61f075d5de486dd143a8540e",
+    "head_sha": "292073c5cce560c375a17e754cdc4be292d1abb4",
+    "module_paths": [
+      "nixos/modules/services/databases/victoriametrics.nix",
+      "nixos/modules/services/monitoring/vmagent.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/victoriametrics/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/419908"
+  },
+  {
+    "cohort": "B",
+    "position": 112,
+    "pr": 456989,
+    "base_sha": "815ff90da1ce5742c9b04a0ce0c0eba8e33fdeed",
+    "head_sha": "53943b006f4a493fdeb83f4f8d6b0ec4895dfbc3",
+    "module_paths": [
+      "nixos/modules/services/audio/mpd.nix",
+      "nixos/modules/services/audio/mpdscribble.nix",
+      "nixos/modules/services/audio/ympd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mpd.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/456989"
+  },
+  {
+    "cohort": "B",
+    "position": 113,
+    "pr": 448254,
+    "base_sha": "d1e1f0580a86f29b80fb8cfcf98195e6f0846550",
+    "head_sha": "2eceead9e744c2b86014e990f8c2b677351e1929",
+    "module_paths": [
+      "nixos/modules/services/networking/avahi-daemon.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/avahi.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/448254"
+  },
+  {
+    "cohort": "B",
+    "position": 114,
+    "pr": 506644,
+    "base_sha": "d9673dc9c0682fe350da00c259243fb00ff3a9ac",
+    "head_sha": "f2cfbe07c39918fbd16ecec4802ac65ccf688a34",
+    "module_paths": [
+      "nixos/modules/services/web-apps/drupal.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/drupal.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/506644"
+  },
+  {
+    "cohort": "B",
+    "position": 115,
+    "pr": 430906,
+    "base_sha": "3f63b0cffc6570dd0a664702e6cd49141c096280",
+    "head_sha": "75ccd1f28868e020ff6d48449380556792d435f8",
+    "module_paths": [
+      "nixos/modules/services/misc/homepage-dashboard.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/homepage-dashboard.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/430906"
+  },
+  {
+    "cohort": "B",
+    "position": 116,
+    "pr": 405186,
+    "base_sha": "8b9086b2dd2a98b282c5c111d18e08dd65eab37a",
+    "head_sha": "7d0363742c496b33c202895c54cee5f46b23d9a0",
+    "module_paths": [
+      "nixos/modules/services/databases/postgresql.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/postgresql/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/405186"
+  },
+  {
+    "cohort": "B",
+    "position": 117,
+    "pr": 483748,
+    "base_sha": "2898dbae4a4c7c74dfc8c549f208b4db7d8eb3e8",
+    "head_sha": "177499a5afa7047b30b84ad2119dba4ec09cfa8e",
+    "module_paths": [
+      "nixos/modules/services/web-servers/caddy/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/caddy.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/483748"
+  },
+  {
+    "cohort": "B",
+    "position": 118,
+    "pr": 405047,
+    "base_sha": "5da2cb42752803610c597f8eec20f91c52463a00",
+    "head_sha": "a95a530883f1c7cd408b823bba87ea17093301ea",
+    "module_paths": [
+      "nixos/modules/services/misc/gitlab.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/gitlab.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/405047"
+  },
+  {
+    "cohort": "B",
+    "position": 119,
+    "pr": 414697,
+    "base_sha": "c7c9cae886393af67a4e6b893e66cc93753ba4eb",
+    "head_sha": "5f833b1008e4d101e985648dd0b558e2ad46b010",
+    "module_paths": [
+      "nixos/modules/services/security/kanidm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kanidm-provisioning.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/414697"
+  },
+  {
+    "cohort": "B",
+    "position": 121,
+    "pr": 408843,
+    "base_sha": "55abd9841e394d3149e8a895c458d7808830a7dd",
+    "head_sha": "a7f40a2648fe922f00d83491b605e3bec292e940",
+    "module_paths": [
+      "nixos/modules/services/web-apps/mealie.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mealie.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/408843"
+  },
+  {
+    "cohort": "B",
+    "position": 125,
+    "pr": 405610,
+    "base_sha": "93bf311f43952c22f93cc76b68fc5076c143997e",
+    "head_sha": "998fe3a6473c6373306895b3d0cd11698b6141c1",
+    "module_paths": [
+      "nixos/modules/services/misc/paperless.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/paperless.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch5/405610"
+  },
+  {
+    "cohort": "B",
+    "position": 126,
+    "pr": 425604,
+    "base_sha": "aa1c5760da76b4211ff16ede2b6d4d62efa8f69d",
+    "head_sha": "d9b0f4a6e901c996a8c6d48552a7eb1495428a79",
+    "module_paths": [
+      "nixos/modules/services/web-apps/peertube.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/peertube.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/425604"
+  },
+  {
+    "cohort": "B",
+    "position": 127,
+    "pr": 421882,
+    "base_sha": "864c9c70a5a61bbf493909284a1b64e38555e5a1",
+    "head_sha": "f7e134def959e06f0f2eed5a9d157aab8a5faa2a",
+    "module_paths": [
+      "nixos/modules/services/web-apps/lanraragi.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/lanraragi.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/421882"
+  },
+  {
+    "cohort": "B",
+    "position": 128,
+    "pr": 443717,
+    "base_sha": "8216b012eecdde64717fd6b38ebaa1bb36aae6f6",
+    "head_sha": "49f3a9f7cbb34c23f3d2661d98e6b6bcdc915741",
+    "module_paths": [
+      "nixos/modules/services/backup/pgbackrest.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/pgbackrest/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/443717"
+  },
+  {
+    "cohort": "B",
+    "position": 130,
+    "pr": 508427,
+    "base_sha": "93b719e82d8c5c0285cb1b87f190f2d367fc6e05",
+    "head_sha": "08a81f0e1060f76b78f368b2b2b95f4691d3456e",
+    "module_paths": [
+      "nixos/modules/services/web-apps/drupal.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/drupal.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/508427"
+  },
+  {
+    "cohort": "B",
+    "position": 131,
+    "pr": 417467,
+    "base_sha": "8bb4a2a8ade1a8b63eaffd91c69c519a1480c376",
+    "head_sha": "24cad7344f37eecba3d456bf59c47837bc4ea094",
+    "module_paths": [
+      "nixos/modules/services/misc/renovate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/renovate.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/417467"
+  },
+  {
+    "cohort": "B",
+    "position": 133,
+    "pr": 440660,
+    "base_sha": "6b820e99d7d83a00f728590b2a68c78298be9c4e",
+    "head_sha": "91f33137366325a14f45a8ad4622c9c3814b43f6",
+    "module_paths": [
+      "nixos/modules/services/networking/prosody.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/xmpp/prosody.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/440660"
+  },
+  {
+    "cohort": "B",
+    "position": 134,
+    "pr": 466504,
+    "base_sha": "0f697360812a0721b65603a1983a80f6105eb69f",
+    "head_sha": "1c77ea5916d409d92131ed82b0e202f1a3fe75a5",
+    "module_paths": [
+      "nixos/modules/services/audio/pulseaudio.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/pulseaudio.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/466504"
+  },
+  {
+    "cohort": "B",
+    "position": 135,
+    "pr": 466004,
+    "base_sha": "3635c3da55f74817efb43d4af48083d3aaade903",
+    "head_sha": "1aa800def6a24855b809c4bc5b4f51bc7fb3f01c",
+    "module_paths": [
+      "nixos/modules/services/misc/ollama.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ollama.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/466004"
+  },
+  {
+    "cohort": "B",
+    "position": 138,
+    "pr": 433962,
+    "base_sha": "e4958d0080a66416dcc344632055d2f1bd7b8569",
+    "head_sha": "1ee66ce836d4bcc4b55d900a0128df63f73ff9dd",
+    "module_paths": [
+      "nixos/modules/services/display-managers/greetd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/greetd-no-shadow.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/433962"
+  },
+  {
+    "cohort": "B",
+    "position": 139,
+    "pr": 492892,
+    "base_sha": "1714b4d7fc69faca67c25c6edbb2aa33a155c454",
+    "head_sha": "1d492ae1b22210daa9510afaf013607e68d34b6a",
+    "module_paths": [
+      "nixos/modules/services/misc/sssd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/sssd-ldap.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/492892"
+  },
+  {
+    "cohort": "B",
+    "position": 140,
+    "pr": 517396,
+    "base_sha": "1dc2eec5bde111a3e20c0c8507e4bd2706b953e5",
+    "head_sha": "06ddcdd6dc380aab0fc1d523440ea3c4cf30a892",
+    "module_paths": [
+      "nixos/modules/services/web-apps/lasuite-meet.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/lasuite-meet.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/517396"
+  },
+  {
+    "cohort": "B",
+    "position": 141,
+    "pr": 449173,
+    "base_sha": "6e5eda48223d33804ddea974ccf606a25a449b72",
+    "head_sha": "9427b8aeda4276cc36aad2e2b9b9076f912eb042",
+    "module_paths": [
+      "nixos/modules/services/web-apps/dolibarr.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/dolibarr.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/449173"
+  },
+  {
+    "cohort": "B",
+    "position": 142,
+    "pr": 395982,
+    "base_sha": "55d6dd76b3f36614e13e37f23f7c255238de29d1",
+    "head_sha": "5f33d95144f8a41401609c6956486d4025d24817",
+    "module_paths": [
+      "nixos/modules/services/networking/openvpn.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/initrd-network-openvpn/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/395982"
+  },
+  {
+    "cohort": "B",
+    "position": 143,
+    "pr": 471996,
+    "base_sha": "905105f25fcc57e2f6fa96cef09a7899870cb08a",
+    "head_sha": "b740fb3106c5a63ed6dd2b6d368b6e57303bb2b7",
+    "module_paths": [
+      "nixos/modules/services/computing/slurm/slurm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/slurm.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/471996"
+  },
+  {
+    "cohort": "B",
+    "position": 144,
+    "pr": 471312,
+    "base_sha": "ca696276378b844d888872c9045d89e9b58cc85a",
+    "head_sha": "62ea5b9ae7d4329475089f60232ee1426d9547a9",
+    "module_paths": [
+      "nixos/modules/services/misc/angrr.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/angrr.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/471312"
+  },
+  {
+    "cohort": "B",
+    "position": 145,
+    "pr": 429244,
+    "base_sha": "ad7560d70c227a218a8a6c75bd8580fa1cd45c6b",
+    "head_sha": "e0308144468a25644ee59c9ea7c90ee424419e99",
+    "module_paths": [
+      "nixos/modules/services/mail/tlsrpt.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/tlsrpt.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/429244"
+  },
+  {
+    "cohort": "B",
+    "position": 147,
+    "pr": 389471,
+    "base_sha": "0d54c58e683512c29493ef6e4283c978f6534859",
+    "head_sha": "20c9782e2fc4f0b24b6c1b364eb46cbfe9ebc160",
+    "module_paths": [
+      "nixos/modules/services/audio/navidrome.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/navidrome.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/389471"
+  },
+  {
+    "cohort": "B",
+    "position": 150,
+    "pr": 467286,
+    "base_sha": "8363ade52b617148dc10ca45aba1202ca25074bf",
+    "head_sha": "fcdfa7b5d0bc65ac086a12dd98dd7de82e2d522f",
+    "module_paths": [
+      "nixos/modules/services/databases/postgresql.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/postgresql/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch6/467286"
+  },
+  {
+    "cohort": "B",
+    "position": 151,
+    "pr": 388978,
+    "base_sha": "7afd4512ca2c0e8885697903d77f47b670c1a7e4",
+    "head_sha": "4e64bf159143b7f47ce7f13f6cbfa7b7d714c3ed",
+    "module_paths": [
+      "nixos/modules/services/databases/mysql.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mysql/mariadb-galera.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/388978"
+  },
+  {
+    "cohort": "B",
+    "position": 152,
+    "pr": 376490,
+    "base_sha": "e5fad5185b76efcfc271ba1875ba5fda8f4f79d1",
+    "head_sha": "16cdde80082ea5e2e02a53260ae3ef4e281c309c",
+    "module_paths": [
+      "nixos/modules/services/security/kanidm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kanidm.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/376490"
+  },
+  {
+    "cohort": "B",
+    "position": 153,
+    "pr": 456004,
+    "base_sha": "4a0f51b3864351a27c8b47da08de159022c22356",
+    "head_sha": "84881aecea36bd65f3340a07fbda400eac743a86",
+    "module_paths": [
+      "nixos/modules/services/audio/snapserver.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/snapcast.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/456004"
+  },
+  {
+    "cohort": "B",
+    "position": 154,
+    "pr": 397130,
+    "base_sha": "df46c58b4151565a48d740748ba8684e9923f88f",
+    "head_sha": "ee84ec39e94cfcc8fa28ca914772d77c014172a5",
+    "module_paths": [
+      "nixos/modules/services/security/kanidm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/kanidm-provisioning.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/397130"
+  },
+  {
+    "cohort": "B",
+    "position": 156,
+    "pr": 428153,
+    "base_sha": "332e97d4a8d5742707b5d27a9a529b5a1d95ef2e",
+    "head_sha": "ed758199980ee3bb0aa77b0f7db16d7add39d35b",
+    "module_paths": [
+      "nixos/modules/services/web-apps/drupal.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/drupal.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/428153"
+  },
+  {
+    "cohort": "B",
+    "position": 157,
+    "pr": 463358,
+    "base_sha": "409eb4f09136d38112ab22f4faf81deb8441e621",
+    "head_sha": "b61914ea6eec15d4b634717992da794fdfa67703",
+    "module_paths": [
+      "nixos/modules/services/misc/ollama.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ollama.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/463358"
+  },
+  {
+    "cohort": "B",
+    "position": 158,
+    "pr": 460730,
+    "base_sha": "9a0b5314e988375390f4f72218ad5e87b5726f24",
+    "head_sha": "a11465f820a394d784fff6a78fa5fe37af242e7c",
+    "module_paths": [
+      "nixos/modules/services/monitoring/beszel-agent.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/beszel.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/460730"
+  },
+  {
+    "cohort": "B",
+    "position": 160,
+    "pr": 466620,
+    "base_sha": "80da349c36121606a8cad534ce822d1c2b837177",
+    "head_sha": "ab961b8547947a2850bc9a95a30e4977b486f4ef",
+    "module_paths": [
+      "nixos/modules/services/networking/llama-swap.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-servers/llama-swap.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/466620"
+  },
+  {
+    "cohort": "B",
+    "position": 162,
+    "pr": 486936,
+    "base_sha": "49016f2147dc637b76f7990c5ac82cb2e2384dba",
+    "head_sha": "188bcbd94981706d94883939a4b0ffae4c506db4",
+    "module_paths": [
+      "nixos/modules/services/web-apps/pretalx.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/pretalx.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/486936"
+  },
+  {
+    "cohort": "B",
+    "position": 163,
+    "pr": 494127,
+    "base_sha": "a97eb80b14463bdc47442afab24156a84ff68af6",
+    "head_sha": "5ad853409cf18274ab2b061b2d83231e5a31a3f4",
+    "module_paths": [
+      "nixos/modules/services/misc/n8n.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/n8n.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/494127"
+  },
+  {
+    "cohort": "B",
+    "position": 164,
+    "pr": 484670,
+    "base_sha": "69459b3b3ea735e9933e1e367db3e68334cce3fe",
+    "head_sha": "cfc02bae23b2bc2bdc30d9c26c7695fbf2ad6d0d",
+    "module_paths": [
+      "nixos/modules/services/misc/omnom.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/omnom/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/484670"
+  },
+  {
+    "cohort": "B",
+    "position": 165,
+    "pr": 463443,
+    "base_sha": "78e952e43a2d08fa35c72ffd3b687852e8567120",
+    "head_sha": "099115500494c74f2790518f78468caeac1a2cd3",
+    "module_paths": [
+      "nixos/modules/services/hardware/tuned.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/tuned.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/463443"
+  },
+  {
+    "cohort": "B",
+    "position": 167,
+    "pr": 347209,
+    "base_sha": "2629605ab2d1fe8217367cea0ca7551d1cdc1316",
+    "head_sha": "cd8540da55892dd6f6e3d795de759daee82cbb8c",
+    "module_paths": [
+      "nixos/modules/services/web-apps/onlyoffice.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/onlyoffice.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/347209"
+  },
+  {
+    "cohort": "B",
+    "position": 168,
+    "pr": 397967,
+    "base_sha": "6990f4ce664f97b0ded551dbc9d4cccc7940d08d",
+    "head_sha": "c0f52c28cd3551ca5df9b574ff27e05dc6c40d7a",
+    "module_paths": [
+      "nixos/modules/services/networking/fedimintd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/fedimintd.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/397967"
+  },
+  {
+    "cohort": "B",
+    "position": 170,
+    "pr": 475112,
+    "base_sha": "308f82252459d32a68cfbbec3af672e5867ff994",
+    "head_sha": "a722a999d1af37d9f3760680dc50fc598fce01a6",
+    "module_paths": [
+      "nixos/modules/services/networking/cgit.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cgit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/475112"
+  },
+  {
+    "cohort": "B",
+    "position": 171,
+    "pr": 386406,
+    "base_sha": "976294211357efd854b0bcf4233fbda3653aadea",
+    "head_sha": "67d9b4b947f8b87eefbf6a182ee48db2dba08f27",
+    "module_paths": [
+      "nixos/modules/services/networking/frp.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/frp.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/386406"
+  },
+  {
+    "cohort": "B",
+    "position": 174,
+    "pr": 468049,
+    "base_sha": "38ea428d59463d2bbe552146534035ca25cc209e",
+    "head_sha": "070e821be46816bec0639e4f37983ca5ead713bd",
+    "module_paths": [
+      "nixos/modules/services/networking/radicale.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/radicale.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/468049"
+  },
+  {
+    "cohort": "B",
+    "position": 175,
+    "pr": 395732,
+    "base_sha": "4ad504735ad405c619b5889ca645bae9ff455c7a",
+    "head_sha": "d62fd5fa6c82f3d153448b417f17aec1ae936130",
+    "module_paths": [
+      "nixos/modules/services/misc/docling-serve.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/docling-serve.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch7/395732"
+  },
+  {
+    "cohort": "B",
+    "position": 176,
+    "pr": 515985,
+    "base_sha": "17bc32dc2d218bc80aaaafb0017dcc455a90b5c4",
+    "head_sha": "2ee66cfc80ff376b06f4eddc84b03598c42a500a",
+    "module_paths": [
+      "nixos/modules/services/networking/porxie.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/porxie.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/515985"
+  },
+  {
+    "cohort": "B",
+    "position": 177,
+    "pr": 500388,
+    "base_sha": "37623ad7aa9f7c72310fbcf61f9db20f25afea93",
+    "head_sha": "abd4cb9ecfa04cad6147dd6c8a093edd7a9a4add",
+    "module_paths": [
+      "nixos/modules/services/networking/searx.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/searx.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/500388"
+  },
+  {
+    "cohort": "B",
+    "position": 178,
+    "pr": 490920,
+    "base_sha": "d1c15b7d5806069da59e819999d70e1cec0760bf",
+    "head_sha": "b898b53e2c0ade92cfcaab4beb088b67bd66831a",
+    "module_paths": [
+      "nixos/modules/services/web-servers/traefik.nix",
+      "nixos/modules/services/networking/pangolin.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/traefik.nix",
+      "nixos/tests/pangolin.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/490920"
+  },
+  {
+    "cohort": "B",
+    "position": 181,
+    "pr": 473479,
+    "base_sha": "d7547a7ed4d0bedcd73c64b2b854426ab55da543",
+    "head_sha": "f83670934aa00de5f23fcf9a38a8e4f8608ff7f6",
+    "module_paths": [
+      "nixos/modules/services/computing/slurm/slurm.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/slurm.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/473479"
+  },
+  {
+    "cohort": "B",
+    "position": 182,
+    "pr": 398420,
+    "base_sha": "f6b299d7773e318cf1787d5da4b3ef836662a5cd",
+    "head_sha": "9cc26fef84b2deec8ec2e16ce712798662cac524",
+    "module_paths": [
+      "nixos/modules/services/torrent/cross-seed.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cross-seed.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/398420"
+  },
+  {
+    "cohort": "B",
+    "position": 183,
+    "pr": 418136,
+    "base_sha": "367bce84bd1d46008f81e63e7c2c65767156f95e",
+    "head_sha": "375fc85aea9a6328e759bb85729ec7b241b1a236",
+    "module_paths": [
+      "nixos/modules/services/networking/ssh/sshd.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/openssh.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/418136"
+  },
+  {
+    "cohort": "B",
+    "position": 184,
+    "pr": 413190,
+    "base_sha": "62bdbeee5fdb5578dc2459046409fe182d58ec1e",
+    "head_sha": "04a5cb63b3ed911fbee602c0abcef3bd29572a69",
+    "module_paths": [
+      "nixos/modules/services/web-apps/lasuite-docs.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/lasuite-docs.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/413190"
+  },
+  {
+    "cohort": "B",
+    "position": 185,
+    "pr": 449513,
+    "base_sha": "d9907011a51e72d7e62630e4a2071d0abbe68292",
+    "head_sha": "cc38ed4577517666fd52b6d832b638702d1b1f89",
+    "module_paths": [
+      "nixos/modules/services/admin/pgadmin.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/pgadmin4.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/449513"
+  },
+  {
+    "cohort": "B",
+    "position": 186,
+    "pr": 492341,
+    "base_sha": "c207940c56176cf7b7d5b523a86a2cfb364b9957",
+    "head_sha": "fbe6eb952a657ef372548a6fa45d9da9ded13de8",
+    "module_paths": [
+      "nixos/modules/services/audio/music-assistant.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/music-assistant.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/492341"
+  },
+  {
+    "cohort": "B",
+    "position": 187,
+    "pr": 438684,
+    "base_sha": "c46f18dfb2f01caf2adca479e8076147bef63069",
+    "head_sha": "414c23faccf416ff4995ca999de620597ab8c1c5",
+    "module_paths": [
+      "nixos/modules/services/networking/ncps.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/ncps.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/438684"
+  },
+  {
+    "cohort": "B",
+    "position": 188,
+    "pr": 401840,
+    "base_sha": "425237e23b0ea9e63d1fb01072f38fbaf3404ed9",
+    "head_sha": "1948ad4bb5aa16054e07cbfd0b585bd58763965b",
+    "module_paths": [
+      "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+      "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/nvidia-container-toolkit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/401840"
+  },
+  {
+    "cohort": "B",
+    "position": 189,
+    "pr": 417590,
+    "base_sha": "ac3f8faff5c1a4191489c7b2f006d9adf4797425",
+    "head_sha": "9319694d25812fbf490fef499f117d5d96e8e40d",
+    "module_paths": [
+      "nixos/modules/services/web-apps/onlyoffice.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/onlyoffice.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/417590"
+  },
+  {
+    "cohort": "B",
+    "position": 190,
+    "pr": 386345,
+    "base_sha": "f176582204e095f1bd023a6f2f8aa8262eb8c045",
+    "head_sha": "6e87867ee3e49ee5199fb48a6cf22958286f3c1d",
+    "module_paths": [
+      "nixos/modules/services/databases/postgresql.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/postgresql/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/386345"
+  },
+  {
+    "cohort": "B",
+    "position": 192,
+    "pr": 459937,
+    "base_sha": "640fe994e5d7815f1dccbc3f84316ff3b0cbd7a1",
+    "head_sha": "eec3fb0c3a5d7b3852a9f60d37bab1d424555733",
+    "module_paths": [
+      "nixos/modules/services/x11/xscreensaver.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/xscreensaver.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/459937"
+  },
+  {
+    "cohort": "B",
+    "position": 196,
+    "pr": 446598,
+    "base_sha": "4b8ce46647bf2e03f0d6b19ea969fdf8ffa4f52f",
+    "head_sha": "87897caee2d7d31fa2f870c38070dd05f47e77ce",
+    "module_paths": [
+      "nixos/modules/services/audio/mopidy.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mopidy.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/446598"
+  },
+  {
+    "cohort": "B",
+    "position": 197,
+    "pr": 458319,
+    "base_sha": "37e6ac33c04e19f8081b6baa925b8017a0026ac6",
+    "head_sha": "ddac798a5a8cf52f820e0da180f870452714f075",
+    "module_paths": [
+      "nixos/modules/services/databases/clickhouse.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/clickhouse/default.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/458319"
+  },
+  {
+    "cohort": "B",
+    "position": 199,
+    "pr": 445176,
+    "base_sha": "717111844a0d2d139cdf32a7b5e308e74ee400e4",
+    "head_sha": "f6a4509bfb4785a844b98f043f738dc553c33d37",
+    "module_paths": [
+      "nixos/modules/services/misc/n8n.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/n8n.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch8/445176"
+  },
+  {
+    "cohort": "B",
+    "position": 201,
+    "pr": 396478,
+    "base_sha": "8ded8cc14b57512b69c9529f329158dd451c36d8",
+    "head_sha": "badd9d1a70ad3d5a27b6549b7ee2c1ee796cd079",
+    "module_paths": [
+      "nixos/modules/services/misc/taskchampion-sync-server.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/taskchampion-sync-server.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/396478"
+  },
+  {
+    "cohort": "B",
+    "position": 202,
+    "pr": 387829,
+    "base_sha": "e31a8ecf35dbf4bb1c8ca45100c79072f8a1e536",
+    "head_sha": "067732921fae5a44f91e47d7bb9e2b9596a9f053",
+    "module_paths": [
+      "nixos/modules/services/home-automation/evcc.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/evcc.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/387829"
+  },
+  {
+    "cohort": "B",
+    "position": 203,
+    "pr": 458481,
+    "base_sha": "d42f6ed0d61c4de3f06202542b0f69b2bcaa5b85",
+    "head_sha": "fbe6fd7edd1f92023e5468a3800161222bd559c0",
+    "module_paths": [
+      "nixos/modules/services/web-apps/writefreely.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/web-apps/writefreely.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/458481"
+  },
+  {
+    "cohort": "B",
+    "position": 204,
+    "pr": 392716,
+    "base_sha": "848d816cf831e9e37125c8734b38a8a43369ee0c",
+    "head_sha": "128bdeb3c5d185af082b8aabd70a99ad1a1466e5",
+    "module_paths": [
+      "nixos/modules/services/mail/cyrus-imap.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/cyrus-imap.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/392716"
+  },
+  {
+    "cohort": "B",
+    "position": 205,
+    "pr": 433631,
+    "base_sha": "e3d1ea47847b490cbe30c4b3110384fff8edd067",
+    "head_sha": "ce3007ed6032fdb64d6cc1d0e88f43d74c542638",
+    "module_paths": [
+      "nixos/modules/services/x11/desktop-managers/enlightenment.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/enlightenment.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/433631"
+  },
+  {
+    "cohort": "B",
+    "position": 206,
+    "pr": 427260,
+    "base_sha": "35ecc48f7ea7260459f0395f0be53f37dfc19586",
+    "head_sha": "711f3730a9758ff0c06382dd39cc38f30eb203b9",
+    "module_paths": [
+      "nixos/modules/services/web-apps/drupal.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/drupal.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/427260"
+  },
+  {
+    "cohort": "B",
+    "position": 207,
+    "pr": 398993,
+    "base_sha": "fd15d1aa09a097a609e4258668e1278e2001afbf",
+    "head_sha": "dd30fd1285b12ff942cc98d8a486eeac7b64f1f2",
+    "module_paths": [
+      "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/nvidia-container-toolkit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/398993"
+  },
+  {
+    "cohort": "B",
+    "position": 208,
+    "pr": 521022,
+    "base_sha": "45162c4a6982c7f95c9c01d9964ef7c7faf84c07",
+    "head_sha": "ab474d84bcc7f0dc33ca4fe9783de7c9e382b4e7",
+    "module_paths": [
+      "nixos/modules/services/security/opensnitch.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/opensnitch.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/521022"
+  },
+  {
+    "cohort": "B",
+    "position": 209,
+    "pr": 480468,
+    "base_sha": "5571d2bb61a577ac18a8914a8e88edc71b2d0b5f",
+    "head_sha": "e034c48ed000c4d9c4dcd759a7e108eb80170992",
+    "module_paths": [
+      "nixos/modules/services/web-apps/mediawiki.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/mediawiki.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/480468"
+  },
+  {
+    "cohort": "B",
+    "position": 210,
+    "pr": 480839,
+    "base_sha": "247bdd36b122075f4b091b8d5557f4bc808ce53e",
+    "head_sha": "0420b1de9dff7e2791418e88dc43218d860c2447",
+    "module_paths": [
+      "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+      "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/nvidia-container-toolkit.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/480839"
+  },
+  {
+    "cohort": "B",
+    "position": 216,
+    "pr": 433539,
+    "base_sha": "3113e10e801b36aa9eeba3f815975bf5c788ee34",
+    "head_sha": "b153fe260e0147bf8f31347619f8625161de2ff7",
+    "module_paths": [
+      "nixos/modules/services/video/frigate.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/frigate.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/433539"
+  },
+  {
+    "cohort": "B",
+    "position": 217,
+    "pr": 446006,
+    "base_sha": "fafe4b8d9ffdee81b1fbeccff1ab6549eb3211dd",
+    "head_sha": "c45673a6235dbf9881b9c67f1d0a1ba044c91796",
+    "module_paths": [
+      "nixos/modules/services/misc/angrr.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/angrr.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/446006"
+  },
+  {
+    "cohort": "B",
+    "position": 218,
+    "pr": 488515,
+    "base_sha": "917fec990948658ef1ccd07cef2a1ef060786846",
+    "head_sha": "b5a97873d917d0ef43b2d13eba6a72bb38c2a3cd",
+    "module_paths": [
+      "nixos/modules/services/networking/harmonia.nix"
+    ],
+    "test_paths": [
+      "nixos/tests/harmonia.nix"
+    ],
+    "orig_dir": "fixtures/s5-live-pr-shadow/adjudication/s5b-batch9/488515"
+  }
+]

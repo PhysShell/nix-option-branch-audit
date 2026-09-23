@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "443717",
+      "module": "nixos/modules/services/backup/pgbackrest.nix",
+      "test": "nixos/tests/pgbackrest/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "pgbackrest"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 107,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "repos"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stanzas"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 196,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stanzas",
+            "jobs"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 201,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "stanzas",
+            "instances"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 234,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "stanzas",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 277,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 310,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 384,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 384,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 43,
+            "col": 28
+          },
+          "source": "if lib.isAttrs v then lib.mapAttrsToList (n': v': \"${n'}=${v'}\") v else v",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 46,
+            "col": 9
+          },
+          "source": "if v == true then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 48,
+            "col": 14
+          },
+          "source": "if v == false then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 118,
+            "col": 17
+          },
+          "source": "if name == \"localhost\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 122,
+            "col": 22
+          },
+          "source": "if config.type or \"posix\" != type then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 244,
+            "col": 35
+          },
+          "source": "if name == \"localhost\" then null else name",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/pgbackrest.nix",
+            "line": 454,
+            "col": 8
+          },
+          "source": "lib.mkIf config.services.postgresql.enable {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/pgbackrest/default.nix",
+            "line": 3,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/pgbackrest/default.nix",
+            "line": 4,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "commands"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

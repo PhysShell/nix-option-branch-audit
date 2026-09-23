@@ -1,0 +1,156 @@
+[
+  {
+    "pr": 429967,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion mechanism as the 7 verdict-level cases above, but the excluded declarations do not include the watched leaf (http_files) for this specific target, so the reported verdict itself (OptionNotFound, both sides, unchanged) happens to be unaffected. discovered_options count drops (58->27 head, 60->28 base) because prosody.nix's real content contains several other named-let-bound submodules (sslOpts, discoOpts, and others) whose own declarations are now excluded under the concrete option_prefix=[services,prosody]. This is the same code path and the same class of over-exclusion as #431289 (same file, in fact), just not manifesting as a watched-verdict difference here -- disclosed as a real output delta from the historical byte-identical record, not assumed benign merely because this specific watch is unaffected."
+  },
+  {
+    "pr": 494314,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same prosody.nix over-exclusion as #429967/#431289 (watched leaf unaffected by the specific declarations excluded, but discovered_options count changes identically 60->27 both sides)."
+  },
+  {
+    "pr": 484133,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class -- rspamd.nix, real named-let-bound submodule content excluded under a concrete option_prefix; watched leaf unaffected."
+  },
+  {
+    "pr": 557329,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class -- portmaster.nix, watched leaf unaffected by the specific declarations excluded."
+  },
+  {
+    "pr": 431289,
+    "cohort": "A",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "OVER-EXCLUSION, not a collision fix. Target watches services.prosody.muc.moderation (option_prefix=[services,prosody,muc]). Real source confirmed (prosody.nix @ head cea3dfac9e5a4bcc13100623be892a37b2d80c2b): `mucOpts = _: { options = { ...; moderation = mkOption {...}; }; };` (a named, let-bound function value, lines 299-376), used via `muc = mkOption { type = types.listOf (types.submodule mucOpts); ... };` (line 819-820) -- a REAL option declared exactly at option_prefix's own concrete relativized path (services.prosody.muc), directly type-referencing mucOpts. This is the LEGITIMATE way this concrete option_prefix's own contents are declared (via listOf(submodule <name>), analogous to kimai's attrsOf(submodule siteOpts) but for a list rather than an attrset), not an unrelated auxiliary construct. F1's fix cannot currently distinguish 'named submodule genuinely unrelated to option_prefix' (angrr's real defect) from 'named submodule that IS option_prefix's own real declared content, referenced by name rather than inline' (this case) -- both are 'a top-level options={} block nested inside a named let/rec binding, not inside a tracked mkOption call', which is the ONLY thing is_nested_inside_named_let_or_rec_binding actually checks. Effect: head regresses from the historically-correct PredicateNotFound (declaration genuinely found, no test ever witnesses it) to the WRONG OptionNotFound (declaration falsely reported as not existing at all), collapsing a real historical VerdictChanged into a false Unchanged -- the opposite failure mode from angrr, but the same code path."
+  },
+  {
+    "pr": 374017,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class -- k3s.nix, watched leaf unaffected."
+  },
+  {
+    "pr": 260551,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same prosody.nix over-exclusion as #429967/#431289/#494314 (same module, different watched leaf: checkConfig, which is declared directly at prosody's own true top-level options block, not inside any named submodule -- so this specific watched verdict is UNAFFECTED, already independently confirmed identical (verdicts field byte-equal) above; this is the already-adjudicated real actionable finding from S5's own round, confirmed to remain intact under the candidate binary)."
+  },
+  {
+    "pr": 432528,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class -- tayga.nix, watched leaf (wkpfStrict, declared directly at the module's own true top level) unaffected -- already independently confirmed identical (verdicts field byte-equal) above; this is the already-adjudicated real PASS from S5's own round, confirmed to remain intact under the candidate binary."
+  },
+  {
+    "pr": 438285,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class -- discovered_options count drops from 3 to 0 on both sides, meaning ALL of this file's discoverable content came from a named let/rec-bound submodule now fully excluded; watched leaf verdict unaffected only because the watched leaf itself was never discoverable at all (OptionNotFound on both sides, before and after)."
+  },
+  {
+    "pr": 423934,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same shape as #438285 -- discovered_options 3->0 both sides, watched verdict unaffected (already OptionNotFound both sides)."
+  },
+  {
+    "pr": 506644,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion mechanism as PR #431289, confirmed via real source (drupal.nix @ head f2cfbe07c39918fbd16ecec4802ac65ccf688a34): `sites = mkOption { type = types.attrsOf (types.submodule siteOpts); ... };` at line 413, directly inside `options.services.drupal = {...}` (lines 408-409) -- a real declaration exactly at option_prefix=[services,drupal,sites]'s own concrete path, referencing the named siteOpts submodule (which declares webRoot, the watched leaf). Same effect: watched webRoot regresses from historical option_not_found->predicate_not_found to a false Unchanged."
+  },
+  {
+    "pr": 508427,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same drupal.nix / siteOpts mechanism as #506644 (same module, same option_prefix, different watched leaf: configRoot instead of webRoot, presumably also declared inside siteOpts)."
+  },
+  {
+    "pr": 440660,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class, prosody.nix, a different named submodule than muc: option_prefix=[services,prosody,httpFileShare], watch=http_external_url -- the same architectural shape as muc/mucOpts (a real option `httpFileShare = mkOption {type = ...(submodule httpFileShareOpts);...}` anchored exactly at option_prefix, referencing a named let-bound submodule)."
+  },
+  {
+    "pr": 471312,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "expected_target_correction",
+    "mechanism": "The demonstrated F1 defect itself, PR #471312 (angrr). Verdict-level: head's watched 'period' correctly changes from a false PredicateNotFound-match (against the unrelated, structurally-distinct temporaryRootPolicyOptions.period) to the correct OptionNotFound (the real, removed top-level services.angrr.period is genuinely gone, and no other option_prefix-anchored declaration answers to 'period' anymore). Matches F1's own intended fix exactly: predicate_not_found->option_not_found, base still PredicateNotFound. Confirmed already via the dedicated regression test and real S5-F1 fixture; re-confirmed here via the frozen S5 replay itself, not merely the synthetic fixture."
+  },
+  {
+    "pr": 428153,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same drupal.nix / siteOpts mechanism as #506644/#508427 (watched leaf: configSyncDir)."
+  },
+  {
+    "pr": 463443,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class, watched leaf unaffected by the specific declarations excluded (discovered_options 18/19 -> 5/6)."
+  },
+  {
+    "pr": 397967,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same over-exclusion class, fedimintd.nix, confirmed via real source (@ head c0f52c28cd3551ca5df9b574ff27e05dc6c40d7a): `fedimintdOpts = {config,lib,name,...}: {options = {...; p2p = {...}; api_ws = {openFirewall = mkOption{...};...}; ...};};` (lines 23-30+, a named let-bound function value), used as `services.fedimintd`'s own per-instance type (attrsOf(submodule fedimintdOpts)). option_prefix=[services,fedimintd], watch=api_ws.openFirewall -- fedimintdOpts IS the legitimate declaration site for this whole target's own watched content, not an unrelated auxiliary. Same effect: watched api_ws.openFirewall regresses from the historical, real, adjudicated new_finding (option_not_found->oba001, reviewed and confirmed correct earlier in the S5 round) to a false Unchanged -- meaning F1, if left as-is, would make this real, already-adjudicated actionable finding INVISIBLE."
+  },
+  {
+    "pr": 401840,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same shape as #438285/#423934 -- discovered_options 3->0 both sides, watched verdict unaffected."
+  },
+  {
+    "pr": 427260,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same drupal.nix / siteOpts mechanism as #506644/#508427/#428153 (watched leaf: privateFilesDir)."
+  },
+  {
+    "pr": 398993,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same shape as #438285/#423934/#401840 -- discovered_options 3->0 both sides, watched verdict unaffected."
+  },
+  {
+    "pr": 480839,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same shape as #438285/#423934/#401840/#398993 -- discovered_options 3->0 both sides, watched verdict unaffected."
+  },
+  {
+    "pr": 433539,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "unexpected_semantic_delta",
+    "mechanism": "Same shape as #438285/#423934/#401840/#398993/#480839 -- discovered_options 3->0 both sides, watched verdict unaffected."
+  }
+]

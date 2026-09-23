@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "397967",
+      "module": "nixos/modules/services/networking/fedimintd.nix",
+      "test": "nixos/tests/fedimintd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "fedimintd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "fedimintd"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 223,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "api_ws",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 241,
+            "col": 13
+          },
+          "source": "lib.optional cfg.api_ws.openFirewall cfg.api_ws.port"
+        },
+        {
+          "path": [
+            "p2p",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 242,
+            "col": 16
+          },
+          "source": "lib.optional cfg.p2p.openFirewall cfg.p2p.port"
+        },
+        {
+          "path": [
+            "ui",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 243,
+            "col": 16
+          },
+          "source": "lib.optional cfg.ui.openFirewall cfg.ui.port"
+        },
+        {
+          "path": [
+            "api_iroh",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 252,
+            "col": 13
+          },
+          "source": "lib.optional cfg.api_iroh.openFirewall cfg.api_iroh.port"
+        },
+        {
+          "path": [
+            "p2p",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 253,
+            "col": 16
+          },
+          "source": "lib.optional cfg.p2p.openFirewall cfg.p2p.port"
+        },
+        {
+          "path": [
+            "bitcoin",
+            "rpc",
+            "secretFile"
+          ],
+          "kind": "NullNeq",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 264,
+            "col": 17
+          },
+          "source": "if cfg.bitcoin.rpc.secretFile != null then"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 235,
+            "col": 5
+          },
+          "source": "mkIf (eachFedimintd != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "enable"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "api_ws.openFirewall"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

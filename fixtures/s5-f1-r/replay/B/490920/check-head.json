@@ -1,0 +1,623 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 1,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "490920-traefik",
+      "module": "nixos/modules/services/web-servers/traefik.nix",
+      "test": "nixos/tests/traefik.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "traefik"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 36,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "staticConfigFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 38,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "staticConfigOptions"
+          ],
+          "default_source": "{\n        entryPoints.http.address = \":80\";\n      }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 48,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dynamicConfigFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 64,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dynamicConfigOptions"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 74,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/traefik\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/traefik"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 90,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"traefik\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "traefik"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 98,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 110,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "dynamicConfigFile"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 16,
+            "col": 5
+          },
+          "source": "if cfg.dynamicConfigFile == null then"
+        },
+        {
+          "path": [
+            "staticConfigFile"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 22,
+            "col": 5
+          },
+          "source": "if cfg.staticConfigFile == null then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 121,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dynamicConfigFile"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dynamicConfigFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 16,
+            "col": 5
+          },
+          "source": "if cfg.dynamicConfigFile == null then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "staticConfigFile"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "staticConfigFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 22,
+            "col": 5
+          },
+          "source": "if cfg.staticConfigFile == null then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 121,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 32,
+            "col": 5
+          },
+          "source": "if cfg.environmentFiles == [ ] then staticConfigFile else \"/run/traefik/config.toml\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "environmentFiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/traefik.nix",
+            "line": 133,
+            "col": 24
+          },
+          "source": "lib.optional (cfg.environmentFiles != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "environmentFiles"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "virtualisation",
+            "oci-containers",
+            "containers",
+            "nginx",
+            "imageStream"
+          ],
+          "instance": "traefik",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/traefik.nix",
+            "line": 31,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OBA001",
+          "option": "staticConfigFile",
+          "predicate": {
+            "path": [
+              "staticConfigFile"
+            ],
+            "kind": "NullEq",
+            "span": {
+              "file": "nixos/modules/services/web-servers/traefik.nix",
+              "line": 22,
+              "col": 5
+            },
+            "source": "if cfg.staticConfigFile == null then"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "staticConfigFile"
+                ],
+                "kind": "NullEq",
+                "span": {
+                  "file": "nixos/modules/services/web-servers/traefik.nix",
+                  "line": 22,
+                  "col": 5
+                },
+                "source": "if cfg.staticConfigFile == null then"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "staticConfigFile"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "staticConfigFile"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-servers/traefik.nix",
+                  "line": 22,
+                  "col": 5
+                },
+                "source": "if cfg.staticConfigFile == null then"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "490920-pangolin",
+      "module": "nixos/modules/services/networking/pangolin.nix",
+      "test": "nixos/tests/pangolin.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "traefik"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/pangolin.nix",
+            "line": 164,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/pangolin.nix",
+            "line": 182,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/pangolin.nix",
+            "line": 95,
+            "col": 19
+          },
+          "source": "if (isNull cfg.baseDomain) then \"\" else \"pangolin.${cfg.baseDomain}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "baseDomain"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/pangolin.nix",
+            "line": 448,
+            "col": 13
+          },
+          "source": "if finalSettings.domains.domain1.prefer_wildcard_cert then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dashboardDomain"
+            ],
+            [
+              "baseDomain"
+            ],
+            [
+              "dashboardDomain"
+            ],
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/pangolin.nix",
+            "line": 491,
+            "col": 17
+          },
+          "source": "lib.optionalAttrs (finalSettings.domains.domain1.prefer_wildcard_cert) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dashboardDomain"
+            ],
+            [
+              "baseDomain"
+            ],
+            [
+              "dashboardDomain"
+            ],
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/pangolin.nix",
+            "line": 543,
+            "col": 14
+          },
+          "source": "lib.mkIf (finalSettings.flags.enable_integration_api) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dashboardDomain"
+            ],
+            [
+              "baseDomain"
+            ],
+            [
+              "dashboardDomain"
+            ],
+            [
+              "settings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "acme",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 39,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "nameservers"
+          ],
+          "instance": "acme",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 40,
+            "col": 9
+          }
+        },
+        {
+          "path": [],
+          "instance": "VPS",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 72,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking"
+          ],
+          "instance": "VPS",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 74,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "networking"
+          ],
+          "instance": "VPS",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 75,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "nameservers"
+          ],
+          "instance": "VPS",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 79,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pangolin",
+            "baseDomain"
+          ],
+          "instance": "VPS",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 93,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "traefik",
+            "staticConfigOptions",
+            "certificatesResolvers",
+            "letsencrypt",
+            "acme",
+            "caServer"
+          ],
+          "instance": "VPS",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pangolin.nix",
+            "line": 102,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "group"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

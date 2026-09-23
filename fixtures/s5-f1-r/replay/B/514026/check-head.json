@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "514026",
+      "module": "nixos/modules/services/security/spire/agent.nix",
+      "test": "nixos/tests/spire.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "spire",
+        "agent",
+        "settings",
+        "agent"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/spire/agent.nix",
+            "line": 130,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "networking",
+            "domain"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/spire.nix",
+            "line": 57,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "spire",
+            "server",
+            "settings",
+            "server",
+            "trust_domain"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/spire.nix",
+            "line": 63,
+            "col": 13
+          }
+        },
+        {
+          "path": [],
+          "instance": "agent",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/spire.nix",
+            "line": 78,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "spire",
+            "agent",
+            "settings",
+            "agent",
+            "trust_domain"
+          ],
+          "instance": "agent",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/spire.nix",
+            "line": 87,
+            "col": 13
+          }
+        },
+        {
+          "path": [],
+          "instance": "tpmAgent",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/spire.nix",
+            "line": 106,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "spire",
+            "agent",
+            "settings",
+            "agent",
+            "trust_domain"
+          ],
+          "instance": "tpmAgent",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/spire.nix",
+            "line": 148,
+            "col": 15
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "trust_domain"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "521022",
+      "module": "nixos/modules/services/security/opensnitch.nix",
+      "test": "nixos/tests/opensnitch.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "opensnitch",
+        "settings"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "opensnitch",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 20,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "opensnitch",
+            "rules"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 23,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "opensnitch",
+            "upstreamDefaults"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 55,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "opensnitch",
+            "configFile"
+          ],
+          "default_source": "let\n            generatedConfig = format.generate \"config.json\" cfg.settings;\n          in\n          if cfg.upstreamDefaults then\n            pkgs.runCommand \"opensnitch-config.json\" { } ''\n              ${lib.getExe pkgs.jq} -s '.[0] * .[1]' ${cfg.package}/etc/opensnitchd/default-config.json ${format.generate \"config.json\" cfg.settings} >\"$out\"\n            ''\n          else\n            generatedConfig",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 65,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "opensnitch",
+            "settings"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 85,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ProcMonitorMethod"
+          ],
+          "default_source": "\"ebpf\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "ebpf"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 90,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "Firewall"
+          ],
+          "default_source": "if config.networking.nftables.enable then \"nftables\" else \"iptables\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 103,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "Ebpf",
+            "ModulesPath"
+          ],
+          "default_source": "if cfg.settings.ProcMonitorMethod == \"ebpf\" then\n                  \"${config.boot.kernelPackages.opensnitch-ebpf}/etc/opensnitchd\"\n                else\n                  null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 114,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "Audit",
+            "AudispSocketPath"
+          ],
+          "default_source": "\"/run/audit/audispd_events\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/audit/audispd_events"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 132,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "Rules",
+            "Path"
+          ],
+          "default_source": "\"/var/lib/opensnitch/rules\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/opensnitch/rules"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 141,
+            "col": 13
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "upstreamDefaults"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 76,
+            "col": 11
+          },
+          "source": "if cfg.upstreamDefaults then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 160,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 108,
+            "col": 25
+          },
+          "source": "if config.networking.nftables.enable then \"nftables\" else \"iptables\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 178,
+            "col": 20
+          },
+          "source": "lib.mkIf (cfg.rules != { }) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "rules"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/opensnitch.nix",
+            "line": 193,
+            "col": 15
+          },
+          "source": "lib.optionalString (rules != { }) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "rules"
+            ],
+            [
+              "settings",
+              "Rules",
+              "Path"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "nodes/containers value is not a literal attrset",
+          "span": {
+            "file": "nixos/tests/opensnitch.nix",
+            "line": 17,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "DefaultAction"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->oba001": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 1,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 1,
+    "notable": [
+      {
+        "bucket": "new_finding",
+        "engine": "oba",
+        "subject": "databasePasswordFile",
+        "code": "OBA001",
+        "message": "uncovered option branch: no test assignment provably flips this predicate away from its default",
+        "detail": "test evidence: none flips it",
+        "transition_origin": "origin_unclear"
+      }
+    ]
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/web-apps/photoprism.nix",
+        "test": "nixos/tests/photoprism.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "photoprism"
+        ],
+        "watched_path": "databasePasswordFile"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "databasePasswordFile"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "databasePasswordFile",
+            "predicate": {
+              "ir": {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "databasePasswordFile"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              "refs": [
+                [
+                  "databasePasswordFile"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/web-apps/photoprism.nix",
+                "line": 137,
+                "col": 12
+              },
+              "source": "lib.optionalString ("
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "databasePasswordFile"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  "refs": [
+                    [
+                      "databasePasswordFile"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/web-apps/photoprism.nix",
+                    "line": 137,
+                    "col": 12
+                  },
+                  "source": "lib.optionalString ("
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "databasePasswordFile"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  "refs": [
+                    [
+                      "databasePasswordFile"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/web-apps/photoprism.nix",
+                    "line": 175,
+                    "col": 11
+                  },
+                  "source": "lib.optionalString (cfg.databasePasswordFile != null) ''"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "databasePasswordFile"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  "refs": [
+                    [
+                      "databasePasswordFile"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/web-apps/photoprism.nix",
+                    "line": 185,
+                    "col": 11
+                  },
+                  "source": "lib.optionalString (cfg.databasePasswordFile != null) ''"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

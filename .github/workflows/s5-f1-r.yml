@@ -1,0 +1,42 @@
+name: S5-F1-R replay self-tests
+
+# Reproducibility checks for the S5-F1-R full-corpus regression replay
+# -- no `oba` invocation, no network (the replay itself is a live,
+# non-replayable fetch, already committed under replay/; this job only
+# proves the comparison/classification scripts reproduce their own
+# committed output from that already-committed data).
+
+on:
+  push:
+    paths:
+      - "fixtures/s5-f1-r/**"
+      - ".github/workflows/s5-f1-r.yml"
+  pull_request:
+    paths:
+      - "fixtures/s5-f1-r/**"
+      - ".github/workflows/s5-f1-r.yml"
+
+jobs:
+  replay-comparison-reproducibility:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recompute comparison report and diff against committed output
+        run: |
+          cd fixtures/s5-f1-r
+          python3 compare-replay.py
+          git diff --exit-code comparison-report.jsonl || {
+            echo "::error::comparison-report.jsonl is not reproducible from the committed replay -- regenerate and commit"
+            exit 1
+          }
+      - name: Recompute delta classification and diff against committed output
+        run: |
+          cd fixtures/s5-f1-r
+          python3 classify-deltas.py
+          git diff --exit-code delta-classification.json || {
+            echo "::error::delta-classification.json is not reproducible -- regenerate and commit"
+            exit 1
+          }

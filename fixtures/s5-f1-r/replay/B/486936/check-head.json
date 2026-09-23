@@ -1,0 +1,1002 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "486936",
+      "module": "nixos/modules/services/web-apps/pretalx.nix",
+      "test": "nixos/tests/web-apps/pretalx.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "pretalx"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 36,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "finalPackage"
+          ],
+          "default_source": "cfg.package.override {\n        inherit (cfg) plugins;\n      }",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 40,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 56,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"pretalx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "pretalx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 67,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"pretalx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "pretalx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 79,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "gunicorn",
+            "extraArgs"
+          ],
+          "default_source": "[\n        \"--name=pretalx\"\n      ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 93,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "celery",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 113,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "celery",
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 122,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 135,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "domain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 144,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 153,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 164,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "database",
+            "backend"
+          ],
+          "default_source": "\"postgresql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "postgresql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 169,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "database",
+            "host"
+          ],
+          "default_source": "if cfg.settings.database.backend == \"postgresql\" then\n                  \"/run/postgresql\"\n                else if cfg.settings.database.backend == \"mysql\" then\n                  \"/run/mysqld/mysqld.sock\"\n                else\n                  null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 182,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "database",
+            "name"
+          ],
+          "default_source": "\"pretalx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "pretalx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 201,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "database",
+            "user"
+          ],
+          "default_source": "\"pretalx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "pretalx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 209,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "files",
+            "upload_limit"
+          ],
+          "default_source": "10",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 219,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "filesystem",
+            "data"
+          ],
+          "default_source": "\"/var/lib/pretalx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/pretalx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 230,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "filesystem",
+            "logs"
+          ],
+          "default_source": "\"/var/log/pretalx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/log/pretalx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 237,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "filesystem",
+            "static"
+          ],
+          "default_source": "\"${finalPackage.static}/\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 244,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "celery",
+            "backend"
+          ],
+          "default_source": "lib.optionalString cfg.celery.enable \"redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 256,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "celery",
+            "broker"
+          ],
+          "default_source": "lib.optionalString cfg.celery.enable \"redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 267,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "redis",
+            "location"
+          ],
+          "default_source": "\"unix://${config.services.redis.servers.pretalx.unixSocket}?db=0\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 280,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "redis",
+            "session"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 291,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "site",
+            "url"
+          ],
+          "default_source": "\"https://${cfg.nginx.domain}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 302,
+            "col": 13
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "celery",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 25,
+            "col": 10
+          },
+          "source": "lib.optionals cfg.celery.enable [ celery ]"
+        },
+        {
+          "path": [
+            "celery",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 258,
+            "col": 25
+          },
+          "source": "lib.optionalString cfg.celery.enable \"redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1\""
+        },
+        {
+          "path": [
+            "celery",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 269,
+            "col": 25
+          },
+          "source": "lib.optionalString cfg.celery.enable \"redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 324,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 352,
+            "col": 15
+          },
+          "source": "lib.mkIf cfg.nginx.enable {"
+        },
+        {
+          "path": [
+            "celery",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 511,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.celery.enable ("
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 529,
+            "col": 51
+          },
+          "source": "lib.mkIf cfg.nginx.enable [ \"pretalx\" ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "database",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 185,
+            "col": 17
+          },
+          "source": "if cfg.settings.database.backend == \"postgresql\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "database",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 187,
+            "col": 22
+          },
+          "source": "if cfg.settings.database.backend == \"mysql\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "celery",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "celery",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 258,
+            "col": 25
+          },
+          "source": "lib.optionalString cfg.celery.enable \"redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=1\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "celery",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "celery",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 269,
+            "col": 25
+          },
+          "source": "lib.optionalString cfg.celery.enable \"redis+socket://${config.services.redis.servers.pretalx.unixSocket}?virtual_host=2\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 324,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "nginx",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nginx",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 352,
+            "col": 15
+          },
+          "source": "lib.mkIf cfg.nginx.enable {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "settings",
+                      "database",
+                      "backend"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 388,
+            "col": 9
+          },
+          "source": "lib.mkIf (cfg.database.createLocally && cfg.settings.database.backend == \"postgresql\")"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "database",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 462,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.settings.database.backend == \"postgresql\") ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "database",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 465,
+            "col": 14
+          },
+          "source": "lib.optionals (cfg.settings.database.backend == \"mysql\") ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "celery",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "celery",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 511,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.celery.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "database",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 518,
+            "col": 16
+          },
+          "source": "lib.optionals (cfg.settings.database.backend == \"postgresql\") ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "database",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "database",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 521,
+            "col": 16
+          },
+          "source": "lib.optionals (cfg.settings.database.backend == \"mysql\") ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "nginx",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nginx",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/pretalx.nix",
+            "line": 529,
+            "col": 51
+          },
+          "source": "lib.mkIf cfg.nginx.enable [ \"pretalx\" ]"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "pretalx",
+            "plugins"
+          ],
+          "instance": "pretalx",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-apps/pretalx.nix",
+            "line": 17,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "environmentFiles"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}
