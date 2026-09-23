@@ -1,0 +1,11 @@
+{
+  "population": 3009,
+  "excl_already_examined_pr_number": 0,
+  "excl_path_ineligible": 2,
+  "eligible_path": 3007,
+  "excl_window": 1872,
+  "excl_docs": 16,
+  "excl_mechanical": 125,
+  "excl_name_or_path": 627,
+  "survived": 367
+}

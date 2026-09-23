@@ -54,12 +54,26 @@ def r3_predicate_change_and_test_change(f: dict) -> Selection:
     return {"selected": ok, "score": int(ok), "reasons": reasons}
 
 
-def r4_option_lifecycle(f: dict) -> Selection:
-    """R4: option lifecycle -- an option declaration appears to have
-    been added/removed (approximated from mkOption/mkEnableOption edit
-    counts and default/type changes, since a real add/remove/rename
-    detector would need AST-level source diffing this design round
-    deliberately keeps lightweight and auditable, not a second parser).
+def r4_mkoption_line_edit_v1(f: dict) -> Selection:
+    """R4_mkoption_line_edit_v1: select iff at least one ADDED or
+    REMOVED diff line in a `nixos/modules/services/**` file contains
+    the literal token `mkOption` or `mkEnableOption`
+    (`mkoption_edit_count`/`mkenableoption_edit_count`, both computed
+    by `extract-features.py` via a plain regex match over real unified
+    -diff `+`/`-` lines -- see `RE_MKOPTION`/`RE_MKENABLEOPTION` and
+    `diff_lines()`/`count_matches()` there).
+
+    This is a LEXICAL line-edit detector, not an option-lifecycle
+    detector: it makes no add/remove/rename claim, performs no AST or
+    structural diffing, and cannot tell an added declaration from a
+    removed one, a genuine semantic edit from a pure reformat, or one
+    edited option from another in the same hunk. A PURELY COSMETIC
+    edit to a line that happens to contain `mkOption`/`mkEnableOption`
+    (e.g. reindentation, a comment moved past the token, a
+    reformat-only diff) selects under this rule -- this is stated
+    explicitly as ACCEPTABLE for an enrichment selector (it only
+    changes which PRs get reviewed, never a verdict), not a defect to
+    be fixed by this rule.
     """
     ok = f["mkoption_edit_count"] > 0 or f["mkenableoption_edit_count"] > 0
     reasons = []
@@ -134,7 +148,7 @@ RULES = {
     "R1_module_and_test_cochange": r1_module_and_test_cochange,
     "R2_option_declaration_and_test_change": r2_option_declaration_and_test_change,
     "R3_predicate_change_and_test_change": r3_predicate_change_and_test_change,
-    "R4_option_lifecycle": r4_option_lifecycle,
+    "R4_mkoption_line_edit_v1": r4_mkoption_line_edit_v1,
     "R5_module_lifecycle": r5_module_lifecycle,
     "R6_branch_relevant_configuration_change": r6_branch_relevant_configuration_change,
     "R7_compound_transparent_score": r7_compound_transparent_score,

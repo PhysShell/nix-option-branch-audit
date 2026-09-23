@@ -1,0 +1,104 @@
+{
+  "generated_by": "fixtures/s5-design/population/write-provenance.py",
+  "frozen_against_commit": "51418df79ad906fc30e00464dbd56f41a18e504f",
+  "window_expansion_procedure": "deterministic backward quarterly expansion from 2026-06-01, hard cap 2024-01-01; see capacity-search.py and s5-protocol-final.md section 5",
+  "capacity_ledger_row_count": 6,
+  "capacity_ledger_summary": [
+    {
+      "window_start": "2026-06-01",
+      "window_end": "2026-09-22",
+      "status": "complete",
+      "survivor_count": 94,
+      "s5a_count": 94,
+      "r4_selected_count_after_a": 0,
+      "criterion_met": false
+    },
+    {
+      "window_start": "2026-03-01",
+      "window_end": "2026-09-22",
+      "status": "complete",
+      "survivor_count": 367,
+      "s5a_count": 150,
+      "r4_selected_count_after_a": 30,
+      "criterion_met": false
+    },
+    {
+      "window_start": "2025-12-01",
+      "window_end": "2026-09-22",
+      "status": "complete",
+      "survivor_count": 639,
+      "s5a_count": 150,
+      "r4_selected_count_after_a": 86,
+      "criterion_met": false
+    },
+    {
+      "window_start": "2025-09-01",
+      "window_end": "2026-09-22",
+      "status": "complete",
+      "survivor_count": 908,
+      "s5a_count": 150,
+      "r4_selected_count_after_a": 126,
+      "criterion_met": false
+    },
+    {
+      "window_start": "2025-06-01",
+      "window_end": "2026-09-22",
+      "status": "complete",
+      "survivor_count": 1154,
+      "s5a_count": 150,
+      "r4_selected_count_after_a": 181,
+      "criterion_met": false
+    },
+    {
+      "window_start": "2025-03-01",
+      "window_end": "2026-09-22",
+      "status": "complete",
+      "survivor_count": 1424,
+      "s5a_count": 150,
+      "r4_selected_count_after_a": 233,
+      "criterion_met": true
+    }
+  ],
+  "satisfying_window": {
+    "window_start": "2025-03-01",
+    "window_end": "2026-09-22",
+    "status": "complete",
+    "raw_pr_count": 3677,
+    "resolved_count": 3677,
+    "excl_already_examined": 0,
+    "excl_path_ineligible": 2,
+    "excl_window": 0,
+    "excl_docs": 52,
+    "excl_mechanical": 314,
+    "excl_name_or_path": 1885,
+    "survivor_count": 1424,
+    "s5a_count": 150,
+    "survivors_after_a_count": 1274,
+    "r4_selected_count_after_a": 233,
+    "criterion_met": true,
+    "raw_jsonl_sha256": "7a845c5364b1c345807dea065e1a41af1696adf9d1ab19a23984c7812fcaa3d7",
+    "survivors_json_sha256": "435248ebe54d9021ce9be6e33aaed6ee0e937697333fdd6d808190570542be19"
+  },
+  "exclusion_addendum": {
+    "s4_examined_pr_count": 187,
+    "cross_checked_against": "fixtures/s5-design/features.jsonl (independent re-derivation, exact match required)"
+  },
+  "freeze": {
+    "satisfying_window_start": "2025-03-01",
+    "window_end": "2026-09-22",
+    "short_sha": "8f1701a",
+    "seed_a": 150040602,
+    "seed_b": 150040603,
+    "survivors": 1424,
+    "s5a_target": 150,
+    "s5a_realized": 150,
+    "remaining_after_s5a": 1274,
+    "s5b_selection_selected": 233,
+    "s5b_selection_not_selected": 1041,
+    "s5b_selection_unresolved": 0,
+    "s5b_cap": 219,
+    "s5b_eligible_pool": 233,
+    "s5b_realized": 219,
+    "s5a_s5b_disjoint": true
+  }
+}

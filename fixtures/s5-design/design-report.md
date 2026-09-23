@@ -88,40 +88,57 @@ passing — see section 13 below).
 Seven rules (`enrichment-rules.py`, R1-R7, exactly the families the
 authorization specified), each a pure function of one PR's feature
 dict, evaluated against the full S4 corpus (`evaluate-rules.py` →
-`rule-comparison.jsonl`):
+`rule-comparison.jsonl`).
 
-| rule | selected/187 | applicable in selected | actionable in selected | actionable/selected-PR | lift vs whole corpus | S4-A-only selected/120 | S4-A-only actionable captured (of 7) |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| R1 module+test co-change | 22 (11.8%) | — | 2 | 0.091 | 1.9x | 13 | 1 |
-| R2 option decl + test change | 3 (1.6%) | — | 0 | 0.0 | — | 2 | 0 |
-| R3 predicate + test change | 9 (4.8%) | — | 1 | 0.111 | 2.3x | 5 | 0 |
-| **R4 option lifecycle** | **34 (18.2%)** | 23 | **9** | **0.265** | **5.5x** | **22** | **7/7 (100%)** |
-| R5 module lifecycle | 2 (1.1%) | — | 1 | 0.500 | 10.4x | 1 | 0 |
-| R6 broad OR (union of above) | 68 (36.4%) | — | 9 | 0.132 | 2.8x | 45 | 7/7 (100%) |
-| R7 compound score ≥3 | 25 (13.4%) | — | 8 | 0.320 | 6.7x | 17 | 6/7 (86%) |
+**Statistical-unit correction (post-`51418df`):** the columns below
+report both actionable PRESENTATIONS and DISTINCT ACTIONABLE PRs in
+selected. The distinct-PR count is now the PRIMARY unit — S4's own 9
+actionable presentations came from only 6 distinct PRs (one PR,
+`#538802`, alone contributed 4), so presentations are not independent
+observations for a confidence bound. Every individual presentation
+still gets full two-reviewer adjudication and any one wrong is still a
+Tier-1 FAIL; only the S5-B precision-bound denominator/numerator use
+the distinct-PR count. See `gate.py`/`test_s5_protocol_machinery.py`
+for the machine-checked aggregation rule.
 
-(Full table, every field: `rule-comparison.jsonl`.)
+| rule | selected/187 | applicable in selected | actionable PRs in selected | presentations in selected | actionable PRs/selected-PR | lift vs whole corpus | S4-A-only selected/120 | S4-A-only actionable PRs captured (of 4) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| R1 module+test co-change | 22 (11.8%) | 21 | 2 | 2 | 0.091 | 1.9x | 13 | 1 |
+| R2 option decl + test change | 3 (1.6%) | 3 | 0 | 0 | 0.0 | — | 2 | 0 |
+| R3 predicate + test change | 9 (4.8%) | 9 | 1 | 1 | 0.111 | 2.3x | 5 | 0 |
+| **R4_mkoption_line_edit_v1** | **34 (18.2%)** | 23 | **6** | 9 | **0.176** | **5.5x** | **22** | **4/4 (100%)** |
+| R5 module lifecycle | 2 (1.1%) | 2 | 1 | 1 | 0.500 | 10.4x | 1 | 0 |
+| R6 broad OR (union of above) | 68 (36.4%) | 46 | 6 | 9 | 0.088 | 2.8x | 45 | 4/4 (100%) |
+| R7 compound score ≥3 | 25 (13.4%) | 19 | 5 | 8 | 0.200 | 6.7x | 17 | 3/4 (75%) |
 
-**R4 ("does this PR's diff touch an `mkOption`/`mkEnableOption`
-declaration line anywhere in a touched `nixos/modules/services/**`
-file") captures 100% of S4's own real actionable presentations, both
-overall (9/9) and within the representative S4-A cohort alone (7/7),
-at an 18% selection rate — a real, mechanically measured 5.5x yield
-lift.** This is not a mysterious correlation: an actionable
+(Full table, every field, mechanically generated: `rule-comparison.jsonl`.)
+
+**`R4_mkoption_line_edit_v1`** (select iff at least one ADDED or
+REMOVED diff line in a `nixos/modules/services/**` file contains the
+literal token `mkOption` or `mkEnableOption` — a lexical line-edit
+detector, no AST, no add/remove/lifecycle claim; a purely cosmetic
+edit to such a line may select, and that is acceptable for an
+enrichment selector) **captures 100% of S4's own distinct actionable
+PRs, both overall (6/6) and within the representative S4-A cohort
+alone (4/4), at an 18.2% selection rate — a real, mechanically measured
+5.5x yield lift.** This is not a mysterious correlation: an actionable
 presentation (`new_finding`/`finding_became_inconclusive`/etc.)
 requires SOME change to a watched option's own declaration or
 predicate surface by construction of how `oba` itself works — R4's
 `mkOption`/`mkEnableOption` edit detection is a reasonably close
 source-diff proxy for "something about this module's option surface
 changed," which is close to a *necessary* (not merely correlated)
-condition. **R6, the broad union rule, selects exactly the same 9
-actionable PRs as R4 while roughly doubling the selected population**
-(68 vs 34) — a genuine internal-consistency confirmation that R4
-alone already captures the real historical signal; R6 adds noise, not
-recall. Sanity checks on R4's own selected subset (all in
-`rule-comparison.jsonl` and the raw evaluate-rules.py run): 0 false
-findings, 0 false PASS, 0 pure-package-bump PRs (contradiction check —
-R4 structurally cannot select a package-only bump, confirmed).
+condition. **R6, the broad union rule, added zero historical
+actionable-PR recall (still the same 6 distinct PRs, still 9
+presentations) despite roughly doubling the selected population** (68
+vs 34) — R6 is a strict superset of R4's own signal (every R4-selected
+PR is also R6-selected), so this is not an independent confirmation
+that R4 "isn't an artifact," only a demonstration that R6's extra
+selection volume buys no additional recall on this corpus. Sanity
+checks on R4's own selected subset (all in `rule-comparison.jsonl` and
+the raw evaluate-rules.py run): 0 false findings, 0 false PASS, 0
+pure-package-bump PRs (contradiction check — R4 structurally cannot
+select a package-only bump, confirmed).
 
 **R2 and R5 are historically near-useless as standalone rules on this
 corpus** — R2 (both a declaration AND a test-assignment change,
@@ -134,32 +151,35 @@ is suggestive and worth re-measuring on a larger future corpus, not
 adopted alone here.
 
 **R7 (compound score ≥3) is a real, close second**: fewer selected
-PRs than R4 (25 vs 34) at a higher per-selected-PR yield (0.32 vs
-0.265), but misses one of S4-A's 7 real actionable presentations
-(86% recall vs R4's 100%). Given the whole point of this exercise is
-not losing real signal to save PRs, R4's full recall at a still-large
-5.5x lift is preferred over R7's marginal yield gain — see the final
-recommendation below.
+PRs than R4 (25 vs 34) at a higher per-selected-PR yield (0.20 vs
+0.176 distinct actionable PRs/selected-PR), but misses one of S4-A's 4
+real distinct actionable PRs (75% recall vs R4's 100%). Given the
+whole point of this exercise is not losing real signal to save PRs,
+R4's full recall at a still-large 5.5x lift is preferred over R7's
+marginal yield gain — see the final recommendation below.
 
-### Volume planning (planning arithmetic only, never a guarantee — `planning-calculations.json`'s own `volume_planning_not_a_guarantee`)
+### Volume planning (distinct-actionable-PR targets; planning arithmetic only, never a guarantee — `planning-calculations.json`'s own `volume_planning_not_a_guarantee`, mechanically generated by `planning-calculations.py`)
 
-| rule | ~candidates needed for 20 actionable | ~for 30 | ~for 40 |
+| rule | ~candidates needed for 20 actionable PRs | ~for 30 | ~for 40 |
 |---|---:|---:|---:|
-| R4 | 416 | 623 | 831 |
-| R6 | 415 | 623 | 831 |
-| R7 | 467 | 701 | 935 |
+| R4 | 623 | 935 | 1247 |
+| R6 | 624 | 935 | 1247 |
+| R7 | 748 | 1122 | 1496 |
 | R1 | 1871 | 2806 | 3742 |
-| R3/R5 | ~3700-3750 | ~5600-5615 | ~7480-7485 |
+| R3/R5 | ~3738-3743 | ~5607-5614 | ~7477-7485 |
 
-R4/R6's identical numbers are the same consistency confirmation as
-above (R6 = R4 + noise, same 9 real hits, proportionally diluted
-yield). **~623 candidate PRs to reach a 30-actionable target under R4
-is a real, large number, disclosed plainly** — but it is roughly
-**3x more efficient** than S4's own literal experience (187 processed
-for 9 actionable, i.e. a ~1-in-21 whole-corpus yield vs R4's own
-~1-in-4 *selected*-PR yield, ~1-in-18 *candidate*-PR yield once the
-~18% selection rate is folded in — still meaningfully better than
-S4's undifferentiated draw, not a miracle fix).
+R4/R6's near-identical numbers are consistent with R6 being a strict
+superset of R4's own signal (same 6 distinct actionable PRs found by
+both), not an independent second confirmation. **~935 candidate PRs to
+reach a 30-distinct-actionable-PR target under R4 is a real, large
+number, disclosed plainly.** Separately, `planning-calculations.py`
+also mechanically derives a **selected-PR cap** (not a candidate-pool
+size) for S5-B's own stopping rule: the smallest N such that
+P(Binomial(N, p=6/34) ≥ 30) ≥ 95%, reusing `s4gen._binom_sf` (already
+verified against the 30/30 → ~0.9050 reference) rather than a new tail
+-probability implementation — **N=219** (P≈95.1%), consistent with the
+mandate's own ~220/~95% estimate. See
+`planning-calculations.json`'s `s5b_selected_pr_cap_planning`.
 
 ### Historical overfitting discipline (section 6)
 
@@ -201,10 +221,17 @@ sample regardless of actionable count).
 Clopper-Pearson lower bounds at n∈{20,25,30,35,40,49}, both "all
 correct" and "one miss" — reusing S4's own already-verified
 implementation (cross-checked here: 30/30 → 0.9050, matching the known
-reference value exactly, confirming the reuse is correct). 30/30
-remains the cleanest anchor for a ≥90% one-sided bound; 20/20 only
-reaches 86.1%. Final threshold choice belongs to S5's own separate
-authorization, not fixed here.
+reference value exactly, confirming the reuse is correct). **n/k here
+now count DISTINCT ACTIONABLE PRs, not presentations** (statistical
+-unit correction above) — the arithmetic is unit-agnostic, only the
+interpretation changed. 30/30 remains the pre-registered target anchor
+for a ≥90% one-sided bound (comfortable margin at 0.9050); mechanically
+re-checking the exact crossing point (`test_s5_protocol_machinery.py`)
+shows the true boundary is **29/29 → 0.9019 (already ≥90%)**, **28/28 →
+0.8985 (<90%)** — a small correction to an initial hand-guess that
+29/29 would fall short; disclosed rather than silently kept. Final
+threshold choice belongs to S5's own separate authorization, not fixed
+here.
 
 ## 10. Gate redesign
 
@@ -281,29 +308,54 @@ can resolve.
 `historical-labels.jsonl`, `enrichment-rules.py`,
 `evaluate-rules.py` + `rule-comparison.jsonl`, `planning-calculations.py`
 + `planning-calculations.json`, `validate_features_schema.py`,
-`test_no_leakage.py`, `s5-protocol-draft.md`, `ledger-schema-draft.json`,
-`selection-record-example.json`.
+`test_no_leakage.py`, `s5-protocol-draft.md` (superseded, kept for
+history), `s5-protocol-final.md` (the operative frozen protocol),
+`ledger-schema-draft.json`, `selection-record-example.json`, `gate.py`
++ `test_s5_protocol_machinery.py` (protocol machinery self-tests),
+`selector/production_selector.py` + its own hostile/isolation tests
+(isolated production selector, mandate section 1/7), `population/`
+(the real fresh-PR population fetch/screen/freeze — mandate section 6),
+`s5a-frozen-order.json` + `s5b-frozen-order.json` (frozen cohort
+orders), `reproduce-s5-freeze.py` (offline reproduction/verification).
 
 ## 16. Final recommendation
+
+**Population-capacity finding (new this round):** the originally
+-planned window (S1-S4's own `2026-06-01`..`2026-09-22`) was measured
+for real and found to supply only 94 survivors — nowhere near enough
+for both cohorts, since S1-S4 had already collectively drawn 317 PR
+numbers and a broad contamination-exclusion ledger from largely that
+same window. A deterministic, pre-declared backward window-expansion
+search (fixed exclusion policy, fixed screens, fixed selector, quarter
+-month steps, hard cap `2024-01-01`) found a satisfying window at
+`2025-03-01`..`2026-09-22` (S5-A: 150/150, R4-selected remainder:
+233/219). Full capacity ledger (6 attempted windows, none discarded):
+`fixtures/s5-design/population/capacity-ledger.jsonl`;
+`s5-protocol-final.md` §5.1 for the full account.
 
 **S5-A (representative)**: fresh, non-overlapping population via S4's
 own screening machinery; seeded shuffle; **n=150**; supports Estimand
 A only; no minimum-actionable requirement.
 
-**S5-B (enriched)**: **R4 ("option lifecycle" — `mkOption`/
-`mkEnableOption` declaration edit anywhere in a touched
-`nixos/modules/services/**` file)**, result-blind (proven by
-`test_no_leakage.py`), historical selection rate 18.2%, historical
-yield 0.265 actionable/selected-PR (5.5x lift), 100% historical recall
-of S4's own known actionable presentations (both overall and within
-S4-A alone) — the strongest recall/simplicity combination among the 7
-candidates, preferred over R7's marginal yield-only edge. Planning
-range: **~600-850 candidate PRs** to reach a 30-40 actionable target at
-R4's own historical rate (not a guarantee). Exact `N_min`/`N_max`/
-actionable-target left to S5's own separate authorization.
+**S5-B (enriched)**: **`R4_mkoption_line_edit_v1`** (select iff an
+added/removed diff line in a touched `nixos/modules/services/**` file
+contains the literal token `mkOption` or `mkEnableOption` — lexical,
+no AST/lifecycle claim), result-blind (proven by `test_no_leakage.py`
+and, for the isolated production implementation, by
+`selector/test_selector_isolation.py`), historical selection rate
+18.2%, historical yield 0.176 distinct actionable PRs/selected-PR (5.5x
+lift), 100% historical recall of S4's own distinct actionable PRs (6/6
+overall, 4/4 within S4-A alone) — the strongest recall/simplicity
+combination among the 7 candidates, preferred over R7's marginal
+yield-only edge. Target: **30 distinct actionable PRs** (not
+presentations — see the statistical-unit correction above). Cap:
+**219 selected PRs**, mechanically derived (see Volume planning
+above). See `s5-protocol-final.md` for the frozen final values.
 
 **Gate**: three-tier (safety → sufficiency → precision), S5-A/S5-B
-never pooled, exactly as drafted in section 10/`s5-protocol-draft.md`.
+never pooled, exactly as frozen in `s5-protocol-final.md` §7
+(implemented mechanically in `gate.py`, unit-tested in
+`test_s5_protocol_machinery.py`).
 
 ## Evidence boundaries
 

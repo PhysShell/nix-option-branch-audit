@@ -1,5 +1,7 @@
 # S5 protocol — DRAFT, not authorized, no fresh draw performed
 
+**SUPERSEDED by `s5-protocol-final.md` — kept for history, not the operative protocol.**
+
 This is a draft written during the S5 design round (design-only
 authorization, `8f1701a`). It proposes the protocol a future, separately
 authorized S5 round would follow. **Nothing in this document authorizes

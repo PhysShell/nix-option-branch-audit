@@ -60,12 +60,22 @@ def main():
         baseline_actionable_rate = sum(r["label"]["actionable_count"] for r in joined) / n_total if n_total else 0
         selected_actionable_rate = actionable_total / n_selected if n_selected else 0
 
+        # PR-level yield: distinct actionable PRs per selected PR. This,
+        # not the presentation-count rate above, is the PRIMARY unit for
+        # S5-B planning/stopping-rule arithmetic -- see design-report.md's
+        # statistical-unit correction. A PR contributing several
+        # presentations (e.g. #538802, 4 presentations) inflates the
+        # presentation-rate but counts once here, since presentations
+        # from the same PR are not independent Bernoulli trials.
+        prs_with_actionable_rate = prs_with_actionable / n_selected if n_selected else 0
+
         # Cohort-A-only (S4-A, the representative random cohort) subset,
         # since a real S5-B rule applied to a representative population
         # is the thing whose lift actually matters.
         joined_a = [r for r in joined if r["cohort"] == "A"]
         selected_a = [s for s in selected if s["cohort"] == "A"]
         actionable_a_total = sum(s["label"]["actionable_count"] for s in selected_a)
+        prs_with_actionable_a = sum(1 for s in selected_a if s["label"]["actionable_count"] > 0)
 
         results.append({
             "rule": rule_name,
@@ -77,6 +87,7 @@ def main():
             "actionable_presentations_in_selected": actionable_total,
             "actionable_per_selected_pr": round(selected_actionable_rate, 4),
             "prs_with_at_least_one_actionable": prs_with_actionable,
+            "actionable_prs_per_selected_pr": round(prs_with_actionable_rate, 4),
             "baseline_actionable_per_pr_whole_corpus": round(baseline_actionable_rate, 4),
             "yield_lift_vs_whole_corpus": (
                 round(selected_actionable_rate / baseline_actionable_rate, 2)
@@ -88,6 +99,7 @@ def main():
             "tool_error_ordinary_in_selected": tool_error_total,
             "s4a_only_selected_prs": len(selected_a),
             "s4a_only_actionable_in_selected": actionable_a_total,
+            "s4a_only_prs_with_at_least_one_actionable": prs_with_actionable_a,
             "s4a_only_of_120": f"{len(selected_a)}/{len(joined_a)}",
         })
 
@@ -99,23 +111,26 @@ def main():
     for r in results:
         print(
             f"  {r['rule']}: selected={r['selected_prs']}/{r['corpus_total_prs']} "
-            f"({r['selection_rate']*100:.1f}%), actionable={r['actionable_presentations_in_selected']}, "
-            f"per-PR={r['actionable_per_selected_pr']}, lift={r['yield_lift_vs_whole_corpus']}"
+            f"({r['selection_rate']*100:.1f}%), actionable_prs={r['prs_with_at_least_one_actionable']}, "
+            f"presentations={r['actionable_presentations_in_selected']}, "
+            f"actionable_prs_per_selected_pr={r['actionable_prs_per_selected_pr']}, "
+            f"lift={r['yield_lift_vs_whole_corpus']}"
         )
 
     # Selection-record example (section 12's own required shape) for
-    # one real PR under the winning-looking rule, for the design report.
+    # one real PR under the FROZEN rule (R4_mkoption_line_edit_v1),
+    # since that is the rule S5-B actually uses -- not R7, which was
+    # never recommended or frozen.
     example = None
     for row in joined:
-        sel = rules_mod.r7_compound_transparent_score(row["features"])
+        sel = rules_mod.r4_mkoption_line_edit_v1(row["features"])
         if sel["selected"]:
             example = {
                 "pr": row["pr"],
-                "selected_by": "R7_compound_transparent_score-v1",
+                "selected_by": "R4_mkoption_line_edit_v1",
                 "features": {
-                    "option_declaration_changed": row["features"]["option_declaration_changed"],
-                    "test_assignment_changed": row["features"]["test_assignment_changed"],
-                    "predicate_logic_changed": row["features"]["predicate_logic_changed"],
+                    "mkoption_edit_count": row["features"]["mkoption_edit_count"],
+                    "mkenableoption_edit_count": row["features"]["mkenableoption_edit_count"],
                 },
                 "score": sel["score"],
                 "reasons": sel["reasons"],

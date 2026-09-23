@@ -1,0 +1,18 @@
+{
+  "satisfying_window_start": "2025-03-01",
+  "window_end": "2026-09-22",
+  "short_sha": "8f1701a",
+  "seed_a": 150040602,
+  "seed_b": 150040603,
+  "survivors": 1424,
+  "s5a_target": 150,
+  "s5a_realized": 150,
+  "remaining_after_s5a": 1274,
+  "s5b_selection_selected": 233,
+  "s5b_selection_not_selected": 1041,
+  "s5b_selection_unresolved": 0,
+  "s5b_cap": 219,
+  "s5b_eligible_pool": 233,
+  "s5b_realized": 219,
+  "s5a_s5b_disjoint": true
+}

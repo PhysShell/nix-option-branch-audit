@@ -8,21 +8,15 @@
       "screen_summary": "object -- same shape as S4's own population-funnel.json"
     },
     "selection_record": {
-      "_comment": "NEW for S5-B. Must be written for EVERY candidate PR examined by the enrichment selector, whether or not it was selected -- a selection_record with selected=false is real evidence too (it proves the selector actually ran on that PR, not skipped it).",
+      "_comment": "NEW for S5-B. Must be written for EVERY candidate PR examined by the enrichment selector, whether or not it was selected, AND whether or not it could be resolved at all -- a selection_record with selected=false is real evidence too (it proves the selector actually ran on that PR, not skipped it), and one with unresolved=true is evidence the selector refused to guess rather than silently defaulting to false. Produced for real by fixtures/s5-design/selector/production_selector.py (the isolated production CLI -- fixtures/s5-design/extract-features.py's own historical extractor is explicitly insufficient here since its main() reads the S4 ledger).",
       "record_type": "selection_record",
       "cohort": "B",
       "pr": "int",
-      "selected_by": "str, e.g. 'S5-B-enrichment-R4-v1'",
-      "features": {
-        "_comment": "the EXACT feature dict extract-features.py produced for this PR -- copied verbatim, not summarized, so a reviewer can re-derive the selection decision from this record alone",
-        "option_declaration_changed": "bool",
-        "test_assignment_changed": "bool",
-        "predicate_logic_changed": "bool",
-        "...": "every key in validate_features_schema.py's own ALLOWED_KEYS"
-      },
-      "score": "int (only meaningful for a scoring rule like R7; 0/1 for a boolean rule like R4)",
-      "selected": "bool",
-      "reasons": "list[str] -- the exact source-diff facts that caused (or would have caused) selection"
+      "selected_by": "str, the frozen rule's own name, e.g. 'R4_mkoption_line_edit_v1'",
+      "score": "int | null (null when unresolved; otherwise 0/1 for this boolean rule)",
+      "selected": "bool | null (null when unresolved -- never coerced to false)",
+      "unresolved": "bool -- true iff the selector could not prove selected/not-selected from the input data (missing patch on a relevant file, or an unproven-complete 300-file truncation boundary; see production_selector.py's own docstring). An unresolved PR is EXCLUDED from the S5-B frozen order (it cannot be enriched by a rule that refused to fire on it) but its selection_record is still written and kept, so the exclusion itself is auditable.",
+      "reasons": "list[str] -- the exact source-diff facts that caused (or would have caused) selection, OR, when unresolved=true, the exact completeness failure that blocked a decision"
     },
     "pr_processing_record": {
       "_comment": "S4's own pr_summary record type, unchanged shape",
@@ -56,7 +50,8 @@
     "frozen-order PREFIX property: processed positions for a cohort are an unbroken 1..N prefix of that cohort's frozen order"
   ],
   "new_invariant_for_s5_b": [
-    "every pr_summary record in cohort B must have a matching selection_record (selected=true) -- a processed S5-B PR with no selection_record is a schema violation, proving the selector's own reasoning was never captured for it",
-    "a selection_record's own `features` field must pass validate_features_schema.py's allowlist check -- an outcome-shaped key anywhere in a real selection_record is a hard validation failure, not a warning"
+    "every pr_summary record in cohort B must have a matching selection_record (selected=true, unresolved=false) -- a processed S5-B PR with no selection_record, or with selected != true, or with unresolved=true, is a schema violation, proving either the selector's own reasoning was never captured for it or it was processed despite being unresolved (never allowed)",
+    "every remaining-after-S5-A candidate PR must have EXACTLY ONE selection_record, selected, not-selected, or unresolved -- see fixtures/s5-design/test_s5_protocol_machinery.py::test_selection_records_cover_every_remaining_pr_exactly_once for the real committed-file check",
+    "an unresolved selection_record is real evidence of the selector's own honest refusal, never silently dropped or coerced to selected=false"
   ]
 }

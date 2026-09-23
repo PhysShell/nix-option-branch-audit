@@ -1,0 +1,5927 @@
+[
+  {
+    "number": 361373,
+    "title": "nixos/tzupdate: make enabled module actually be enabled",
+    "state": "MERGED",
+    "mergedAt": "2025-04-22T10:57:48Z",
+    "baseRefOid": "ce3ac173cfca919127671b3405186c259ea7c37e",
+    "headRefOid": "a6c31c856b44058079de808793f762aca38dadca",
+    "additions": 35,
+    "deletions": 4,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/tzupdate.nix",
+        "additions": 35,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 438467,
+    "title": "nixos/photoprism: add run config options",
+    "state": "MERGED",
+    "mergedAt": "2025-12-20T15:29:25Z",
+    "baseRefOid": "91d78878903c163055eaa882e36e9a45d49b66bb",
+    "headRefOid": "af4ba50fbfc4c1abee31db65754c701aed777e95",
+    "additions": 15,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/photoprism.nix",
+        "additions": 15,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 353770,
+    "title": "nixos/syncthing: declare ignore patterns (resolves #268282)",
+    "state": "MERGED",
+    "mergedAt": "2025-10-21T12:45:02Z",
+    "baseRefOid": "b619339061dc3e2273c9b89dce30460ae11bc0f0",
+    "headRefOid": "7a223b26858aaebb44009c8966a1756918e936e3",
+    "additions": 82,
+    "deletions": 1,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/syncthing.nix",
+        "additions": 30,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/syncthing/folders.nix",
+        "additions": 52,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 413033,
+    "title": "{nixos/,}cockpit: add branding + small fixes",
+    "state": "MERGED",
+    "mergedAt": "2025-09-25T13:02:12Z",
+    "baseRefOid": "610eccade10bb2411a94ebdce09bf355a4488206",
+    "headRefOid": "395b4112402c0f069a7cd13810b002c2b7b45223",
+    "additions": 85,
+    "deletions": 10,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/monitoring/cockpit.nix",
+        "additions": 42,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/co/cockpit/branding.css",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/co/cockpit/package.nix",
+        "additions": 32,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 260551,
+    "title": " nixos/prosody: add config check option ",
+    "state": "MERGED",
+    "mergedAt": "2025-08-01T02:19:17Z",
+    "baseRefOid": "f8a3116347dbec8df87c3ec6d8058d6bc3fe104e",
+    "headRefOid": "0a92661ec32d274258dc038dd1064eb92af0f0df",
+    "additions": 343,
+    "deletions": 354,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/prosody.nix",
+        "additions": 341,
+        "deletions": 354,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 548783,
+    "title": "nixos/quake3-server: add settings option",
+    "state": "MERGED",
+    "mergedAt": "2026-08-25T09:22:22Z",
+    "baseRefOid": "b81f108792a4a28bd81846ae4aed37419a5506bf",
+    "headRefOid": "32c5967e2c31e48b2e1cede8dbf4e352c5db2f9b",
+    "additions": 68,
+    "deletions": 16,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2611.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/games/quake3-server.nix",
+        "additions": 66,
+        "deletions": 16,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "files_complete": true
+  },
+  {
+    "number": 558042,
+    "title": "nixos/headplane: add server.proxy_auth option",
+    "state": "MERGED",
+    "mergedAt": "2026-09-11T15:20:48Z",
+    "baseRefOid": "1640c048f5a62f978a7ca3cc167d25cdc0497c05",
+    "headRefOid": "14d7d8501c04516724767150353335df8653cc75",
+    "additions": 99,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/headplane.nix",
+        "additions": 99,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "files_complete": true
+  },
+  {
+    "number": 480700,
+    "title": "nixos/bluesky-pds: prefer goat & add rate limit by deafult",
+    "state": "MERGED",
+    "mergedAt": "2026-01-25T15:39:14Z",
+    "baseRefOid": "8e13ad6266acf92aa1c61d006f51a30c53d43851",
+    "headRefOid": "35b20dfd9ec9a4d8953ffd8877e8c82b801b5bf7",
+    "additions": 20,
+    "deletions": 5,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/bluesky-pds.nix",
+        "additions": 20,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 411155,
+    "title": "nixos/amdgpu: add overdrive and ppfeaturemask option",
+    "state": "MERGED",
+    "mergedAt": "2025-05-27T14:15:13Z",
+    "baseRefOid": "e2833acefc33729fa390610ed75dc0e9a85995c6",
+    "headRefOid": "6d5ddd0bbfeed70ea674b6e755f47be7e2961412",
+    "additions": 50,
+    "deletions": 39,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/hardware/corectrl.nix",
+        "additions": 11,
+        "deletions": 24,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/amdgpu.nix",
+        "additions": 29,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/tuxclocker.nix",
+        "additions": 7,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 482512,
+    "title": "nixos/traefik: refactor",
+    "state": "MERGED",
+    "mergedAt": "2026-02-10T03:29:47Z",
+    "baseRefOid": "59915114d14c6d77a91745f6b9424d9c6fd1bad4",
+    "headRefOid": "8fecfdbd99b10f6d28d9023c9fff2e275f2a185b",
+    "additions": 459,
+    "deletions": 100,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/pangolin.nix",
+        "additions": 7,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-servers/traefik.nix",
+        "additions": 450,
+        "deletions": 90,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 498611,
+    "title": "olivetin-3k: init at 3000.11.3, olivetin: update `gen` hash, refactor",
+    "state": "MERGED",
+    "mergedAt": "2026-03-20T21:11:27Z",
+    "baseRefOid": "b442309475987e40b670840495fb133ed00737a7",
+    "headRefOid": "059e991229cc8dd5f38553a5b9227bbba9b6194f",
+    "additions": 288,
+    "deletions": 119,
+    "changedFiles": 6,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/olivetin.nix",
+        "additions": 11,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/olivetin.nix",
+        "additions": 13,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ol/olivetin/3k.nix",
+        "additions": 141,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/ol/olivetin/package.nix",
+        "additions": 112,
+        "deletions": 115,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ol/olivetin/update-3k.sh",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/top-level/all-packages.nix",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 462487,
+    "title": "nixos/guacamole: client option defined in server module",
+    "state": "MERGED",
+    "mergedAt": "2025-11-18T16:23:40Z",
+    "baseRefOid": "3db8153243db1455a18da92119581d0580dd70b8",
+    "headRefOid": "598f6dd4fc046410bb2719227d5d48e927e7d39b",
+    "additions": 35,
+    "deletions": 26,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/guacamole-client.nix",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-apps/guacamole-server.nix",
+        "additions": 10,
+        "deletions": 26,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 444604,
+    "title": "nixos/yggdrasil: refactor",
+    "state": "MERGED",
+    "mergedAt": "2026-01-03T17:49:28Z",
+    "baseRefOid": "10b48a67e9513a514e03f1046885a3359b3cfb79",
+    "headRefOid": "5f0e96d0c333e1313107064f657c594eecabe5c3",
+    "additions": 297,
+    "deletions": 87,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/yggdrasil.nix",
+        "additions": 195,
+        "deletions": 87,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/yggdrasil.nix",
+        "additions": 95,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 318630,
+    "title": "nixos/ups: run upsmon as non-root user \"nutmon\" by default ",
+    "state": "MERGED",
+    "mergedAt": "2025-05-09T21:11:33Z",
+    "baseRefOid": "6cc98dd019d7d71cf1ad24b59b3827ef12529b65",
+    "headRefOid": "e4fb0507b8c89a8cb1e27633d921ba326e51d82a",
+    "additions": 27,
+    "deletions": 19,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/monitoring/ups.nix",
+        "additions": 27,
+        "deletions": 19,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 412906,
+    "title": "duplicati: 2.1.0.2 -> 2.1.0.5",
+    "state": "MERGED",
+    "mergedAt": "2025-06-30T10:36:05Z",
+    "baseRefOid": "9673b37be1d7e468489522e798d18ededfa255c3",
+    "headRefOid": "0fc73e51010df0e889ad7a0cc8a24ab78ac11e92",
+    "additions": 92,
+    "deletions": 24,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/backup/duplicati.nix",
+        "additions": 43,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/du/duplicati/package.nix",
+        "additions": 49,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 357164,
+    "title": "bluemap: 5.4 -> 5.7",
+    "state": "MERGED",
+    "mergedAt": "2025-06-01T13:20:10Z",
+    "baseRefOid": "ea0057cc9fa818ee66b850887e119db2a1b9a313",
+    "headRefOid": "5b3e5519c104052b53e7756739745b0dad4219b4",
+    "additions": 4,
+    "deletions": 28,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/bluemap.nix",
+        "additions": 2,
+        "deletions": 26,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/bl/bluemap/package.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 432528,
+    "title": "tayga: 0.9.2 -> 0.9.5",
+    "state": "MERGED",
+    "mergedAt": "2025-08-10T15:50:45Z",
+    "baseRefOid": "d905dba83fc239994167ac8f24790e55b3e26542",
+    "headRefOid": "4548324aae5650a39e9a77816f6f2de4f16e0ed6",
+    "additions": 68,
+    "deletions": 16,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/tayga.nix",
+        "additions": 25,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/tayga.nix",
+        "additions": 24,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ta/tayga/package.nix",
+        "additions": 19,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 452714,
+    "title": "wyoming-openwakeword: 1.10.0 -> 2.0.0",
+    "state": "MERGED",
+    "mergedAt": "2025-10-19T22:28:40Z",
+    "baseRefOid": "337fe8e9d11047d6861c05119f6173b2826d255d",
+    "headRefOid": "5f7f58ff8a3c17090fa8e2564797a16463191283",
+    "additions": 94,
+    "deletions": 36,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/openwakeword.nix",
+        "additions": 23,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/wy/wyoming-openwakeword/package.nix",
+        "additions": 13,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/development/python-modules/pyopen-wakeword/default.nix",
+        "additions": 56,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/top-level/python-packages.nix",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 394668,
+    "title": "cloudflare-ddns: init at 1.15.1",
+    "state": "MERGED",
+    "mergedAt": "2025-09-26T17:46:34Z",
+    "baseRefOid": "f06c7c3b6f5074dbffcf02542fb86af3a5526afa",
+    "headRefOid": "4b567a39f115b78620068229a67e4264a616e748",
+    "additions": 370,
+    "deletions": 0,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "maintainers/maintainer-list.nix",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/cloudflare-ddns.nix",
+        "additions": 327,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/cl/cloudflare-ddns/package.nix",
+        "additions": 35,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 415304,
+    "title": "pinchflat: use a static user",
+    "state": "MERGED",
+    "mergedAt": "2025-06-10T23:16:42Z",
+    "baseRefOid": "8177ee4e7091be60fc7f9408d2cda89c701ee245",
+    "headRefOid": "c2450f04fb1b35b31980f8d8c05f42b5b51e1fa2",
+    "additions": 30,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/pinchflat.nix",
+        "additions": 30,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 438285,
+    "title": "frigate: pin joserfc at 1.1.0; ffmpeg flavor selection",
+    "state": "MERGED",
+    "mergedAt": "2025-08-29T23:52:40Z",
+    "baseRefOid": "776c94a900e4a278ae057c1ed71bb6387869d75c",
+    "headRefOid": "6c4b1800989fcd82bca51f7ba8a72439cfe84c3c",
+    "additions": 52,
+    "deletions": 24,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/video/frigate.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/fr/frigate/ffmpeg.patch",
+        "additions": 21,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/fr/frigate/package.nix",
+        "additions": 20,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 458146,
+    "title": "nixos/trilium-server: add option for environment file",
+    "state": "MERGED",
+    "mergedAt": "2025-11-12T15:24:12Z",
+    "baseRefOid": "49f0cbd7f89b87594b41d07d3ab93f15b868ad54",
+    "headRefOid": "391bda9e02f09dd18fcd81d5fbcb18e930b43744",
+    "additions": 11,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/trilium.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 403669,
+    "title": "nixos/tandoor-recipes: add 'database.createLocally'",
+    "state": "MERGED",
+    "mergedAt": "2025-07-07T14:58:05Z",
+    "baseRefOid": "26b45ca359b25487a23933719620ace9485f99e6",
+    "headRefOid": "edbd8e3ff6615dc28f1b43788669df659ba79444",
+    "additions": 32,
+    "deletions": 23,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/tandoor-recipes.nix",
+        "additions": 31,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/tandoor-recipes.nix",
+        "additions": 1,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 541493,
+    "title": "nixos/step-ca: add extraArgs option for additional step-ca CLI flags",
+    "state": "MERGED",
+    "mergedAt": "2026-09-02T20:04:46Z",
+    "baseRefOid": "0328abf972281512f9e9cd8305c185915c69d3a8",
+    "headRefOid": "8bd1fa478dc05512b6399b57eefbaed846108d4f",
+    "additions": 10,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/step-ca.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "files_complete": true
+  },
+  {
+    "number": 427898,
+    "title": "nixos/hedgedoc: add configureNginx option",
+    "state": "MERGED",
+    "mergedAt": "2025-09-02T16:18:03Z",
+    "baseRefOid": "bd59d6740b8b3b587b0cb2a56fd7569bf259418b",
+    "headRefOid": "7259b7ca67392490f869013e27155553ba950ea7",
+    "additions": 32,
+    "deletions": 4,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/hedgedoc.nix",
+        "additions": 32,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 388953,
+    "title": "nixos/h2o: enable HTTP/3 via QUIC",
+    "state": "MERGED",
+    "mergedAt": "2025-04-02T08:38:48Z",
+    "baseRefOid": "f68ad5cc5ff24efb3dedc5a5b1e70ee9bff4e294",
+    "headRefOid": "75545814743d6bc3c378f39bdb3e5fc7e512734e",
+    "additions": 68,
+    "deletions": 30,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-servers/h2o/default.nix",
+        "additions": 20,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/web-servers/h2o/basic.nix",
+        "additions": 27,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/web-servers/h2o/mruby.nix",
+        "additions": 2,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 441245,
+    "title": "nixos/snapserver: migrate to settings option",
+    "state": "MERGED",
+    "mergedAt": "2025-09-11T15:05:16Z",
+    "baseRefOid": "b772b8167c85abc3ad71a8428811a8aeeda6bc08",
+    "headRefOid": "b0f63e9173f873a9f7d458154eb86eb27d8082d2",
+    "additions": 182,
+    "deletions": 284,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/audio/snapserver.nix",
+        "additions": 158,
+        "deletions": 262,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/snapcast.nix",
+        "additions": 18,
+        "deletions": 20,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/audio/snapcast/default.nix",
+        "additions": 4,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 414490,
+    "title": "ly: 1.0.3 -> 1.1.0",
+    "state": "MERGED",
+    "mergedAt": "2025-06-13T05:24:33Z",
+    "baseRefOid": "77215bbae4a3847d2aa39d9a164ca1c0a84d7be7",
+    "headRefOid": "17260c31264ea0de35594e9bb28770972cdb74d0",
+    "additions": 72,
+    "deletions": 39,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/modules/services/display-managers/ly.nix",
+        "additions": 7,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/ly.nix",
+        "additions": 36,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ly/ly/deps.nix",
+        "additions": 7,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ly/ly/package.nix",
+        "additions": 22,
+        "deletions": 18,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 382862,
+    "title": "peering-manager: 1.8.3 -> 1.9.6",
+    "state": "MERGED",
+    "mergedAt": "2025-07-28T12:15:58Z",
+    "baseRefOid": "dc71c8cc49eb48aadb244c15cab3bca1820b24e1",
+    "headRefOid": "1918e3ced1882d3a31f3ba0753abe78fa84781e4",
+    "additions": 67,
+    "deletions": 74,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/peering-manager.nix",
+        "additions": 61,
+        "deletions": 34,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/pe/peering-manager/fix-pyixapi-0.2.3-compatibility.patch",
+        "additions": 0,
+        "deletions": 30,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/by-name/pe/peering-manager/package.nix",
+        "additions": 6,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 412297,
+    "title": "nixos/taler: update modules; fix tests",
+    "state": "MERGED",
+    "mergedAt": "2025-06-02T07:38:20Z",
+    "baseRefOid": "7f25223c182ce63a47f68b9d8d4f445497efaaae",
+    "headRefOid": "d5f88753ab875cc9afe902336853ea6f43f6a1c7",
+    "additions": 132,
+    "deletions": 72,
+    "changedFiles": 12,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2505.section.md",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/finance/libeufin/common.nix",
+        "additions": 2,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/finance/taler/common.nix",
+        "additions": 3,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/finance/taler/exchange.nix",
+        "additions": 17,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/finance/taler/merchant.nix",
+        "additions": 6,
+        "deletions": 17,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/taler/common/nodes.nix",
+        "additions": 10,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/taler/common/scripts.nix",
+        "additions": 28,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/taler/conf/taler-accounts.conf",
+        "additions": 0,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/taler/tests/basic.nix",
+        "additions": 43,
+        "deletions": 18,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ta/taler-exchange/package.nix",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ta/taler-merchant/package.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ta/taler-wallet-core/package.nix",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 451125,
+    "title": "nixos/tinyproxy: remove with lib",
+    "state": "MERGED",
+    "mergedAt": "2025-10-11T21:34:34Z",
+    "baseRefOid": "a4ce7cac3e81663a7784c890404152fc12e8fb53",
+    "headRefOid": "603ffef0ebc5bb783d834ee0d8a6fd4efed5f34d",
+    "additions": 19,
+    "deletions": 22,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/tinyproxy.nix",
+        "additions": 19,
+        "deletions": 22,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 383499,
+    "title": "nixos/cloudflared: add option for cert.pem and use dynamic user",
+    "state": "MERGED",
+    "mergedAt": "2025-03-10T10:15:07Z",
+    "baseRefOid": "3de97cbf05b1428ea0509c38af3a44c3b498d498",
+    "headRefOid": "4f644e0b317fe1e1c4b3ee9dc2383fc6e55e1919",
+    "additions": 63,
+    "deletions": 30,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/cloudflared.nix",
+        "additions": 61,
+        "deletions": 30,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 407100,
+    "title": "photoprism: 250321-57590c48b -> 250426-27ec7a128",
+    "state": "MERGED",
+    "mergedAt": "2025-10-02T18:59:22Z",
+    "baseRefOid": "b0c26f67c3b9482c10e2c94f80130c77e7264f5b",
+    "headRefOid": "4a14d1e05d434a820e78e06ef1592eb2360baeeb",
+    "additions": 55,
+    "deletions": 125,
+    "changedFiles": 5,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/photoprism.nix",
+        "additions": 33,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ph/photoprism/backend.nix",
+        "additions": 18,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ph/photoprism/frontend.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ph/photoprism/libtensorflow.nix",
+        "additions": 0,
+        "deletions": 104,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/by-name/ph/photoprism/package.nix",
+        "additions": 3,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 358780,
+    "title": "graylog-5_1: remove",
+    "state": "MERGED",
+    "mergedAt": "2025-03-16T14:45:23Z",
+    "baseRefOid": "8b38173d7288cdca61d6269cb31c078dad9c00f6",
+    "headRefOid": "7eed7c8da606a38083a3d750f018236d3484f859",
+    "additions": 24,
+    "deletions": 26,
+    "changedFiles": 6,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/logging/graylog.nix",
+        "additions": 18,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/tools/misc/graylog/5.1.nix",
+        "additions": 0,
+        "deletions": 10,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/tools/misc/graylog/plugins.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/top-level/aliases.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/top-level/all-packages.nix",
+        "additions": 1,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 509507,
+    "title": "nixos/sshd: remove 'banner' option, in favour of settings.Banner",
+    "state": "MERGED",
+    "mergedAt": "2026-04-17T14:33:27Z",
+    "baseRefOid": "c763082f22d4da96fa678d5fdcbed27da01f311e",
+    "headRefOid": "667a124021ed1d8bbdb1cf66a61499f4fdd7afcd",
+    "additions": 15,
+    "deletions": 9,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/ssh/sshd.nix",
+        "additions": 13,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 441506,
+    "title": "audit: 4.1.1-unstable-2025-08-01 -> 4.1.2, cleanup",
+    "state": "MERGED",
+    "mergedAt": "2025-09-15T08:53:38Z",
+    "baseRefOid": "83413ceb781ef03b5d4efb9b48c22c6782ee7d55",
+    "headRefOid": "d4ebfe389fb23492887e76ae05bdeafb0bc937e0",
+    "additions": 96,
+    "deletions": 54,
+    "changedFiles": 7,
+    "files": [
+      {
+        "path": "nixos/modules/security/audit.nix",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/security/auditd.nix",
+        "additions": 14,
+        "deletions": 32,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/security/opensnitch.nix",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/audit.nix",
+        "additions": 4,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/au/audit/package.nix",
+        "additions": 44,
+        "deletions": 17,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/op/opensnitch/package.nix",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/top-level/python-packages.nix",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 362643,
+    "title": "nixos/mediawiki: allow adding programs for extended functionality via\u2026",
+    "state": "MERGED",
+    "mergedAt": "2025-12-03T01:56:39Z",
+    "baseRefOid": "af6e115058bd49e45aa537b80d8c3177c17a8850",
+    "headRefOid": "13ccca1c201ce5664577aeee4774a4003fd1aac9",
+    "additions": 29,
+    "deletions": 18,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/mediawiki.nix",
+        "additions": 27,
+        "deletions": 12,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/me/mediawiki/package.nix",
+        "additions": 2,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 429240,
+    "title": "nixos/x2goserver: add package option",
+    "state": "MERGED",
+    "mergedAt": "2025-08-19T18:33:31Z",
+    "baseRefOid": "458f0558e962a8bba544dafc40ce83b79fa342c3",
+    "headRefOid": "a4177afa8d41056ca63b9c2c5e03f7c099770cb3",
+    "additions": 16,
+    "deletions": 7,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/x2goserver.nix",
+        "additions": 16,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 457573,
+    "title": "nixos/oink: update service options to pass secrets via file",
+    "state": "MERGED",
+    "mergedAt": "2025-11-10T20:04:01Z",
+    "baseRefOid": "960a2e69a891ca58669169b186a74840f3dc7b8b",
+    "headRefOid": "34870c39740f17701b294157dc36a2b6b15917ac",
+    "additions": 30,
+    "deletions": 9,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/oink.nix",
+        "additions": 28,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 514026,
+    "title": "Add spire-tpm-plugin support to spire NixOS module",
+    "state": "MERGED",
+    "mergedAt": "2026-04-27T13:40:58Z",
+    "baseRefOid": "cf929aef5b6b3610e024147a535ef17fed77cc5f",
+    "headRefOid": "e27ef5378cdea60940f246675e7f663cb76ac5e3",
+    "additions": 317,
+    "deletions": 37,
+    "changedFiles": 5,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/spire/agent-tpm.nix",
+        "additions": 34,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "nixos/modules/services/security/spire/agent.nix",
+        "additions": 52,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/security/spire/server-tpm.nix",
+        "additions": 59,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "nixos/modules/services/security/spire/server.nix",
+        "additions": 32,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/spire.nix",
+        "additions": 140,
+        "deletions": 25,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 446636,
+    "title": "nixos/gerrit: Drop global lib expansion",
+    "state": "MERGED",
+    "mergedAt": "2025-09-29T20:37:52Z",
+    "baseRefOid": "e3a3b32cc234f1683258d36c6232f150d57df015",
+    "headRefOid": "cfaae643885317cfb95994bd6fcb8b07c056a6ba",
+    "additions": 24,
+    "deletions": 26,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/gerrit.nix",
+        "additions": 24,
+        "deletions": 26,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 436367,
+    "title": "nixos/mihomo: add an option for processes info",
+    "state": "MERGED",
+    "mergedAt": "2026-03-08T13:08:27Z",
+    "baseRefOid": "80bdc1e5ce51f56b19791b52b2901187931f5353",
+    "headRefOid": "46f22dc20ad86d7520aef0544120d46a4a990972",
+    "additions": 14,
+    "deletions": 5,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/mihomo.nix",
+        "additions": 14,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 470783,
+    "title": "nixos/oauth2-proxy: require secrets be put in files",
+    "state": "MERGED",
+    "mergedAt": "2026-02-09T17:22:22Z",
+    "baseRefOid": "404e6438d4328b07227cc0f58a02adb08823f852",
+    "headRefOid": "0f7f3caa32a780eb25c265904b9d020e834bab08",
+    "additions": 32,
+    "deletions": 13,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/security/oauth2-proxy.nix",
+        "additions": 30,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 442520,
+    "title": "nixos/chromadb: deprecate logPath option",
+    "state": "MERGED",
+    "mergedAt": "2025-09-13T19:18:11Z",
+    "baseRefOid": "b0998a53ed83c1424d9fa396e556cc163eca2a41",
+    "headRefOid": "e9010614129c6bf749be8c1ac37fe09f9b43f843",
+    "additions": 7,
+    "deletions": 9,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/chromadb.nix",
+        "additions": 7,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 432756,
+    "title": "nixos/paretosecurity: Add support for declarative linking",
+    "state": "MERGED",
+    "mergedAt": "2025-09-17T15:07:19Z",
+    "baseRefOid": "a218601fcd8824913c5a8a1c26b718aaa94f896c",
+    "headRefOid": "93403bdacd38d36f4a8f2c7397d6bf1a9faf6210",
+    "additions": 137,
+    "deletions": 53,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/paretosecurity.nix",
+        "additions": 77,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/paretosecurity.nix",
+        "additions": 48,
+        "deletions": 42,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/pa/paretosecurity/package.nix",
+        "additions": 12,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 410856,
+    "title": "nixos/vmalert: support multiple instances",
+    "state": "MERGED",
+    "mergedAt": "2025-06-09T13:18:38Z",
+    "baseRefOid": "b79f59cf2ed99803ef8ee6b760f83d8138388f52",
+    "headRefOid": "0d46fda9746f50f5e1d69950000b5ff8c6941a28",
+    "additions": 165,
+    "deletions": 115,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 3,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2305.section.md",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/monitoring/vmalert.nix",
+        "additions": 160,
+        "deletions": 113,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/victoriametrics/vmalert.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 408218,
+    "title": "nixos/bazarr: add dataDir option",
+    "state": "MERGED",
+    "mergedAt": "2025-05-19T22:05:19Z",
+    "baseRefOid": "389c8cec6ba42a5fdb38acd8570da4e345b8a101",
+    "headRefOid": "d62c17d97ef9a9af21aacb254b6561c22157d84b",
+    "additions": 14,
+    "deletions": 4,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/bazarr.nix",
+        "additions": 14,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 396915,
+    "title": "nixos/homebox: add 'database.createLocally'",
+    "state": "MERGED",
+    "mergedAt": "2025-04-08T09:33:19Z",
+    "baseRefOid": "134bc9de5348cc783b4cb3283ea9b920d92cf2d6",
+    "headRefOid": "52cb257ea6b3da911b134143117d9c7480c4a312",
+    "additions": 67,
+    "deletions": 19,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/homebox.nix",
+        "additions": 39,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/homebox.nix",
+        "additions": 28,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 414502,
+    "title": "mastodon: 4.3.8 -> 4.4.0",
+    "state": "MERGED",
+    "mergedAt": "2025-07-09T13:56:45Z",
+    "baseRefOid": "f8e3d1afbb3c784541aa1eab10db8deffb937e16",
+    "headRefOid": "704a7b9372e838825b0145fcc124cca434d0c6ae",
+    "additions": 922,
+    "deletions": 746,
+    "changedFiles": 7,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/mastodon.nix",
+        "additions": 5,
+        "deletions": 21,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/development/ruby-modules/gem-config/default.nix",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/servers/mastodon/default.nix",
+        "additions": 5,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/servers/mastodon/gemset.nix",
+        "additions": 818,
+        "deletions": 707,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/servers/mastodon/missing-hashes.json",
+        "additions": 75,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/servers/mastodon/source.nix",
+        "additions": 4,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/servers/mastodon/update.sh",
+        "additions": 9,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 457031,
+    "title": "nixos/ddccontrol: enable hardware.i2c and mention its group",
+    "state": "MERGED",
+    "mergedAt": "2025-11-10T06:21:41Z",
+    "baseRefOid": "a3c5320303de81866df9192942df61edf964afc3",
+    "headRefOid": "787aa8b71fda9c4a0c854a182db3a523366e50c5",
+    "additions": 171,
+    "deletions": 20,
+    "changedFiles": 6,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/ddccontrol.nix",
+        "additions": 24,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/dd/ddccontrol-db/package.nix",
+        "additions": 10,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/dd/ddccontrol/package.nix",
+        "additions": 10,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/dd/ddcutil-service/package.nix",
+        "additions": 46,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/vd/vdu_controls/package.nix",
+        "additions": 79,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 419745,
+    "title": "python3Packages.wyoming: 1.6.1 -> 1.7.1; wyoming-piper: 1.5.4 -> 1.6.0",
+    "state": "MERGED",
+    "mergedAt": "2025-06-25T01:53:17Z",
+    "baseRefOid": "d51c8e50a9eccc1dc6ec494ece98655c9a1819fb",
+    "headRefOid": "797f061205879ba8bfbef1e31d84881c086023c6",
+    "additions": 20,
+    "deletions": 7,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/piper.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/wy/wyoming-openwakeword/package.nix",
+        "additions": 8,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/wy/wyoming-piper/package.nix",
+        "additions": 3,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/development/python-modules/wyoming/default.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 428138,
+    "title": "nixos/ncps: support sign narinfo option",
+    "state": "MERGED",
+    "mergedAt": "2025-11-27T00:24:13Z",
+    "baseRefOid": "aaa9838faee87663d68d5fb494fd0fa62426d4f1",
+    "headRefOid": "3bd3493d361e66a59ea6f59f4ed69beb480bcba8",
+    "additions": 10,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/ncps.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 445875,
+    "title": "ncps: add support to the --netrc-file flag",
+    "state": "MERGED",
+    "mergedAt": "2025-10-03T18:26:34Z",
+    "baseRefOid": "ce4335d74c98d0825ef71424a5964f62c8e5dafe",
+    "headRefOid": "09f91985f60e9868aabb3e5950767e673910677e",
+    "additions": 19,
+    "deletions": 2,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/ncps.nix",
+        "additions": 15,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/nc/ncps/package.nix",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 460724,
+    "title": "nixos/btrbk: add extraArgs option",
+    "state": "MERGED",
+    "mergedAt": "2026-05-06T22:27:16Z",
+    "baseRefOid": "67e26173dfd8752cc33425a0beda31f7b68c66d3",
+    "headRefOid": "22f19b998281032b29dbb3f6f368870429a66d32",
+    "additions": 11,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/backup/btrbk.nix",
+        "additions": 11,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 368849,
+    "title": " nixos/g810-led: support earlySetup in initrd",
+    "state": "MERGED",
+    "mergedAt": "2026-03-02T05:05:31Z",
+    "baseRefOid": "4868e994de79bd9ff36581d73978549c35bc614d",
+    "headRefOid": "dc56ffef551900b5c13b11cc63b4af69dfb92b09",
+    "additions": 10,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/g810-led.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 385348,
+    "title": "nixos/dhcpcd: fix hostname via DHCP",
+    "state": "MERGED",
+    "mergedAt": "2025-05-06T01:19:21Z",
+    "baseRefOid": "04ced10e56f4cf43e9422c6b19862c7cafb8d992",
+    "headRefOid": "66db09eb6225dbc3b013a70513ce8ae82d32edf6",
+    "additions": 104,
+    "deletions": 31,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/dhcpcd.nix",
+        "additions": 74,
+        "deletions": 30,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/networking/networkd-and-scripted.nix",
+        "additions": 23,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/dh/dhcpcd/package.nix",
+        "additions": 7,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 401384,
+    "title": "paretosecurity: 0.1.9 -> 0.2.12",
+    "state": "MERGED",
+    "mergedAt": "2025-04-24T11:00:41Z",
+    "baseRefOid": "30a7bc1176cd9cd066cd75b9339872fa985a6379",
+    "headRefOid": "f07205812cc90d15bea0b06a313b1c6720416bb5",
+    "additions": 36,
+    "deletions": 12,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/paretosecurity.nix",
+        "additions": 5,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/paretosecurity.nix",
+        "additions": 12,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/pa/paretosecurity/package.nix",
+        "additions": 19,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 389428,
+    "title": "nixos/searx: add option for favicons settings",
+    "state": "MERGED",
+    "mergedAt": "2025-03-13T08:18:44Z",
+    "baseRefOid": "f1a7026e80ac6072ff674a983f1ac4026daa7ac5",
+    "headRefOid": "461be7d8c880c757eaa9713d4ce08cd9e12beb53",
+    "additions": 39,
+    "deletions": 2,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/searx.nix",
+        "additions": 37,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 464654,
+    "title": "nixos/atuin: add environmentFile option for secrets",
+    "state": "MERGED",
+    "mergedAt": "2026-04-14T16:28:45Z",
+    "baseRefOid": "ee52b70e0e9ee94b801bb3e7073d7d281a11b0e5",
+    "headRefOid": "b44c2a5758c3214a60fbee0299cb6ced0bd7a990",
+    "additions": 11,
+    "deletions": 0,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/atuin.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 461327,
+    "title": "nixos/beszel-agent: Enable systemd monitoring",
+    "state": "MERGED",
+    "mergedAt": "2026-03-01T00:55:00Z",
+    "baseRefOid": "dda3bd1c541f08f081c866a2d67b9b07f57ea0a5",
+    "headRefOid": "d4282ed5a1b82474dbcc8adf7a9011f66a0a1c2d",
+    "additions": 48,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/monitoring/beszel-agent.nix",
+        "additions": 48,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 406386,
+    "title": "nixos/postsrsd: expose socketPath via module option",
+    "state": "MERGED",
+    "mergedAt": "2025-05-12T13:17:13Z",
+    "baseRefOid": "431eb3a50eed049f932109b3aa008e2d3fbaa796",
+    "headRefOid": "047a80444950005004b423b09c1c0a5531e7cab3",
+    "additions": 10,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/mail/postsrsd.nix",
+        "additions": 10,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 516776,
+    "title": "traccar: 6.15.2 -> 6.15.3",
+    "state": "MERGED",
+    "mergedAt": "2026-08-28T15:07:06Z",
+    "baseRefOid": "c7b78a8e1839dc59a8fe550c1bdd71a0823f3991",
+    "headRefOid": "5a8fac718920cfe2121eb54361615c0abe76df2c",
+    "additions": 3960,
+    "deletions": 25,
+    "changedFiles": 6,
+    "files": [
+      {
+        "path": "nixos/modules/services/monitoring/traccar.nix",
+        "additions": 20,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/tr/traccar/deps.json",
+        "additions": 3801,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/tr/traccar/package.nix",
+        "additions": 89,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/tr/traccar/protobuf-java-version.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/tr/traccar/update.sh",
+        "additions": 17,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/tr/traccar/use-protobuf-from-nixpkgs.patch",
+        "additions": 32,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ],
+    "files_complete": true
+  },
+  {
+    "number": 427876,
+    "title": "nixos/lact: allow configuring declaratively",
+    "state": "MERGED",
+    "mergedAt": "2025-08-18T20:54:54Z",
+    "baseRefOid": "54260f5b36f6136fc2f71629fb8d2c8c7158f140",
+    "headRefOid": "e2a516cf97ad85b5252cddacca6595e1e67d3e96",
+    "additions": 29,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/lact.nix",
+        "additions": 29,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 441886,
+    "title": "nixos/victoriametrics: Add ability to pass basicAuthPasswordFile",
+    "state": "MERGED",
+    "mergedAt": "2025-09-16T09:37:12Z",
+    "baseRefOid": "db3febbe9694345760424d51f7dd15710a643fe8",
+    "headRefOid": "dcf2b9c0a0b992bf41b281472c0ebd402bd7b85f",
+    "additions": 36,
+    "deletions": 6,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/victoriametrics.nix",
+        "additions": 34,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/victoriametrics/remote-write.nix",
+        "additions": 2,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 412480,
+    "title": "nixos/jenkins: Introduce javaPackage option; Bump Java version to 21",
+    "state": "MERGED",
+    "mergedAt": "2025-06-07T13:17:23Z",
+    "baseRefOid": "21391a591d34574cfd1ed22f75c03e3bc862b587",
+    "headRefOid": "e3846c4216caf5ea1bcc1d7f69810186d22d1c0e",
+    "additions": 8,
+    "deletions": 12,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+        "additions": 5,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/je/jenkins/package.nix",
+        "additions": 3,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 411451,
+    "title": "nixos/dnscrypt-proxy2: add `package` option",
+    "state": "MERGED",
+    "mergedAt": "2025-06-06T13:21:30Z",
+    "baseRefOid": "08d385792359a40bac6873213dc27dd6cffdbc19",
+    "headRefOid": "101965187eb19218d061b1ab04da4d76ea8fa66f",
+    "additions": 17,
+    "deletions": 12,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+        "additions": 15,
+        "deletions": 12,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 387599,
+    "title": "pipewire: 1.2.7 -> 1.4.0",
+    "state": "MERGED",
+    "mergedAt": "2025-03-06T14:06:17Z",
+    "baseRefOid": "cb39a49be245617ddcb7ade622836edeb7644a34",
+    "headRefOid": "c63e1d1dafd34f47f93e15c52f83fbf1528b16ba",
+    "additions": 16,
+    "deletions": 32,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/desktops/pipewire/pipewire.nix",
+        "additions": 10,
+        "deletions": 30,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/development/libraries/pipewire/default.nix",
+        "additions": 6,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 408421,
+    "title": "dsnet: init at 0.8.1, nixos/dsnet: init",
+    "state": "MERGED",
+    "mergedAt": "2025-06-02T21:14:24Z",
+    "baseRefOid": "e97c731667172a5a03185b0c655c0e6ce2adf3d0",
+    "headRefOid": "eb01e02bd5c96acf9e95044012452b7a1b56be70",
+    "additions": 268,
+    "deletions": 0,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "maintainers/maintainer-list.nix",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/dsnet.md",
+        "additions": 31,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "nixos/modules/services/networking/dsnet.nix",
+        "additions": 184,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/ds/dsnet/package.nix",
+        "additions": 47,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 479174,
+    "title": "dokuwiki: add `extraConfigs` to combine",
+    "state": "MERGED",
+    "mergedAt": "2026-02-02T18:16:08Z",
+    "baseRefOid": "055b001b5319eda15f52e2e5eba08d72bdd8f441",
+    "headRefOid": "8b4f523448a2b5fb2f7909ae700ba7dc70579d8b",
+    "additions": 30,
+    "deletions": 10,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/dokuwiki.nix",
+        "additions": 17,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/dokuwiki.nix",
+        "additions": 3,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/do/dokuwiki/package.nix",
+        "additions": 10,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 485285,
+    "title": "nixos/n8n: package n8n runners and enable them in the module",
+    "state": "MERGED",
+    "mergedAt": "2026-02-19T14:39:24Z",
+    "baseRefOid": "4dd7177b0e26255cb1960c2794fe7e8bc42f4093",
+    "headRefOid": "f8ec773b6058107dffd7f5066961ba280d96dbde",
+    "additions": 315,
+    "deletions": 6,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/n8n.nix",
+        "additions": 259,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/n8n.nix",
+        "additions": 56,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 410858,
+    "title": "kubo: 0.34.1 -> 0.35.0",
+    "state": "MERGED",
+    "mergedAt": "2025-07-06T11:51:16Z",
+    "baseRefOid": "6eaed15add429ab4dbeb216425d1bc237100f74e",
+    "headRefOid": "27ab7b4f770980a98c8ca74e81c731a66c109cfa",
+    "additions": 50,
+    "deletions": 10,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/network-filesystems/kubo.nix",
+        "additions": 10,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/kubo/kubo-fuse.nix",
+        "additions": 38,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ku/kubo/package.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 454579,
+    "title": "nixos/kubo: add Mounts.FuseAllowOther setting for better documentation of the default value",
+    "state": "MERGED",
+    "mergedAt": "2025-11-23T04:20:19Z",
+    "baseRefOid": "f991670eceab6a7dcbb8caea67051b983ed5b031",
+    "headRefOid": "e4cdf3a3a19d74f283ef13aed8b7e1e6073835e3",
+    "additions": 7,
+    "deletions": 5,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/network-filesystems/kubo.nix",
+        "additions": 7,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 405269,
+    "title": "nixos/alloy: add environmentFile option",
+    "state": "MERGED",
+    "mergedAt": "2025-06-05T12:55:16Z",
+    "baseRefOid": "b924f045bbf4f3133eb0828d814e80dd5fabbbed",
+    "headRefOid": "cd3824f7bc8eaa57a3d2332a0c0349715c9ea35f",
+    "additions": 10,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/monitoring/alloy.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 483675,
+    "title": "nixos/nm-file-secret-agent: add `trim` option",
+    "state": "MERGED",
+    "mergedAt": "2026-02-08T21:40:16Z",
+    "baseRefOid": "da1a98afa33751284b2ece09b1fd9f5f5e7372e9",
+    "headRefOid": "04d2bad3cbaa6207f3f9b5060d3ba130c659f390",
+    "additions": 6,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/nm-file-secret-agent.nix",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 448934,
+    "title": "nixos/cloudflared: add edge IP version option",
+    "state": "MERGED",
+    "mergedAt": "2025-11-14T21:03:58Z",
+    "baseRefOid": "f0a05ce889294b1c1e02377b086b9931554f5bf3",
+    "headRefOid": "f28474f8dfaceb18aa1e46b323deff1967e4a5aa",
+    "additions": 21,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/cloudflared.nix",
+        "additions": 21,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 423934,
+    "title": "nixos/nvidia-container-toolkit: add extraArgs option",
+    "state": "MERGED",
+    "mergedAt": "2025-07-11T00:06:08Z",
+    "baseRefOid": "5663dc9a5a520912b3d4563b2eebc00fe0636c77",
+    "headRefOid": "73b4810ff3a5a2124e3a0145ffc1060fdf27d732",
+    "additions": 12,
+    "deletions": 11,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix",
+        "additions": 3,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+        "additions": 9,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 376418,
+    "title": "hylafaxplus: 7.0.9 -> 7.0.10, misc improvements (also module)",
+    "state": "MERGED",
+    "mergedAt": "2025-03-08T21:39:47Z",
+    "baseRefOid": "16c225539220d31bee2f5696b22853504452708f",
+    "headRefOid": "39003ad9d710b302376ba9d201a495a1e32676ae",
+    "additions": 72,
+    "deletions": 52,
+    "changedFiles": 6,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/hylafax/default.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/hylafax/modem-default.nix",
+        "additions": 3,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/hylafax/options.nix",
+        "additions": 15,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/hylafax/spool.sh",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/hylafax/systemd.nix",
+        "additions": 44,
+        "deletions": 28,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/hy/hylafaxplus/package.nix",
+        "additions": 7,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 244302,
+    "title": "services.xserver.desktopManager: Allow to disable wallpaper",
+    "state": "MERGED",
+    "mergedAt": "2026-07-08T16:45:49Z",
+    "baseRefOid": "0bb7ec54c8483066ec9d7720e780a5caa71f8612",
+    "headRefOid": "fa126dbedee8de3e2ffa39dcefd3ce612a543f0c",
+    "additions": 11,
+    "deletions": 4,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/x11/desktop-managers/default.nix",
+        "additions": 11,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "files_complete": true
+  },
+  {
+    "number": 466806,
+    "title": "nixos/gollum: remove services.gollum.local-time option",
+    "state": "MERGED",
+    "mergedAt": "2025-12-01T18:11:49Z",
+    "baseRefOid": "db4ebe6cca2ecf477e5cf828881db8eff567cd24",
+    "headRefOid": "a2ad9d8e6df3095073d839aa3bb5f4b644cd0fec",
+    "additions": 19,
+    "deletions": 7,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/gollum.nix",
+        "additions": 12,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/gollum.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 386318,
+    "title": "nixos/h2o: add simple listen.host setting, add example",
+    "state": "MERGED",
+    "mergedAt": "2025-03-09T04:32:06Z",
+    "baseRefOid": "3a8ebeb1dfb2cf841ac697d865c656cfc7055ad0",
+    "headRefOid": "1e3e30d56649dd3a910da3dc4bc3091f0af68c4d",
+    "additions": 44,
+    "deletions": 6,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-servers/h2o/default.nix",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+        "additions": 25,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 428972,
+    "title": "nixos/display-managers: tty1 everywhere",
+    "state": "MERGED",
+    "mergedAt": "2025-07-29T04:32:42Z",
+    "baseRefOid": "8845a9ba586fe957904ef5a2b3f68dc7b06c4774",
+    "headRefOid": "431a9761829604e71130790ff6f95e71d4013174",
+    "additions": 55,
+    "deletions": 67,
+    "changedFiles": 14,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/lib/systemd-lib.nix",
+        "additions": 0,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/display-managers/default.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/display-managers/gdm.nix",
+        "additions": 0,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/display-managers/greetd.nix",
+        "additions": 10,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/display-managers/lemurs.nix",
+        "additions": 14,
+        "deletions": 14,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/display-managers/ly.nix",
+        "additions": 5,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/display-managers/sddm.nix",
+        "additions": 1,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/ttys/getty.nix",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/x11/display-managers/lightdm.nix",
+        "additions": 1,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/x11/xserver.nix",
+        "additions": 5,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/lemurs/lemurs.nix",
+        "additions": 3,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/display-managers/sddm/unwrapped.nix",
+        "additions": 1,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/gd/gdm/package.nix",
+        "additions": 1,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 471330,
+    "title": "nixos/sshd: add enableRecommendedAlgorithms option",
+    "state": "MERGED",
+    "mergedAt": "2026-04-13T08:28:49Z",
+    "baseRefOid": "4eb3c802539f72fe7538cb049c65ae2cb27a45e6",
+    "headRefOid": "41c383338e1881994bf517b4c66aacb30a2410f7",
+    "additions": 140,
+    "deletions": 42,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/ssh/sshd.nix",
+        "additions": 85,
+        "deletions": 33,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/openssh.nix",
+        "additions": 53,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 436651,
+    "title": "nixos/homebox: update module",
+    "state": "MERGED",
+    "mergedAt": "2025-10-08T21:17:26Z",
+    "baseRefOid": "ec5c5c748e3fdd72de4c6d1b3d9dd3149583804a",
+    "headRefOid": "91352f2f836d1469805a484663477b2d840ac919",
+    "additions": 65,
+    "deletions": 20,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "maintainers/maintainer-list.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-apps/homebox.nix",
+        "additions": 53,
+        "deletions": 19,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 484577,
+    "title": "nixos/n8n: add custom nodes option",
+    "state": "MERGED",
+    "mergedAt": "2026-01-29T22:24:09Z",
+    "baseRefOid": "332ed114efcf99d73edbf6da01be07dba719ade3",
+    "headRefOid": "267c9bbb92dfcc15b7a48807f3b68c04c395f3bb",
+    "additions": 60,
+    "deletions": 0,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/n8n.nix",
+        "additions": 21,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/n8n.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/n8/n8n-nodes-carbonejs/package.nix",
+        "additions": 32,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 450453,
+    "title": "nixos/searx: fix config file locations, modernize and harden service",
+    "state": "MERGED",
+    "mergedAt": "2026-06-20T18:21:35Z",
+    "baseRefOid": "93b9af4f8d0380d23de2e299108de7a217ee7e9d",
+    "headRefOid": "d78b9e46d5d606347b022a1b7104e15641a9e57a",
+    "additions": 99,
+    "deletions": 54,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/searx.nix",
+        "additions": 99,
+        "deletions": 54,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "files_complete": true
+  },
+  {
+    "number": 507768,
+    "title": "nixos/gdm: add extraPackages to extend XDG_DATA_DIRS",
+    "state": "MERGED",
+    "mergedAt": "2026-04-08T18:04:28Z",
+    "baseRefOid": "ad1602de15363141e019f759c7c9fe8646b28b30",
+    "headRefOid": "b0ae5a671eb0d14a288fde12137fc70a823397be",
+    "additions": 20,
+    "deletions": 7,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/display-managers/gdm.nix",
+        "additions": 20,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 366842,
+    "title": "nixos/networkmanager: add an `enableDefaultPlugins` option",
+    "state": "MERGED",
+    "mergedAt": "2025-05-26T12:34:24Z",
+    "baseRefOid": "b34038394e39f0c60cc73dadba5e2bf76fc4baef",
+    "headRefOid": "98c23a61c3d0cce6bdfd12c76a5d72f4983a3a6d",
+    "additions": 10,
+    "deletions": 2,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/networkmanager.nix",
+        "additions": 10,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 409546,
+    "title": "nixos/frp: add setting",
+    "state": "MERGED",
+    "mergedAt": "2025-12-10T22:16:53Z",
+    "baseRefOid": "f2e05822c7a3a9c50aee464b7e918fa96fb0c5b0",
+    "headRefOid": "c546b27a6b70ab7cb90f99a342fc77c6064afce9",
+    "additions": 35,
+    "deletions": 4,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/frp.nix",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/frp.nix",
+        "additions": 23,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 489143,
+    "title": "nixos/stalwart: add module-specific `stateVersion`, clean up and switch logging from stdout to journal",
+    "state": "MERGED",
+    "mergedAt": "2026-04-05T14:13:57Z",
+    "baseRefOid": "bdab6d6d27074f1ca86a4923279c1b606f391f88",
+    "headRefOid": "28a9274f560b33bd05365c4c47c6c0248b68a4bc",
+    "additions": 52,
+    "deletions": 19,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/mail/stalwart.nix",
+        "additions": 43,
+        "deletions": 18,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/stalwart/stalwart-config.nix",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 423898,
+    "title": "nixos/ddclient: generic secrets",
+    "state": "MERGED",
+    "mergedAt": "2025-07-29T13:17:36Z",
+    "baseRefOid": "ef312db1d83a4a62b47b75c6be38570714de7e47",
+    "headRefOid": "6ad9c8f08e66c2575d19c4092aa6fa8c6268ccf7",
+    "additions": 32,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/ddclient.nix",
+        "additions": 32,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 397316,
+    "title": "postsrsd: 1.12 -> 2.0.10 + corresponding service changes",
+    "state": "MERGED",
+    "mergedAt": "2025-04-29T12:41:04Z",
+    "baseRefOid": "bec207e91656c2a311a44c13c0a4df38e19a5eb1",
+    "headRefOid": "d1e920fc3778706599e32e80069a536f59a9e0d8",
+    "additions": 84,
+    "deletions": 60,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2505.section.md",
+        "additions": 4,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/mail/postsrsd.nix",
+        "additions": 71,
+        "deletions": 58,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/po/postsrsd/package.nix",
+        "additions": 9,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 481406,
+    "title": "vikunja: add address option",
+    "state": "MERGED",
+    "mergedAt": "2026-02-06T19:41:55Z",
+    "baseRefOid": "6ea793840a9f18a6183cd2f080f6bf2e716f2860",
+    "headRefOid": "b7786d98437402888599667bdba0876cc6f39500",
+    "additions": 6,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/vikunja.nix",
+        "additions": 6,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 432765,
+    "title": "nixos/kanidm: add support for kanidm unixd config v2",
+    "state": "MERGED",
+    "mergedAt": "2026-01-11T16:28:22Z",
+    "baseRefOid": "28474d1da8cd0f6e78a01a44a211c2c14f511d0b",
+    "headRefOid": "e00fd16309633aaaf30a79df3b0a70ef37c11ded",
+    "additions": 18,
+    "deletions": 4,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/kanidm.nix",
+        "additions": 17,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/kanidm.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 477894,
+    "title": "keyd: cleanup, nixos/keyd: cleanup",
+    "state": "MERGED",
+    "mergedAt": "2026-05-13T21:21:39Z",
+    "baseRefOid": "da1a98afa33751284b2ece09b1fd9f5f5e7372e9",
+    "headRefOid": "f7eefe7eb2ccae6148e218fbd165c246b2a1b236",
+    "additions": 76,
+    "deletions": 78,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/keyd.nix",
+        "additions": 65,
+        "deletions": 66,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ke/keyd/package.nix",
+        "additions": 11,
+        "deletions": 12,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 471565,
+    "title": "nixos/homepage-dashboard: Allow multiple environmentFiles",
+    "state": "MERGED",
+    "mergedAt": "2026-02-17T04:09:58Z",
+    "baseRefOid": "80e4adbcf8992d3fd27ad4964fbb84907f9478b0",
+    "headRefOid": "d57c48cd2c62154f76eca9ee91fba70197724199",
+    "additions": 15,
+    "deletions": 5,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/homepage-dashboard.nix",
+        "additions": 13,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 361515,
+    "title": "nezha: 0.20.3 -> 1.9.5; nezha-agent: 0.20.5 -> 1.9.2; nixos/nezha-agent: refactor",
+    "state": "MERGED",
+    "mergedAt": "2025-03-05T16:38:43Z",
+    "baseRefOid": "4db3723321fdbf621dbb97f9a5998f2c1fdde09c",
+    "headRefOid": "1df119a49c62e5d8412b635f17e0f94662db85bd",
+    "additions": 350,
+    "deletions": 134,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/monitoring/nezha-agent.nix",
+        "additions": 255,
+        "deletions": 111,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ne/nezha-agent/package.nix",
+        "additions": 8,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ne/nezha/package.nix",
+        "additions": 85,
+        "deletions": 18,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 273833,
+    "title": "nixos/keycloak: add realmFiles option",
+    "state": "MERGED",
+    "mergedAt": "2025-03-24T08:35:04Z",
+    "baseRefOid": "742b17f589944371b5c058b17900d78e38c0f7ea",
+    "headRefOid": "cd10f9a8745bd688b8a02c1a1d4808c412137ca7",
+    "additions": 41,
+    "deletions": 1,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-apps/keycloak.nix",
+        "additions": 39,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 524915,
+    "title": "nixos/nominatim: make UI optional",
+    "state": "MERGED",
+    "mergedAt": "2026-05-28T06:53:25Z",
+    "baseRefOid": "2477ee9f4b4b6f1972ad4f9467e292688d3fdf90",
+    "headRefOid": "a3d43e3230b80fe7b8213d5f91d484275fc35c98",
+    "additions": 8,
+    "deletions": 4,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/search/nominatim.nix",
+        "additions": 8,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 413495,
+    "title": "Revert \"nixos/murmur: Get rid of global lib expansion\"",
+    "state": "MERGED",
+    "mergedAt": "2025-06-03T06:13:24Z",
+    "baseRefOid": "c2a03962b8e24e669fb37b7df10e7c79531ff1a4",
+    "headRefOid": "716d4db111dece868578de4e8079a4d7e06dc6e5",
+    "additions": 127,
+    "deletions": 99,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/murmur.nix",
+        "additions": 127,
+        "deletions": 99,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 459162,
+    "title": "wyoming-piper: 2.0.0 -> 2.1.2",
+    "state": "MERGED",
+    "mergedAt": "2025-12-06T20:32:18Z",
+    "baseRefOid": "e415595c9e57948d5d2012a38a04ebd205c2d4b9",
+    "headRefOid": "332b1f231992db802f35038bf86722cbdd77680e",
+    "additions": 20,
+    "deletions": 9,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/piper.nix",
+        "additions": 17,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/wy/wyoming-piper/package.nix",
+        "additions": 3,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 424464,
+    "title": "navidrome: introduce plugin infrastructure",
+    "state": "MERGED",
+    "mergedAt": "2026-05-07T15:33:36Z",
+    "baseRefOid": "2f80625df416e89b8b46db93c466d985bfff9ae5",
+    "headRefOid": "0541efdcf6cde2010ce6657b4d77e4e5a6b4b0ac",
+    "additions": 247,
+    "deletions": 4,
+    "changedFiles": 9,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/navidrome.nix",
+        "additions": 65,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/navidrome.nix",
+        "additions": 9,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/na/navidrome/package.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/na/navidrome/plugins/README.md",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/na/navidrome/plugins/apple-music/package.nix",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/na/navidrome/plugins/build-plugin.nix",
+        "additions": 67,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/na/navidrome/plugins/discord-rich-presence/package.nix",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/na/navidrome/plugins/listenbrainz-daily-playlist/package.nix",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/top-level/all-packages.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 408517,
+    "title": "openrgb: add startupProfile option to service",
+    "state": "MERGED",
+    "mergedAt": "2025-09-26T13:03:37Z",
+    "baseRefOid": "09954f87df190706ac38e4a09d042f557c2b49b9",
+    "headRefOid": "cf47cb7c1043f0b3e555e7962cc8f1e117adc55d",
+    "additions": 8,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/openrgb.nix",
+        "additions": 8,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 524728,
+    "title": "porxie: 0.3.1 -> 0.3.3, nixos/porxie: update options for version ",
+    "state": "MERGED",
+    "mergedAt": "2026-05-29T12:34:16Z",
+    "baseRefOid": "e4f7995bc4fbc2537c64ed9558ba33c895777606",
+    "headRefOid": "e244279d81644dc1fcd06772e75b2850cbcc6a79",
+    "additions": 18,
+    "deletions": 62,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/porxie.nix",
+        "additions": 15,
+        "deletions": 59,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/po/porxie/package.nix",
+        "additions": 3,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 412653,
+    "title": "nixos/filebrowser: add user and group options",
+    "state": "MERGED",
+    "mergedAt": "2025-06-01T15:16:35Z",
+    "baseRefOid": "58a28f6e2131b0a983b4ca121444b43207a9ee80",
+    "headRefOid": "c7ddf0b314ca1139015cef4cfea5d8b36477675c",
+    "additions": 41,
+    "deletions": 11,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/filebrowser.nix",
+        "additions": 41,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 412693,
+    "title": "nixos/murmur: Get rid of global lib expansion",
+    "state": "MERGED",
+    "mergedAt": "2025-06-02T19:04:25Z",
+    "baseRefOid": "8a697a854a63954af0f39915730b4b28097a2fe8",
+    "headRefOid": "7c7c839a26215b2585c685c4be87103a0e9198fa",
+    "additions": 99,
+    "deletions": 127,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/murmur.nix",
+        "additions": 99,
+        "deletions": 127,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 421759,
+    "title": "nixos/monero: add `environmentFile` option",
+    "state": "MERGED",
+    "mergedAt": "2025-07-06T12:02:49Z",
+    "baseRefOid": "8e5b16f6fc7ca0e94a9c10d82fbfa956c9b9af9c",
+    "headRefOid": "1fb02bc8f9932996fcc75a9d63c3d719e4a8ec6a",
+    "additions": 35,
+    "deletions": 1,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/monero.nix",
+        "additions": 33,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 437310,
+    "title": "nixos/crowdsec: init module",
+    "state": "MERGED",
+    "mergedAt": "2025-09-05T15:46:20Z",
+    "baseRefOid": "4e979b7a27489161b47cefbfe533f5bff95e25fd",
+    "headRefOid": "a2c6b5e6af20f102f91b8c15b4d23618454a6882",
+    "additions": 978,
+    "deletions": 0,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "maintainers/maintainer-list.nix",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/security/crowdsec.nix",
+        "additions": 973,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 416806,
+    "title": "nixos/postgresql: fix docs on default package",
+    "state": "MERGED",
+    "mergedAt": "2025-06-17T10:29:50Z",
+    "baseRefOid": "8ca040e9ed7a9ebef8a5e544df90217a405f2d15",
+    "headRefOid": "2a6405fb153fab2718a77ad07160e400c6bd8748",
+    "additions": 21,
+    "deletions": 3,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/postgresql.md",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/databases/postgresql.nix",
+        "additions": 17,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 393943,
+    "title": "nixos/cfssl: Add Disable Option",
+    "state": "MERGED",
+    "mergedAt": "2025-04-08T12:40:24Z",
+    "baseRefOid": "6f1396f7dc459dce81252622acc156ffdf7bafde",
+    "headRefOid": "4392f03db71ed9dc3f2dcb476a7c4fd643af0bb5",
+    "additions": 7,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/cfssl.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 413653,
+    "title": "nixos/traccar: Rework configuration file creation.",
+    "state": "MERGED",
+    "mergedAt": "2025-08-04T08:26:00Z",
+    "baseRefOid": "d4bcee88801024e01a7f76a04d54c6491f68ca2e",
+    "headRefOid": "51462b8a68c06fb3886feb53a429a143acbad122",
+    "additions": 39,
+    "deletions": 19,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/monitoring/traccar.nix",
+        "additions": 37,
+        "deletions": 19,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 419908,
+    "title": "victoriametrics & vmagent: Make the config check optional",
+    "state": "MERGED",
+    "mergedAt": "2025-08-27T20:25:51Z",
+    "baseRefOid": "cc80af1b81627d5a61f075d5de486dd143a8540e",
+    "headRefOid": "292073c5cce560c375a17e754cdc4be292d1abb4",
+    "additions": 36,
+    "deletions": 8,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/victoriametrics.nix",
+        "additions": 18,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/monitoring/vmagent.nix",
+        "additions": 18,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 456989,
+    "title": "nixos/mpd: apply RFC 42",
+    "state": "MERGED",
+    "mergedAt": "2025-12-15T14:31:37Z",
+    "baseRefOid": "815ff90da1ce5742c9b04a0ce0c0eba8e33fdeed",
+    "headRefOid": "53943b006f4a493fdeb83f4f8d6b0ec4895dfbc3",
+    "additions": 309,
+    "deletions": 165,
+    "changedFiles": 5,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/mpd.nix",
+        "additions": 257,
+        "deletions": 113,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/audio/mpdscribble.nix",
+        "additions": 5,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/audio/ympd.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/mpd.nix",
+        "additions": 32,
+        "deletions": 34,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/mp/mpd/package.nix",
+        "additions": 13,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 448254,
+    "title": "nixos/avahi: add debug option",
+    "state": "MERGED",
+    "mergedAt": "2025-10-18T05:33:52Z",
+    "baseRefOid": "d1e1f0580a86f29b80fb8cfcf98195e6f0846550",
+    "headRefOid": "2eceead9e744c2b86014e990f8c2b677351e1929",
+    "additions": 4,
+    "deletions": 1,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/avahi-daemon.nix",
+        "additions": 3,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/avahi.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 506644,
+    "title": "nixos/drupal: refactor sites dir interface",
+    "state": "MERGED",
+    "mergedAt": "2026-04-05T20:39:48Z",
+    "baseRefOid": "d9673dc9c0682fe350da00c259243fb00ff3a9ac",
+    "headRefOid": "f2cfbe07c39918fbd16ecec4802ac65ccf688a34",
+    "additions": 156,
+    "deletions": 40,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-apps/drupal.nix",
+        "additions": 154,
+        "deletions": 40,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 430906,
+    "title": "homepage-dashboard: 1.3.2 -> 1.4.6",
+    "state": "MERGED",
+    "mergedAt": "2025-08-25T23:02:05Z",
+    "baseRefOid": "3f63b0cffc6570dd0a664702e6cd49141c096280",
+    "headRefOid": "75ccd1f28868e020ff6d48449380556792d435f8",
+    "additions": 65,
+    "deletions": 58,
+    "changedFiles": 5,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/homepage-dashboard.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/homepage-dashboard.nix",
+        "additions": 20,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ho/homepage-dashboard/package.nix",
+        "additions": 3,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ho/homepage-dashboard/prerender_cache_path.patch",
+        "additions": 30,
+        "deletions": 52,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ho/homepage-dashboard/update.sh",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 405186,
+    "title": "nixos/postgresql: remove recoveryConfig option",
+    "state": "MERGED",
+    "mergedAt": "2025-05-09T07:28:23Z",
+    "baseRefOid": "8b9086b2dd2a98b282c5c111d18e08dd65eab37a",
+    "headRefOid": "7d0363742c496b33c202895c54cee5f46b23d9a0",
+    "additions": 6,
+    "deletions": 12,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/postgresql.nix",
+        "additions": 6,
+        "deletions": 12,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 483748,
+    "title": "nixos/caddy: add options for ports and openFirewall",
+    "state": "MERGED",
+    "mergedAt": "2026-01-29T06:23:36Z",
+    "baseRefOid": "2898dbae4a4c7c74dfc8c549f208b4db7d8eb3e8",
+    "headRefOid": "177499a5afa7047b30b84ad2119dba4ec09cfa8e",
+    "additions": 53,
+    "deletions": 0,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-servers/caddy/default.nix",
+        "additions": 51,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 405047,
+    "title": "nixos/gitlab: add activeRecord key files",
+    "state": "MERGED",
+    "mergedAt": "2025-05-12T06:40:16Z",
+    "baseRefOid": "5da2cb42752803610c597f8eec20f91c52463a00",
+    "headRefOid": "a95a530883f1c7cd408b823bba87ea17093301ea",
+    "additions": 76,
+    "deletions": 2,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/gitlab.nix",
+        "additions": 64,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/gitlab.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 414697,
+    "title": "kanidm-provision: 1.2.1 -> 1.3.0",
+    "state": "MERGED",
+    "mergedAt": "2025-06-08T15:36:03Z",
+    "baseRefOid": "c7c9cae886393af67a4e6b893e66cc93753ba4eb",
+    "headRefOid": "5f833b1008e4d101e985648dd0b558e2ad46b010",
+    "additions": 33,
+    "deletions": 12,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/kanidm.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/kanidm-provisioning.nix",
+        "additions": 19,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ka/kanidm-provision/package.nix",
+        "additions": 3,
+        "deletions": 12,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 399226,
+    "title": "nixos/cook-cli: init module",
+    "state": "MERGED",
+    "mergedAt": "2025-04-21T12:57:09Z",
+    "baseRefOid": "56b428200981993582f997725608c4351cb976d8",
+    "headRefOid": "7fbf79c4aca9b510e7785cc6a9673cabc57a613d",
+    "additions": 115,
+    "deletions": 0,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-apps/cook-cli.nix",
+        "additions": 113,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 408843,
+    "title": "nixos/mealie: add extraOptions to allow setting trusted proxies",
+    "state": "MERGED",
+    "mergedAt": "2025-09-24T08:19:55Z",
+    "baseRefOid": "55abd9841e394d3149e8a895c458d7808830a7dd",
+    "headRefOid": "a7f40a2648fe922f00d83491b605e3bec292e940",
+    "additions": 13,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/mealie.nix",
+        "additions": 13,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 506376,
+    "title": "nixos/buffyboard: fixes for 3.5.1",
+    "state": "MERGED",
+    "mergedAt": "2026-04-20T16:33:39Z",
+    "baseRefOid": "8efa58d9bbb078ac81c0f8a262fcb25477b52021",
+    "headRefOid": "73176866937a0392273e12a5b429cc52585ba3ad",
+    "additions": 20,
+    "deletions": 2,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/buffyboard.nix",
+        "additions": 20,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 455593,
+    "title": "pkgs/buffybox: 3.3.0 -> 3.4.2-unstable-2025-10-25",
+    "state": "MERGED",
+    "mergedAt": "2025-10-26T21:11:24Z",
+    "baseRefOid": "cdb28fb5da733bfd08daff736c79182691853357",
+    "headRefOid": "28e2ca30c4f6a20721c146a2930303903fb1fd1d",
+    "additions": 20,
+    "deletions": 18,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/buffyboard.nix",
+        "additions": 16,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/bu/buffybox/package.nix",
+        "additions": 4,
+        "deletions": 17,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 439761,
+    "title": "espeak-ng: 1.51.1 -> 1.52.0; piper-tts: 2023.11.14-2 -> 1.3.0; piper-train: drop",
+    "state": "MERGED",
+    "mergedAt": "2025-09-16T00:12:32Z",
+    "baseRefOid": "8a3f0f06a41ced113e31862e8a503b8895a098e1",
+    "headRefOid": "bb733d678d5129c6bac07765aa304d0d8f7da334",
+    "additions": 432,
+    "deletions": 144,
+    "changedFiles": 10,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/piper.nix",
+        "additions": 13,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/audio/espeak-ng/default.nix",
+        "additions": 74,
+        "deletions": 43,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/audio/espeak-ng/libsonic.patch",
+        "additions": 41,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/applications/audio/espeak-ng/mbrola.patch",
+        "additions": 10,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ca/calibre/package.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/lo/local-ai/package.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/pi/piper-train/package.nix",
+        "additions": 0,
+        "deletions": 52,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/by-name/pi/piper-tts/cmake-system-libs.patch",
+        "additions": 201,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/pi/piper-tts/package.nix",
+        "additions": 90,
+        "deletions": 42,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/top-level/aliases.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 405610,
+    "title": "nixos/paperless: expose manage package ",
+    "state": "MERGED",
+    "mergedAt": "2025-05-19T14:37:42Z",
+    "baseRefOid": "93bf311f43952c22f93cc76b68fc5076c143997e",
+    "headRefOid": "998fe3a6473c6373306895b3d0cd11698b6141c1",
+    "additions": 13,
+    "deletions": 2,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 3,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/paperless.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 425604,
+    "title": "nixos/peertube: only include whisper when transcription is enabled",
+    "state": "MERGED",
+    "mergedAt": "2025-07-16T19:25:16Z",
+    "baseRefOid": "aa1c5760da76b4211ff16ede2b6d4d62efa8f69d",
+    "headRefOid": "d9b0f4a6e901c996a8c6d48552a7eb1495428a79",
+    "additions": 33,
+    "deletions": 2,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/peertube.nix",
+        "additions": 33,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 421882,
+    "title": "nixos/LANraragi: Add `openFirewall` option",
+    "state": "MERGED",
+    "mergedAt": "2025-07-21T14:49:01Z",
+    "baseRefOid": "864c9c70a5a61bbf493909284a1b64e38555e5a1",
+    "headRefOid": "f7e134def959e06f0f2eed5a9d157aab8a5faa2a",
+    "additions": 8,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/lanraragi.nix",
+        "additions": 8,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 443717,
+    "title": "pgbackrest: 2.55.1 -> 2.56.0",
+    "state": "MERGED",
+    "mergedAt": "2025-09-18T08:37:29Z",
+    "baseRefOid": "8216b012eecdde64717fd6b38ebaa1bb36aae6f6",
+    "headRefOid": "49f3a9f7cbb34c23f3d2661d98e6b6bcdc915741",
+    "additions": 57,
+    "deletions": 3,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/backup/pgbackrest.nix",
+        "additions": 55,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/pg/pgbackrest/package.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 438371,
+    "title": "nixos/postgresql-backup: add pgdumpAllOptions",
+    "state": "MERGED",
+    "mergedAt": "2025-08-30T12:22:54Z",
+    "baseRefOid": "041d4a3d00cde2157c1d3b1737c3c0d62551c9d6",
+    "headRefOid": "82d2631e1c03e7bc8507e786bdb0e34b61c0d968",
+    "additions": 15,
+    "deletions": 2,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/backup/postgresql-backup.nix",
+        "additions": 14,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/postgresql/postgresql.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 508427,
+    "title": "nixos/drupal: synchronize config sync yamls from src into drupal state dir",
+    "state": "MERGED",
+    "mergedAt": "2026-04-10T15:20:56Z",
+    "baseRefOid": "93b719e82d8c5c0285cb1b87f190f2d367fc6e05",
+    "headRefOid": "08a81f0e1060f76b78f368b2b2b95f4691d3456e",
+    "additions": 66,
+    "deletions": 5,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2605.section.md",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-apps/drupal.nix",
+        "additions": 65,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 417467,
+    "title": "renovate: add support for environment variables",
+    "state": "MERGED",
+    "mergedAt": "2025-06-17T10:31:26Z",
+    "baseRefOid": "8bb4a2a8ade1a8b63eaffd91c69c519a1480c376",
+    "headRefOid": "24cad7344f37eecba3d456bf59c47837bc4ea094",
+    "additions": 33,
+    "deletions": 8,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/renovate.nix",
+        "additions": 33,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 416212,
+    "title": "nixos/dwm-status:  use structured RFC42 style settings",
+    "state": "MERGED",
+    "mergedAt": "2025-06-15T09:33:35Z",
+    "baseRefOid": "0a83273d06fbea81e12d90d83ff7178b9ad78465",
+    "headRefOid": "daf30d2fcd017ffd6d0044065cc5c59ee9f38bc0",
+    "additions": 47,
+    "deletions": 36,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/dwm-status.nix",
+        "additions": 45,
+        "deletions": 36,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 440660,
+    "title": "prosody: allow to specify http_external_url for http_file_share module",
+    "state": "MERGED",
+    "mergedAt": "2025-11-18T22:56:42Z",
+    "baseRefOid": "6b820e99d7d83a00f728590b2a68c78298be9c4e",
+    "headRefOid": "91f33137366325a14f45a8ad4622c9c3814b43f6",
+    "additions": 16,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/prosody.nix",
+        "additions": 16,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 466504,
+    "title": "nixos/pulseaudio: add tcp.{port,openFirewall} options",
+    "state": "MERGED",
+    "mergedAt": "2025-12-07T10:32:51Z",
+    "baseRefOid": "0f697360812a0721b65603a1983a80f6105eb69f",
+    "headRefOid": "1c77ea5916d409d92131ed82b0e202f1a3fe75a5",
+    "additions": 24,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/pulseaudio.nix",
+        "additions": 24,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 466004,
+    "title": "nixos/ollama: remove `acceleration` option in favor of setting `package`",
+    "state": "MERGED",
+    "mergedAt": "2025-12-03T17:09:04Z",
+    "baseRefOid": "3635c3da55f74817efb43d4af48083d3aaade903",
+    "headRefOid": "1aa800def6a24855b809c4bc5b4f51bc7fb3f01c",
+    "additions": 35,
+    "deletions": 39,
+    "changedFiles": 6,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/ollama.nix",
+        "additions": 27,
+        "deletions": 32,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/ollama-cuda.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/ollama-rocm.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/ollama-vulkan.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ol/ollama/package.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/top-level/all-packages.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 518211,
+    "title": "nixos/oauth2-proxy: add trustedProxyIP option and warning when it is not set in combination with reverseProxy",
+    "state": "MERGED",
+    "mergedAt": "2026-05-15T15:20:00Z",
+    "baseRefOid": "c4c54bb4c363a3c3f506f1775e767395bffcc946",
+    "headRefOid": "52fd7bf87ee83b5c86dadfb4fde4c6cfbaab4027",
+    "additions": 18,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/oauth2-proxy.nix",
+        "additions": 18,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 444630,
+    "title": "nixos/newt: fix cli args",
+    "state": "MERGED",
+    "mergedAt": "2025-09-22T09:45:10Z",
+    "baseRefOid": "fc555626ebcf665d71d28b88d32946bebf1168ae",
+    "headRefOid": "dedf2939ec883d93edb8c610e356d11e70eff4c5",
+    "additions": 38,
+    "deletions": 37,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/newt.nix",
+        "additions": 38,
+        "deletions": 37,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 433962,
+    "title": "nixos/greetd: avoid systemd boot messages interrupt greetd",
+    "state": "MERGED",
+    "mergedAt": "2025-08-18T15:33:59Z",
+    "baseRefOid": "e4958d0080a66416dcc344632055d2f1bd7b8569",
+    "headRefOid": "1ee66ce836d4bcc4b55d900a0128df63f73ff9dd",
+    "additions": 23,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/display-managers/greetd.nix",
+        "additions": 23,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 492892,
+    "title": "freeipa: Add support for subUIDs and subGIDs",
+    "state": "MERGED",
+    "mergedAt": "2026-03-03T22:31:19Z",
+    "baseRefOid": "1714b4d7fc69faca67c25c6edbb2aa33a155c454",
+    "headRefOid": "1d492ae1b22210daa9510afaf013607e68d34b6a",
+    "additions": 44,
+    "deletions": 0,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/config/nsswitch.nix",
+        "additions": 29,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/security/ipa.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/sssd.nix",
+        "additions": 14,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 517396,
+    "title": " lasuite-meet{,-frontend}: 0.14.0 -> 0.15.0;  lasuite-meet: refactor;  nixos/lasuite-meet: refactor;  nixos/lasuite-meet: add addons settings",
+    "state": "MERGED",
+    "mergedAt": "2026-05-09T11:58:44Z",
+    "baseRefOid": "1dc2eec5bde111a3e20c0c8507e4bd2706b953e5",
+    "headRefOid": "06ddcdd6dc380aab0fc1d523440ea3c4cf30a892",
+    "additions": 2396,
+    "deletions": 108,
+    "changedFiles": 7,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/lasuite-meet.nix",
+        "additions": 124,
+        "deletions": 34,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/la/lasuite-meet-frontend/package.nix",
+        "additions": 0,
+        "deletions": 51,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/by-name/la/lasuite-meet/addon-outlook.nix",
+        "additions": 42,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/la/lasuite-meet/frontend.nix",
+        "additions": 31,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/la/lasuite-meet/mail.nix",
+        "additions": 40,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/la/lasuite-meet/package-lock.json",
+        "additions": 2108,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/la/lasuite-meet/package.nix",
+        "additions": 51,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 449173,
+    "title": "nixos/dolibarr: support PostgreSQL + H2O",
+    "state": "MERGED",
+    "mergedAt": "2025-10-12T06:37:10Z",
+    "baseRefOid": "6e5eda48223d33804ddea974ccf606a25a449b72",
+    "headRefOid": "9427b8aeda4276cc36aad2e2b9b9076f912eb042",
+    "additions": 369,
+    "deletions": 183,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/dolibarr.nix",
+        "additions": 292,
+        "deletions": 132,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/dolibarr.nix",
+        "additions": 77,
+        "deletions": 51,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 395982,
+    "title": "services: openvpn: servers: authUserPass: allow to be a path",
+    "state": "MERGED",
+    "mergedAt": "2025-06-16T00:04:13Z",
+    "baseRefOid": "55d6dd76b3f36614e13e37f23f7c255238de29d1",
+    "headRefOid": "5f33d95144f8a41401609c6956486d4025d24817",
+    "additions": 28,
+    "deletions": 20,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/openvpn.nix",
+        "additions": 28,
+        "deletions": 20,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 471996,
+    "title": "nixos/slurm: add extraFlags option to slurmctld service",
+    "state": "MERGED",
+    "mergedAt": "2026-01-02T07:54:31Z",
+    "baseRefOid": "905105f25fcc57e2f6fa96cef09a7899870cb08a",
+    "headRefOid": "b740fb3106c5a63ed6dd2b6d368b6e57303bb2b7",
+    "additions": 34,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/computing/slurm/slurm.nix",
+        "additions": 34,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 471312,
+    "title": "angrr: 0.1.5 -> 0.2.0",
+    "state": "MERGED",
+    "mergedAt": "2025-12-16T15:08:41Z",
+    "baseRefOid": "ca696276378b844d888872c9045d89e9b58cc85a",
+    "headRefOid": "62ea5b9ae7d4329475089f60232ee1426d9547a9",
+    "additions": 420,
+    "deletions": 38,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/misc/angrr.nix",
+        "additions": 247,
+        "deletions": 22,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/angrr.nix",
+        "additions": 162,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/an/angrr/package.nix",
+        "additions": 9,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 429244,
+    "title": "nixos/tlsrpt: configure explicit http_script",
+    "state": "MERGED",
+    "mergedAt": "2025-07-30T13:02:30Z",
+    "baseRefOid": "ad7560d70c227a218a8a6c75bd8580fa1cd45c6b",
+    "headRefOid": "e0308144468a25644ee59c9ea7c90ee424419e99",
+    "additions": 11,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/mail/tlsrpt.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 480156,
+    "title": "nixos/services.picom: use libconfig to generate the config",
+    "state": "MERGED",
+    "mergedAt": "2026-01-23T12:25:43Z",
+    "baseRefOid": "b28963a6b5b595953c63d967c86edada5edc9b52",
+    "headRefOid": "7a055af8e7ccb3473cfa733818c8100e80f47e4e",
+    "additions": 17,
+    "deletions": 86,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/x11/picom.nix",
+        "additions": 17,
+        "deletions": 86,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 389471,
+    "title": "nixos/navidrome: Add environmentFile config option",
+    "state": "MERGED",
+    "mergedAt": "2025-04-01T13:55:59Z",
+    "baseRefOid": "0d54c58e683512c29493ef6e4283c978f6534859",
+    "headRefOid": "20c9782e2fc4f0b24b6c1b364eb46cbfe9ebc160",
+    "additions": 7,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/navidrome.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 491981,
+    "title": "nixos/hardware.displaylink: fix unknown driver assertion",
+    "state": "MERGED",
+    "mergedAt": "2026-02-28T02:17:29Z",
+    "baseRefOid": "2e3f7f8be65e9d64d7137e8a70968a96a61ae38d",
+    "headRefOid": "71f94c224a0f1bf22121b75fe95087174fbc4e28",
+    "additions": 24,
+    "deletions": 2,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/hardware/video/displaylink.nix",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/x11/xserver.nix",
+        "additions": 22,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 451681,
+    "title": "nixos/gitwatch: add message option",
+    "state": "MERGED",
+    "mergedAt": "2025-10-14T18:06:23Z",
+    "baseRefOid": "1506cdec761c807472327bd6ec28836a1a09dc03",
+    "headRefOid": "024fd0a28ca715f1d52296d0ff54ae0050f72579",
+    "additions": 18,
+    "deletions": 2,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "maintainers/maintainer-list.nix",
+        "additions": 6,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/monitoring/gitwatch.nix",
+        "additions": 12,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 467286,
+    "title": "nixos/postgresql: add freeformType to ensureClauses option",
+    "state": "MERGED",
+    "mergedAt": "2025-12-26T11:05:42Z",
+    "baseRefOid": "8363ade52b617148dc10ca45aba1202ca25074bf",
+    "headRefOid": "fcdfa7b5d0bc65ac086a12dd98dd7de82e2d522f",
+    "additions": 125,
+    "deletions": 155,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/postgresql.nix",
+        "additions": 111,
+        "deletions": 153,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/postgresql/postgresql.nix",
+        "additions": 14,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 388978,
+    "title": "nixos/services.mysql: add galera cluster options",
+    "state": "MERGED",
+    "mergedAt": "2025-04-05T22:26:06Z",
+    "baseRefOid": "7afd4512ca2c0e8885697903d77f47b670c1a7e4",
+    "headRefOid": "4e64bf159143b7f47ce7f13f6cbfa7b7d714c3ed",
+    "additions": 199,
+    "deletions": 47,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/databases/mysql.nix",
+        "additions": 169,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/mysql/mariadb-galera.nix",
+        "additions": 15,
+        "deletions": 42,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 376490,
+    "title": "nixos/kanidm: add extraJsonFile option",
+    "state": "MERGED",
+    "mergedAt": "2025-03-12T12:15:36Z",
+    "baseRefOid": "e5fad5185b76efcfc271ba1875ba5fda8f4f79d1",
+    "headRefOid": "16cdde80082ea5e2e02a53260ae3ef4e281c309c",
+    "additions": 46,
+    "deletions": 19,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/kanidm.nix",
+        "additions": 46,
+        "deletions": 19,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 456004,
+    "title": "nixos/snapserver: migrate options per snapcast 0.33 changes",
+    "state": "MERGED",
+    "mergedAt": "2025-12-11T17:02:36Z",
+    "baseRefOid": "4a0f51b3864351a27c8b47da08de159022c22356",
+    "headRefOid": "84881aecea36bd65f3340a07fbda400eac743a86",
+    "additions": 41,
+    "deletions": 29,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/snapserver.nix",
+        "additions": 33,
+        "deletions": 26,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/snapcast.nix",
+        "additions": 8,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 397130,
+    "title": "kanidm-provision: 1.1.2 -> 1.2.0, modernize",
+    "state": "MERGED",
+    "mergedAt": "2025-04-09T22:52:50Z",
+    "baseRefOid": "df46c58b4151565a48d740748ba8684e9923f88f",
+    "headRefOid": "ee84ec39e94cfcc8fa28ca914772d77c014172a5",
+    "additions": 41,
+    "deletions": 9,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/kanidm.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ka/kanidm-provision/package.nix",
+        "additions": 31,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 506197,
+    "title": "nixos/squeezelite: add pulseaudio support and refresh options",
+    "state": "MERGED",
+    "mergedAt": "2026-04-06T15:43:26Z",
+    "baseRefOid": "9ebff1eb5d4e4c6a78e0b2d15602f976c7efde63",
+    "headRefOid": "67cff4ab78d2946b1b132ac9965c87c6b74bc662",
+    "additions": 114,
+    "deletions": 25,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/squeezelite.nix",
+        "additions": 114,
+        "deletions": 25,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 428153,
+    "title": "nixos/drupal: config extend",
+    "state": "MERGED",
+    "mergedAt": "2025-08-01T02:38:24Z",
+    "baseRefOid": "332e97d4a8d5742707b5d27a9a529b5a1d95ef2e",
+    "headRefOid": "ed758199980ee3bb0aa77b0f7db16d7add39d35b",
+    "additions": 66,
+    "deletions": 7,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/drupal.nix",
+        "additions": 66,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 463358,
+    "title": "nixos/ollama: add `syncModels` to remove models not defined in `loadModels`",
+    "state": "MERGED",
+    "mergedAt": "2025-11-27T12:46:46Z",
+    "baseRefOid": "409eb4f09136d38112ab22f4faf81deb8441e621",
+    "headRefOid": "b61914ea6eec15d4b634717992da794fdfa67703",
+    "additions": 61,
+    "deletions": 23,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/ollama.nix",
+        "additions": 61,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 460730,
+    "title": "nixos/beszel: allow S.M.A.R.T monitoring",
+    "state": "MERGED",
+    "mergedAt": "2026-01-23T17:44:04Z",
+    "baseRefOid": "9a0b5314e988375390f4f72218ad5e87b5726f24",
+    "headRefOid": "a11465f820a394d784fff6a78fa5fe37af242e7c",
+    "additions": 50,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/monitoring/beszel-agent.nix",
+        "additions": 50,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 494028,
+    "title": "asusctl: 6.3.2 -> 6.3.3",
+    "state": "MERGED",
+    "mergedAt": "2026-02-25T14:04:31Z",
+    "baseRefOid": "4440fdfc30f8e4869e3fc195b70009e205299a08",
+    "headRefOid": "1aeecc32e09b7c5b47b82eab216684baaffb097f",
+    "additions": 8,
+    "deletions": 16,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/asusd.nix",
+        "additions": 5,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/as/asusctl/package.nix",
+        "additions": 3,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 466620,
+    "title": "llama-swap: 165 -> 176",
+    "state": "MERGED",
+    "mergedAt": "2026-01-04T22:16:11Z",
+    "baseRefOid": "80da349c36121606a8cad534ce822d1c2b837177",
+    "headRefOid": "ab961b8547947a2850bc9a95a30e4977b486f4ef",
+    "additions": 77,
+    "deletions": 8,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/llama-swap.nix",
+        "additions": 57,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ll/llama-swap/package.nix",
+        "additions": 18,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ll/llama-swap/ui.nix",
+        "additions": 2,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 508939,
+    "title": "nixos/{pipewire,wireplumber}: add LADSPA plugin path setup",
+    "state": "MERGED",
+    "mergedAt": "2026-04-11T11:32:59Z",
+    "baseRefOid": "205b13add2e6479dfabb3ad5fc8c296c69aa6159",
+    "headRefOid": "d2bd7d91e06c502ff696745b1ebdc04c0ab7dd8e",
+    "additions": 81,
+    "deletions": 30,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/desktops/pipewire/pipewire.nix",
+        "additions": 36,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/desktops/pipewire/wireplumber.nix",
+        "additions": 45,
+        "deletions": 21,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 486936,
+    "title": "nixos/pretalx: Add support for secrets",
+    "state": "MERGED",
+    "mergedAt": "2026-02-04T15:31:50Z",
+    "baseRefOid": "49016f2147dc637b76f7990c5ac82cb2e2384dba",
+    "headRefOid": "188bcbd94981706d94883939a4b0ffae4c506db4",
+    "additions": 15,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/pretalx.nix",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 494127,
+    "title": "nixos/n8n: fix eval error with default values",
+    "state": "MERGED",
+    "mergedAt": "2026-02-27T14:45:15Z",
+    "baseRefOid": "a97eb80b14463bdc47442afab24156a84ff68af6",
+    "headRefOid": "5ad853409cf18274ab2b061b2d83231e5a31a3f4",
+    "additions": 44,
+    "deletions": 39,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/n8n.nix",
+        "additions": 7,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/n8n.nix",
+        "additions": 37,
+        "deletions": 29,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 484670,
+    "title": "omnom: 0.7.0 -> 0.9.0; nixos/omnom: add `base_url` option",
+    "state": "MERGED",
+    "mergedAt": "2026-02-16T05:48:50Z",
+    "baseRefOid": "69459b3b3ea735e9933e1e367db3e68334cce3fe",
+    "headRefOid": "cfc02bae23b2bc2bdc30d9c26c7695fbf2ad6d0d",
+    "additions": 31,
+    "deletions": 17,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/omnom.nix",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/omnom/default.nix",
+        "additions": 12,
+        "deletions": 12,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/om/omnom/package.nix",
+        "additions": 7,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 463443,
+    "title": "nixos/tuned: add recommend option, fix ppdSupport, minor refactor",
+    "state": "MERGED",
+    "mergedAt": "2026-03-01T00:54:07Z",
+    "baseRefOid": "78e952e43a2d08fa35c72ffd3b687852e8567120",
+    "headRefOid": "099115500494c74f2790518f78468caeac1a2cd3",
+    "additions": 94,
+    "deletions": 63,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/tuned.nix",
+        "additions": 94,
+        "deletions": 63,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 394826,
+    "title": "nixos/hddfancontrol: use attrset for config",
+    "state": "MERGED",
+    "mergedAt": "2025-05-15T17:49:19Z",
+    "baseRefOid": "255ef859f92ba6e5dd3e55b8b47b4ff651f85abb",
+    "headRefOid": "3dd5d8606a9f7217c5f880be5bf0eed3a84c51d4",
+    "additions": 144,
+    "deletions": 52,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2505.section.md",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/hddfancontrol.nix",
+        "additions": 143,
+        "deletions": 51,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 347209,
+    "title": "nixos/onlyoffice: add allowLocalConnections option",
+    "state": "MERGED",
+    "mergedAt": "2026-04-22T12:01:13Z",
+    "baseRefOid": "2629605ab2d1fe8217367cea0ca7551d1cdc1316",
+    "headRefOid": "cd8540da55892dd6f6e3d795de759daee82cbb8c",
+    "additions": 10,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/onlyoffice.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 397967,
+    "title": "fedimint: 0.5.1 -> 0.7.1",
+    "state": "MERGED",
+    "mergedAt": "2025-06-20T19:28:34Z",
+    "baseRefOid": "6990f4ce664f97b0ded551dbc9d4cccc7940d08d",
+    "headRefOid": "c0f52c28cd3551ca5df9b574ff27e05dc6c40d7a",
+    "additions": 103,
+    "deletions": 33,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/fedimintd.nix",
+        "additions": 93,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/fedimintd.nix",
+        "additions": 3,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/fe/fedimint/package.nix",
+        "additions": 7,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 392678,
+    "title": "nixos/archtika: fix module and package",
+    "state": "MERGED",
+    "mergedAt": "2025-04-04T12:52:59Z",
+    "baseRefOid": "940b51954450ad966f4c1af1ec1c7c560e1ce290",
+    "headRefOid": "2c916c0352c301253c75233232673290f5db76ce",
+    "additions": 8,
+    "deletions": 5,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/archtika.nix",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ar/archtika/package.nix",
+        "additions": 7,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 475112,
+    "title": "nixos/cgit: add gitHttpBackend options",
+    "state": "MERGED",
+    "mergedAt": "2026-01-03T15:00:40Z",
+    "baseRefOid": "308f82252459d32a68cfbbec3af672e5867ff994",
+    "headRefOid": "a722a999d1af37d9f3760680dc50fc598fce01a6",
+    "additions": 95,
+    "deletions": 6,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/cgit.nix",
+        "additions": 56,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/cgit.nix",
+        "additions": 37,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 386406,
+    "title": "nixos/frp: support multiple instances",
+    "state": "MERGED",
+    "mergedAt": "2025-12-10T11:22:08Z",
+    "baseRefOid": "976294211357efd854b0bcf4233fbda3653aadea",
+    "headRefOid": "67d9b4b947f8b87eefbf6a182ee48db2dba08f27",
+    "additions": 104,
+    "deletions": 76,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2311.section.md",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/frp.nix",
+        "additions": 101,
+        "deletions": 75,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 461561,
+    "title": "nixos/onlyoffice: allow specifying a nonce",
+    "state": "MERGED",
+    "mergedAt": "2025-11-14T16:27:53Z",
+    "baseRefOid": "655dcbafa1435b633ce9ed423b33b4c4e0d864c3",
+    "headRefOid": "acad2ac1d37a4ea3985c7f20f895a1e0701e5228",
+    "additions": 29,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/onlyoffice.nix",
+        "additions": 29,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 417413,
+    "title": "wyoming-faster-whisper: 2.4.0 -> 2.5.0",
+    "state": "MERGED",
+    "mergedAt": "2025-06-25T03:18:48Z",
+    "baseRefOid": "8eff0be761d12d7e463c2f2f3a863393ab5c5c4c",
+    "headRefOid": "f495eb597f2796d250791be7c973081cb9a564c4",
+    "additions": 246,
+    "deletions": 203,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/faster-whisper.nix",
+        "additions": 235,
+        "deletions": 201,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/wy/wyoming-faster-whisper/package.nix",
+        "additions": 11,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 468049,
+    "title": "nixos/radicale: allow setting the user on service.radicale",
+    "state": "MERGED",
+    "mergedAt": "2026-05-15T17:52:07Z",
+    "baseRefOid": "38ea428d59463d2bbe552146534035ca25cc209e",
+    "headRefOid": "070e821be46816bec0639e4f37983ca5ead713bd",
+    "additions": 22,
+    "deletions": 6,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/radicale.nix",
+        "additions": 22,
+        "deletions": 6,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 395732,
+    "title": "nixos/docling-serve: update environment variables",
+    "state": "MERGED",
+    "mergedAt": "2025-04-03T12:30:16Z",
+    "baseRefOid": "4ad504735ad405c619b5889ca645bae9ff455c7a",
+    "headRefOid": "d62fd5fa6c82f3d153448b417f17aec1ae936130",
+    "additions": 37,
+    "deletions": 6,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/docling-serve.nix",
+        "additions": 18,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/do/docling-serve/package.nix",
+        "additions": 6,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/development/python-modules/docling-serve/default.nix",
+        "additions": 13,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 515985,
+    "title": "porxie: 0.1.2 -> 0.2.0, nixos/porxie: update options",
+    "state": "MERGED",
+    "mergedAt": "2026-05-02T22:55:53Z",
+    "baseRefOid": "17bc32dc2d218bc80aaaafb0017dcc455a90b5c4",
+    "headRefOid": "2ee66cfc80ff376b06f4eddc84b03598c42a500a",
+    "additions": 16,
+    "deletions": 16,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/porxie.nix",
+        "additions": 13,
+        "deletions": 13,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/po/porxie/package.nix",
+        "additions": 3,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 500388,
+    "title": "nixos/searx: add openFirewall option",
+    "state": "MERGED",
+    "mergedAt": "2026-03-18T12:28:31Z",
+    "baseRefOid": "37623ad7aa9f7c72310fbcf61f9db20f25afea93",
+    "headRefOid": "abd4cb9ecfa04cad6147dd6c8a093edd7a9a4add",
+    "additions": 22,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/searx.nix",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 490920,
+    "title": "[Revert]: \"nixos/traefik: refactor\" due to issues with complex configurations and failing testcases.",
+    "state": "MERGED",
+    "mergedAt": "2026-02-16T02:49:15Z",
+    "baseRefOid": "d1c15b7d5806069da59e819999d70e1cec0760bf",
+    "headRefOid": "b898b53e2c0ade92cfcaab4beb088b67bd66831a",
+    "additions": 100,
+    "deletions": 459,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 0,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/pangolin.nix",
+        "additions": 10,
+        "deletions": 7,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/web-servers/traefik.nix",
+        "additions": 90,
+        "deletions": 450,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 401132,
+    "title": "nixos: nix.sshServe: add trusted option",
+    "state": "MERGED",
+    "mergedAt": "2025-04-24T00:57:33Z",
+    "baseRefOid": "d72d003fcac553047b693c7f52ef3a84cf035c2e",
+    "headRefOid": "7b593827dda6d3f65bdd344f1da1b80a790e1a14",
+    "additions": 9,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/nix-ssh-serve.nix",
+        "additions": 9,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 521288,
+    "title": "Revert \"nixos/blueman: Add option to enable Blueman tray applet\"",
+    "state": "MERGED",
+    "mergedAt": "2026-05-17T19:24:52Z",
+    "baseRefOid": "a0cf521e3344478c43918f5fe5904f4c5baacf54",
+    "headRefOid": "43927d54303274cd68a2df615eaddb12a15da0b9",
+    "additions": 0,
+    "deletions": 16,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/desktops/blueman.nix",
+        "additions": 0,
+        "deletions": 16,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 473479,
+    "title": "nixos/slurm: add rest options",
+    "state": "MERGED",
+    "mergedAt": "2025-12-26T12:38:42Z",
+    "baseRefOid": "d7547a7ed4d0bedcd73c64b2b854426ab55da543",
+    "headRefOid": "f83670934aa00de5f23fcf9a38a8e4f8608ff7f6",
+    "additions": 210,
+    "deletions": 98,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/computing/slurm/slurm.nix",
+        "additions": 180,
+        "deletions": 98,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/slurm.nix",
+        "additions": 16,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/sl/slurm/package.nix",
+        "additions": 12,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 398420,
+    "title": "nixos/cross-seed: add 'useGenConfigDefaults'",
+    "state": "MERGED",
+    "mergedAt": "2025-04-14T20:10:39Z",
+    "baseRefOid": "f6b299d7773e318cf1787d5da4b3ef836662a5cd",
+    "headRefOid": "9cc26fef84b2deec8ec2e16ce712798662cac524",
+    "additions": 35,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/torrent/cross-seed.nix",
+        "additions": 35,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 418136,
+    "title": "nixos/sshd: add generateHostKeys setting",
+    "state": "MERGED",
+    "mergedAt": "2025-12-05T11:31:23Z",
+    "baseRefOid": "367bce84bd1d46008f81e63e7c2c65767156f95e",
+    "headRefOid": "375fc85aea9a6328e759bb85729ec7b241b1a236",
+    "additions": 252,
+    "deletions": 208,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 1,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/ssh/sshd.nix",
+        "additions": 225,
+        "deletions": 207,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/openssh.nix",
+        "additions": 26,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 413190,
+    "title": "nixos/lasuite-docs: Set collaboration server allowed origins",
+    "state": "MERGED",
+    "mergedAt": "2025-06-07T13:38:27Z",
+    "baseRefOid": "62bdbeee5fdb5578dc2459046409fe182d58ec1e",
+    "headRefOid": "04a5cb63b3ed911fbee602c0abcef3bd29572a69",
+    "additions": 7,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/lasuite-docs.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 449513,
+    "title": "nixos/pgadmin: Use lib.mkEnableOption where possible",
+    "state": "MERGED",
+    "mergedAt": "2025-10-13T15:48:10Z",
+    "baseRefOid": "d9907011a51e72d7e62630e4a2071d0abbe68292",
+    "headRefOid": "cc38ed4577517666fd52b6d832b638702d1b1f89",
+    "additions": 3,
+    "deletions": 17,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/admin/pgadmin.nix",
+        "additions": 3,
+        "deletions": 17,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 492341,
+    "title": " music-assistant: replace all pre-compiled binaries,  music-assistant: bring back airplay support ",
+    "state": "MERGED",
+    "mergedAt": "2026-03-26T23:00:17Z",
+    "baseRefOid": "c207940c56176cf7b7d5b523a86a2cfb364b9957",
+    "headRefOid": "fbe6eb952a657ef372548a6fa45d9da9ded13de8",
+    "additions": 291,
+    "deletions": 14,
+    "changedFiles": 8,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/music-assistant.nix",
+        "additions": 42,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/cl/cliairplay/package.nix",
+        "additions": 81,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/li/libraop/link-libssl.diff",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/li/libraop/package.nix",
+        "additions": 83,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/mu/music-assistant/cliraop-cliap2.patch",
+        "additions": 29,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/mu/music-assistant/package.nix",
+        "additions": 16,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/mu/music-assistant/shairport-sync.patch",
+        "additions": 20,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/sh/shairport-sync/package.nix",
+        "additions": 5,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 438684,
+    "title": "ncps: Update the module for ncps v0.3.0",
+    "state": "MERGED",
+    "mergedAt": "2025-09-05T07:17:52Z",
+    "baseRefOid": "c46f18dfb2f01caf2adca479e8076147bef63069",
+    "headRefOid": "414c23faccf416ff4995ca999de620597ab8c1c5",
+    "additions": 24,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/ncps.nix",
+        "additions": 24,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 401840,
+    "title": "nixos/nvidia-container-toolkit: allow to provide CSV files",
+    "state": "MERGED",
+    "mergedAt": "2025-05-28T15:13:29Z",
+    "baseRefOid": "425237e23b0ea9e63d1fb01072f38fbaf3404ed9",
+    "headRefOid": "1948ad4bb5aa16054e07cbfd0b585bd58763965b",
+    "additions": 65,
+    "deletions": 25,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix",
+        "additions": 12,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+        "additions": 53,
+        "deletions": 22,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 417590,
+    "title": "nixos/onlyoffice: add wopi setting",
+    "state": "MERGED",
+    "mergedAt": "2025-12-19T17:06:47Z",
+    "baseRefOid": "ac3f8faff5c1a4191489c7b2f006d9adf4797425",
+    "headRefOid": "9319694d25812fbf490fef499f117d5d96e8e40d",
+    "additions": 4,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/onlyoffice.nix",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 386345,
+    "title": "nixos/postgresql: allow customisations of SystemCallFilter",
+    "state": "MERGED",
+    "mergedAt": "2025-03-11T16:11:29Z",
+    "baseRefOid": "f176582204e095f1bd023a6f2f8aa8262eb8c045",
+    "headRefOid": "6e87867ee3e49ee5199fb48a6cf22958286f3c1d",
+    "additions": 120,
+    "deletions": 10,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/databases/postgresql.nix",
+        "additions": 120,
+        "deletions": 10,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 425576,
+    "title": "nixos/a2boot: init",
+    "state": "MERGED",
+    "mergedAt": "2025-10-12T16:16:54Z",
+    "baseRefOid": "aab9cae3f7fb9a0953b4da972771fe57c5abf129",
+    "headRefOid": "1ae83239bd9894ead51039e213c729b3621f99c7",
+    "additions": 38,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/network-filesystems/a2boot.nix",
+        "additions": 38,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 459937,
+    "title": "nixos/xscreensaver: init hooks options",
+    "state": "MERGED",
+    "mergedAt": "2025-12-08T18:32:20Z",
+    "baseRefOid": "640fe994e5d7815f1dccbc3f84316ff3b0cbd7a1",
+    "headRefOid": "eec3fb0c3a5d7b3852a9f60d37bab1d424555733",
+    "additions": 81,
+    "deletions": 10,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/x11/xscreensaver.nix",
+        "additions": 58,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/xscreensaver.nix",
+        "additions": 23,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 493887,
+    "title": "wyoming-faster-whisper: 2.5.0 -> 3.1.0",
+    "state": "MERGED",
+    "mergedAt": "2026-02-28T02:34:23Z",
+    "baseRefOid": "2eca90295d8093e7286785499c073e1181b8a6a6",
+    "headRefOid": "4e807c814a0328a1a7f5ec61f2fae35808676b6c",
+    "additions": 292,
+    "deletions": 234,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/faster-whisper.nix",
+        "additions": 262,
+        "deletions": 222,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/home-automation/wyoming/piper.nix",
+        "additions": 6,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/wy/wyoming-faster-whisper/package.nix",
+        "additions": 24,
+        "deletions": 9,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 493931,
+    "title": "nixos/athens: remove minio support",
+    "state": "MERGED",
+    "mergedAt": "2026-02-26T09:07:40Z",
+    "baseRefOid": "ffae6adc2949e03aeb150f0e2d216ce23ba5b33d",
+    "headRefOid": "5c6f18d76d892ed8fbb4428c9d6930401db6a1b3",
+    "additions": 8,
+    "deletions": 48,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/development/athens.nix",
+        "additions": 8,
+        "deletions": 48,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 516780,
+    "title": "jitterentropy: 3.6.3 -> 3.7.0; jitterentropy-rngd: 1.2.8 -> 1.3.1",
+    "state": "MERGED",
+    "mergedAt": "2026-05-05T13:25:30Z",
+    "baseRefOid": "28e181da73c6586c3657a5128fca96a3e30b7cf0",
+    "headRefOid": "2365bfc13e3cda50cfa2711fca7fb2c3619c9527",
+    "additions": 69,
+    "deletions": 17,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/security/jitterentropy-rngd.nix",
+        "additions": 45,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ji/jitterentropy-rngd/package.nix",
+        "additions": 9,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ji/jitterentropy/package.nix",
+        "additions": 15,
+        "deletions": 11,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 446598,
+    "title": "mopidy: migrate to rfc42",
+    "state": "MERGED",
+    "mergedAt": "2025-10-04T02:03:08Z",
+    "baseRefOid": "4b8ce46647bf2e03f0d6b19ea969fdf8ffa4f52f",
+    "headRefOid": "87897caee2d7d31fa2f870c38070dd05f47e77ce",
+    "additions": 15,
+    "deletions": 8,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/audio/mopidy.nix",
+        "additions": 15,
+        "deletions": 8,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 458319,
+    "title": "nixos/clickhouse: allow configuring with Nix attribute set",
+    "state": "MERGED",
+    "mergedAt": "2025-11-05T16:50:33Z",
+    "baseRefOid": "37e6ac33c04e19f8081b6baa925b8017a0026ac6",
+    "headRefOid": "ddac798a5a8cf52f820e0da180f870452714f075",
+    "additions": 108,
+    "deletions": 5,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "doc/release-notes/rl-2511.section.md",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/databases/clickhouse.nix",
+        "additions": 107,
+        "deletions": 5,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 416319,
+    "title": "yeahwm: drop",
+    "state": "MERGED",
+    "mergedAt": "2025-06-14T13:13:57Z",
+    "baseRefOid": "db5b6ac458dcf49a26f1dda2786fefca1d640f71",
+    "headRefOid": "c822122883d43fb2013c7f201c8fe65e53dba0d0",
+    "additions": 3,
+    "deletions": 121,
+    "changedFiles": 5,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2511.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/x11/window-managers/default.nix",
+        "additions": 0,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/x11/window-managers/yeahwm.nix",
+        "additions": 0,
+        "deletions": 30,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/by-name/ye/yeahwm/package.nix",
+        "additions": 0,
+        "deletions": 90,
+        "changeType": "DELETED"
+      },
+      {
+        "path": "pkgs/top-level/aliases.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 445176,
+    "title": "nixos/n8n: use env vars instead of config file",
+    "state": "MERGED",
+    "mergedAt": "2025-10-26T10:40:47Z",
+    "baseRefOid": "717111844a0d2d139cdf32a7b5e308e74ee400e4",
+    "headRefOid": "f6a4509bfb4785a844b98f043f738dc553c33d37",
+    "additions": 64,
+    "deletions": 36,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/n8n.nix",
+        "additions": 61,
+        "deletions": 35,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/n8n.nix",
+        "additions": 3,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 501095,
+    "title": "programs.nix-required-mounts.presets.zluda.enable: init",
+    "state": "MERGED",
+    "mergedAt": "2026-04-09T21:26:53Z",
+    "baseRefOid": "96e87bd250d5f4f3447b87ab7e94689ea19e0c2a",
+    "headRefOid": "a8a1365dd293322ae60e6f6c7935d4db09ae6d09",
+    "additions": 67,
+    "deletions": 21,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/programs/nix-required-mounts.nix",
+        "additions": 35,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/amdgpu.nix",
+        "additions": 32,
+        "deletions": 21,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 396478,
+    "title": "nixos/taskchampion-sync-server: fix start failure",
+    "state": "MERGED",
+    "mergedAt": "2025-04-06T05:47:53Z",
+    "baseRefOid": "8ded8cc14b57512b69c9529f329158dd451c36d8",
+    "headRefOid": "badd9d1a70ad3d5a27b6549b7ee2c1ee796cd079",
+    "additions": 8,
+    "deletions": 1,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/taskchampion-sync-server.nix",
+        "additions": 7,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/taskchampion-sync-server.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 387829,
+    "title": "evcc: add envsubst secret support",
+    "state": "MERGED",
+    "mergedAt": "2025-03-07T10:47:53Z",
+    "baseRefOid": "e31a8ecf35dbf4bb1c8ca45100c79072f8a1e536",
+    "headRefOid": "067732921fae5a44f91e47d7bb9e2b9596a9f053",
+    "additions": 65,
+    "deletions": 20,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/home-automation/evcc.nix",
+        "additions": 53,
+        "deletions": 16,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/evcc.nix",
+        "additions": 11,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ev/evcc/package.nix",
+        "additions": 1,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 458481,
+    "title": "nixos/writefreely: add support for email smtp password + minor fixes",
+    "state": "MERGED",
+    "mergedAt": "2026-05-12T00:08:38Z",
+    "baseRefOid": "d42f6ed0d61c4de3f06202542b0f69b2bcaa5b85",
+    "headRefOid": "fbe6fd7edd1f92023e5468a3800161222bd559c0",
+    "additions": 22,
+    "deletions": 2,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/writefreely.nix",
+        "additions": 22,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 392716,
+    "title": "nxios/cyrus-imap: fix cyrus-imap certs options",
+    "state": "MERGED",
+    "mergedAt": "2025-04-08T00:01:10Z",
+    "baseRefOid": "848d816cf831e9e37125c8734b38a8a43369ee0c",
+    "headRefOid": "128bdeb3c5d185af082b8aabd70a99ad1a1466e5",
+    "additions": 14,
+    "deletions": 18,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/mail/cyrus-imap.nix",
+        "additions": 14,
+        "deletions": 18,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 433631,
+    "title": "nixos.enlightenment: add option to exclude packages",
+    "state": "MERGED",
+    "mergedAt": "2025-08-14T18:13:42Z",
+    "baseRefOid": "e3d1ea47847b490cbe30c4b3110384fff8edd067",
+    "headRefOid": "ce3007ed6032fdb64d6cc1d0e88f43d74c542638",
+    "additions": 11,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/x11/desktop-managers/enlightenment.nix",
+        "additions": 11,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 427260,
+    "title": "nixos/drupal: add config for private files directory",
+    "state": "MERGED",
+    "mergedAt": "2025-07-23T08:59:12Z",
+    "baseRefOid": "35ecc48f7ea7260459f0395f0be53f37dfc19586",
+    "headRefOid": "711f3730a9758ff0c06382dd39cc38f30eb203b9",
+    "additions": 15,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/drupal.nix",
+        "additions": 15,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 398993,
+    "title": "nvidia-container-toolkit: add suppressNvidiaDriverAssertion option",
+    "state": "MERGED",
+    "mergedAt": "2025-04-17T16:15:37Z",
+    "baseRefOid": "fd15d1aa09a097a609e4258668e1278e2001afbf",
+    "headRefOid": "dd30fd1285b12ff942cc98d8a486eeac7b64f1f2",
+    "additions": 13,
+    "deletions": 2,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+        "additions": 13,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 521022,
+    "title": "nixos/opensnitch: remove IFD",
+    "state": "MERGED",
+    "mergedAt": "2026-05-17T16:13:38Z",
+    "baseRefOid": "45162c4a6982c7f95c9c01d9964ef7c7faf84c07",
+    "headRefOid": "ab474d84bcc7f0dc33ca4fe9783de7c9e382b4e7",
+    "additions": 40,
+    "deletions": 85,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/security/opensnitch.nix",
+        "additions": 38,
+        "deletions": 85,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 480468,
+    "title": "nixos/mediawiki: Fix support for SQLite (#266761)",
+    "state": "MERGED",
+    "mergedAt": "2026-03-01T04:12:08Z",
+    "baseRefOid": "5571d2bb61a577ac18a8914a8e88edc71b2d0b5f",
+    "headRefOid": "e034c48ed000c4d9c4dcd759a7e108eb80170992",
+    "additions": 217,
+    "deletions": 137,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/web-apps/mediawiki.nix",
+        "additions": 202,
+        "deletions": 137,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/mediawiki.nix",
+        "additions": 15,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 480839,
+    "title": "nvidia-container-toolkit: add disable-hooks and enable-hooks options",
+    "state": "MERGED",
+    "mergedAt": "2026-01-20T19:28:54Z",
+    "baseRefOid": "247bdd36b122075f4b091b8d5557f4bc808ce53e",
+    "headRefOid": "0420b1de9dff7e2791418e88dc43218d860c2447",
+    "additions": 26,
+    "deletions": 1,
+    "changedFiles": 2,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/cdi-generate.nix",
+        "additions": 4,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix",
+        "additions": 22,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 476945,
+    "title": "mullvad, nixos/mullvad-vpn: Match upstream config",
+    "state": "MERGED",
+    "mergedAt": "2026-02-12T22:43:24Z",
+    "baseRefOid": "c9bea9736722ea85b119431044a6618f62bf5e0f",
+    "headRefOid": "c001f7763cb504886e16bf50875134c8518c41cb",
+    "additions": 30,
+    "deletions": 140,
+    "changedFiles": 4,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/mullvad-vpn.nix",
+        "additions": 30,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/networking/mullvad/default.nix",
+        "additions": 0,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/networking/mullvad/mullvad.nix",
+        "additions": 0,
+        "deletions": 23,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/applications/networking/mullvad/openvpn.nix",
+        "additions": 0,
+        "deletions": 115,
+        "changeType": "DELETED"
+      }
+    ]
+  },
+  {
+    "number": 512159,
+    "title": "reframe: init at 1.15.1, nixos/reframe: init",
+    "state": "MERGED",
+    "mergedAt": "2026-04-23T23:51:31Z",
+    "baseRefOid": "073365fe115ec67e43a715508fea31eafcaab7a5",
+    "headRefOid": "98831cfb6d67d9e11dbf89b7ab573f75fc906e6e",
+    "additions": 285,
+    "deletions": 0,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/doc/manual/release-notes/rl-2605.section.md",
+        "additions": 2,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/modules/services/networking/reframe.nix",
+        "additions": 190,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/by-name/re/reframe/package.nix",
+        "additions": 93,
+        "deletions": 0,
+        "changeType": "ADDED"
+      }
+    ]
+  },
+  {
+    "number": 446440,
+    "title": "nixos/factorio: add extraArgs option",
+    "state": "MERGED",
+    "mergedAt": "2025-10-18T21:57:09Z",
+    "baseRefOid": "e318417e454122c5e42c4eee7cf4d901f8aec285",
+    "headRefOid": "6b3460f0b10f00b64ebaf9227ded719654771145",
+    "additions": 10,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/games/factorio.nix",
+        "additions": 10,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 448271,
+    "title": "nixos/serviio: add option to open firewall ports",
+    "state": "MERGED",
+    "mergedAt": "2025-10-09T05:17:34Z",
+    "baseRefOid": "228ba700480f031a19b3f0923a6669e79716a0fa",
+    "headRefOid": "4f67d0e4f84264df6afe634503373b8562d2a48a",
+    "additions": 9,
+    "deletions": 1,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/serviio.nix",
+        "additions": 9,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 445279,
+    "title": "nixos/newt: declarative resource management",
+    "state": "MERGED",
+    "mergedAt": "2026-02-09T05:18:02Z",
+    "baseRefOid": "c0f00d16c4309cc76169393bb334e6b48732be01",
+    "headRefOid": "17315e63f896338cdd77a4a0539f79eb66c62143",
+    "additions": 28,
+    "deletions": 3,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/newt.nix",
+        "additions": 28,
+        "deletions": 3,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 433539,
+    "title": "nixos/frigate: Add preCheckConfig",
+    "state": "MERGED",
+    "mergedAt": "2025-12-13T12:22:20Z",
+    "baseRefOid": "3113e10e801b36aa9eeba3f815975bf5c788ee34",
+    "headRefOid": "b153fe260e0147bf8f31347619f8625161de2ff7",
+    "additions": 11,
+    "deletions": 0,
+    "changedFiles": 1,
+    "files": [
+      {
+        "path": "nixos/modules/services/video/frigate.nix",
+        "additions": 11,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 446006,
+    "title": "angrr: 0.1.1 -> 0.1.3",
+    "state": "MERGED",
+    "mergedAt": "2025-11-26T14:19:44Z",
+    "baseRefOid": "fafe4b8d9ffdee81b1fbeccff1ab6549eb3211dd",
+    "headRefOid": "c45673a6235dbf9881b9c67f1d0a1ba044c91796",
+    "additions": 56,
+    "deletions": 4,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/misc/angrr.nix",
+        "additions": 24,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/angrr.nix",
+        "additions": 25,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/an/angrr/package.nix",
+        "additions": 7,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 488515,
+    "title": "harmonia: 2.1.0 -> 3.0.0",
+    "state": "MERGED",
+    "mergedAt": "2026-03-05T20:01:47Z",
+    "baseRefOid": "917fec990948658ef1ccd07cef2a1ef060786846",
+    "headRefOid": "b5a97873d917d0ef43b2d13eba6a72bb38c2a3cd",
+    "additions": 262,
+    "deletions": 92,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/networking/harmonia.nix",
+        "additions": 255,
+        "deletions": 86,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "nixos/tests/harmonia.nix",
+        "additions": 2,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/ha/harmonia/package.nix",
+        "additions": 5,
+        "deletions": 4,
+        "changeType": "MODIFIED"
+      }
+    ]
+  },
+  {
+    "number": 475894,
+    "title": "tlp-pd: init at 1.9.0",
+    "state": "MERGED",
+    "mergedAt": "2026-01-01T16:23:34Z",
+    "baseRefOid": "0fdc9a3016b428f7051d88983b8746d13f7a8025",
+    "headRefOid": "748054a6257f89c4ad1618fc5df112c6b555de65",
+    "additions": 99,
+    "deletions": 2,
+    "changedFiles": 3,
+    "files": [
+      {
+        "path": "nixos/modules/services/hardware/tlp.nix",
+        "additions": 32,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "pkgs/by-name/tl/tlp-pd/package.nix",
+        "additions": 60,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": "pkgs/tools/misc/tlp/default.nix",
+        "additions": 7,
+        "deletions": 0,
+        "changeType": "MODIFIED"
+      }
+    ]
+  }
+]

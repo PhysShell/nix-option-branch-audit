@@ -51,3 +51,11 @@ jobs:
             echo "::error::historical-labels.jsonl is not reproducible from the S4 ledger -- regenerate and commit"
             exit 1
           }
+      - name: Production selector hostile + isolation tests
+        run: |
+          python3 fixtures/s5-design/selector/test_production_selector.py
+          python3 fixtures/s5-design/selector/test_selector_isolation.py
+      - name: S5 protocol machinery self-tests
+        run: python3 fixtures/s5-design/test_s5_protocol_machinery.py
+      - name: Reproduce S5-A/S5-B frozen orders from committed population data (offline, no network)
+        run: python3 fixtures/s5-design/reproduce-s5-freeze.py

@@ -1,0 +1,16 @@
+{
+  "fetch_started_at": "2026-09-22T22:06:15.670799+00:00",
+  "fetch_finished_at": "2026-09-22T22:45:55.895806+00:00",
+  "window_start": "2026-06-01T00:00:00Z",
+  "window_end": "2026-09-22T23:59:59Z",
+  "paths": [
+    "nixos/modules/services",
+    "nixos/tests"
+  ],
+  "exclusion_set_size": 317,
+  "distinct_commit_shas": 2109,
+  "distinct_pr_numbers_pre_exclusion": 809,
+  "dropped_by_pr_number_exclusion": 317,
+  "candidates_fetched_detail_for": 492,
+  "raw_records_written": 492
+}

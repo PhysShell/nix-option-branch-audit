@@ -1,14 +1,12 @@
 {
-  "pr": 538141,
-  "selected_by": "R7_compound_transparent_score-v1",
+  "pr": 511721,
+  "selected_by": "R4_mkoption_line_edit_v1",
   "features": {
-    "option_declaration_changed": true,
-    "test_assignment_changed": false,
-    "predicate_logic_changed": true
+    "mkoption_edit_count": 1,
+    "mkenableoption_edit_count": 0
   },
-  "score": 4,
+  "score": 1,
   "reasons": [
-    "+2 option_declaration_changed",
-    "+2 predicate_logic_changed"
+    "mkoption_edit_count=1"
   ]
 }

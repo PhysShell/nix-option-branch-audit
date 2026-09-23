@@ -168,21 +168,21 @@
   "volume_planning_not_a_guarantee": [
     {
       "rule": "R1_module_and_test_cochange",
-      "historical_yield_per_selected_pr": 0.0909,
+      "historical_actionable_prs_per_selected_pr": 0.0909,
       "historical_selection_rate": 0.1176,
       "targets": [
         {
-          "actionable_target": 20,
+          "distinct_actionable_pr_target": 20,
           "selected_prs_needed_approx": 220.0,
           "candidate_prs_needed_approx": 1871
         },
         {
-          "actionable_target": 30,
+          "distinct_actionable_pr_target": 30,
           "selected_prs_needed_approx": 330.0,
           "candidate_prs_needed_approx": 2806
         },
         {
-          "actionable_target": 40,
+          "distinct_actionable_pr_target": 40,
           "selected_prs_needed_approx": 440.0,
           "candidate_prs_needed_approx": 3742
         }
@@ -190,21 +190,21 @@
     },
     {
       "rule": "R2_option_declaration_and_test_change",
-      "historical_yield_per_selected_pr": 0.0,
+      "historical_actionable_prs_per_selected_pr": 0.0,
       "historical_selection_rate": 0.016,
       "targets": [
         {
-          "actionable_target": 20,
+          "distinct_actionable_pr_target": 20,
           "selected_prs_needed_approx": null,
           "candidate_prs_needed_approx": null
         },
         {
-          "actionable_target": 30,
+          "distinct_actionable_pr_target": 30,
           "selected_prs_needed_approx": null,
           "candidate_prs_needed_approx": null
         },
         {
-          "actionable_target": 40,
+          "distinct_actionable_pr_target": 40,
           "selected_prs_needed_approx": null,
           "candidate_prs_needed_approx": null
         }
@@ -212,65 +212,65 @@
     },
     {
       "rule": "R3_predicate_change_and_test_change",
-      "historical_yield_per_selected_pr": 0.1111,
+      "historical_actionable_prs_per_selected_pr": 0.1111,
       "historical_selection_rate": 0.0481,
       "targets": [
         {
-          "actionable_target": 20,
+          "distinct_actionable_pr_target": 20,
           "selected_prs_needed_approx": 180.0,
           "candidate_prs_needed_approx": 3743
         },
         {
-          "actionable_target": 30,
+          "distinct_actionable_pr_target": 30,
           "selected_prs_needed_approx": 270.0,
           "candidate_prs_needed_approx": 5614
         },
         {
-          "actionable_target": 40,
+          "distinct_actionable_pr_target": 40,
           "selected_prs_needed_approx": 360.0,
           "candidate_prs_needed_approx": 7485
         }
       ]
     },
     {
-      "rule": "R4_option_lifecycle",
-      "historical_yield_per_selected_pr": 0.2647,
+      "rule": "R4_mkoption_line_edit_v1",
+      "historical_actionable_prs_per_selected_pr": 0.1765,
       "historical_selection_rate": 0.1818,
       "targets": [
         {
-          "actionable_target": 20,
-          "selected_prs_needed_approx": 75.6,
-          "candidate_prs_needed_approx": 416
-        },
-        {
-          "actionable_target": 30,
+          "distinct_actionable_pr_target": 20,
           "selected_prs_needed_approx": 113.3,
           "candidate_prs_needed_approx": 623
         },
         {
-          "actionable_target": 40,
-          "selected_prs_needed_approx": 151.1,
-          "candidate_prs_needed_approx": 831
+          "distinct_actionable_pr_target": 30,
+          "selected_prs_needed_approx": 170.0,
+          "candidate_prs_needed_approx": 935
+        },
+        {
+          "distinct_actionable_pr_target": 40,
+          "selected_prs_needed_approx": 226.6,
+          "candidate_prs_needed_approx": 1247
         }
       ]
     },
     {
       "rule": "R5_module_lifecycle",
-      "historical_yield_per_selected_pr": 0.5,
+      "historical_actionable_prs_per_selected_pr": 0.5,
       "historical_selection_rate": 0.0107,
       "targets": [
         {
-          "actionable_target": 20,
+          "distinct_actionable_pr_target": 20,
           "selected_prs_needed_approx": 40.0,
           "candidate_prs_needed_approx": 3738
         },
         {
-          "actionable_target": 30,
+          "distinct_actionable_pr_target": 30,
           "selected_prs_needed_approx": 60.0,
           "candidate_prs_needed_approx": 5607
         },
         {
-          "actionable_target": 40,
+          "distinct_actionable_pr_target": 40,
           "selected_prs_needed_approx": 80.0,
           "candidate_prs_needed_approx": 7477
         }
@@ -278,47 +278,58 @@
     },
     {
       "rule": "R6_branch_relevant_configuration_change",
-      "historical_yield_per_selected_pr": 0.1324,
+      "historical_actionable_prs_per_selected_pr": 0.0882,
       "historical_selection_rate": 0.3636,
       "targets": [
         {
-          "actionable_target": 20,
-          "selected_prs_needed_approx": 151.1,
-          "candidate_prs_needed_approx": 415
+          "distinct_actionable_pr_target": 20,
+          "selected_prs_needed_approx": 226.8,
+          "candidate_prs_needed_approx": 624
         },
         {
-          "actionable_target": 30,
-          "selected_prs_needed_approx": 226.6,
-          "candidate_prs_needed_approx": 623
+          "distinct_actionable_pr_target": 30,
+          "selected_prs_needed_approx": 340.1,
+          "candidate_prs_needed_approx": 935
         },
         {
-          "actionable_target": 40,
-          "selected_prs_needed_approx": 302.1,
-          "candidate_prs_needed_approx": 831
+          "distinct_actionable_pr_target": 40,
+          "selected_prs_needed_approx": 453.5,
+          "candidate_prs_needed_approx": 1247
         }
       ]
     },
     {
       "rule": "R7_compound_transparent_score",
-      "historical_yield_per_selected_pr": 0.32,
+      "historical_actionable_prs_per_selected_pr": 0.2,
       "historical_selection_rate": 0.1337,
       "targets": [
         {
-          "actionable_target": 20,
-          "selected_prs_needed_approx": 62.5,
-          "candidate_prs_needed_approx": 467
+          "distinct_actionable_pr_target": 20,
+          "selected_prs_needed_approx": 100.0,
+          "candidate_prs_needed_approx": 748
         },
         {
-          "actionable_target": 30,
-          "selected_prs_needed_approx": 93.8,
-          "candidate_prs_needed_approx": 701
+          "distinct_actionable_pr_target": 30,
+          "selected_prs_needed_approx": 150.0,
+          "candidate_prs_needed_approx": 1122
         },
         {
-          "actionable_target": 40,
-          "selected_prs_needed_approx": 125.0,
-          "candidate_prs_needed_approx": 935
+          "distinct_actionable_pr_target": 40,
+          "selected_prs_needed_approx": 200.0,
+          "candidate_prs_needed_approx": 1496
         }
       ]
     }
-  ]
+  ],
+  "s5b_selected_pr_cap_planning": {
+    "assumed_yield_rate_source": "R4_mkoption_line_edit_v1 whole-S4-corpus actionable_prs_per_selected_pr",
+    "assumed_yield_rate": 0.1765,
+    "distinct_actionable_pr_target": 30,
+    "target_probability_of_reaching_target": 0.95,
+    "mechanically_derived_minimum_cap": 219,
+    "p_reach_target_at_derived_cap": 0.9514,
+    "expected_actionable_prs_at_derived_cap": 38.7,
+    "p_reach_target_at_cap_220_for_reference": 0.9543,
+    "note": "IID planning approximation only, not a gate input. The real S5-B stopping rule stops on volume only at 30 distinct actionable PRs or this frozen cap, whichever comes first; correctness never affects stopping."
+  }
 }
