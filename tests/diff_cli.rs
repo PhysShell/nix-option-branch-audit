@@ -329,7 +329,15 @@ fn real_angrr_pr471312_false_unchanged_is_now_a_real_verdict_change() {
 /// "temporaryRootPolicyOptions", ...). A real top-level `widgetTimeout`
 /// is removed; an unrelated, newly-introduced `widgetTimeout` survives
 /// nested inside a named `let`-bound `unrelatedHelperOptions` submodule
-/// that has nothing to do with `option_prefix`.
+/// that has nothing to do with `option_prefix` -- genuinely unrelated,
+/// like angrr's real `temporaryRootPolicyOptions`, meaning it is NEVER
+/// referenced by any real, `option_prefix`-anchored declaration's own
+/// `type =` field (S5-F1B revision: a named submodule that IS so
+/// referenced -- prosody's `mucOpts`, drupal's `siteOpts`, fedimintd's
+/// `fedimintdOpts` shape -- is legitimate and must be included; only a
+/// truly orphaned one like this stays excluded). `profiles` here uses
+/// an unrelated, differently-shaped inline submodule instead, so
+/// `unrelatedHelperOptions` has no real referrer anywhere in the file.
 #[test]
 fn synthetic_generic_collision_removed_field_plus_unrelated_survivor_is_not_unchanged() {
     let base_dir = std::env::temp_dir().join("oba-f1-generic-collision-base");
@@ -380,7 +388,14 @@ fn synthetic_generic_collision_removed_field_plus_unrelated_survivor_is_not_unch
           options.services.widget = {
             enable = lib.mkEnableOption "widget";
             profiles = lib.mkOption {
-              type = lib.types.attrsOf (lib.types.submodule unrelatedHelperOptions);
+              type = lib.types.attrsOf (lib.types.submodule {
+                options = {
+                  label = lib.mkOption {
+                    type = lib.types.str;
+                    default = "";
+                  };
+                };
+              });
               default = { };
             };
           };

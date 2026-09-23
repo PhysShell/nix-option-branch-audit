@@ -724,7 +724,31 @@ fn scan_options(
     option_prefix: &[String],
 ) -> Vec<OptionDecl> {
     let mut out = Vec::new();
+    let mut referenced: std::collections::HashSet<rowan::TextRange> = std::collections::HashSet::new();
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
+
+    // S5-F1B: named `let`/`rec`-bound `options = {...}` candidates found
+    // during the pass below are DEFERRED here rather than decided
+    // immediately -- the provenance check that decides them (do they
+    // appear in `referenced`, built from real declarations' own `type =`
+    // fields?) needs the REST of this same pass's real declarations to
+    // have been discovered first, and F needs the answer to be the same
+    // regardless of source order (declaration order must never matter --
+    // see the order-independence hostile control). Each entry is the
+    // real `value` node (the options block's own RHS attrset/merge) plus
+    // the `NODE_ATTRPATH_VALUE` node used to look up its enclosing named
+    // binding for the provenance check.
+    let mut deferred: Vec<(SyntaxNode, SyntaxNode)> = Vec::new();
+
+    // --- Pass 1: walk every TRUE root immediately (flat-dotted match,
+    // or the nested-form root that is NOT itself inside a tracked
+    // `mkOption` call and NOT itself inside a named `let`/`rec` binding
+    // -- i.e. the module's own real top-level options, exactly as
+    // before F1/F1B ever existed for this case), collecting real
+    // declarations AND, via `walk_options_block`'s own new provenance
+    // hook, which named bindings those real declarations' `type =`
+    // fields genuinely reference. Named-binding candidates are deferred,
+    // never decided here. ---
     for node in root.descendants() {
         if node.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -759,49 +783,31 @@ fn scan_options(
             // nested submodule, and `walk_options_block`'s own recursion
             // (below, inside the `is_mk_option_call` branch) now finds
             // and walks it with the correct, extended path. Processing
-            // it AGAIN here, from a fresh empty path, is exactly the bug
-            // this fix closes: a same-named leaf anywhere inside that
-            // submodule (`enable`, `host`, `port`, ...) would silently
-            // collide with an unrelated option of the same bare name
-            // elsewhere in the file, and `run_target`'s gate-1 lookup
-            // (`options.iter().find(|o| o.path == watched_path)`) has no
-            // way to tell the two apart -- a real, demonstrated
-            // false-positive-CAPABLE bug (see
-            // `fixtures/synthetic/h2-nested-submodule-collision/`),
-            // found by the E1 holdout audit on real, unfamiliar code
-            // (`xandikos`), not a hypothetical. Kimai's own `siteOpts`
-            // submodule is unaffected: it's a plain `let`-bound function
-            // value, referenced only by NAME (`types.submodule
-            // siteOpts`) elsewhere, never itself inside an `mkOption
-            // {...}` call -- `is_nested_inside_mk_option_call` correctly
-            // returns `false` for it, so it keeps being walked from a
-            // fresh empty path exactly as before this fix.
-            //
-            // S5-F1 fix: the SAME bare-name-collision risk this comment
-            // already names ("would silently collide with an unrelated
-            // option of the same bare name elsewhere in the file") was
-            // left open for exactly this kimai-siteOpts SHAPE (a named
-            // `let`/`rec` binding, never itself inside an `mkOption`
-            // call) -- and a real instance was later found in angrr PR
-            // #471312 (S5's own confirmed false "Unchanged" on a real
-            // breaking removal): `temporaryRootPolicyOptions.options.period`,
-            // a brand-new, unrelated option several structural levels
-            // deep inside a named `let`-bound submodule, bare-recorded
-            // as `["period"]` and silently matched against the real,
-            // removed, concretely-`option_prefix`-anchored top-level
-            // `services.angrr.period`. `is_nested_inside_named_let_or_rec_binding`
-            // closes this, but ONLY when `option_prefix` is concrete --
-            // kimai's own wildcard prefix keeps relying on bare-recorded
-            // siteOpts declarations exactly as before (see that
-            // function's own doc comment for why gating on
-            // `prefix_is_concrete` is required, not optional, here).
-            if is_nested_inside_mk_option_call(&node)
-                || (prefix_is_concrete && is_nested_inside_named_let_or_rec_binding(&node))
-            {
+            // it AGAIN here, from a fresh empty path, would silently
+            // collide a same-named leaf inside that submodule with an
+            // unrelated option of the same bare name elsewhere in the
+            // file (`fixtures/synthetic/h2-nested-submodule-collision/`,
+            // a real E1 holdout finding).
+            if is_nested_inside_mk_option_call(&node) {
+                continue;
+            }
+            // S5-F1B: a named `let`/`rec` binding (kimai's `siteOpts`,
+            // angrr's `temporaryRootPolicyOptions`, prosody's `mucOpts`,
+            // drupal's `siteOpts`, fedimintd's `fedimintdOpts` -- all
+            // this exact shape) is deferred to the provenance-checked
+            // second pass below, under a concrete `option_prefix`
+            // (matching `option_prefix_relative_path`'s own established
+            // `prefix_is_concrete` gate; a wildcard prefix keeps relying
+            // on bare-recorded named-binding declarations exactly as
+            // before, unconditionally -- see
+            // `is_nested_inside_named_let_or_rec_binding`'s own doc
+            // comment for why kimai's own siteOpts needs this).
+            if prefix_is_concrete && is_nested_inside_named_let_or_rec_binding(&node) {
+                deferred.push((value, node));
                 continue;
             }
             walk_merge_operands(&value, |attrset| {
-                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix);
+                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix, &mut referenced);
             });
             continue;
         }
@@ -816,10 +822,62 @@ fn scan_options(
                 .unwrap_or(false)
         {
             walk_merge_operands(&value, |attrset| {
-                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix);
+                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix, &mut referenced);
             });
         }
     }
+
+    // --- Pass 2: promote any deferred named-binding candidate whose own
+    // enclosing binding is genuinely referenced by a TRUE-ROOT
+    // declaration's own `type =` field -- `referenced` is frozen here,
+    // exactly as Pass 1 left it. This is deliberately a SINGLE pass, not
+    // a fixpoint: a promoted candidate's own declarations are walked
+    // with a throwaway, discarded reference set (`&mut
+    // std::collections::HashSet::new()` below), so anything THEY
+    // themselves reference does not cascade into promoting yet another
+    // named binding. Every real, demonstrated case (prosody's `mucOpts`,
+    // drupal's `siteOpts`, fedimintd's `fedimintdOpts`) is exactly one
+    // hop from a true-root declaration; nothing in the S5 corpus needs
+    // more. Capping at one hop is a deliberately tighter invariant than
+    // "reachable via any chain of type references": angrr's own real
+    // module has a REAL two-hop chain to its real defect
+    // (`services.angrr.settings` -> `settingsOptions` -> `temporary-root-policies`
+    // -> `temporaryRootPolicyOptions` -> the unrelated `period`) that
+    // currently only stays excluded because that second hop's own
+    // `type` field happens to be written `with lib.types; attrsOf
+    // (submodule temporaryRootPolicyOptions)` -- and `resolve_ident_binding`
+    // already, separately, refuses to resolve any identifier reached
+    // through a `with` scope. Relying on that as the ONLY thing
+    // preventing a cascade would be an accident of angrr's own coding
+    // style, not a real boundary: the semantically identical
+    // `lib.types.attrsOf (lib.types.submodule temporaryRootPolicyOptions)`
+    // (no `with`) would resolve just fine and, under an unbounded
+    // fixpoint, promote `temporaryRootPolicyOptions` too, reintroducing
+    // angrr's exact original false-"Unchanged" defect one hop deeper.
+    // Capping at one hop closes this structurally, without depending on
+    // `with`-opacity at all. A candidate never referenced by a
+    // true-root declaration has no established provenance from the
+    // watched concrete option root at all -- exactly angrr's real
+    // defect -- and stays excluded, silently, exactly as F1 already did
+    // for it. ---
+    for (value, binding_node) in deferred {
+        let is_legitimate = enclosing_named_binding_value(&binding_node)
+            .is_some_and(|binding_value| referenced.contains(&binding_value.text_range()));
+        if is_legitimate {
+            walk_merge_operands(&value, |attrset| {
+                walk_options_block(
+                    file,
+                    src,
+                    attrset,
+                    &mut Vec::new(),
+                    &mut out,
+                    option_prefix,
+                    &mut std::collections::HashSet::new(),
+                );
+            });
+        }
+    }
+
     out
 }
 
@@ -873,6 +931,7 @@ fn walk_options_block(
     path: &mut Vec<String>,
     out: &mut Vec<OptionDecl>,
     option_prefix: &[String],
+    referenced: &mut std::collections::HashSet<rowan::TextRange>,
 ) {
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
     for entry in attrset.children() {
@@ -942,14 +1001,26 @@ fn walk_options_block(
             // -- so `nginx.enable` is recorded at `["nginx","enable"]`,
             // never at the bare, collision-prone `["enable"]`.
             if let Some(nested) = find_nested_options_block(&value) {
-                walk_options_block(file, src, &nested, path, out, option_prefix);
+                walk_options_block(file, src, &nested, path, out, option_prefix, referenced);
+            }
+            // S5-F1B: this declaration is, by construction, real and
+            // already-anchored (we only ever reach here via a legitimate
+            // walk -- the true root, or an already-promoted candidate).
+            // Its own `type =` field may reference a NAMED submodule
+            // instead of (or in addition to) an inline one -- record
+            // every such reference as real provenance evidence for
+            // `scan_options`'s own second pass.
+            if matches!(helper, OptionHelperCall::Explicit) {
+                if let Some(type_expr) = mk_option_field(&value, "type") {
+                    collect_type_reference_ranges(&type_expr, referenced);
+                }
             }
         } else {
             walk_merge_operands(&value, |attrset| {
                 if at_prefix_root {
-                    walk_options_block(file, src, attrset, &mut Vec::new(), out, option_prefix);
+                    walk_options_block(file, src, attrset, &mut Vec::new(), out, option_prefix, referenced);
                 } else {
-                    walk_options_block(file, src, attrset, path, out, option_prefix);
+                    walk_options_block(file, src, attrset, path, out, option_prefix, referenced);
                 }
             });
         }
@@ -1233,6 +1304,91 @@ fn is_rec_attrset(node: &SyntaxNode) -> bool {
             .children_with_tokens()
             .filter_map(|e| e.into_token())
             .any(|t| t.kind() == TOKEN_REC)
+}
+
+/// S5-F1B fix (F1-R's own real finding: `is_nested_inside_named_let_or_rec_binding`
+/// alone is too broad a predicate -- it correctly excludes angrr's real
+/// defect, a named submodule genuinely UNRELATED to `option_prefix`,
+/// but also wrongly excludes a named submodule that IS the legitimate
+/// declaration site for a concrete `option_prefix`, just referenced by
+/// NAME rather than written inline -- the real, demonstrated regression
+/// on prosody's `mucOpts`, drupal's `siteOpts`, and fedimintd's
+/// `fedimintdOpts`, all real options declared exactly at their own
+/// target's concrete `option_prefix`, each referencing a named
+/// `let`-bound submodule via `types.(listOf|attrsOf|nullOr|...)?
+/// (types.submodule <name>)`. Syntactic nesting alone cannot
+/// distinguish these two real, demonstrated shapes; the required test
+/// is semantic: is this named binding *reachable* -- referenced by
+/// name -- from a real, already-anchored declaration's own `type =`
+/// expression?
+///
+/// Given a bare identifier reference node (anywhere inside a real
+/// option's `type =` field), returns the `TextRange` of whatever it
+/// resolves to, reusing the SAME scope-aware, shadowing-correct
+/// `resolve_ident_binding` this project already built for alias
+/// resolution elsewhere -- never a second, independent name-lookup
+/// mechanism. A reference that doesn't resolve to a real `let`/`rec`
+/// binding (a function parameter, an import, `lib`/`types` themselves,
+/// anything `resolve_ident_binding` can't or won't resolve) is simply
+/// not collected -- not an error, just not relevant provenance
+/// evidence.
+fn resolve_type_reference(ident_node: &SyntaxNode) -> Option<rowan::TextRange> {
+    let name = ident_text(ident_node)?;
+    resolve_ident_binding(ident_node, &name)
+        .ok()
+        .map(|resolved| resolved.text_range())
+}
+
+/// Scans a real, already-anchored option's own `type = ...` expression
+/// for every bare identifier reference, resolving each via
+/// `resolve_type_reference` -- the full set of named bindings this one
+/// declaration genuinely reaches through its type structure (`submodule
+/// <name>`, `listOf (submodule <name>)`, `attrsOf (submodule <name>)`,
+/// `nullOr (submodule <name>)`, or any other wrapper combinator this
+/// project hasn't specifically named, since nothing here depends on
+/// recognizing a wrapper BY NAME -- any bare identifier used anywhere
+/// inside the type expression is a candidate, exactly the "AST/type
+/// machinery establishing the relationship more generally" this fix is
+/// required to prefer over a textual wrapper-name allowlist).
+fn collect_type_reference_ranges(
+    type_expr: &SyntaxNode,
+    into: &mut std::collections::HashSet<rowan::TextRange>,
+) {
+    for node in type_expr.descendants() {
+        if node.kind() != NODE_IDENT {
+            continue;
+        }
+        if let Some(range) = resolve_type_reference(&node) {
+            into.insert(range);
+        }
+    }
+}
+
+/// Given a node inside a named `let`/`rec` binding's own value (e.g. a
+/// node somewhere inside `temporaryRootPolicyOptions`'s or `mucOpts`'s
+/// own `options = {...}` block), finds that ENCLOSING binding's own
+/// VALUE node -- the exact same node `resolve_ident_binding` returns
+/// for a reference to that binding's name elsewhere in the file, so its
+/// `TextRange` can be looked up directly in a set built by
+/// `collect_type_reference_ranges`. `None` if `node` isn't actually
+/// inside a named `let`/`rec` binding at all (a caller bug, since this
+/// is only ever called on nodes `is_nested_inside_named_let_or_rec_binding`
+/// already confirmed `true` for).
+fn enclosing_named_binding_value(node: &SyntaxNode) -> Option<SyntaxNode> {
+    for ancestor in node.ancestors().skip(1) {
+        if ancestor.kind() != NODE_ATTRPATH_VALUE {
+            continue;
+        }
+        let Some(parent) = ancestor.parent() else {
+            continue;
+        };
+        if parent.kind() == NODE_LET_IN || is_rec_attrset(&parent) {
+            let mut children = ancestor.children();
+            let _attrpath = children.next();
+            return children.next();
+        }
+    }
+    None
 }
 
 /// E1/GAP-4 fix. Finds a `types.submodule { options = {...}; }`-shaped
@@ -7449,15 +7605,145 @@ mod tests {
     // the full causal chain into `compare()`'s false "Unchanged".
 
     #[test]
-    fn scan_options_excludes_ambiguous_same_named_leaves_in_unrelated_named_let_bindings() {
-        // Hostile controls (a) same terminal field name under unrelated
-        // parents, and (e) ambiguous candidate correspondence, combined:
-        // TWO different named let-bound submodules (neither is the
-        // module's own top-level root) both declare a leaf called
-        // "shared_leaf" -- NEITHER may satisfy a bare watch for it, not
-        // even "first one wins". The module's own real top-level
-        // "shared_leaf" (present here too, to prove the fix doesn't
-        // over-exclude the true root) must still be found correctly.
+    fn scan_options_excludes_unrelated_but_includes_legitimately_referenced_named_let_bindings() {
+        // S5-F1B revision of this test (F1-R's own finding: a named
+        // `let`-bound submodule that IS referenced by a real,
+        // `option_prefix`-anchored declaration's own `type =` field --
+        // prosody's `mucOpts`, drupal's `siteOpts`, fedimintd's
+        // `fedimintdOpts` shape -- must be INCLUDED, not excluded; only a
+        // named binding with NO such provenance, like angrr's real
+        // `temporaryRootPolicyOptions`, stays excluded). This fixture
+        // combines both in one file: hostile control (a), same terminal
+        // field name under an UNRELATED parent (helperA, never
+        // referenced by any real option's `type =`) must still be
+        // excluded; a DIFFERENTLY-named leaf under a LEGITIMATELY
+        // referenced parent (helperB, referenced by profilesB's own
+        // `type = attrsOf (submodule helperB)`) must be included. The
+        // module's own real top-level "shared_leaf" must survive
+        // untouched either way.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              helperA = {
+                options = {
+                  shared_leaf = lib.mkOption { default = "from-A"; };
+                };
+              };
+              helperB = {
+                options = {
+                  helper_b_leaf = lib.mkOption { default = "from-B"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                shared_leaf = lib.mkOption { default = "from-top-level"; };
+                profilesB = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperB);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+
+        let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
+        assert_eq!(
+            shared_leaf_matches.len(),
+            1,
+            "helperA is genuinely unrelated (never referenced by any real option's type =) and \
+             must stay excluded -- only the true top-level shared_leaf may survive; got {opts:?}"
+        );
+        assert_eq!(
+            shared_leaf_matches[0].default_source.as_deref(),
+            Some("\"from-top-level\""),
+            "the surviving shared_leaf candidate must be the real top-level declaration"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["helper_b_leaf"])
+                && o.default_source.as_deref() == Some("\"from-B\"")),
+            "helperB IS legitimately referenced (profilesB's own type = attrsOf (submodule helperB), \
+             anchored exactly at option_prefix) and must be included, bare-recorded exactly as the \
+             true top-level's own leaves are; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_named_let_binding_provenance_is_order_independent() {
+        // Hostile control (f): reordered siblings / irrelevant nearby
+        // changes -- the same fixture as above, but with both let-bound
+        // helpers declared BEFORE their own use-sites, the legitimate
+        // reference (profilesB) declared AFTER the unrelated helper's
+        // own use-site would be (were there one), and an extra
+        // irrelevant option interleaved -- must produce the same result
+        // regardless of source order. This also exercises Pass 2's own
+        // order-independence (S5-F1B's own promotion pass reads
+        // `referenced` only after Pass 1 has fully settled, so the
+        // relative order of `deferred` entries cannot matter), not just
+        // F1's original single-pass exclusion order-independence.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              helperB = {
+                options = {
+                  helper_b_leaf = lib.mkOption { default = "from-B"; };
+                };
+              };
+              helperA = {
+                options = {
+                  shared_leaf = lib.mkOption { default = "from-A"; };
+                };
+              };
+              cfg = config.services.widget;
+              unrelatedThing = "irrelevant nearby change";
+            in
+            {
+              options.services.widget = {
+                profilesB = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperB);
+                  default = { };
+                };
+                enable = lib.mkEnableOption "widget";
+                shared_leaf = lib.mkOption { default = "from-top-level"; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
+        assert_eq!(shared_leaf_matches.len(), 1, "reordering must not change the result; got {opts:?}");
+        assert_eq!(shared_leaf_matches[0].default_source.as_deref(), Some("\"from-top-level\""));
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["helper_b_leaf"])),
+            "reordering must not change whether the legitimately-referenced helper is included; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_two_legitimately_referenced_named_bindings_sharing_a_leaf_name_is_a_disclosed_limitation() {
+        // Hostile control (e), ambiguous candidate correspondence -- NOT
+        // demonstrated anywhere in the real S5 corpus (every real
+        // prosody/drupal/fedimintd regression has exactly one legitimate
+        // named submodule per colliding leaf), but constructible: if TWO
+        // DIFFERENT named submodules are BOTH legitimately referenced
+        // (each by its own real, option_prefix-anchored option) and
+        // BOTH happen to declare a leaf with the same name, `scan_options`
+        // records all of them bare -- it does not itself deduplicate or
+        // flag the collision. This is disclosed here deliberately rather
+        // than silently assumed away: `run_target`'s own gate-1 lookup
+        // (`options.iter().find(...)`, unmodified by S5-F1 or S5-F1B)
+        // picks whichever is first in `out`'s own vector order, exactly
+        // its pre-existing behavior for any other kind of duplicate path.
+        // Resolving this ambiguity with an explicit inconclusive signal,
+        // rather than a silent first-match, is a real but SEPARATE
+        // architectural question from S5-F1B's own narrow mandate (fix
+        // the over-exclusion F1-R found), and is not addressed here.
         let src = r#"
             { config, lib, ... }:
             let
@@ -7491,63 +7777,36 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-
         let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
         assert_eq!(
             shared_leaf_matches.len(),
-            1,
-            "exactly one shared_leaf candidate must remain -- the true top-level one, \
-             neither helperA's nor helperB's; got {opts:?}"
+            3,
+            "both helperA and helperB are legitimately referenced (profilesA/profilesB's own \
+             type = attrsOf (submodule helperA/helperB), each anchored exactly at option_prefix) \
+             and are correctly included -- all three same-named candidates (top-level, helperA, \
+             helperB) are recorded; this test documents that scan_options does not itself \
+             disambiguate them, it is not a claim that this is fully resolved; got {opts:?}"
         );
-        assert_eq!(
-            shared_leaf_matches[0].default_source.as_deref(),
-            Some("\"from-top-level\""),
-            "the surviving candidate must be the real top-level declaration, not either helper's"
-        );
-    }
-
-    #[test]
-    fn scan_options_named_let_binding_exclusion_is_order_independent() {
-        // Hostile control (f): reordered siblings / irrelevant nearby
-        // changes -- the same fixture as above, but with the let-bound
-        // helper declared BEFORE its own use-site's sibling option, and
-        // an extra irrelevant option interleaved, must produce the same
-        // result.
-        let src = r#"
-            { config, lib, ... }:
-            let
-              helperA = {
-                options = {
-                  shared_leaf = lib.mkOption { default = "from-A"; };
-                };
-              };
-              cfg = config.services.widget;
-              unrelatedThing = "irrelevant nearby change";
-            in
-            {
-              options.services.widget = {
-                profilesA = lib.mkOption {
-                  type = lib.types.attrsOf (lib.types.submodule helperA);
-                  default = { };
-                };
-                enable = lib.mkEnableOption "widget";
-                shared_leaf = lib.mkOption { default = "from-top-level"; };
-              };
-            }
-        "#;
-        let root = rnix::Root::parse(src);
-        assert!(root.errors().is_empty());
-        let prefix = vec!["services".to_string(), "widget".to_string()];
-        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
-        assert_eq!(shared_leaf_matches.len(), 1, "reordering must not change the result; got {opts:?}");
-        assert_eq!(shared_leaf_matches[0].default_source.as_deref(), Some("\"from-top-level\""));
     }
 
     #[test]
     fn scan_options_rec_bound_submodule_leaf_is_also_excluded_from_concrete_prefix_match() {
         // The `rec { ... }` sibling of the `let ... in` case -- same
-        // named-binding shape, different Nix scoping construct.
+        // named-binding shape, different Nix scoping construct. Unlike
+        // the `let`-bound sibling tests above, this fixture's helperA
+        // (referenced by profilesA's own type = attrsOf (submodule
+        // helperA), otherwise identical to the legitimate case) is
+        // NOT promoted under S5-F1B either -- not because the
+        // provenance check treats rec differently, but because
+        // `resolve_ident_binding` itself already, deliberately, refuses
+        // to resolve any name bound inside a `rec {...}` attrset
+        // (`ResolveFailure::UnsupportedScope("rec attrset")`, pre-dating
+        // both F1 and F1B), so `collect_type_reference_ranges` never
+        // records this reference at all -- a conservative, disclosed,
+        // fail-closed gap: a real nixpkgs module using `rec {}` for this
+        // exact shape would still be over-excluded by this fix, exactly
+        // as it was pre-F1B. Not demonstrated in the real S5 corpus
+        // (prosody/drupal/fedimintd all use `let ... in` for this).
         let src = r#"
             { config, lib, ... }:
             let
