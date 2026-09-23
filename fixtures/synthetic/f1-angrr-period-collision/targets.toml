@@ -1,0 +1,21 @@
+# S5-F1 regression reproducer: real NixOS/nixpkgs PR #471312
+# ("angrr: 0.1.5 -> 0.2.0"), base ca696276378b844d888872c9045d89e9b58cc85a
+# -> head 62ea5b9ae7d4329475089f60232ee1426d9547a9 -- S5's own confirmed
+# false "Unchanged" on a real breaking removal (see
+# fixtures/s5-live-pr-shadow/s5-confirmed-defects.md, defect 2). Real
+# module/test content fetched verbatim from GitHub at those exact SHAs,
+# unedited. Before the fix: reports "Unchanged" (PredicateNotFound on
+# both sides). After the fix: reports a real VerdictChanged
+# (PredicateNotFound -> OptionNotFound), since the real top-level
+# services.angrr.period was genuinely removed via mkRemovedOptionModule
+# and the unrelated services.angrr.settings.temporary-root-policies.
+# <name>.period (a brand-new, structurally distinct option nested
+# inside a named let-bound submodule, temporaryRootPolicyOptions) no
+# longer falsely satisfies the bare "period" watch.
+[[target]]
+name = "angrr"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "angrr"]
+watch = ["period"]

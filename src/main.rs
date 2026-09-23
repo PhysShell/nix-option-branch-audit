@@ -776,7 +776,28 @@ fn scan_options(
             // {...}` call -- `is_nested_inside_mk_option_call` correctly
             // returns `false` for it, so it keeps being walked from a
             // fresh empty path exactly as before this fix.
-            if is_nested_inside_mk_option_call(&node) {
+            //
+            // S5-F1 fix: the SAME bare-name-collision risk this comment
+            // already names ("would silently collide with an unrelated
+            // option of the same bare name elsewhere in the file") was
+            // left open for exactly this kimai-siteOpts SHAPE (a named
+            // `let`/`rec` binding, never itself inside an `mkOption`
+            // call) -- and a real instance was later found in angrr PR
+            // #471312 (S5's own confirmed false "Unchanged" on a real
+            // breaking removal): `temporaryRootPolicyOptions.options.period`,
+            // a brand-new, unrelated option several structural levels
+            // deep inside a named `let`-bound submodule, bare-recorded
+            // as `["period"]` and silently matched against the real,
+            // removed, concretely-`option_prefix`-anchored top-level
+            // `services.angrr.period`. `is_nested_inside_named_let_or_rec_binding`
+            // closes this, but ONLY when `option_prefix` is concrete --
+            // kimai's own wildcard prefix keeps relying on bare-recorded
+            // siteOpts declarations exactly as before (see that
+            // function's own doc comment for why gating on
+            // `prefix_is_concrete` is required, not optional, here).
+            if is_nested_inside_mk_option_call(&node)
+                || (prefix_is_concrete && is_nested_inside_named_let_or_rec_binding(&node))
+            {
                 continue;
             }
             walk_merge_operands(&value, |attrset| {
@@ -1131,6 +1152,87 @@ fn is_nested_inside_mk_option_call(node: &SyntaxNode) -> bool {
     node.ancestors()
         .skip(1)
         .any(|a| a.kind() == NODE_APPLY && is_mk_option_call(&a))
+}
+
+/// S5-F1 fix (real angrr PR #471312 defect, S5's own confirmed false
+/// "Unchanged" on a real breaking removal -- see
+/// `fixtures/s5-live-pr-shadow/s5-confirmed-defects.md`). An `options =
+/// {...}` block reached by walking UP through a NAMED `let`/`rec`
+/// binding's own value (e.g. angrr's real `temporaryRootPolicyOptions =
+/// { freeformType = ...; options = { period = mkOption {...}; ... };
+/// };`, or kimai's `siteOpts = {...}: { options = {...}; };` -- both a
+/// plain named binding, referenced only by NAME elsewhere via
+/// `types.submodule <name>`, never itself inside an `mkOption {...}`
+/// call) is NOT the module's own top-level options root -- it is a
+/// separately-named auxiliary construct whose leaves have no
+/// established structural relationship to `option_prefix` at all,
+/// unlike the module's own real top-level `options = {...}`, which is
+/// the direct BODY of its enclosing `let ... in <body>` (or the
+/// function's own returned value), never itself a named binding's own
+/// value.
+///
+/// Root cause this closes: `scan_options`'s nested-form branch (`segs
+/// == ["options"]`) walks EVERY such block it finds with a fresh empty
+/// path (`&mut Vec::new()`), and `option_prefix_relative_path` only
+/// NORMALIZES paths that are longer than `option_prefix` and start with
+/// it -- a path shorter than `option_prefix` (as every leaf inside a
+/// standalone, unrelated block like `temporaryRootPolicyOptions` is,
+/// since nothing there ever nests through `services.angrr`) is "left
+/// untouched, exactly as before" (see `option_prefix_relative_path`'s
+/// own doc comment), i.e. recorded VERBATIM with zero verification that
+/// it relates to `option_prefix` at all. A bare leaf name that
+/// coincidentally matches a real, concretely-`option_prefix`-anchored
+/// declaration elsewhere in the file (angrr's real, removed top-level
+/// `services.angrr.period`, vs. this new unrelated
+/// `temporaryRootPolicyOptions.options.period` several structural
+/// levels deeper) then satisfies `run_target`'s gate-1 lookup
+/// (`options.iter().find(|o| o.path == watched_path)`) as if it were
+/// the SAME option -- and since `compare()`'s own `TargetIdentity` is
+/// keyed purely on the watched STRING (never on which declaration it
+/// resolved to on either side, by design -- see `TargetIdentity`'s own
+/// doc comment), base's real removed declaration and head's unrelated
+/// surviving declaration are compared as "the same identity," both
+/// landing on `Verdict::PredicateNotFound` (same `VerdictKind`), so
+/// `compare()` emits `TargetDiff::Unchanged` -- a real breaking
+/// removal, invented as continuity nobody ever established.
+///
+/// The fix: discard (never record) declarations from this class of
+/// block, so the concrete-prefix gate-1 lookup can no longer find a
+/// false match for them -- head's watched `period` then correctly
+/// resolves to `Verdict::OptionNotFound` (nothing under the real,
+/// concretely-verified `services.angrr` tree answers to that name any
+/// more), genuinely different from base's `PredicateNotFound`, so
+/// `compare()` -- completely unchanged itself -- naturally emits
+/// `VerdictChanged` instead of `Unchanged`. Gated on `prefix_is_concrete`
+/// specifically to leave kimai's own wildcard-prefix case (`option_prefix
+/// = ["services","kimai","sites","*"]`) completely untouched: kimai's
+/// siteOpts declarations are ALSO reached via a named `let`-binding
+/// (this predicate would return `true` for them too) and MUST keep
+/// being bare-recorded, since a wildcard segment can never appear in any
+/// real declaration's own attrpath, so there is no OTHER mechanism by
+/// which siteOpts's own options could ever be discovered at all --
+/// see `option_prefix_relative_path`'s own doc comment for the
+/// pre-existing, deliberate reasoning this same `prefix_is_concrete`
+/// gate already relies on elsewhere in this file.
+fn is_nested_inside_named_let_or_rec_binding(node: &SyntaxNode) -> bool {
+    node.ancestors().skip(1).any(|a| {
+        a.kind() == NODE_ATTRPATH_VALUE
+            && a.parent()
+                .is_some_and(|p| p.kind() == NODE_LET_IN || is_rec_attrset(&p))
+    })
+}
+
+/// `true` iff `node` is a `rec { ... }` attrset (as opposed to a plain
+/// `{ ... }`) -- both share `NODE_ATTR_SET`, distinguished only by a
+/// leading `TOKEN_REC` child (the same check already used, for a
+/// different purpose, where this project first needed to tell the two
+/// apart -- see the `TOKEN_REC` scan near `resolve_ident_binding`).
+fn is_rec_attrset(node: &SyntaxNode) -> bool {
+    node.kind() == NODE_ATTR_SET
+        && node
+            .children_with_tokens()
+            .filter_map(|e| e.into_token())
+            .any(|t| t.kind() == TOKEN_REC)
 }
 
 /// E1/GAP-4 fix. Finds a `types.submodule { options = {...}; }`-shaped
@@ -7328,6 +7430,194 @@ mod tests {
             opts.is_empty(),
             "cfg binds to a different scope than option_prefix claims -- must not correlate; \
              got {opts:?}"
+        );
+    }
+
+    // --- S5-F1: real angrr PR #471312 false-"Unchanged" defect ---------
+    //
+    // Root cause: `scan_options`'s nested-form walk (`segs ==
+    // ["options"]`) gave EVERY such block a fresh empty starting path
+    // unless it was textually nested inside a tracked `mkOption {...}`
+    // call -- a named `let`/`rec`-bound auxiliary submodule's own
+    // leaves (angrr's real `temporaryRootPolicyOptions`, kimai's real
+    // `siteOpts`) got bare-recorded with zero verification they relate
+    // to `option_prefix` at all, since `option_prefix_relative_path`
+    // only normalizes paths LONGER than `option_prefix` -- a short bare
+    // path is "left untouched, exactly as before" regardless of where
+    // it actually came from. See
+    // `is_nested_inside_named_let_or_rec_binding`'s own doc comment for
+    // the full causal chain into `compare()`'s false "Unchanged".
+
+    #[test]
+    fn scan_options_excludes_ambiguous_same_named_leaves_in_unrelated_named_let_bindings() {
+        // Hostile controls (a) same terminal field name under unrelated
+        // parents, and (e) ambiguous candidate correspondence, combined:
+        // TWO different named let-bound submodules (neither is the
+        // module's own top-level root) both declare a leaf called
+        // "shared_leaf" -- NEITHER may satisfy a bare watch for it, not
+        // even "first one wins". The module's own real top-level
+        // "shared_leaf" (present here too, to prove the fix doesn't
+        // over-exclude the true root) must still be found correctly.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              helperA = {
+                options = {
+                  shared_leaf = lib.mkOption { default = "from-A"; };
+                };
+              };
+              helperB = {
+                options = {
+                  shared_leaf = lib.mkOption { default = "from-B"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                shared_leaf = lib.mkOption { default = "from-top-level"; };
+                profilesA = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperA);
+                  default = { };
+                };
+                profilesB = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperB);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+
+        let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
+        assert_eq!(
+            shared_leaf_matches.len(),
+            1,
+            "exactly one shared_leaf candidate must remain -- the true top-level one, \
+             neither helperA's nor helperB's; got {opts:?}"
+        );
+        assert_eq!(
+            shared_leaf_matches[0].default_source.as_deref(),
+            Some("\"from-top-level\""),
+            "the surviving candidate must be the real top-level declaration, not either helper's"
+        );
+    }
+
+    #[test]
+    fn scan_options_named_let_binding_exclusion_is_order_independent() {
+        // Hostile control (f): reordered siblings / irrelevant nearby
+        // changes -- the same fixture as above, but with the let-bound
+        // helper declared BEFORE its own use-site's sibling option, and
+        // an extra irrelevant option interleaved, must produce the same
+        // result.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              helperA = {
+                options = {
+                  shared_leaf = lib.mkOption { default = "from-A"; };
+                };
+              };
+              cfg = config.services.widget;
+              unrelatedThing = "irrelevant nearby change";
+            in
+            {
+              options.services.widget = {
+                profilesA = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperA);
+                  default = { };
+                };
+                enable = lib.mkEnableOption "widget";
+                shared_leaf = lib.mkOption { default = "from-top-level"; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
+        assert_eq!(shared_leaf_matches.len(), 1, "reordering must not change the result; got {opts:?}");
+        assert_eq!(shared_leaf_matches[0].default_source.as_deref(), Some("\"from-top-level\""));
+    }
+
+    #[test]
+    fn scan_options_rec_bound_submodule_leaf_is_also_excluded_from_concrete_prefix_match() {
+        // The `rec { ... }` sibling of the `let ... in` case -- same
+        // named-binding shape, different Nix scoping construct.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+            in
+            rec {
+              helperA = {
+                options = {
+                  shared_leaf = lib.mkOption { default = "from-A"; };
+                };
+              };
+              options.services.widget = {
+                shared_leaf = lib.mkOption { default = "from-top-level"; };
+                profilesA = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperA);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
+        assert_eq!(shared_leaf_matches.len(), 1, "rec-bound helper's leaf must also be excluded; got {opts:?}");
+        assert_eq!(shared_leaf_matches[0].default_source.as_deref(), Some("\"from-top-level\""));
+    }
+
+    #[test]
+    fn scan_options_wildcard_prefix_still_bare_records_named_let_bound_submodule_leaves() {
+        // Critical regression guard: kimai's real siteOpts mechanism
+        // (and any other wildcard-instantiated submodule) MUST keep
+        // working exactly as before this fix. With a wildcard
+        // `option_prefix` (`prefix_is_concrete == false`), there is no
+        // OTHER mechanism by which a named submodule's own options
+        // could ever be discovered -- a wildcard segment can never
+        // appear in any real declaration's own attrpath. This fix is
+        // gated on `prefix_is_concrete` specifically so this case is
+        // completely untouched.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              siteOpts = {
+                options = {
+                  host = lib.mkOption { default = "localhost"; };
+                };
+              };
+            in
+            {
+              options.services.widget.sites = lib.mkOption {
+                type = lib.types.attrsOf (lib.types.submodule siteOpts);
+                default = { };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let wildcard_prefix = vec![
+            "services".to_string(),
+            "widget".to_string(),
+            "sites".to_string(),
+            "*".to_string(),
+        ];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &wildcard_prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["host"])),
+            "wildcard-prefix targets must keep finding named submodule leaves bare-recorded, \
+             exactly as before this fix -- kimai's real siteOpts depends on this; got {opts:?}"
         );
     }
 
