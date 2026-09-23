@@ -724,31 +724,44 @@ fn scan_options(
     option_prefix: &[String],
 ) -> Vec<OptionDecl> {
     let mut out = Vec::new();
-    let mut referenced: std::collections::HashSet<rowan::TextRange> = std::collections::HashSet::new();
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
 
-    // S5-F1B: named `let`/`rec`-bound `options = {...}` candidates found
-    // during the pass below are DEFERRED here rather than decided
-    // immediately -- the provenance check that decides them (do they
-    // appear in `referenced`, built from real declarations' own `type =`
-    // fields?) needs the REST of this same pass's real declarations to
-    // have been discovered first, and F needs the answer to be the same
-    // regardless of source order (declaration order must never matter --
-    // see the order-independence hostile control). Each entry is the
-    // real `value` node (the options block's own RHS attrset/merge) plus
-    // the `NODE_ATTRPATH_VALUE` node used to look up its enclosing named
-    // binding for the provenance check.
-    let mut deferred: Vec<(SyntaxNode, SyntaxNode)> = Vec::new();
-
-    // --- Pass 1: walk every TRUE root immediately (flat-dotted match,
-    // or the nested-form root that is NOT itself inside a tracked
-    // `mkOption` call and NOT itself inside a named `let`/`rec` binding
-    // -- i.e. the module's own real top-level options, exactly as
-    // before F1/F1B ever existed for this case), collecting real
-    // declarations AND, via `walk_options_block`'s own new provenance
-    // hook, which named bindings those real declarations' `type =`
-    // fields genuinely reference. Named-binding candidates are deferred,
-    // never decided here. ---
+    // S5-F1D: a named `let`/`rec`-bound `options = {...}` block is no
+    // longer treated as a candidate to be discovered here at all -- it
+    // is walked ONLY when, and exactly where, a real, already-anchored
+    // declaration's own `type =` field genuinely references it
+    // (`walk_named_type_references`, invoked from `walk_options_block`
+    // below), using THAT reference's own accumulated `path` as the
+    // starting prefix for the submodule's own content -- never a fresh,
+    // bare `Vec::new()`. This replaces S5-F1B/F1C's own one-hop-capped
+    // promotion mechanism (and its `referenced`/`deferred`/
+    // `enclosing_named_binding_value` machinery) entirely: recursion may
+    // now follow a real reference chain to ANY depth (cycle-guarded, see
+    // `walk_named_type_references`), because the SAFETY property no
+    // longer depends on stopping early -- it depends on the recorded
+    // `path` correctly reflecting how deep the reference chain actually
+    // reached. Angrr's real defect (`temporaryRootPolicyOptions.period`,
+    // two real hops from `option_prefix`) is now genuinely discoverable
+    // -- `discovered_options` will contain it -- but at its own real,
+    // qualified path (`["settings","temporary-root-policies","period"]`),
+    // which can never collide with a bare watched query for `period`.
+    // Discovery is allowed; false identity is not. See
+    // `fixtures/s5-f1d/investigation.md` for the full trace.
+    //
+    // A named binding under a WILDCARD `option_prefix` (kimai's real
+    // `siteOpts`) is unaffected by any of this -- it keeps using the
+    // separate, unconditional, `prefix_is_concrete`-gated mechanism
+    // below exactly as before (a wildcard segment can never appear in
+    // any real reference, so there is no "true root reference" for
+    // `walk_named_type_references` to ever start from under a wildcard
+    // prefix; unconditional discovery remains the only way kimai's own
+    // content is ever found, unchanged since S5-F1B).
+    //
+    // --- Walk every TRUE root (flat-dotted match, or the nested-form
+    // root that is NOT itself inside a tracked `mkOption` call and NOT
+    // itself inside a named `let`/`rec` binding). A named-binding
+    // candidate is simply skipped here now -- reachable only by
+    // reference, never as a root of its own. ---
     for node in root.descendants() {
         if node.kind() != NODE_ATTRPATH_VALUE {
             continue;
@@ -791,23 +804,32 @@ fn scan_options(
             if is_nested_inside_mk_option_call(&node) {
                 continue;
             }
-            // S5-F1B: a named `let`/`rec` binding (kimai's `siteOpts`,
+            // S5-F1D: a named `let`/`rec` binding (kimai's `siteOpts`,
             // angrr's `temporaryRootPolicyOptions`, prosody's `mucOpts`,
-            // drupal's `siteOpts`, fedimintd's `fedimintdOpts` -- all
-            // this exact shape) is deferred to the provenance-checked
-            // second pass below, under a concrete `option_prefix`
-            // (matching `option_prefix_relative_path`'s own established
-            // `prefix_is_concrete` gate; a wildcard prefix keeps relying
-            // on bare-recorded named-binding declarations exactly as
-            // before, unconditionally -- see
+            // drupal's `siteOpts`, fedimintd's `fedimintdOpts`,
+            // rspamd's `bindSocketOpts`, tayga's `addrOpts` -- all this
+            // exact shape) is simply not a root of its own, under a
+            // concrete `option_prefix` -- it is walked only if and where
+            // `walk_named_type_references` finds it genuinely
+            // referenced, using that reference's own path. A wildcard
+            // prefix keeps relying on unconditional discovery here,
+            // exactly as before (see this file's own module-level
+            // comment above `scan_options` and
             // `is_nested_inside_named_let_or_rec_binding`'s own doc
             // comment for why kimai's own siteOpts needs this).
             if prefix_is_concrete && is_nested_inside_named_let_or_rec_binding(&node) {
-                deferred.push((value, node));
                 continue;
             }
             walk_merge_operands(&value, |attrset| {
-                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix, &mut referenced);
+                walk_options_block(
+                    file,
+                    src,
+                    attrset,
+                    &mut Vec::new(),
+                    &mut out,
+                    option_prefix,
+                    &mut std::collections::HashSet::new(),
+                );
             });
             continue;
         }
@@ -821,49 +843,6 @@ fn scan_options(
                 .map(|resolved| resolved == option_prefix)
                 .unwrap_or(false)
         {
-            walk_merge_operands(&value, |attrset| {
-                walk_options_block(file, src, attrset, &mut Vec::new(), &mut out, option_prefix, &mut referenced);
-            });
-        }
-    }
-
-    // --- Pass 2: promote any deferred named-binding candidate whose own
-    // enclosing binding is genuinely referenced by a TRUE-ROOT
-    // declaration's own `type =` field -- `referenced` is frozen here,
-    // exactly as Pass 1 left it. This is deliberately a SINGLE pass, not
-    // a fixpoint: a promoted candidate's own declarations are walked
-    // with a throwaway, discarded reference set (`&mut
-    // std::collections::HashSet::new()` below), so anything THEY
-    // themselves reference does not cascade into promoting yet another
-    // named binding. Every real, demonstrated case (prosody's `mucOpts`,
-    // drupal's `siteOpts`, fedimintd's `fedimintdOpts`) is exactly one
-    // hop from a true-root declaration; nothing in the S5 corpus needs
-    // more. Capping at one hop is a deliberately tighter invariant than
-    // "reachable via any chain of type references": angrr's own real
-    // module has a REAL two-hop chain to its real defect
-    // (`services.angrr.settings` -> `settingsOptions` -> `temporary-root-policies`
-    // -> `temporaryRootPolicyOptions` -> the unrelated `period`) that
-    // currently only stays excluded because that second hop's own
-    // `type` field happens to be written `with lib.types; attrsOf
-    // (submodule temporaryRootPolicyOptions)` -- and `resolve_ident_binding`
-    // already, separately, refuses to resolve any identifier reached
-    // through a `with` scope. Relying on that as the ONLY thing
-    // preventing a cascade would be an accident of angrr's own coding
-    // style, not a real boundary: the semantically identical
-    // `lib.types.attrsOf (lib.types.submodule temporaryRootPolicyOptions)`
-    // (no `with`) would resolve just fine and, under an unbounded
-    // fixpoint, promote `temporaryRootPolicyOptions` too, reintroducing
-    // angrr's exact original false-"Unchanged" defect one hop deeper.
-    // Capping at one hop closes this structurally, without depending on
-    // `with`-opacity at all. A candidate never referenced by a
-    // true-root declaration has no established provenance from the
-    // watched concrete option root at all -- exactly angrr's real
-    // defect -- and stays excluded, silently, exactly as F1 already did
-    // for it. ---
-    for (value, binding_node) in deferred {
-        let is_legitimate = enclosing_named_binding_value(&binding_node)
-            .is_some_and(|binding_value| referenced.contains(&binding_value.text_range()));
-        if is_legitimate {
             walk_merge_operands(&value, |attrset| {
                 walk_options_block(
                     file,
@@ -968,7 +947,7 @@ fn walk_options_block(
     path: &mut Vec<String>,
     out: &mut Vec<OptionDecl>,
     option_prefix: &[String],
-    referenced: &mut std::collections::HashSet<rowan::TextRange>,
+    currently_walking: &mut std::collections::HashSet<rowan::TextRange>,
 ) {
     let prefix_is_concrete = !option_prefix.iter().any(|s| s == "*");
     for entry in attrset.children() {
@@ -1038,26 +1017,30 @@ fn walk_options_block(
             // -- so `nginx.enable` is recorded at `["nginx","enable"]`,
             // never at the bare, collision-prone `["enable"]`.
             if let Some(nested) = find_nested_options_block(&value) {
-                walk_options_block(file, src, &nested, path, out, option_prefix, referenced);
+                walk_options_block(file, src, &nested, path, out, option_prefix, currently_walking);
             }
-            // S5-F1B: this declaration is, by construction, real and
+            // S5-F1D: this declaration is, by construction, real and
             // already-anchored (we only ever reach here via a legitimate
-            // walk -- the true root, or an already-promoted candidate).
-            // Its own `type =` field may reference a NAMED submodule
-            // instead of (or in addition to) an inline one -- record
-            // every such reference as real provenance evidence for
-            // `scan_options`'s own second pass.
-            if matches!(helper, OptionHelperCall::Explicit) {
+            // walk from a true root). Its own `type =` field may
+            // reference a NAMED submodule instead of (or in addition to)
+            // an inline one -- walk it too, right here, at THIS
+            // declaration's own accumulated `path`, to any real
+            // reference depth (`walk_named_type_references`). Gated on
+            // `prefix_is_concrete`: under a wildcard prefix every named
+            // binding is already discovered unconditionally elsewhere
+            // (kimai's own mechanism, unchanged), and chasing references
+            // here too would risk double-discovering the same content.
+            if prefix_is_concrete && matches!(helper, OptionHelperCall::Explicit) {
                 if let Some(type_expr) = mk_option_field(&value, "type") {
-                    collect_type_reference_ranges(&type_expr, referenced);
+                    walk_named_type_references(file, src, &type_expr, path, out, option_prefix, currently_walking);
                 }
             }
         } else {
             walk_merge_operands(&value, |attrset| {
                 if at_prefix_root {
-                    walk_options_block(file, src, attrset, &mut Vec::new(), out, option_prefix, referenced);
+                    walk_options_block(file, src, attrset, &mut Vec::new(), out, option_prefix, currently_walking);
                 } else {
-                    walk_options_block(file, src, attrset, path, out, option_prefix, referenced);
+                    walk_options_block(file, src, attrset, path, out, option_prefix, currently_walking);
                 }
             });
         }
@@ -1374,115 +1357,149 @@ fn resolve_type_reference(ident_node: &SyntaxNode) -> Option<SyntaxNode> {
     resolve_ident_binding(ident_node, &name, WithPolicy::TransparentForRecognizedTypeNamespace).ok()
 }
 
-/// Scans a real, already-anchored option's own `type = ...` expression
-/// for every bare identifier reference, resolving each via
-/// `resolve_type_reference` -- the full set of named bindings this one
-/// declaration genuinely reaches through its type structure (`submodule
-/// <name>`, `listOf (submodule <name>)`, `attrsOf (submodule <name>)`,
-/// `nullOr (submodule <name>)`, or any other wrapper combinator this
-/// project hasn't specifically named, since nothing here depends on
-/// recognizing a wrapper BY NAME -- any bare identifier used anywhere
-/// inside the type expression is a candidate, exactly the "AST/type
-/// machinery establishing the relationship more generally" this fix is
-/// required to prefer over a textual wrapper-name allowlist).
+/// S5-F1D: scans a real, already-anchored option's own `type = ...`
+/// expression for every bare identifier reference, resolving each via
+/// `resolve_type_reference` (`submodule <name>`, `listOf (submodule
+/// <name>)`, `attrsOf (submodule <name>)`, `nullOr (submodule <name>)`,
+/// or any other wrapper combinator this project hasn't specifically
+/// named, since nothing here depends on recognizing a wrapper BY NAME --
+/// any bare identifier used anywhere inside the type expression is a
+/// candidate).
 ///
-/// S5-F1C-B: a resolved reference isn't always the submodule itself --
-/// portmaster's real `packages = mkOption { type = listOf
-/// profilePackageType; };` resolves to `profilePackageType`, itself just
-/// `types.coercedTo types.package (package: {inherit package;})
-/// packageMatchType` -- a pure type-expression/alias step, not a
-/// submodule declaration, that itself references `packageMatchType`,
-/// the REAL submodule. `collect_type_reference_ranges_rec` follows such
-/// a chain transitively: after resolving and recording a reference, if
-/// the resolved value does NOT itself directly contain an `options =
-/// {...}` block (`find_nested_options_block`, the SAME check
-/// `walk_options_block`'s own inline-submodule handling already uses --
-/// i.e. it's not itself a submodule declaration, just another
-/// expression), it's treated as a transparent alias step and recursed
-/// into. A resolved value that DOES contain its own `options = {...}`
-/// block is a genuine submodule -- recursion deliberately stops there;
-/// its own internal declarations are handled separately, by the
-/// existing (one-hop-capped) promoted-candidate walk in `scan_options`,
-/// not by this alias-following recursion. This distinction is the whole
-/// safety property: recursing into a genuine submodule's own body here
-/// too would functionally remove the one-hop cap and reintroduce
-/// angrr's own defect (`settingsOptions`, itself a genuine submodule
-/// referenced with no `with` at all, would recurse straight into its own
-/// `temporary-root-policies` field and, combined with F1C-A's own
-/// with-transparency, promote `temporaryRootPolicyOptions` two hops from
-/// the true root) -- verified against that exact shape in
-/// `scan_options_angrr_two_hop_defect_stays_excluded_under_combined_with_and_alias_resolution`.
-fn collect_type_reference_ranges(
+/// A resolved reference isn't always the submodule itself -- portmaster's
+/// real `packages = mkOption { type = listOf profilePackageType; };`
+/// resolves to `profilePackageType`, itself just `types.coercedTo
+/// types.package (package: {inherit package;}) packageMatchType` -- a
+/// pure type-expression/alias step, not a submodule declaration, that
+/// itself references `packageMatchType`, the REAL submodule. Whether a
+/// resolved value directly contains its own `options = {...}` block
+/// (`find_nested_options_block`, the SAME check `walk_options_block`'s
+/// own inline-submodule handling already uses) decides which of two
+/// things happens next:
+///
+/// - **A transparent alias step** (no `options = {...}` block of its
+///   own): recurse into ITS OWN value, looking for what IT references in
+///   turn (`profilePackageType` -> `packageMatchType`).
+/// - **A genuine submodule** (has its own `options = {...}` block):
+///   WALK it, right here, via `walk_options_block`, using `path` (this
+///   call's own caller's accumulated path -- e.g. `settings`'s own path
+///   when resolving `settings`'s `type = submodule settingsOptions;`)
+///   as the starting prefix for the submodule's own content -- never a
+///   fresh, bare path. This is the crux of S5-F1D: since a promoted
+///   submodule's own leaves are now recorded at their REAL, qualified
+///   position, recursion may continue through it to ANY real reference
+///   depth (nothing caps it at one hop anymore) without risking a false
+///   collision -- angrr's own `temporaryRootPolicyOptions.period` is now
+///   genuinely discovered, at `["settings","temporary-root-policies","period"]`,
+///   which can never equal the bare watched `["period"]`. Discovery of a
+///   reachable declaration is allowed; false identity from discarding
+///   its own real embedding is not.
+///
+/// `currently_walking` is a cycle guard: a submodule's own resolved
+/// range is inserted before walking/recursing into it and removed right
+/// after, so a genuine reference cycle (`A` embeds a field referencing
+/// `B`, `B` embeds a field referencing `A` again) is detected and that
+/// branch simply stops -- termination is structural (bounded by the
+/// finite AST), not an arbitrary depth cap. Because the guard is
+/// popped after each walk completes, the SAME submodule reached from a
+/// second, independent reference elsewhere in the file is walked again
+/// there too, at ITS OWN qualified path -- a submodule genuinely used in
+/// two different places really does produce two separate sets of
+/// declared leaves in real Nix semantics, and this preserves that.
+/// `seen_this_scan` is a separate, purely local dedup guard (fresh per
+/// top-level call, i.e. per real declaration's own `type =` field) so a
+/// pathological type expression mentioning the same reference twice
+/// (`either (submodule X) (submodule X)`) doesn't walk `X` twice within
+/// that one scan.
+fn walk_named_type_references(
+    file: &str,
+    src: &str,
     type_expr: &SyntaxNode,
-    into: &mut std::collections::HashSet<rowan::TextRange>,
+    path: &mut Vec<String>,
+    out: &mut Vec<OptionDecl>,
+    option_prefix: &[String],
+    currently_walking: &mut std::collections::HashSet<rowan::TextRange>,
 ) {
-    let mut visited = std::collections::HashSet::new();
-    collect_type_reference_ranges_rec(type_expr, into, &mut visited);
+    let mut seen_this_scan = std::collections::HashSet::new();
+    walk_named_type_references_rec(file, src, type_expr, path, out, option_prefix, currently_walking, &mut seen_this_scan);
 }
 
-/// The recursive worker behind `collect_type_reference_ranges`. `visited`
-/// is a single cycle-detection set threaded through this one top-level
-/// call's own entire recursion only -- each fresh `collect_type_reference_ranges`
-/// call (one per real declaration's own `type =` field) gets its own,
-/// so one declaration's alias chain can never suppress an unrelated
-/// sibling declaration's identical chain. Termination is guaranteed by
-/// `visited` alone (a resolved range can be entered at most once across
-/// the whole recursion, and the AST is finite), not by an arbitrary
-/// depth cap -- `A -> B -> A` (or `A -> A` directly) simply stops the
-/// moment the cycle closes, the same way `resolve_alias_recursively`'s
-/// own `AliasChain`-based cycle detection already works for predicate
-/// aliasing elsewhere in this file, applied here to `TextRange`s instead
-/// of names (so it stays correct across the same name reused in
-/// different lexical scopes, which the name-based `AliasChain` alone
-/// wouldn't distinguish).
-fn collect_type_reference_ranges_rec(
+fn walk_named_type_references_rec(
+    file: &str,
+    src: &str,
     type_expr: &SyntaxNode,
-    into: &mut std::collections::HashSet<rowan::TextRange>,
-    visited: &mut std::collections::HashSet<rowan::TextRange>,
+    path: &mut Vec<String>,
+    out: &mut Vec<OptionDecl>,
+    option_prefix: &[String],
+    currently_walking: &mut std::collections::HashSet<rowan::TextRange>,
+    seen_this_scan: &mut std::collections::HashSet<rowan::TextRange>,
 ) {
-    for node in type_expr.descendants() {
-        if node.kind() != NODE_IDENT {
-            continue;
-        }
+    let mut idents = Vec::new();
+    collect_bare_idents_excluding_nested_options_blocks(type_expr, &mut idents);
+    for node in idents {
         let Some(resolved) = resolve_type_reference(&node) else {
             continue;
         };
         let range = resolved.text_range();
-        if !visited.insert(range) {
+        if !seen_this_scan.insert(range) {
             continue;
         }
-        into.insert(range);
-        if find_nested_options_block(&resolved).is_none() {
-            collect_type_reference_ranges_rec(&resolved, into, visited);
+        if currently_walking.contains(&range) {
+            continue; // a real reference cycle -- stop this branch
+        }
+        if let Some(options_block) = find_nested_options_block(&resolved) {
+            currently_walking.insert(range);
+            walk_merge_operands(&options_block, |attrset| {
+                walk_options_block(file, src, attrset, path, out, option_prefix, currently_walking);
+            });
+            currently_walking.remove(&range);
+        } else {
+            currently_walking.insert(range);
+            walk_named_type_references_rec(file, src, &resolved, path, out, option_prefix, currently_walking, seen_this_scan);
+            currently_walking.remove(&range);
         }
     }
 }
 
-/// Given a node inside a named `let`/`rec` binding's own value (e.g. a
-/// node somewhere inside `temporaryRootPolicyOptions`'s or `mucOpts`'s
-/// own `options = {...}` block), finds that ENCLOSING binding's own
-/// VALUE node -- the exact same node `resolve_ident_binding` returns
-/// for a reference to that binding's name elsewhere in the file, so its
-/// `TextRange` can be looked up directly in a set built by
-/// `collect_type_reference_ranges`. `None` if `node` isn't actually
-/// inside a named `let`/`rec` binding at all (a caller bug, since this
-/// is only ever called on nodes `is_nested_inside_named_let_or_rec_binding`
-/// already confirmed `true` for).
-fn enclosing_named_binding_value(node: &SyntaxNode) -> Option<SyntaxNode> {
-    for ancestor in node.ancestors().skip(1) {
-        if ancestor.kind() != NODE_ATTRPATH_VALUE {
-            continue;
-        }
-        let Some(parent) = ancestor.parent() else {
-            continue;
-        };
-        if parent.kind() == NODE_LET_IN || is_rec_attrset(&parent) {
-            let mut children = ancestor.children();
-            let _attrpath = children.next();
-            return children.next();
+/// S5-F1D bug found and fixed during implementation: a plain
+/// `type_expr.descendants()` scan (as F1C-B originally did) walks
+/// EVERYTHING inside `type_expr`, including a NESTED `options = {...}`
+/// block belonging to a DIFFERENT, inline-declared option one level
+/// deeper -- portmaster's real `profiles`'s own type expression is an
+/// inline submodule whose OWN body contains `packages = mkOption { type
+/// = listOf profilePackageType; };`, so a naive scan of `profiles`'s
+/// own type expression finds `profilePackageType` a SECOND time (in
+/// addition to `packages`'s own, separately-triggered, correctly
+/// path-qualified scan), and walks it AGAIN at `profiles`'s own
+/// (too-shallow) path -- a real, demonstrated double-recording bug
+/// (`["profiles","directory"]` alongside the correct
+/// `["profiles","packages","directory"]`), caught by re-running the
+/// existing portmaster hostile test after this file's own two-pass ->
+/// unbounded-recursion rewrite.
+///
+/// This bounded traversal stops descending the moment it reaches
+/// another `options = {...}`-shaped attrpath-value node -- that nested
+/// block is a SEPARATE option's own type-field scope, and
+/// `walk_options_block`'s own existing inline-submodule recursion
+/// (`find_nested_options_block`) already walks it separately, at ITS
+/// OWN correctly-extended path, when it processes that option's own
+/// entry. Everything else about `type_expr`'s own structure is walked
+/// normally.
+fn collect_bare_idents_excluding_nested_options_blocks(node: &SyntaxNode, out: &mut Vec<SyntaxNode>) {
+    if node.kind() == NODE_IDENT {
+        out.push(node.clone());
+        return;
+    }
+    if node.kind() == NODE_ATTRPATH_VALUE {
+        if let Some(attrpath) = node.children().next() {
+            if attrpath_segments(&attrpath).as_deref() == Some(["options".to_string()].as_slice()) {
+                return; // opaque boundary -- a separate option's own nested type scope
+            }
         }
     }
-    None
+    for child in node.children() {
+        collect_bare_idents_excluding_nested_options_blocks(&child, out);
+    }
 }
 
 /// E1/GAP-4 fix. Finds a `types.submodule { options = {...}; }`-shaped
@@ -7824,11 +7841,10 @@ mod tests {
             "the surviving shared_leaf candidate must be the real top-level declaration"
         );
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["helper_b_leaf"])
+            opts.iter().any(|o| path_eq(&o.path, &["profilesB", "helper_b_leaf"])
                 && o.default_source.as_deref() == Some("\"from-B\"")),
-            "helperB IS legitimately referenced (profilesB's own type = attrsOf (submodule helperB), \
-             anchored exactly at option_prefix) and must be included, bare-recorded exactly as the \
-             true top-level's own leaves are; got {opts:?}"
+            "helperB IS legitimately referenced (profilesB's own type = attrsOf (submodule helperB)) \
+             and must be included, at its own qualified path; got {opts:?}"
         );
     }
 
@@ -7880,30 +7896,34 @@ mod tests {
         assert_eq!(shared_leaf_matches.len(), 1, "reordering must not change the result; got {opts:?}");
         assert_eq!(shared_leaf_matches[0].default_source.as_deref(), Some("\"from-top-level\""));
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["helper_b_leaf"])),
-            "reordering must not change whether the legitimately-referenced helper is included; got {opts:?}"
+            opts.iter().any(|o| path_eq(&o.path, &["profilesB", "helper_b_leaf"])),
+            "reordering must not change whether the legitimately-referenced helper is included, nor \
+             its own qualified path; got {opts:?}"
         );
     }
 
     #[test]
-    fn scan_options_two_legitimately_referenced_named_bindings_sharing_a_leaf_name_is_a_disclosed_limitation() {
-        // Hostile control (e), ambiguous candidate correspondence -- NOT
-        // demonstrated anywhere in the real S5 corpus (every real
-        // prosody/drupal/fedimintd regression has exactly one legitimate
-        // named submodule per colliding leaf), but constructible: if TWO
-        // DIFFERENT named submodules are BOTH legitimately referenced
-        // (each by its own real, option_prefix-anchored option) and
-        // BOTH happen to declare a leaf with the same name, `scan_options`
-        // records all of them bare -- it does not itself deduplicate or
-        // flag the collision. This is disclosed here deliberately rather
-        // than silently assumed away: `run_target`'s own gate-1 lookup
-        // (`options.iter().find(...)`, unmodified by S5-F1 or S5-F1B)
-        // picks whichever is first in `out`'s own vector order, exactly
-        // its pre-existing behavior for any other kind of duplicate path.
-        // Resolving this ambiguity with an explicit inconclusive signal,
-        // rather than a silent first-match, is a real but SEPARATE
-        // architectural question from S5-F1B's own narrow mandate (fix
-        // the over-exclusion F1-R found), and is not addressed here.
+    fn scan_options_two_legitimately_referenced_named_bindings_sharing_a_leaf_name_no_longer_collide() {
+        // Hostile control (e), ambiguous candidate correspondence -- S5-F1B/
+        // F1C's own version of this test found that `scan_options`
+        // recorded THREE same-named `shared_leaf` candidates bare
+        // (top-level, helperA's, helperB's), disclosed as an open,
+        // unresolved ambiguity (`run_target`'s own gate-1 `.find()` would
+        // silently pick whichever came first). S5-F1D's own provenance-
+        // qualified paths RESOLVE this as a side effect, not by any new
+        // disambiguation policy: helperA's own content is now qualified
+        // by `profilesA` (the real option that references it), helperB's
+        // by `profilesB` -- three genuinely DIFFERENT paths, not a
+        // collision requiring `.find()` to pick between them at all.
+        // `run_target`'s own lookup itself is unmodified; provenance
+        // alone made the ambiguity disappear (per the mandate's own
+        // guidance: "if provenance makes two candidates genuinely
+        // distinct, retain that distinction rather than collapsing
+        // them"). Whether the REAL, previously-disclosed 8-PR collision
+        // corpus (prosody's own `domain` field, etc.) is similarly
+        // resolved is verified separately against live-fetched content,
+        // not assumed from this synthetic case alone -- see
+        // `fixtures/s5-f1d/f1d-report.md`.
         let src = r#"
             { config, lib, ... }:
             let
@@ -7940,12 +7960,19 @@ mod tests {
         let shared_leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["shared_leaf"])).collect();
         assert_eq!(
             shared_leaf_matches.len(),
-            3,
-            "both helperA and helperB are legitimately referenced (profilesA/profilesB's own \
-             type = attrsOf (submodule helperA/helperB), each anchored exactly at option_prefix) \
-             and are correctly included -- all three same-named candidates (top-level, helperA, \
-             helperB) are recorded; this test documents that scan_options does not itself \
-             disambiguate them, it is not a claim that this is fully resolved; got {opts:?}"
+            1,
+            "only the true top-level shared_leaf now matches the bare path -- helperA's and helperB's \
+             own shared_leaf are correctly qualified by their own referencing option's name instead; \
+             got {opts:?}"
+        );
+        assert_eq!(shared_leaf_matches[0].default_source.as_deref(), Some("\"from-top-level\""));
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["profilesA", "shared_leaf"]) && o.default_source.as_deref() == Some("\"from-A\"")),
+            "helperA's own shared_leaf, qualified by profilesA; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["profilesB", "shared_leaf"]) && o.default_source.as_deref() == Some("\"from-B\"")),
+            "helperB's own shared_leaf, qualified by profilesB; got {opts:?}"
         );
     }
 
@@ -8083,8 +8110,11 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"]) && o.default_source.as_deref() == Some("\"from-foo\"")),
-            "a one-hop reference wrapped in a LOCAL `with lib.types;` must resolve; got {opts:?}"
+            opts.iter()
+                .any(|o| path_eq(&o.path, &["thing", "leaf"]) && o.default_source.as_deref() == Some("\"from-foo\"")),
+            "a one-hop reference wrapped in a LOCAL `with lib.types;` must resolve, at its own \
+             correctly-qualified path (S5-F1D: the referencing declaration's own path, `thing`, is \
+             threaded through, not reset to bare); got {opts:?}"
         );
     }
 
@@ -8116,7 +8146,7 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "`with types;` (bare) must also resolve; got {opts:?}"
         );
     }
@@ -8151,8 +8181,14 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["a"])), "listOf-wrapped with-reference must resolve; got {opts:?}");
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["b"])), "nullOr-wrapped with-reference must resolve; got {opts:?}");
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["listThing", "a"])),
+            "listOf-wrapped with-reference must resolve; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["nullThing", "b"])),
+            "nullOr-wrapped with-reference must resolve; got {opts:?}"
+        );
     }
 
     #[test]
@@ -8199,7 +8235,7 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        let leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["leaf"])).collect();
+        let leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["thing", "leaf"])).collect();
         assert_eq!(
             leaf_matches.len(),
             1,
@@ -8242,7 +8278,7 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "a name reachable past TWO stacked, BOTH-recognized with clauses must resolve; got {opts:?}"
         );
     }
@@ -8286,7 +8322,7 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            !opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            !opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "fooOpts is bound in the OUTER let, reachable only by passing the unrecognized `with pkgs;` \
              layer (the inner, recognized `with types;` alone doesn't reach that far) -- must stay \
              excluded, never guessed; got {opts:?}"
@@ -8322,25 +8358,26 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            !opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            !opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "an unrecognized with-source (`with pkgs;`, not `types`/`lib.types`) must NOT be treated \
              as transparent -- fooOpts must stay excluded, exactly as before this fix; got {opts:?}"
         );
     }
 
     #[test]
-    fn scan_options_angrr_two_hop_defect_stays_excluded_under_with_resolution() {
-        // The angrr counterexample must remain excluded even with F1C-A's
-        // with-transparency active: `settingsOptions` (hop 1, no local
-        // `with`) legitimately promotes, but `temporaryRootPolicyOptions`
-        // (hop 2, reached only via `settingsOptions`'s own promoted
-        // content, itself walked with a THROWAWAY reference set per the
-        // existing one-hop cap) must NOT be promoted just because ITS OWN
-        // local `with lib.types;` reference would now otherwise resolve.
-        // Reproduces the real shape: settings -> settingsOptions (dotted,
-        // promotes) -> temporary-root-policies -> temporaryRootPolicyOptions
-        // (`with lib.types; attrsOf (submodule ...)`, two hops from the
-        // true root).
+    fn scan_options_angrr_two_hop_period_is_discovered_but_correctly_qualified_under_with_resolution() {
+        // S5-F1D: the angrr counterexample's own `period` is now
+        // genuinely DISCOVERED (the one-hop cap is gone; F1C-A's own
+        // with-transparency lets `temporary-root-policies`'s local
+        // `with lib.types;` reference resolve) -- but it is recorded at
+        // its own real, qualified path
+        // (`["settings","temporary-root-policies","period"]`), which can
+        // never equal the bare watched `["period"]`. Discovery of a
+        // reachable declaration is allowed; false identity from
+        // discarding its own real embedding is not. Reproduces the real
+        // shape: settings -> settingsOptions (dotted) -> temporary-root-policies
+        // -> temporaryRootPolicyOptions (`with lib.types; attrsOf
+        // (submodule ...)`, two real hops from the true root).
         let src = r#"
             { config, lib, ... }:
             let
@@ -8372,14 +8409,18 @@ mod tests {
         let prefix = vec!["services".to_string(), "angrr".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["temporary-root-policies"])),
-            "settingsOptions (hop 1, no local with) must still promote; got {opts:?}"
+            opts.iter().any(|o| path_eq(&o.path, &["settings", "temporary-root-policies"])),
+            "settingsOptions (hop 1, no local with) must still resolve at its own qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["settings", "temporary-root-policies", "period"])),
+            "temporaryRootPolicyOptions's own period IS now genuinely discovered (no cap, and its own \
+             local with-reference now resolves) -- at its own real, qualified path; got {opts:?}"
         );
         assert!(
             !opts.iter().any(|o| path_eq(&o.path, &["period"])),
-            "temporaryRootPolicyOptions (hop 2, only reachable via settingsOptions's own promoted \
-             content) must stay excluded -- the one-hop cap, not the with-resolution fix, is what \
-             keeps angrr's real defect closed; got {opts:?}"
+            "the discovered period must NEVER match the bare watched query -- discovery is allowed, \
+             false identity is not; got {opts:?}"
         );
     }
 
@@ -8421,25 +8462,38 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "prosody".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["enabled"])), "vHostOpts.enabled must resolve; got {opts:?}");
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["ssl"])), "vHostOpts.ssl must resolve; got {opts:?}");
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["virtualHosts", "enabled"])),
+            "vHostOpts.enabled must resolve at its own qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["virtualHosts", "ssl"])),
+            "vHostOpts.ssl must resolve at its own qualified path; got {opts:?}"
+        );
     }
 
     #[test]
     fn scan_options_real_rspamd_workeropts_with_types_reference_resolves() {
         // Integration anchor: rspamd.nix (PR #484133) -- `workers =
         // mkOption { type = with types; attrsOf (submodule workerOpts); };`
-        // workerOpts's own direct leaves (bindSockets, count, includes,
-        // ...) must now resolve. bindSocketOpts (nested a further hop
-        // inside workerOpts's own promoted content) is intentionally NOT
-        // asserted here -- that's a separate, still-capped hop-2 case,
-        // covered by the angrr-shaped test above, not a regression this
-        // test needs to guard.
+        // workerOpts's own direct leaves (count, includes) must resolve
+        // at their own qualified path. `bindSockets`'s own type
+        // (`listOf (either str (submodule bindSocketOpts))`) is a
+        // SECOND real hop (workerOpts -> bindSocketOpts) -- previously
+        // (S5-F1C) capped and excluded; S5-F1D removes the cap, so
+        // bindSocketOpts's own leaves must now resolve too, at their own
+        // further-qualified path.
         let src = r#"
             { config, options, pkgs, lib, ... }:
             with lib;
             let
               cfg = config.services.rspamd;
+              bindSocketOpts = { options, config, ... }: {
+                options = {
+                  socket = mkOption { type = types.str; };
+                  mode = mkOption { type = types.str; default = "0644"; };
+                };
+              };
               workerOpts = { name, options, ... }: {
                 options = {
                   count = mkOption {
@@ -8448,6 +8502,10 @@ mod tests {
                   };
                   includes = mkOption {
                     type = types.listOf types.str;
+                    default = [ ];
+                  };
+                  bindSockets = mkOption {
+                    type = types.listOf (types.either types.str (types.submodule bindSocketOpts));
                     default = [ ];
                   };
                 };
@@ -8466,24 +8524,36 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "rspamd".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["count"])), "workerOpts.count must resolve; got {opts:?}");
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["includes"])), "workerOpts.includes must resolve; got {opts:?}");
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["workers", "count"])),
+            "workerOpts.count must resolve at its own qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["workers", "includes"])),
+            "workerOpts.includes must resolve at its own qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["workers", "bindSockets", "socket"])),
+            "bindSocketOpts.socket (hop 2 via bindSockets) is now genuinely discovered, at its own \
+             real, qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["workers", "bindSockets", "mode"])),
+            "bindSocketOpts.mode (hop 2 via bindSockets); got {opts:?}"
+        );
     }
 
     #[test]
-    fn scan_options_real_tayga_addropts_stays_excluded_by_the_unwidened_hop_cap() {
-        // Integration anchor, negative result, HONESTLY documented: the
-        // real tayga.nix case (PR #432528) is NOT fully resolved by
-        // F1C-A alone. `pool = mkOption { type = with types; nullOr
-        // (submodule (addrOpts v)); };` is declared INSIDE versionOpts's
-        // own content (itself a promoted, hop-1 candidate from the true
-        // root `ipv4`/`ipv6`) -- so `addrOpts` is TWO hops from the true
-        // root, exactly like angrr's own temporaryRootPolicyOptions. The
-        // one-hop cap (unchanged, out of scope for F1C per its own
-        // mandate) keeps `addrOpts`'s own `prefixLength`/`address`
-        // excluded regardless of this fix. This is a compound-cause case
-        // -- F1C-A's own with-resolution is necessary but not sufficient
-        // here, and F1C is not authorized to widen the cap to close it.
+    fn scan_options_real_tayga_addropts_now_resolves_at_its_own_qualified_path() {
+        // Integration anchor: the real tayga.nix case (PR #432528),
+        // previously (S5-F1C) a documented negative result -- `pool =
+        // mkOption { type = with types; nullOr (submodule (addrOpts v));
+        // };` is declared INSIDE versionOpts's own content (itself
+        // resolved, one hop, from the true root `ipv4`) -- `addrOpts` is
+        // two real hops from the true root, exactly like angrr's own
+        // temporaryRootPolicyOptions. S5-F1D removes the one-hop cap
+        // entirely: `addrOpts`'s own `prefixLength` is now genuinely
+        // discovered, at its own real, qualified path.
         let src = r#"
             { config, lib, ... }:
             with lib;
@@ -8514,11 +8584,17 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "tayga".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["pool"])), "versionOpts (hop 1) must still promote; got {opts:?}");
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["ipv4", "pool"])),
+            "versionOpts (hop 1) must still resolve at its own qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["ipv4", "pool", "prefixLength"])),
+            "addrOpts (hop 2 via pool) is now genuinely discovered, at its own real, qualified path; got {opts:?}"
+        );
         assert!(
             !opts.iter().any(|o| path_eq(&o.path, &["prefixLength"])),
-            "addrOpts (hop 2 via pool) must stay excluded -- documenting the compound-cause boundary, \
-             not a claim this fix resolves tayga fully; got {opts:?}"
+            "the discovered prefixLength must never match a bare watched query; got {opts:?}"
         );
     }
 
@@ -8562,8 +8638,8 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
-            "one alias hop (aliasType -> realSubmodule) must resolve; got {opts:?}"
+            opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
+            "one alias hop (aliasType -> realSubmodule) must resolve at its own qualified path; got {opts:?}"
         );
     }
 
@@ -8598,9 +8674,75 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "a three-hop pure alias chain (aliasA -> aliasB -> aliasC -> realSubmodule) must resolve \
-             transitively; got {opts:?}"
+             transitively, at its own qualified path; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_resolves_an_arbitrary_depth_chain_of_genuine_submodules() {
+        // S5-F1D's own decisive capability test: FOUR real, GENUINE
+        // submodule hops (each its own `options = {...}` block,
+        // referencing the next by name -- not a transparent alias chain
+        // like the test above), no cap. Each hop's own leaf must be
+        // discoverable at its own correctly-accumulated qualified path.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              levelD = {
+                options = {
+                  leafD = lib.mkOption { default = "from-D"; };
+                };
+              };
+              levelC = {
+                options = {
+                  leafC = lib.mkOption { default = "from-C"; };
+                  toD = lib.mkOption {
+                    type = lib.types.submodule levelD;
+                    default = { };
+                  };
+                };
+              };
+              levelB = {
+                options = {
+                  leafB = lib.mkOption { default = "from-B"; };
+                  toC = lib.mkOption {
+                    type = lib.types.submodule levelC;
+                    default = { };
+                  };
+                };
+              };
+              levelA = {
+                options = {
+                  leafA = lib.mkOption { default = "from-A"; };
+                  toB = lib.mkOption {
+                    type = lib.types.submodule levelB;
+                    default = { };
+                  };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                toA = lib.mkOption {
+                  type = lib.types.submodule levelA;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["toA", "leafA"])), "hop 1; got {opts:?}");
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["toA", "toB", "leafB"])), "hop 2; got {opts:?}");
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["toA", "toB", "toC", "leafC"])), "hop 3; got {opts:?}");
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["toA", "toB", "toC", "toD", "leafD"])),
+            "hop 4 -- the whole point of removing the one-hop cap; got {opts:?}"
         );
     }
 
@@ -8656,11 +8798,18 @@ mod tests {
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         for leaf in ["directory", "package", "strictHead", "strictLast", "storeNameRegex", "wrapped"] {
             assert!(
-                opts.iter().any(|o| path_eq(&o.path, &[leaf])),
+                opts.iter().any(|o| path_eq(&o.path, &["profiles", "packages", leaf])),
                 "packageMatchType's own {leaf}, reachable only via the profilePackageType alias step, \
-                 must resolve; got {opts:?}"
+                 must resolve at its own qualified path (S5-F1D: the referencing packages declaration's \
+                 own path is threaded through) -- not duplicated at any shorter path either; got {opts:?}"
             );
         }
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["profiles", "directory"])),
+            "must not ALSO appear at the too-shallow path a naive full-descendant scan of profiles's own \
+             inline type expression would have produced (the double-recording bug found and fixed while \
+             building this fix); got {opts:?}"
+        );
     }
 
     #[test]
@@ -8701,7 +8850,7 @@ mod tests {
         // assertion here IS that this line completes at all.
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            opts.iter().any(|o| path_eq(&o.path, &["unrelatedAnchor", "leaf"])),
             "unrelated realSubmodule (reached via a completely separate, non-cyclic anchor) must still \
              resolve normally -- the cycle in aliasA/aliasB must not corrupt unrelated resolution; got {opts:?}"
         );
@@ -8769,7 +8918,7 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            !opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            !opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "unsupportedAlias's own value is `with pkgs;`-wrapped (unrecognized with-source) -- \
              realSubmodule must NOT resolve through it; got {opts:?}"
         );
@@ -8818,8 +8967,14 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["leafA"])), "thingA's own helperAlias must resolve to realA; got {opts:?}");
-        assert!(opts.iter().any(|o| path_eq(&o.path, &["leafB"])), "thingB's own helperAlias must resolve to realB; got {opts:?}");
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["thingA", "leafA"])),
+            "thingA's own helperAlias must resolve to realA, at thingA's own qualified path; got {opts:?}"
+        );
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["thingB", "leafB"])),
+            "thingB's own helperAlias must resolve to realB, at thingB's own qualified path; got {opts:?}"
+        );
     }
 
     #[test]
@@ -8852,70 +9007,24 @@ mod tests {
         let prefix = vec!["services".to_string(), "widget".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
         assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            opts.iter().any(|o| path_eq(&o.path, &["thing", "leaf"])),
             "aliasA is reached with a plain dotted reference (no with); ITS OWN value is with-wrapped -- \
              recursing into it must reuse F1C-A's own with-transparency; got {opts:?}"
         );
     }
 
-    #[test]
-    fn scan_options_angrr_two_hop_defect_stays_excluded_under_combined_with_and_alias_resolution() {
-        // The decisive combined-safety test: with BOTH F1C-A (with-
-        // transparency) AND F1C-B (alias-chain recursion) active
-        // together, angrr's real defect must STILL stay excluded.
-        // `settingsOptions` is a genuine submodule (has its own `options
-        // = {...}` block directly) -- `find_nested_options_block` on its
-        // resolved value returns `Some`, so F1C-B's own recursion
-        // deliberately does NOT descend into it looking for further
-        // references. Its own internal `temporary-root-policies` field
-        // (which DOES reference `temporaryRootPolicyOptions`, `with
-        // lib.types;`-wrapped) is instead only reachable via the
-        // existing, unrelated, one-hop-capped promoted-candidate walk,
-        // which uses a throwaway reference set -- so even though F1C-A
-        // would now happily resolve that with-wrapped reference in
-        // isolation, it never reaches the SHARED set this decision is
-        // made from.
-        let src = r#"
-            { config, lib, ... }:
-            let
-              cfg = config.services.angrr;
-              temporaryRootPolicyOptions = {
-                options = {
-                  period = lib.mkOption { default = "unrelated-period"; };
-                };
-              };
-              settingsOptions = {
-                options = {
-                  temporary-root-policies = lib.mkOption {
-                    type = with lib.types; attrsOf (submodule temporaryRootPolicyOptions);
-                    default = { };
-                  };
-                };
-              };
-            in
-            {
-              options.services.angrr = {
-                settings = lib.mkOption {
-                  type = lib.types.submodule settingsOptions;
-                };
-              };
-            }
-        "#;
-        let root = rnix::Root::parse(src);
-        assert!(root.errors().is_empty());
-        let prefix = vec!["services".to_string(), "angrr".to_string()];
-        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        assert!(
-            opts.iter().any(|o| path_eq(&o.path, &["temporary-root-policies"])),
-            "settingsOptions (hop 1, no local with) must still promote; got {opts:?}"
-        );
-        assert!(
-            !opts.iter().any(|o| path_eq(&o.path, &["period"])),
-            "temporaryRootPolicyOptions must stay excluded even with BOTH F1C-A and F1C-B active \
-             together -- settingsOptions is a genuine submodule, not an alias, so F1C-B's own \
-             recursion correctly does not descend into it; got {opts:?}"
-        );
-    }
+    // S5-F1D note: this file previously had a second angrr test here
+    // ("...stays_excluded_under_combined_with_and_alias_resolution")
+    // specifically checking that F1C-A's with-transparency and F1C-B's
+    // alias-chain recursion, combined, didn't reintroduce angrr's real
+    // defect. Under F1D, `temporaryRootPolicyOptions.period` IS
+    // genuinely discovered (the one-hop cap is gone), at its own
+    // qualified path -- making that test's own fixture and assertions
+    // identical to `scan_options_angrr_two_hop_period_is_discovered_but_correctly_qualified_under_with_resolution`
+    // above (both exercise the exact same shape, since walk_options_block
+    // itself now reaches `temporary-root-policies` via the normal
+    // recursive walk, not via F1C-B's own alias-chain-following at all).
+    // Removed as a genuine duplicate rather than kept as dead weight.
 
     // --- S5-F1C-C: stable two-pass discovery order ----------------------
     //
@@ -8985,18 +9094,21 @@ mod tests {
     }
 
     #[test]
-    fn scan_options_real_k3s_manifestmodule_duplicate_enable_keeps_historical_order() {
-        // Integration anchor: the real F1B-R counterexample (k3s.nix, PR
-        // #374017). `manifestModule` (declared near the top of the file,
-        // its own `options = {...}` containing `enable`/`target`) is
-        // referenced from `manifests`, itself declared inside
+    fn scan_options_real_k3s_manifestmodule_enable_no_longer_collides_and_stays_source_ordered() {
+        // Integration anchor: the real F1B-R/F1C counterexample (k3s.nix,
+        // PR #374017). `manifestModule` (declared near the top of the
+        // file, its own `options = {...}` containing `enable`/`target`)
+        // is referenced from `manifests`, itself declared inside
         // `options.services.k3s = {...}` alongside a DIFFERENT, unrelated
         // `enable = mkEnableOption "k3s";` (the module's own top-level
-        // enable). Historically (v0.4.5, single-pass), manifestModule's
-        // own `enable` appears FIRST (it's declared earliest in the
-        // source); the module's own top-level `enable` appears later.
-        // This must be preserved exactly, not reordered by which pass
-        // discovered which.
+        // enable). Under S5-F1C, both bare-recorded to the SAME path
+        // (`["enable"]`), a real, pre-existing, disclosed collision whose
+        // own relative ORDER (whichever came first) was the only thing
+        // F1C-C fixed. Under S5-F1D, manifestModule's own `enable` is now
+        // qualified by `manifests` (`["manifests","enable"]`) -- it no
+        // longer collides with the top-level `enable` at all. General
+        // source-position ordering (F1C-C, unchanged) still governs the
+        // OVERALL vector, verified here on the full result.
         let src = r#"
             { config, lib, ... }:
             let
@@ -9033,24 +9145,27 @@ mod tests {
         assert!(root.errors().is_empty());
         let prefix = vec!["services".to_string(), "k3s".to_string()];
         let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
-        let enable_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["enable"])).collect();
+        let bare_enable_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["enable"])).collect();
         assert_eq!(
-            enable_matches.len(),
-            2,
-            "both the manifestModule's own enable and the module's own top-level enable must be \
-             present (a real, pre-existing, unrelated-to-F1C collision); got {opts:?}"
+            bare_enable_matches.len(),
+            1,
+            "only the module's own true top-level enable matches the bare path now -- manifestModule's \
+             own enable is qualified by manifests instead, no longer colliding; got {opts:?}"
         );
-        // manifestModule's own `enable` (declared earliest in the source,
-        // inside the `let` block) must sort BEFORE the top-level
-        // `options.services.k3s.enable` (declared later, inside the `in`
-        // body) -- the same relative order v0.4.5's own single-pass walk
-        // always produced.
-        let manifest_enable_pos = opts.iter().position(|o| path_eq(&o.path, &["enable"]) && o.span.line < 20).unwrap();
-        let toplevel_enable_pos = opts.iter().position(|o| path_eq(&o.path, &["enable"]) && o.span.line > 20).unwrap();
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["manifests", "enable"])),
+            "manifestModule's own enable, qualified by manifests; got {opts:?}"
+        );
+        // General source-position ordering (F1C-C) still governs the
+        // overall vector: manifestModule's own content (declared
+        // earliest, inside the `let`) sorts before the module's own true
+        // top-level content (declared later, inside the `in` body).
+        let manifest_enable_pos = opts.iter().position(|o| path_eq(&o.path, &["manifests", "enable"])).unwrap();
+        let toplevel_enable_pos = opts.iter().position(|o| path_eq(&o.path, &["enable"])).unwrap();
         assert!(
             manifest_enable_pos < toplevel_enable_pos,
-            "manifestModule's own enable (earlier in source) must sort before the top-level enable \
-             (later in source), matching historical document order; got {opts:?}"
+            "manifestModule's own enable (earlier in source) must still sort before the top-level \
+             enable (later in source), matching historical document order; got {opts:?}"
         );
     }
 
