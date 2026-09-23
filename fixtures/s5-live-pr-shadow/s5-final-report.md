@@ -11,6 +11,26 @@ prose around those numbers, never a hand-typed restatement of them.
 artifact SHA-256 `c07bed6c37fa3e0f1885099bb3dfc7a7b741531e8a156dc4fa8a7a160bd45800`
 — exactly the frozen baseline, no other build was used anywhere in this round.
 
+**S5-R0 report-integrity correction**: the initially-committed report
+undercounted `s5a.pass_verdict_count` (0, corrected to 1) and
+`s5b.actionable_presentation_count` (17, corrected to 18).
+`generate-report.py` had summed `pr_summary.actionable_count`/
+`pass_verdict_count` — fields that record what the tool's own
+rendering flagged as needing review *at evidence-gathering time* — for
+two presentations the coordinator's independent adjudication added
+*after* evidence-gathering (PR `#471312`'s false "Unchanged" was never
+flagged by the tool's own rendering as anything needing review; PR
+`#461261`'s PASS was deliberately left unclassified by the
+evidence-gathering pass pending coordinator judgment). Fixed to count
+directly from the ledger's own `actionable_presentation`/
+`pass_adjudication` records — the true source of truth — never from
+`pr_summary`'s own counters. **This changed no adjudication, no
+corpus membership, no gate verdict, and no confirmed-defect finding**
+— `gate`, `pr_level_precision`, `reconciliation`, and
+`path_overlap_diagnostics` are byte-identical before and after. See
+`s5-confirmed-defects.md` for the full, unambiguous provenance record
+of each of the 3 confirmed defects.
+
 ## Reconciliation
 
 Both cohorts processed as an unbroken 1..N prefix of their frozen
@@ -44,7 +64,7 @@ already governs the verdict).
 | Positions processed | 219 / 219 (cap reached) |
 | Applicable | 149 (68.0%) — vs. S5-A's 20.7%, confirming the frozen `R4_mkoption_line_edit_v1` selector's enrichment worked as designed |
 | `TOOL_ERROR` | 0 |
-| Actionable presentations surfaced | 17 |
+| Actionable presentations surfaced | 18 (every actionable PR this round happened to contribute exactly 1 presentation, so this number equals the distinct-PR count below — not a general property, just how this round landed) |
 | Distinct actionable PRs | **18** (target 30, not reached) |
 | PR-level correct / total | **15 / 18** |
 | PASS verdicts surfaced for review | 5 (all confirmed correct: `tayga`, `yggdrasil`, `vmalert`, `ncps`, `paretosecurity`) |

@@ -61,12 +61,23 @@ def main():
     dup_b = len(s5b) != len({r["pr"] for r in s5b})
 
     # --- S5-A estimand A stats ---
-    def bucket_stats(cohort):
+    # actionable_presentation_count / pass_verdict_count are counted
+    # DIRECTLY from the ledger's own actionable_presentation/
+    # pass_adjudication records (the true source of truth), never from
+    # pr_summary's own actionable_count/pass_verdict_count fields.
+    # S5-R0 finding: those pr_summary fields record what the tool's own
+    # rendering flagged as needing review AT EVIDENCE-GATHERING TIME --
+    # they go stale whenever the coordinator's own independent
+    # adjudication later determines something needs review that the
+    # tool's rendering never flagged as such (exactly PR #471312's false
+    # "Unchanged" and PR #461261's PASS, both coordinator-added
+    # post-hoc; see s5-confirmed-defects.md for the full provenance).
+    def bucket_stats(cohort, cohort_label):
         n = len(cohort)
         applicable = sum(1 for r in cohort if r["applicable"])
         tool_errors = sum(r["tool_error_count"] for r in cohort)
-        actionable = sum(r["actionable_count"] for r in cohort)
-        pass_verdicts = sum(r["pass_verdict_count"] for r in cohort)
+        actionable = sum(1 for r in actionable_presentations if r["cohort"] == cohort_label)
+        pass_verdicts = sum(1 for r in pass_adjs if r["cohort"] == cohort_label)
         effort = {}
         for r in cohort:
             effort[r["manual_effort_bucket"]] = effort.get(r["manual_effort_bucket"], 0) + 1
@@ -79,8 +90,8 @@ def main():
             "manual_effort_distribution": effort,
         }
 
-    s5a_stats = bucket_stats(s5a)
-    s5b_stats = bucket_stats(s5b)
+    s5a_stats = bucket_stats(s5a, "A")
+    s5b_stats = bucket_stats(s5b, "B")
 
     # --- PR-level aggregation (the frozen statistical unit) ---
     by_pr = {}

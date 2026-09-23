@@ -19,7 +19,7 @@
     "applicable_rate": 0.2067,
     "tool_error_count": 0,
     "actionable_presentation_count": 0,
-    "pass_verdict_count": 0,
+    "pass_verdict_count": 1,
     "manual_effort_distribution": {
       "<2": 119,
       "2-10": 31
@@ -30,7 +30,7 @@
     "applicable": 149,
     "applicable_rate": 0.6804,
     "tool_error_count": 0,
-    "actionable_presentation_count": 17,
+    "actionable_presentation_count": 18,
     "pass_verdict_count": 5,
     "manual_effort_distribution": {
       "<2": 152,

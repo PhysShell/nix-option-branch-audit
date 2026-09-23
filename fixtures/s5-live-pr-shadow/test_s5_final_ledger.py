@@ -71,6 +71,42 @@ def test_every_actionable_presentation_and_pass_has_exactly_two_distinct_reviewe
         assert gate.two_reviewers_ok(reviewer_ids), f"{r.get('presentation_id') or r.get('pass_id')}: reviewers {reviewer_ids}"
 
 
+def test_report_stats_are_counted_from_ledger_truth_not_stale_pr_summary_counters():
+    """S5-R0 regression test: generate-report.py must count
+    actionable_presentation_count/pass_verdict_count directly from the
+    ledger's own actionable_presentation/pass_adjudication records,
+    never from pr_summary's own counters -- those go stale whenever a
+    coordinator-driven adjudication adds a record the original
+    evidence-gathering pass didn't flag (exactly PR #471312's false
+    "Unchanged" and PR #461261's PASS). This test proves the known
+    discrepancy is real (so a future accidental revert to the stale
+    counters would be caught) and that the committed report already
+    reflects the ledger-truth count."""
+    rows = load_ledger()
+    ap = [r for r in rows if r["record_type"] == "actionable_presentation"]
+    pa = [r for r in rows if r["record_type"] == "pass_adjudication"]
+    ps_by_pr = {r["pr"]: r for r in rows if r["record_type"] == "pr_summary"}
+
+    stale_ap = [r["pr"] for r in ap if ps_by_pr[r["pr"]]["actionable_count"] < 1]
+    stale_pa = [r["pr"] for r in pa if ps_by_pr[r["pr"]]["pass_verdict_count"] < 1]
+    assert stale_ap == [471312], f"expected exactly the known PR 471312 staleness, got {stale_ap}"
+    assert stale_pa == [461261], f"expected exactly the known PR 461261 staleness, got {stale_pa}"
+
+    report_path = D / "s5-final-report.json"
+    if not report_path.exists():
+        print("SKIP  test_report_stats_are_counted_from_ledger_truth_not_stale_pr_summary_counters: report not yet generated")
+        return
+    report = json.loads(report_path.read_text())
+    ap_a = sum(1 for r in ap if r["cohort"] == "A")
+    ap_b = sum(1 for r in ap if r["cohort"] == "B")
+    pa_a = sum(1 for r in pa if r["cohort"] == "A")
+    pa_b = sum(1 for r in pa if r["cohort"] == "B")
+    assert report["s5a"]["actionable_presentation_count"] == ap_a
+    assert report["s5b"]["actionable_presentation_count"] == ap_b
+    assert report["s5a"]["pass_verdict_count"] == pa_a
+    assert report["s5b"]["pass_verdict_count"] == pa_b
+
+
 def test_every_disagreement_has_a_coordinator_resolution():
     """A disagreement is any actionable_presentation/pass_adjudication where
     the two raw reviews don't trivially agree on every field -- these must
