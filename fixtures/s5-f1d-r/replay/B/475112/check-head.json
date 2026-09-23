@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 1,
+    "inconclusive": 0,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "475112",
+      "module": "nixos/modules/services/networking/cgit.nix",
+      "test": "nixos/tests/cgit.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "cgit"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "cgit"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 122,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 130,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "virtualHost"
+          ],
+          "default_source": "config._module.args.name",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 134,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "location"
+          ],
+          "default_source": "\"/\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 141,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "repos"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 148,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "scanPath"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 160,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 167,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 179,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"cgit\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "cgit"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 185,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"cgit\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "cgit"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 191,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "gitHttpBackend",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 197,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "gitHttpBackend",
+            "checkExportOkFiles"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 210,
+            "col": 15
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "scanPath"
+          ],
+          "kind": "NullNeq",
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 117,
+            "col": 16
+          },
+          "source": "if cfg.scanPath != null then cfg.scanPath else \"${fcgiwrapRuntimeDir name}/repos\""
+        },
+        {
+          "path": [
+            "gitHttpBackend",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 308,
+            "col": 16
+          },
+          "source": "lib.optionalAttrs cfg.gitHttpBackend.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 79,
+            "col": 7
+          },
+          "source": "if value == true then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 81,
+            "col": 12
+          },
+          "source": "if value == false then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 89,
+            "col": 18
+          },
+          "source": "if lib.isList value then map (cgitrcLine name) value else [ (cgitrcLine name value) ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 229,
+            "col": 12
+          },
+          "source": "lib.mkIf (lib.any (cfg: cfg.enable) (lib.attrValues cfgs)) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "enable"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/cgit.nix",
+            "line": 278,
+            "col": 9
+          },
+          "source": "lib.mkIf (cfg.repos != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "repos"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "cgit",
+            "localhost",
+            "package"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/cgit.nix",
+            "line": 20,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OBA001",
+          "option": "gitHttpBackend.enable",
+          "predicate": {
+            "path": [
+              "gitHttpBackend",
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "optionalAttrs"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/cgit.nix",
+              "line": 308,
+              "col": 16
+            },
+            "source": "lib.optionalAttrs cfg.gitHttpBackend.enable {"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "gitHttpBackend",
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "optionalAttrs"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/cgit.nix",
+                  "line": 308,
+                  "col": 16
+                },
+                "source": "lib.optionalAttrs cfg.gitHttpBackend.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

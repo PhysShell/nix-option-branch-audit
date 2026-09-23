@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->pass": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 1,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 1,
+    "notable": [
+      {
+        "bucket": "resolved_inconclusive",
+        "engine": "oba",
+        "subject": "wkpfStrict",
+        "message": "a real test assignment provably flips this predicate away from its default",
+        "detail": "test evidence: 2 assignment(s) prove a transition",
+        "transition_origin": "origin_unclear"
+      }
+    ]
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/tayga.nix",
+        "test": "nixos/tests/tayga.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "tayga"
+        ],
+        "watched_path": "wkpfStrict"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "wkpfStrict"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PASS",
+            "option": "wkpfStrict",
+            "predicate": {
+              "path": [
+                "wkpfStrict"
+              ],
+              "kind": {
+                "Truthy": "if"
+              },
+              "span": {
+                "file": "nixos/modules/services/networking/tayga.nix",
+                "line": 31,
+                "col": 19
+              },
+              "source": "if cfg.wkpfStrict then \"yes\" else \"no\""
+            },
+            "default_outcome": true,
+            "evidence": [
+              {
+                "path": [
+                  "services",
+                  "tayga",
+                  "wkpfStrict"
+                ],
+                "value_source": "false",
+                "value_class": {
+                  "Bool": false
+                },
+                "known_value": {
+                  "Exact": {
+                    "Bool": false
+                  }
+                },
+                "instance": "router_systemd",
+                "span": {
+                  "file": "nixos/tests/tayga.nix",
+                  "line": 147,
+                  "col": 9
+                }
+              },
+              {
+                "path": [
+                  "services",
+                  "tayga",
+                  "wkpfStrict"
+                ],
+                "value_source": "false",
+                "value_class": {
+                  "Bool": false
+                },
+                "known_value": {
+                  "Exact": {
+                    "Bool": false
+                  }
+                },
+                "instance": "router_nixos",
+                "span": {
+                  "file": "nixos/tests/tayga.nix",
+                  "line": 220,
+                  "col": 9
+                }
+              }
+            ],
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "wkpfStrict"
+                  ],
+                  "kind": {
+                    "Truthy": "if"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/networking/tayga.nix",
+                    "line": 31,
+                    "col": 19
+                  },
+                  "source": "if cfg.wkpfStrict then \"yes\" else \"no\""
+                },
+                "witnessed": true
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "wkpfStrict"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "wkpfStrict"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/networking/tayga.nix",
+                    "line": 31,
+                    "col": 19
+                  },
+                  "source": "if cfg.wkpfStrict then \"yes\" else \"no\""
+                },
+                "witnessed": true
+              }
+            ]
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

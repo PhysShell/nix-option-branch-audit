@@ -1,0 +1,569 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "466806",
+      "module": "nixos/modules/services/misc/gollum.nix",
+      "test": "nixos/tests/gollum.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "gollum"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 29,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "address"
+          ],
+          "default_source": "\"0.0.0.0\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "0.0.0.0"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 31,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "4567",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 37,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 43,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "math"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 56,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "allowUploads"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 62,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user-icons"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "emoji"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 84,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "h1-title"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 90,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "no-edit"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 96,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "branch"
+          ],
+          "default_source": "\"master\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "master"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 102,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/gollum\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/gollum"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"gollum\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gollum"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 117,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"gollum\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "gollum"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 123,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 130,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "math"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 164,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.math \"--math\""
+        },
+        {
+          "path": [
+            "emoji"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 165,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.emoji \"--emoji\""
+        },
+        {
+          "path": [
+            "h1-title"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 166,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.h1-title \"--h1-title\""
+        },
+        {
+          "path": [
+            "no-edit"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 167,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.no-edit \"--no-edit\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 130,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "gollum"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 132,
+            "col": 26
+          },
+          "source": "lib.mkIf (cfg.user == \"gollum\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "math"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "math"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 164,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.math \"--math\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "emoji"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "emoji"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 165,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.emoji \"--emoji\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "h1-title"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "h1-title"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 166,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.h1-title \"--h1-title\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "no-edit"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "no-edit"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 167,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.no-edit \"--no-edit\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "allowUploads"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "allowUploads"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 168,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.allowUploads != null) \"--allow-uploads ${cfg.allowUploads}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "user-icons"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "user-icons"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gollum.nix",
+            "line": 169,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.user-icons != null) \"--user-icons ${cfg.user-icons}\""
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "local-time"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

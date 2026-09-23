@@ -1,0 +1,121 @@
+[
+  {
+    "pr": 429967,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Prosody -- watched leaf (http_files) verdict historical-identical, unaffected. discovered_options fully reconciles: vHostOpts's own leaves now requalified by `virtualHosts`, matching historical content exactly (same span, corrected path). Zero unexplained deltas."
+  },
+  {
+    "pr": 494314,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Same prosody mechanism as #429967. Fully reconciled, zero unexplained deltas."
+  },
+  {
+    "pr": 484133,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Rspamd -- watched leaf (extraArgs) restored to historical option_not_found->predicate_not_found. discovered_options fully reconciles: workerOpts's own leaves (count, includes, bindSockets, ...) now requalified by `workers`'s own path; bindSocketOpts's own leaves (socket, mode, owner, rawEntry -- the rspamd second-hop anchor) are NOW ALSO discovered, requalified by workers.bindSockets's own path -- previously entirely absent under the one-hop cap (S5-F1C), now present and correctly embedded. Zero unexplained_loss, zero unexplained_gain: every historical span (all bare, pre-F1-unconditional-walk era content) is accounted for."
+  },
+  {
+    "pr": 557329,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Portmaster -- watched leaf verdict historical-identical, unaffected. discovered_options fully reconciles: packageMatchType's own 7 leaves (directory, name, package, storeNameRegex, strictHead, strictLast, wrapped), reached only through the profilePackageType alias step, now requalified by profiles.packages's own path. Zero unexplained deltas -- the portmaster alias chain anchor confirmed intact in the real corpus."
+  },
+  {
+    "pr": 431289,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "One of the 7 former F1 watched-verdict regressions (prosody muc.moderation). Watched verdict restored to historical option_not_found->predicate_not_found exactly. discovered_options fully reconciles: every historical span matches a candidate span at the same source position -- same_identity where the path was already correct (true-root content), requalified where F1D now correctly prefixes vHostOpts's own content by its own referencing option's name (`virtualHosts.enabled`/`virtualHosts.ssl` etc., previously bare `enabled`/`ssl` historically). Zero unexplained_loss, zero unexplained_gain."
+  },
+  {
+    "pr": 374017,
+    "cohort": "A",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "K3s -- watched leaf (autoDeployCharts) verdict historical-identical. discovered_options fully reconciles: manifestModule's own enable/target/content/source, previously bare-colliding with the module's own unrelated top-level `enable` (a real, pre-existing collision S5-F1C's own ordering fix had to work around), are now requalified by `manifests`'s own path -- the collision is gone, not merely re-ordered. Zero unexplained deltas. Confirms this round's own synthetic k3s test against the real corpus."
+  },
+  {
+    "pr": 260551,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Prosody -- watched checkConfig (the already-adjudicated real S5 finding) declared directly at prosody's own true top level, unaffected -- confirmed identical (option_not_found->oba001, matching historical exactly). Residual discovered_options delta (vHostOpts's own content) fully reconciles as requalification, zero unexplained deltas."
+  },
+  {
+    "pr": 432528,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Tayga -- watched wkpfStrict (the already-adjudicated real S5 PASS finding) declared directly at the module's own true top level, unaffected -- confirmed identical (option_not_found->pass, matching historical exactly). Residual discovered_options delta fully reconciles as requalification (addrOpts's own content, previously bare, now qualified by pool/versionOpts's own path), zero unexplained deltas. Notably: addrOpts's own prefixLength is NOW discoverable under F1D (the one-hop cap removed) where it previously was not under F1C -- this PR's own watched leaf is unrelated to addrOpts, so this has no verdict effect here, but is direct evidence of the tayga second-hop anchor recovering in the real corpus, not just the synthetic unit test."
+  },
+  {
+    "pr": 438285,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Frigate.nix. Watched leaf ('path', inside cameraFormat.ffmpeg.inputs) historical-identical, unaffected -- unchanged since S5-F1B/F1C's own disclosure. Residual: 3 spans (ffmpeg.inputs, ffmpeg.inputs.path, ffmpeg.inputs.roles) present historically, absent under F1D -- unchanged root cause: the file's own TRUE-ROOT declaration itself (`options.services.frigate = with types; {...};`) is wrapped in a form `walk_merge_operands` does not unwrap, so Pass 1 never discovers a true-root declaration in this file at all, meaning F1D's own reference-following (which starts FROM a true-root declaration) never runs for it either -- exactly the same, unrelated, pre-existing limitation disclosed in S5-F1B's own completion report, confirmed still present and unchanged by F1D specifically (F1D does not touch walk_merge_operands)."
+  },
+  {
+    "pr": 423934,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "nvidia-container-toolkit/default.nix. Watched verdict historical-identical, unaffected. Residual: 3 spans (hostPath, containerPath, mountOptions -- mountType, a named let-binding) present historically, absent under F1D -- unchanged root cause: the file's own TRUE-ROOT declaration is `options = let mountType = {...}; in {...};` -- the whole `options =` value is a `let...in` expression, which `walk_merge_operands` also does not unwrap. Same class of gap as #438285/#433539, different wrapper syntax, already disclosed in S5-F1B's own completion report, confirmed unchanged by F1D."
+  },
+  {
+    "pr": 440660,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "Same prosody vHostOpts mechanism as #431289 (watched leaf http_external_url). Fully reconciled, zero unexplained deltas."
+  },
+  {
+    "pr": 471312,
+    "cohort": "B",
+    "verdict_delta": true,
+    "classification": "expected_target_correction",
+    "mechanism": "angrr, the decisive anchor. Re-confirmed from the frozen replay itself: head's watched 'period' transitions PredicateNotFound (historical, false match) -> OptionNotFound (candidate, correct). Final result Changed, not Unchanged -- matches S5-F1/F1B/F1C's own intended fix exactly. Direct check output confirms temporaryRootPolicyOptions's own 'period' IS now present in discovered_options, at its own real, qualified path (services.angrr.settings.temporary-root-policies.period) -- discovery is allowed, it simply never matches the bare watched query. This is the decisive proof of F1D's own intended mechanism, verified from the live replay, not merely the committed synthetic fixture."
+  },
+  {
+    "pr": 463443,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "provenance_requalification",
+    "mechanism": "One of the 7 former F1 watched-verdict regressions (watched leaf 'recommend'). Restored to historical option_not_found->predicate_not_found. A pre-existing, non-F1D-introduced 'profiles' path collision (leaf-collision-scan.json, previously disclosed) is now resolved: the colliding declarations requalify to distinct paths. Zero unexplained deltas."
+  },
+  {
+    "pr": 401840,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same nvidia-container-toolkit / let-in-wrapped true-root mechanism as #423934."
+  },
+  {
+    "pr": 398993,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same nvidia-container-toolkit / let-in-wrapped true-root mechanism as #423934."
+  },
+  {
+    "pr": 480839,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same nvidia-container-toolkit / let-in-wrapped true-root mechanism as #423934."
+  },
+  {
+    "pr": 433539,
+    "cohort": "B",
+    "verdict_delta": false,
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same frigate.nix / with-wrapped true-root mechanism as #438285."
+  }
+]

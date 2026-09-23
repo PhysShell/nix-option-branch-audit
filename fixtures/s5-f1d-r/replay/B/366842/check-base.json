@@ -1,0 +1,692 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "366842",
+      "module": "nixos/modules/services/networking/networkmanager.nix",
+      "test": "nixos/tests/networking/networkmanager.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "networking",
+        "networkmanager"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 152,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "connectionConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 166,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 189,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "unmanaged"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 204,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 219,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dhcp"
+          ],
+          "default_source": "\"internal\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "internal"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 242,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logLevel"
+          ],
+          "default_source": "\"WARN\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "WARN"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 253,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "appendNameservers"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 268,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "insertNameservers"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 277,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "wifi",
+            "backend"
+          ],
+          "default_source": "\"wpa_supplicant\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "wpa_supplicant"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 291,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "wifi",
+            "powersave"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 303,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "wifi",
+            "scanRandMacAddress"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 311,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "dns"
+          ],
+          "default_source": "\"default\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "default"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 321,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dispatcherScripts"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 341,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dispatcherScripts",
+            "source"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 345,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "dispatcherScripts",
+            "type"
+          ],
+          "default_source": "\"basic\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "basic"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 352,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "enableStrongSwan"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 385,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ensureProfiles",
+            "environmentFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 459,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 522,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableStrongSwan"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 675,
+            "col": 8
+          },
+          "source": "mkIf cfg.enableStrongSwan {"
+        },
+        {
+          "path": [
+            "wifi",
+            "powersave"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 690,
+            "col": 13
+          },
+          "source": "if cfg.wifi.powersave == null then"
+        },
+        {
+          "path": [
+            "wifi",
+            "powersave"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 692,
+            "col": 18
+          },
+          "source": "if cfg.wifi.powersave then"
+        },
+        {
+          "path": [
+            "enableStrongSwan"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 707,
+            "col": 10
+          },
+          "source": "optional cfg.enableStrongSwan pkgs.strongswanNM"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 522,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableStrongSwan"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableStrongSwan"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 675,
+            "col": 8
+          },
+          "source": "mkIf cfg.enableStrongSwan {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "wifi",
+                  "backend"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "iwd"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "wifi",
+              "backend"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 679,
+            "col": 8
+          },
+          "source": "mkIf enableIwd {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "wifi",
+                  "powersave"
+                ]
+              },
+              {
+                "Literal": "Null"
+              }
+            ]
+          },
+          "refs": [
+            [
+              "wifi",
+              "powersave"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 690,
+            "col": 13
+          },
+          "source": "if cfg.wifi.powersave == null then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "wifi",
+                  "powersave"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "wifi",
+              "powersave"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 692,
+            "col": 18
+          },
+          "source": "if cfg.wifi.powersave then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableStrongSwan"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableStrongSwan"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 707,
+            "col": 10
+          },
+          "source": "optional cfg.enableStrongSwan pkgs.strongswanNM"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dns"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "dnsmasq"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dns"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 708,
+            "col": 10
+          },
+          "source": "optional (cfg.dns == \"dnsmasq\") pkgs.dnsmasq"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 23,
+            "col": 20
+          },
+          "source": "if config.networking.resolvconf.enable then \"resolvconf\" else \"unmanaged\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 26,
+            "col": 27
+          },
+          "source": "if cfg.unmanaged == [ ] then null else lib.concatStringsSep \";\" cfg.unmanaged",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "unmanaged"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 135,
+            "col": 8
+          },
+          "source": "lib.optionals (!delegateWireless && !enableIwd) [",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": [
+            [
+              "unmanaged"
+            ],
+            [
+              "wifi",
+              "backend"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 554,
+            "col": 10
+          },
+          "source": "optionalAttrs (cfg.appendNameservers != [ ] || cfg.insertNameservers != [ ]) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "appendNameservers"
+            ],
+            [
+              "insertNameservers"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 632,
+            "col": 55
+          },
+          "source": "mkIf (cfg.ensureProfiles.profiles != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "ensureProfiles",
+              "profiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/networkmanager.nix",
+            "line": 659,
+            "col": 8
+          },
+          "source": "mkIf (!delegateWireless) {",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": [
+            [
+              "unmanaged"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/networking/networkmanager.nix",
+            "line": 6,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enableDefaultPlugins"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

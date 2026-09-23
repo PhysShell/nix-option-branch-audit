@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "389428",
+      "module": "nixos/modules/services/networking/searx.nix",
+      "test": "nixos/tests/searx.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "searx"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 48,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 55,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redisCreateLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 66,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 75,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settingsFile"
+          ],
+          "default_source": "\"${runDir}/settings.yml\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 105,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "limiterSettings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 121,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "runInUwsgi"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 148,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "uwsgiConfig"
+          ],
+          "default_source": "{ http = \":8080\"; }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 162,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 184,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "runInUwsgi"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 225,
+            "col": 30
+          },
+          "source": "mkIf cfg.runInUwsgi {"
+        },
+        {
+          "path": [
+            "redisCreateLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 233,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally \"unix://${config.services.redis.servers.searx.unixSocket}\""
+        },
+        {
+          "path": [
+            "runInUwsgi"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 236,
+            "col": 22
+          },
+          "source": "mkIf cfg.runInUwsgi {"
+        },
+        {
+          "path": [
+            "redisCreateLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 260,
+            "col": 36
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 184,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 203,
+            "col": 12
+          },
+          "source": "optionalAttrs (cfg.environmentFile != null)"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "runInUwsgi"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "runInUwsgi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 208,
+            "col": 30
+          },
+          "source": "mkIf (!cfg.runInUwsgi) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 217,
+            "col": 12
+          },
+          "source": "optionalAttrs (cfg.environmentFile != null)"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "runInUwsgi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "runInUwsgi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 225,
+            "col": 30
+          },
+          "source": "mkIf cfg.runInUwsgi {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redisCreateLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redisCreateLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 233,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally \"unix://${config.services.redis.servers.searx.unixSocket}\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "runInUwsgi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "runInUwsgi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 236,
+            "col": 22
+          },
+          "source": "mkIf cfg.runInUwsgi {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redisCreateLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redisCreateLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 260,
+            "col": 36
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 266,
+            "col": 46
+          },
+          "source": "lib.mkIf (cfg.limiterSettings != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "limiterSettings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "searx",
+            "environmentFile"
+          ],
+          "instance": "base",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/searx.nix",
+            "line": 15,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "faviconsSettings"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

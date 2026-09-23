@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "456004",
+      "module": "nixos/modules/services/audio/snapserver.nix",
+      "test": "nixos/tests/snapcast.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "snapserver",
+        "settings"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 109,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 113,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "stream",
+            "bind_to_address"
+          ],
+          "default_source": "\"::\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "::"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 124,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "stream",
+            "port"
+          ],
+          "default_source": "1704",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 131,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "stream",
+            "source"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 139,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "tcp",
+            "enabled"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 149,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "tcp",
+            "bind_to_address"
+          ],
+          "default_source": "\"::\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "::"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 151,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "tcp",
+            "port"
+          ],
+          "default_source": "1705",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 158,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "http",
+            "enabled"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 168,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "http",
+            "bind_to_address"
+          ],
+          "default_source": "\"::\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "::"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 170,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "http",
+            "port"
+          ],
+          "default_source": "1780",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 177,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "http",
+            "doc_root"
+          ],
+          "default_source": "pkgs.snapweb",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 185,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 198,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 210,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/snapserver.nix",
+            "line": 248,
+            "col": 7
+          },
+          "source": "lib.optionals cfg.openFirewall [ cfg.settings.stream.port ]"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "settings",
+            "stream",
+            "port"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/snapcast.nix",
+            "line": 26,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "settings",
+            "stream",
+            "buffer"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/snapcast.nix",
+            "line": 33,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "settings",
+            "tcp",
+            "port"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/snapcast.nix",
+            "line": 37,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "snapserver",
+            "settings",
+            "http",
+            "port"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/snapcast.nix",
+            "line": 41,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "stream.source"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,670 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "gotenberg",
+      "module": "nixos/modules/services/misc/gotenberg.nix",
+      "test": "nixos/tests/gotenberg.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "gotenberg"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 41,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "3000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 48,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "timeout"
+          ],
+          "default_source": "\"30s\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "30s"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 54,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "rootPath"
+          ],
+          "default_source": "\"/\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 60,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableBasicAuth"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 66,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraFontPackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 77,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "chromium",
+            "maxQueueSize"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 86,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "chromium",
+            "autoStart"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 92,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "chromium",
+            "disableJavascript"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 98,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "chromium",
+            "disableRoutes"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 104,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "libreoffice",
+            "restartAfter"
+          ],
+          "default_source": "10",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 114,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "libreoffice",
+            "maxQueueSize"
+          ],
+          "default_source": "0",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 120,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "libreoffice",
+            "autoStart"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 126,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "libreoffice",
+            "disableRoutes"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 132,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "pdfEngines"
+          ],
+          "default_source": "[\n          \"pdftk\"\n          \"qpdf\"\n          \"libreoffice-pdfengine\"\n          \"exiftool\"\n          \"pdfcpu\"\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 139,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logLevel"
+          ],
+          "default_source": "\"info\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "info"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 163,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 174,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 180,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enableBasicAuth"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 21,
+            "col": 8
+          },
+          "source": "optional cfg.enableBasicAuth \"--api-enable-basic-auth\""
+        },
+        {
+          "path": [
+            "chromium",
+            "autoStart"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 22,
+            "col": 8
+          },
+          "source": "optional cfg.chromium.autoStart \"--chromium-auto-start\""
+        },
+        {
+          "path": [
+            "chromium",
+            "disableJavascript"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 23,
+            "col": 8
+          },
+          "source": "optional cfg.chromium.disableJavascript \"--chromium-disable-javascript\""
+        },
+        {
+          "path": [
+            "chromium",
+            "disableRoutes"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 24,
+            "col": 8
+          },
+          "source": "optional cfg.chromium.disableRoutes \"--chromium-disable-routes\""
+        },
+        {
+          "path": [
+            "libreoffice",
+            "autoStart"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 25,
+            "col": 8
+          },
+          "source": "optional cfg.libreoffice.autoStart \"--libreoffice-auto-start\""
+        },
+        {
+          "path": [
+            "libreoffice",
+            "disableRoutes"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 26,
+            "col": 8
+          },
+          "source": "optional cfg.libreoffice.disableRoutes \"--libreoffice-disable-routes\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 188,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableBasicAuth"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableBasicAuth"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 21,
+            "col": 8
+          },
+          "source": "optional cfg.enableBasicAuth \"--api-enable-basic-auth\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "chromium",
+                  "autoStart"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "chromium",
+              "autoStart"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 22,
+            "col": 8
+          },
+          "source": "optional cfg.chromium.autoStart \"--chromium-auto-start\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "chromium",
+                  "disableJavascript"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "chromium",
+              "disableJavascript"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 23,
+            "col": 8
+          },
+          "source": "optional cfg.chromium.disableJavascript \"--chromium-disable-javascript\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "chromium",
+                  "disableRoutes"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "chromium",
+              "disableRoutes"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 24,
+            "col": 8
+          },
+          "source": "optional cfg.chromium.disableRoutes \"--chromium-disable-routes\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "libreoffice",
+                  "autoStart"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "libreoffice",
+              "autoStart"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 25,
+            "col": 8
+          },
+          "source": "optional cfg.libreoffice.autoStart \"--libreoffice-auto-start\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "libreoffice",
+                  "disableRoutes"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "libreoffice",
+              "disableRoutes"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 26,
+            "col": 8
+          },
+          "source": "optional cfg.libreoffice.disableRoutes \"--libreoffice-disable-routes\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 188,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/gotenberg.nix",
+            "line": 250,
+            "col": 12
+          },
+          "source": "optionalAttrs (cfg.environmentFile != null) { EnvironmentFile = cfg.environmentFile; }"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "pdfEngines"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,979 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "386345",
+      "module": "nixos/modules/services/databases/postgresql.nix",
+      "test": "nixos/tests/postgresql/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "postgresql"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 108,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableJIT"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 110,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "finalPackage"
+          ],
+          "default_source": "postgresql",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 116,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "checkConfig"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 127,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 133,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "authentication"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 145,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "identMap"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 161,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "initdbArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 175,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "initialScript"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 188,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ensureDatabases"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 201,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ensureUsers"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 216,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ensureUsers",
+            "name"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 220,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "ensureUsers",
+            "ensureDBOwnership"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 227,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "ensureUsers",
+            "ensureClauses"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 237,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "enableTCPIP"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 411,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extensions"
+          ],
+          "default_source": "_: [ ]",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 421,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 430,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "shared_preload_libraries"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 441,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "log_line_prefix"
+          ],
+          "default_source": "\"[%p] \"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "[%p] "
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 450,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "port"
+          ],
+          "default_source": "5432",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 461,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "recoveryConfig"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 492,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "superUser"
+          ],
+          "default_source": "\"postgres\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "postgres"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 500,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enableJIT"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 47,
+            "col": 17
+          },
+          "source": "if cfg.enableJIT then cfg.package.withJIT else cfg.package.withoutJIT"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 516,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableTCPIP"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 536,
+            "col": 26
+          },
+          "source": "if cfg.enableTCPIP then \"*\" else \"localhost\""
+        },
+        {
+          "path": [
+            "enableJIT"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 537,
+            "col": 24
+          },
+          "source": "if cfg.enableJIT then \"on\" else \"off\""
+        },
+        {
+          "path": [
+            "enableJIT"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 572,
+            "col": 18
+          },
+          "source": "if cfg.enableJIT then base.withJIT else base"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableJIT"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableJIT"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 47,
+            "col": 17
+          },
+          "source": "if cfg.enableJIT then cfg.package.withJIT else cfg.package.withoutJIT"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 516,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableTCPIP"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableTCPIP"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 536,
+            "col": 26
+          },
+          "source": "if cfg.enableTCPIP then \"*\" else \"localhost\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableJIT"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableJIT"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 537,
+            "col": 24
+          },
+          "source": "if cfg.enableJIT then \"on\" else \"off\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableJIT"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableJIT"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 572,
+            "col": 18
+          },
+          "source": "if cfg.enableJIT then base.withJIT else base"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "recoveryConfig"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "recoveryConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 630,
+            "col": 11
+          },
+          "source": "optionalString (cfg.recoveryConfig != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "initialScript"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "initialScript"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 647,
+            "col": 15
+          },
+          "source": "optionalString (cfg.initialScript != null) ''"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 49,
+            "col": 16
+          },
+          "source": "if cfg.extensions == [ ] then basePackage else basePackage.withPackages cfg.extensions",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "extensions"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 53,
+            "col": 5
+          },
+          "source": "if true == value then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 55,
+            "col": 10
+          },
+          "source": "if false == value then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 57,
+            "col": 10
+          },
+          "source": "if isString value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 554,
+            "col": 11
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"24.11\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 556,
+            "col": 16
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"23.11\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 558,
+            "col": 16
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"22.05\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 560,
+            "col": 16
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"21.11\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 562,
+            "col": 16
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"20.03\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 564,
+            "col": 16
+          },
+          "source": "if versionAtLeast config.system.stateVersion \"17.09\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 603,
+            "col": 21
+          },
+          "source": "lib.optional (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "checkConfig"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 653,
+            "col": 11
+          },
+          "source": "optionalString (cfg.ensureDatabases != [ ]) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "ensureDatabases"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 662,
+            "col": 33
+          },
+          "source": "optionalString user.ensureDBOwnership ''$PSQL -tAc 'ALTER DATABASE \"${user.name}\" OWNER TO \"${user.name}\";' ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 666,
+            "col": 65
+          },
+          "source": "if v then n else \"no${n}\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 685,
+            "col": 18
+          },
+          "source": "if versionAtLeast cfg.package.version \"9.6\" then \"notify\" else \"simple\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package",
+              "version"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 735,
+            "col": 16
+          },
+          "source": "lib.optionals (any extensionInstalled [ \"plv8\" ]) [ \"@pkey\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "extensions"
+            ],
+            [
+              "enableJIT"
+            ],
+            [
+              "package",
+              "withJIT"
+            ],
+            [
+              "package",
+              "withoutJIT"
+            ],
+            [
+              "enableJIT"
+            ],
+            [
+              "package",
+              "withJIT"
+            ],
+            [
+              "package",
+              "withoutJIT"
+            ],
+            [
+              "extensions"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 736,
+            "col": 16
+          },
+          "source": "lib.optionals (any extensionInstalled [ \"citus\" ]) [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "extensions"
+            ],
+            [
+              "enableJIT"
+            ],
+            [
+              "package",
+              "withJIT"
+            ],
+            [
+              "package",
+              "withoutJIT"
+            ],
+            [
+              "enableJIT"
+            ],
+            [
+              "package",
+              "withJIT"
+            ],
+            [
+              "package",
+              "withoutJIT"
+            ],
+            [
+              "extensions"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 740,
+            "col": 19
+          },
+          "source": "if groupAccessAvailable then \"0027\" else \"0077\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "finalPackage",
+              "version"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 742,
+            "col": 10
+          },
+          "source": "mkIf (cfg.dataDir != \"/var/lib/postgresql/${cfg.package.psqlSchema}\") {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dataDir"
+            ],
+            [
+              "package",
+              "psqlSchema"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 746,
+            "col": 10
+          },
+          "source": "mkIf (cfg.dataDir == \"/var/lib/postgresql/${cfg.package.psqlSchema}\") {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "dataDir"
+            ],
+            [
+              "package",
+              "psqlSchema"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/postgresql.nix",
+            "line": 749,
+            "col": 32
+          },
+          "source": "if groupAccessAvailable then \"0750\" else \"0700\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "finalPackage",
+              "version"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/postgresql/default.nix",
+            "line": 7,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "systemCallFilter"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

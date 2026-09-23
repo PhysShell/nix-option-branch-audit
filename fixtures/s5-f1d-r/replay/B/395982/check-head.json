@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "395982",
+      "module": "nixos/modules/services/networking/openvpn.nix",
+      "test": "nixos/tests/initrd-network-openvpn/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "openvpn",
+        "servers"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "openvpn",
+            "servers"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 109,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "config"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 158,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "up"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 170,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "down"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 178,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "autoStart"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 186,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "updateResolvConf"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 192,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "authUserPass"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 202,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "authUserPass",
+            "username"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 218,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "authUserPass",
+            "password"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 223,
+            "col": 23
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openvpn",
+            "restartAfterSleep"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 238,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "updateResolvConf"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 37,
+            "col": 11
+          },
+          "source": "optionalString cfg.updateResolvConf \"${pkgs.update-resolv-conf}/libexec/openvpn/update-resolv-conf\""
+        },
+        {
+          "path": [
+            "updateResolvConf"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 42,
+            "col": 11
+          },
+          "source": "optionalString cfg.updateResolvConf \"${pkgs.update-resolv-conf}/libexec/openvpn/update-resolv-conf\""
+        },
+        {
+          "path": [
+            "autoStart"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 71,
+            "col": 18
+          },
+          "source": "optional cfg.autoStart \"multi-user.target\""
+        },
+        {
+          "path": [
+            "restartAfterSleep"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 85,
+            "col": 20
+          },
+          "source": "optionalAttrs cfg.restartAfterSleep {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 57,
+            "col": 11
+          },
+          "source": "if isAttrs cfg.authUserPass then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "authUserPass"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/openvpn.nix",
+            "line": 248,
+            "col": 12
+          },
+          "source": "mkIf (cfg.servers != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "servers"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "systemd",
+            "enable"
+          ],
+          "instance": "minimalboot",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/initrd-network-openvpn/default.nix",
+            "line": 33,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "network",
+            "openvpn",
+            "configuration"
+          ],
+          "instance": "minimalboot",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/initrd-network-openvpn/default.nix",
+            "line": 38,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "systemd",
+            "enable"
+          ],
+          "instance": "ovpnclient",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/initrd-network-openvpn/default.nix",
+            "line": 51,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "preLVMCommands"
+          ],
+          "instance": "ovpnclient",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/initrd-network-openvpn/default.nix",
+            "line": 64,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "boot",
+            "initrd",
+            "network",
+            "postCommands"
+          ],
+          "instance": "ovpnclient",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/initrd-network-openvpn/default.nix",
+            "line": 72,
+            "col": 17
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "testserver.authUserPass"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

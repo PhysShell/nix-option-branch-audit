@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "432765",
+      "module": "nixos/modules/services/security/kanidm.nix",
+      "test": "nixos/tests/kanidm.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "kanidm",
+        "unixd",
+        "settings",
+        "kanidm"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "provision",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 62,
+            "col": 6
+          },
+          "source": "optionals cfg.provision.enable provisionSecretFiles"
+        },
+        {
+          "path": [
+            "provision",
+            "idmAdminPasswordFile"
+          ],
+          "kind": "NullNeq",
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 160,
+            "col": 5
+          },
+          "source": "if cfg.provision.idmAdminPasswordFile != null then"
+        },
+        {
+          "path": [
+            "provision",
+            "extraJsonFile"
+          ],
+          "kind": "NullNeq",
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 185,
+            "col": 5
+          },
+          "source": "if cfg.provision.extraJsonFile != null then"
+        },
+        {
+          "path": [
+            "provision",
+            "acceptInvalidCerts"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 198,
+            "col": 10
+          },
+          "source": "optionalString cfg.provision.acceptInvalidCerts \"--insecure\""
+        },
+        {
+          "path": [
+            "provision",
+            "acceptInvalidCerts"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 215,
+            "col": 11
+          },
+          "source": "optionalString cfg.provision.acceptInvalidCerts \"--accept-invalid-certs\""
+        },
+        {
+          "path": [
+            "enableClient"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 888,
+            "col": 34
+          },
+          "source": "mkIf cfg.enableClient [ cfg.package ]"
+        },
+        {
+          "path": [
+            "enableServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 898,
+            "col": 31
+          },
+          "source": "mkIf cfg.enableServer {"
+        },
+        {
+          "path": [
+            "provision",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 922,
+            "col": 27
+          },
+          "source": "mkIf cfg.provision.enable postStartScript"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 950,
+            "col": 37
+          },
+          "source": "mkIf cfg.enablePam {"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 993,
+            "col": 43
+          },
+          "source": "mkIf cfg.enablePam {"
+        },
+        {
+          "path": [
+            "enableServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1047,
+            "col": 8
+          },
+          "source": "mkIf cfg.enableServer { \"kanidm/server.toml\".source = serverConfigFile; }"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1051,
+            "col": 8
+          },
+          "source": "mkIf cfg.enablePam { \"kanidm/unixd\".source = unixConfigFile; }"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1054,
+            "col": 25
+          },
+          "source": "mkIf cfg.enablePam [ cfg.package ]"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1057,
+            "col": 46
+          },
+          "source": "optional cfg.enablePam \"kanidm\""
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1058,
+            "col": 47
+          },
+          "source": "optional cfg.enablePam \"kanidm\""
+        },
+        {
+          "path": [
+            "enableServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1061,
+            "col": 8
+          },
+          "source": "mkIf cfg.enableServer { kanidm = { }; }"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1062,
+            "col": 8
+          },
+          "source": "mkIf cfg.enablePam { kanidm-unixd = { }; }"
+        },
+        {
+          "path": [
+            "enableServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1065,
+            "col": 8
+          },
+          "source": "mkIf cfg.enableServer {"
+        },
+        {
+          "path": [
+            "enablePam"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1073,
+            "col": 8
+          },
+          "source": "mkIf cfg.enablePam {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 76,
+            "col": 21
+          },
+          "source": "optional (!hasPrefixInList filteredPaths newPath) newPath",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 225,
+            "col": 5
+          },
+          "source": "if hasInfix \"]:\" address then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "serverSettings",
+              "bindaddress"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 229,
+            "col": 5
+          },
+          "source": "if hasInfix \".\" address then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "serverSettings",
+              "bindaddress"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 481,
+            "col": 17
+          },
+          "source": "optional (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 881,
+            "col": 11
+          },
+          "source": "if lib.versionAtLeast config.system.stateVersion \"24.11\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 890,
+            "col": 45
+          },
+          "source": "mkIf enableServerBackup {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "enableServer"
+            ],
+            [
+              "serverSettings",
+              "online_backup",
+              "versions"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 929,
+            "col": 16
+          },
+          "source": "optional enableServerBackup cfg.serverSettings.online_backup.path",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "enableServer"
+            ],
+            [
+              "serverSettings",
+              "online_backup",
+              "versions"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 930,
+            "col": 16
+          },
+          "source": "optional (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "enablePam"
+            ],
+            [
+              "unixSettings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/kanidm.nix",
+            "line": 1048,
+            "col": 8
+          },
+          "source": "mkIf options.services.kanidm.clientSettings.isDefined {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/kanidm.nix",
+            "line": 24,
+            "col": 3
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kanidm",
+            "package"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/kanidm.nix",
+            "line": 30,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kanidm",
+            "serverSettings",
+            "domain"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/kanidm.nix",
+            "line": 34,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "users",
+            "users",
+            "kanidm",
+            "shell"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/kanidm.nix",
+            "line": 47,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kanidm",
+            "package"
+          ],
+          "instance": "client",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/kanidm.nix",
+            "line": 60,
+            "col": 9
+          }
+        },
+        {
+          "path": [],
+          "instance": "client",
+          "reason": "dynamic (\"${...}\") attribute name at module root -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/kanidm.nix",
+            "line": 73,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "pam_allowed_login_groups"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

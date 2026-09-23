@@ -1,0 +1,1502 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "509507",
+      "module": "nixos/modules/services/networking/ssh/sshd.nix",
+      "test": "nixos/tests/openssh.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "openssh"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 241,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "config.programs.ssh.package",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 250,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "startWhenNeeded"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 257,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "allowSFTP"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 267,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sftpServerExecutable"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 277,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sftpFlags"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 286,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ports"
+          ],
+          "default_source": "[ 22 ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 298,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 306,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenAddresses"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 314,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenAddresses",
+            "addr"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 319,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "listenAddresses",
+            "port"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 326,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "hostKeys"
+          ],
+          "default_source": "[\n          {\n            type = \"rsa\";\n            bits = 4096;\n            path = \"/etc/ssh/ssh_host_rsa_key\";\n          }\n          {\n            type = \"ed25519\";\n            path = \"/etc/ssh/ssh_host_ed25519_key\";\n          }\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 365,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "generateHostKeys"
+          ],
+          "default_source": "config.services.openssh.enable",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 399,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableRecommendedAlgorithms"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 412,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "authorizedKeysFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 422,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "authorizedKeysInHomedir"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 438,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "authorizedKeysCommand"
+          ],
+          "default_source": "\"none\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "none"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 449,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "authorizedKeysCommandUser"
+          ],
+          "default_source": "\"nobody\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "nobody"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 459,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 469,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "AcceptEnv"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 483,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "AuthorizedPrincipalsFile"
+          ],
+          "default_source": "\"none\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "none"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 492,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "LogLevel"
+          ],
+          "default_source": "\"INFO\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "INFO"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 500,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "UsePAM"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 520,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "UseDns"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 524,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "X11Forwarding"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 534,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PasswordAuthentication"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 541,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PermitRootLogin"
+          ],
+          "default_source": "\"prohibit-password\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "prohibit-password"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 548,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "KbdInteractiveAuthentication"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 563,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "GatewayPorts"
+          ],
+          "default_source": "\"no\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "no"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 570,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "KexAlgorithms"
+          ],
+          "default_source": "if config.services.openssh.enableRecommendedAlgorithms then\n                    [\n                      \"mlkem768x25519-sha256\"\n                      \"sntrup761x25519-sha512\"\n                      \"sntrup761x25519-sha512@openssh.com\"\n                      \"curve25519-sha256\"\n                      \"curve25519-sha256@libssh.org\"\n                      \"diffie-hellman-group-exchange-sha256\"\n                    ]\n                  else\n                    null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 579,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "Macs"
+          ],
+          "default_source": "if config.services.openssh.enableRecommendedAlgorithms then\n                    [\n                      \"hmac-sha2-512-etm@openssh.com\"\n                      \"hmac-sha2-256-etm@openssh.com\"\n                      \"umac-128-etm@openssh.com\"\n                    ]\n                  else\n                    null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 613,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "StrictModes"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 641,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "Ciphers"
+          ],
+          "default_source": "if config.services.openssh.enableRecommendedAlgorithms then\n                    [\n                      \"chacha20-poly1305@openssh.com\"\n                      \"aes256-gcm@openssh.com\"\n                      \"aes128-gcm@openssh.com\"\n                      \"aes256-ctr\"\n                      \"aes192-ctr\"\n                      \"aes128-ctr\"\n                    ]\n                  else\n                    null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 648,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "AllowUsers"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 682,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DenyUsers"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 690,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "AllowGroups"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 699,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "DenyGroups"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 708,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "PrintMotd"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 719,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "Banner"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 722,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 735,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "moduliFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 741,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "users",
+            "users"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 753,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 762,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "startWhenNeeded"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 804,
+            "col": 24
+          },
+          "source": "lib.mkIf cfg.startWhenNeeded {"
+        },
+        {
+          "path": [
+            "generateHostKeys"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 826,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.generateHostKeys [ \"sshd-keygen.service\" ]"
+        },
+        {
+          "path": [
+            "generateHostKeys"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 851,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.generateHostKeys [ \"sshd-keygen.service\" ]"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 872,
+            "col": 45
+          },
+          "source": "lib.optionals cfg.openFirewall cfg.ports"
+        },
+        {
+          "path": [
+            "authorizedKeysInHomedir"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 884,
+            "col": 9
+          },
+          "source": "lib.optional cfg.authorizedKeysInHomedir \"%h/.ssh/authorized_keys\""
+        },
+        {
+          "path": [
+            "allowSFTP"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 902,
+            "col": 14
+          },
+          "source": "lib.optional cfg.allowSFTP \"Subsystem sftp ${cfg.sftpServerExecutable} ${lib.concatStringsSep \" \" cfg.sftpFlags}\""
+        },
+        {
+          "path": [
+            "settings",
+            "X11Forwarding"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 937,
+            "col": 23
+          },
+          "source": "if cfg.settings.X11Forwarding then cfgc.setXAuthLocation else true"
+        },
+        {
+          "path": [
+            "generateHostKeys"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 984,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.generateHostKeys {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 762,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "startWhenNeeded"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "startWhenNeeded"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 804,
+            "col": 24
+          },
+          "source": "lib.mkIf cfg.startWhenNeeded {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "generateHostKeys"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "generateHostKeys"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 826,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.generateHostKeys [ \"sshd-keygen.service\" ]"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "startWhenNeeded"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "startWhenNeeded"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 844,
+            "col": 25
+          },
+          "source": "lib.mkIf (!cfg.startWhenNeeded) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "generateHostKeys"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "generateHostKeys"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 851,
+            "col": 19
+          },
+          "source": "lib.mkIf cfg.generateHostKeys [ \"sshd-keygen.service\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 872,
+            "col": 45
+          },
+          "source": "lib.optionals cfg.openFirewall cfg.ports"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "UsePAM"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "UsePAM"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 874,
+            "col": 36
+          },
+          "source": "lib.mkIf (cfg.settings.UsePAM == true) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "PasswordAuthentication"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "PasswordAuthentication"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 877,
+            "col": 20
+          },
+          "source": "if cfg.settings.PasswordAuthentication == true then true else false"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "authorizedKeysInHomedir"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "authorizedKeysInHomedir"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 884,
+            "col": 9
+          },
+          "source": "lib.optional cfg.authorizedKeysInHomedir \"%h/.ssh/authorized_keys\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "allowSFTP"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "allowSFTP"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 902,
+            "col": 14
+          },
+          "source": "lib.optional cfg.allowSFTP \"Subsystem sftp ${cfg.sftpServerExecutable} ${lib.concatStringsSep \" \" cfg.sftpFlags}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "authorizedKeysCommand"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "none"
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "authorizedKeysCommand"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 906,
+            "col": 14
+          },
+          "source": "lib.optional (cfg.authorizedKeysCommand != \"none\") ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "X11Forwarding"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "X11Forwarding"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 937,
+            "col": 23
+          },
+          "source": "if cfg.settings.X11Forwarding then cfgc.setXAuthLocation else true"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "generateHostKeys"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "generateHostKeys"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 984,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.generateHostKeys {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 14,
+            "col": 5
+          },
+          "source": "if pkgs.stdenv.buildPlatform == pkgs.stdenv.hostPlatform then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 25,
+            "col": 9
+          },
+          "source": "if lib.isInt v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 27,
+            "col": 14
+          },
+          "source": "if lib.isString v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 29,
+            "col": 14
+          },
+          "source": "if true == v then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 31,
+            "col": 14
+          },
+          "source": "if false == v then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 66,
+            "col": 13
+          },
+          "source": "if lib.isList val then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 67,
+            "col": 15
+          },
+          "source": "if lib.elem key commaSeparated then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 69,
+            "col": 20
+          },
+          "source": "if lib.elem key spaceSeparated then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 582,
+            "col": 19
+          },
+          "source": "if config.services.openssh.enableRecommendedAlgorithms then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 616,
+            "col": 19
+          },
+          "source": "if config.services.openssh.enableRecommendedAlgorithms then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 651,
+            "col": 19
+          },
+          "source": "if config.services.openssh.enableRecommendedAlgorithms then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 808,
+            "col": 13
+          },
+          "source": "if cfg.listenAddresses != [ ] then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "listenAddresses"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 811,
+            "col": 17
+          },
+          "source": "if port != null then [ \"${addr}:${toString port}\" ] else map (p: \"${addr}:${toString p}\") cfg.ports",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 887,
+            "col": 60
+          },
+          "source": "lib.mkIf (",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 894,
+            "col": 30
+          },
+          "source": "if config.networking.enableIPv6 then \"any\" else \"inet\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 899,
+            "col": 37
+          },
+          "source": "lib.optionalString (port != null) (\":\" + toString port)",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 901,
+            "col": 14
+          },
+          "source": "lib.optional cfgc.setXAuthLocation \"XAuthLocation ${lib.getExe pkgs.xauth}\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 928,
+            "col": 18
+          },
+          "source": "if la.port != null then [ la.port ] else cfg.ports",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 1004,
+            "col": 19
+          },
+          "source": "lib.optionalString (k ? bits) \"-b ${toString k.bits}\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 1005,
+            "col": 19
+          },
+          "source": "lib.optionalString (k ? comment) \"-C '${k.comment}'\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/ssh/sshd.nix",
+            "line": 1006,
+            "col": 19
+          },
+          "source": "lib.optionalString (k ? openSSHFormat && k.openSSHFormat) \"-o\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "openssh",
+            "package"
+          ],
+          "instance": "server-no-openssl",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/openssh.nix",
+            "line": 187,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openssh",
+            "package"
+          ],
+          "instance": "server-no-pam",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/openssh.nix",
+            "line": 237,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openssh",
+            "package"
+          ],
+          "instance": "server-null-pam",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/openssh.nix",
+            "line": 254,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "banner"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

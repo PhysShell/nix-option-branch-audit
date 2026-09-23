@@ -1,0 +1,564 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "480468",
+      "module": "nixos/modules/services/web-apps/mediawiki.nix",
+      "test": "nixos/tests/mediawiki.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "mediawiki",
+        "database"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 269,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "finalPackage"
+          ],
+          "default_source": "pkg",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 280,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "name"
+          ],
+          "default_source": "\"MediaWiki\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "MediaWiki"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 290,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "url"
+          ],
+          "default_source": "if cfg.webserver == \"apache\" then\n            \"${\n              if\n                cfg.httpd.virtualHost.addSSL || cfg.httpd.virtualHost.forceSSL || cfg.httpd.virtualHost.onlySSL\n              then\n                \"https\"\n              else\n                \"http\"\n            }://${cfg.httpd.virtualHost.hostName}\"\n          else if cfg.webserver == \"nginx\" then\n            let\n              hasSSL = host: host.forceSSL || host.addSSL;\n            in\n            \"${\n              if hasSSL config.services.nginx.virtualHosts.${cfg.nginx.hostName} then \"https\" else \"http\"\n            }://${cfg.nginx.hostName}\"\n          else\n            \"http://localhost\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 297,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "uploadsDir"
+          ],
+          "default_source": "\"${stateDir}/uploads\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 325,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "passwordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 334,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "passwordSender"
+          ],
+          "default_source": "if cfg.webserver == \"apache\" then\n            if cfg.httpd.virtualHost.adminAddr != null then\n              cfg.httpd.virtualHost.adminAddr\n            else\n              config.services.httpd.adminAddr\n          else\n            \"root@localhost\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 342,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "path"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 362,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "skins"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 369,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "extensions"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 378,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "webserver"
+          ],
+          "default_source": "\"apache\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "apache"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 398,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "type"
+          ],
+          "default_source": "\"mysql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mysql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 409,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "host"
+          ],
+          "default_source": "if cfg.database.type == \"sqlite\" then null else \"localhost\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 421,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "if cfg.database.type == \"mysql\" then\n              3306\n            else if cfg.database.type != \"sqlite\" then\n              5432\n            else\n              null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 428,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "name"
+          ],
+          "default_source": "\"mediawiki\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mediawiki"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 441,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "if cfg.database.type != \"sqlite\" then \"mediawiki\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 447,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "path"
+          ],
+          "default_source": "if cfg.database.type == \"sqlite\" then \"${stateDir}/data\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 454,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 461,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "tablePrefix"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 471,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "socket"
+          ],
+          "default_source": "if (cfg.database.type == \"mysql\" && cfg.database.createLocally) then\n              \"/run/mysqld/mysqld.sock\"\n            else if (cfg.database.type == \"postgres\" && cfg.database.createLocally) then\n              \"/run/postgresql\"\n            else\n              null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 483,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "createLocally"
+          ],
+          "default_source": "cfg.database.type == \"mysql\" || cfg.database.type == \"postgres\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 496,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "nginx",
+            "hostName"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 507,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "httpd",
+            "virtualHost"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 517,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "poolConfig"
+          ],
+          "default_source": "{\n          \"pm\" = \"dynamic\";\n          \"pm.max_children\" = 32;\n          \"pm.start_servers\" = 2;\n          \"pm.min_spare_servers\" = 2;\n          \"pm.max_spare_servers\" = 4;\n          \"pm.max_requests\" = 500;\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 533,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mediawiki",
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 555,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "database",
+            "socket"
+          ],
+          "kind": "NullEq",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 112,
+            "col": 5
+          },
+          "source": "if cfg.database.socket == null then"
+        },
+        {
+          "path": [
+            "httpd",
+            "virtualHost",
+            "adminAddr"
+          ],
+          "kind": "NullNeq",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 346,
+            "col": 13
+          },
+          "source": "if cfg.httpd.virtualHost.adminAddr != null then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 578,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 73,
+            "col": 13
+          },
+          "source": "if v != null then v else \"$src/share/mediawiki/extensions/${k}\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 263,
+            "col": 28
+          },
+          "source": "if lib.hasSuffix \"/\" str then str else \"${str}/\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/mediawiki.nix",
+            "line": 314,
+            "col": 15
+          },
+          "source": "if hasSSL config.services.nginx.virtualHosts.${cfg.nginx.hostName} then \"https\" else \"http\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "nginx",
+              "hostName"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/mediawiki.nix",
+            "line": 30,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/mediawiki.nix",
+            "line": 45,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/mediawiki.nix",
+            "line": 60,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/mediawiki.nix",
+            "line": 75,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/mediawiki.nix",
+            "line": 97,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "path"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

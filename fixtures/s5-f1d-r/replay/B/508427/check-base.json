@@ -1,0 +1,460 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "508427",
+      "module": "nixos/modules/services/web-apps/drupal.nix",
+      "test": "nixos/tests/drupal.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "drupal",
+        "sites"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 194,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "filesDir"
+          ],
+          "default_source": "\"/var/lib/drupal/${name}/sites/default/files\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 197,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "privateFilesDir"
+          ],
+          "default_source": "\"/var/lib/drupal/${name}/private\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 209,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "configSyncDir"
+          ],
+          "default_source": "\"/var/lib/drupal/${name}/config/sync\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 216,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "webRoot"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 227,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 238,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/drupal/${name}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 251,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "modulesDir"
+          ],
+          "default_source": "\"/var/lib/drupal/${name}/modules\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 266,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "themesDir"
+          ],
+          "default_source": "\"/var/lib/drupal/${name}/themes\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 279,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "phpOptions"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 292,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 310,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "3306",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 316,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"drupal\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "drupal"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 322,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "\"drupal\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "drupal"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 328,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 334,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "tablePrefix"
+          ],
+          "default_source": "\"dp_\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "dp_"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 344,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "socket"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 355,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 362,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "virtualHost"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 369,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "poolConfig"
+          ],
+          "default_source": "{\n            \"pm\" = \"dynamic\";\n            \"pm.max_children\" = 32;\n            \"pm.start_servers\" = 2;\n            \"pm.min_spare_servers\" = 2;\n            \"pm.max_spare_servers\" = 4;\n            \"pm.max_requests\" = 500;\n          }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 383,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "drupal",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 412,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "drupal",
+            "sites"
+          ],
+          "default_source": "{\n          \"localhost\" = {\n            enable = true;\n          };\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 415,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "drupal",
+            "webserver"
+          ],
+          "default_source": "\"nginx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "nginx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 425,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 444,
+            "col": 12
+          },
+          "source": "mkIf (cfg.enable) (mkMerge ["
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 457,
+            "col": 24
+          },
+          "source": "mkIf (any (v: v.database.createLocally) (attrValues eachSite)) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "sites"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/drupal.nix",
+            "line": 533,
+            "col": 10
+          },
+          "source": "optionalAttrs (any (v: v.database.createLocally) (attrValues eachSite)) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "sites"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "inherit binding at test spec root -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/drupal.nix",
+            "line": 57,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "configRoot"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

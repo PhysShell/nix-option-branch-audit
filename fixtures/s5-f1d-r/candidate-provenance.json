@@ -1,0 +1,36 @@
+{
+  "candidate_commit": "25c5b5468c94f87231eed115e6eba5ad6118e9ff",
+  "candidate_commit_short": "25c5b54",
+  "note_on_commit_choice": "The mandate is explicit: the binary under replay must be built from 25c5b54 (the F1D implementation commit), not from 892231a (the F1D report/documentation-only commit that follows it). Verified: `git diff 25c5b54 892231a -- src/` is empty (892231a only adds fixtures/s5-f1d/*.md) -- so this is a provenance discipline point, not a behavioral one, but honored precisely as instructed.",
+  "built_from": "clean git clone + checkout, verified `git status --short` empty and `git rev-parse HEAD == 25c5b5468c94f87231eed115e6eba5ad6118e9ff` before building -- never the working tree used for editing. No `cp`-based restoration was used anywhere in this build or in any A/B comparison this round -- every candidate-vs-historical comparison in this round used this same clean-checkout binary directly.",
+  "clean_checkout_path": "/home/tandem/f1dr-clean-checkout/repo",
+  "build_location_note": "Built under /home/tandem (real disk), not /tmp (tmpfs) -- a real disk-exhaustion failure was hit during S5-F1D's own targeted verification from building inside /tmp; this round's clean checkout was placed outside it from the start.",
+  "binary_path": "/home/tandem/f1dr-clean-checkout/target/release/oba",
+  "binary_sha256": "3e2b180f07f3b8352f3faf668ac4d93c7198992e52c7cbff47494d5df07fb8f9",
+  "rustc_version": "rustc 1.100.0-nightly (8925ea358 2026-08-20), toolchain nightly-2026-08-21-x86_64-unknown-linux-gnu",
+  "build_command": "CARGO_TARGET_DIR=/home/tandem/f1dr-clean-checkout/target rustup run nightly-2026-08-21-x86_64-unknown-linux-gnu cargo build --release",
+  "self_reported_tool_version": "0.4.5",
+  "note": "Cargo.toml version is unchanged (no version bump, per this round's own scope constraints) -- the candidate binary self-reports the SAME 'tool.version: 0.4.5' string as the historical S5 baseline binary and every prior candidate (cdfb4ca, 6c2c2aa). Candidate identity is established by this file's own binary_sha256 and candidate_commit, not by the self-reported version string.",
+  "baseline_for_comparison": {
+    "release": "v0.4.5",
+    "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+    "artifact_sha256": "c07bed6c37fa3e0f1885099bb3dfc7a7b741531e8a156dc4fa8a7a160bd45800",
+    "note": "the ORIGINAL S5 round's own binary, whose outputs are the historical ground truth this replay compares against -- fixtures/s5-live-pr-shadow/adjudication/**/*.json, untouched by this replay"
+  },
+  "diagnostic_reference_candidates": [
+    {"release": "S5-F1 first candidate", "commit": "cdfb4cac31b7346d925a28eb2c4e5c280aeac95d", "verdict": "S5-F1-R FAIL"},
+    {"release": "S5-F1B replacement candidate", "commit": "6c2c2aa71f0c9764c8fb7c1bb76473ae5918c5af", "verdict": "S5-F1B-R FAIL"},
+    {"release": "S5-F1C (three commits)", "commits": ["d272ccf", "2054cbb", "26acad9"], "verdict": "no full replay run (deferred to F1D)"}
+  ],
+  "history_chain": [
+    {"step": "historical S5 under test", "ref": "v0.4.5 / 8f1701a", "verdict": "FAIL"},
+    {"step": "S5-R0 report-integrity fix", "ref": "28a1d58"},
+    {"step": "first F1 candidate", "ref": "cdfb4ca"},
+    {"step": "S5-F1-R full-corpus replay of cdfb4ca", "ref": "baaaec9 / f0a54a3", "verdict": "FAIL"},
+    {"step": "S5-F1B replacement candidate", "ref": "6c2c2aa"},
+    {"step": "S5-F1B-R full-corpus replay of 6c2c2aa", "ref": "44edf38", "verdict": "FAIL"},
+    {"step": "S5-F1C (with-resolution, alias-chain, stable ordering)", "ref": "d272ccf / 2054cbb / 26acad9 / f94959f"},
+    {"step": "S5-F1D (remove one-hop cap, provenance-qualified paths)", "ref": "25c5b54 / 892231a"},
+    {"step": "S5-F1D-R full-corpus acceptance replay of 25c5b54 (this round)", "ref": "in progress"}
+  ]
+}

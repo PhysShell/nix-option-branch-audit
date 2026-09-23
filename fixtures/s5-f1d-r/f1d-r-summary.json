@@ -1,0 +1,88 @@
+{
+  "round": "S5-F1D-R",
+  "purpose": "frozen full-corpus acceptance replay of implementation candidate 25c5b54",
+  "baseline": {"release": "v0.4.5", "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356"},
+  "historical_s5_verdict": "FAIL",
+  "acceptance_candidate": {
+    "commit": "25c5b5468c94f87231eed115e6eba5ad6118e9ff",
+    "commit_short": "25c5b54",
+    "binary_sha256": "3e2b180f07f3b8352f3faf668ac4d93c7198992e52c7cbff47494d5df07fb8f9",
+    "note": "built from a genuinely clean checkout, no cp-based restoration used anywhere in this round"
+  },
+  "coverage": {
+    "total_frozen_prs": 369,
+    "non_applicable": 189,
+    "applicable": 180,
+    "applicable_re_derived_independently_from_ledger": true,
+    "applicable_evaluated": 180,
+    "window_evaluation_incomplete": 0,
+    "fetch_failures": 0
+  },
+  "comparison": {
+    "identical_to_historical": 163,
+    "changed_vs_historical": 17,
+    "changed_prs": [429967, 494314, 484133, 557329, 431289, 374017, 260551, 432528, 438285, 423934, 440660, 471312, 463443, 401840, 398993, 480839, 433539],
+    "note_vs_prior_rounds": "22 PRs changed under 6c2c2aa (S5-F1B-R/F1C); 17 under 25c5b54 -- 5 (506644, 508427, 428153, 427260, 397967) are now fully byte-identical to historical, including discovered_options, not just watched verdict."
+  },
+  "delta_classification_counts": {
+    "expected_target_correction": 1,
+    "provenance_requalification": 10,
+    "known_pre_existing_limitation": 6
+  },
+  "provenance_conservation_reconciliation": {
+    "methodology": "span-based (file, line, col) declaration matching between historical and candidate discovered_options, not raw path-set diffing -- see reconcile-discoveries.py",
+    "same_identity_spans": 450,
+    "requalified_spans": 401,
+    "newly_reachable_spans": 0,
+    "removed_false_duplicate_spans": 0,
+    "unexplained_loss_spans_mechanical": 37,
+    "unexplained_gain_spans_mechanical": 0,
+    "unexplained_loss_spans_after_manual_tracing": 0,
+    "unexplained_loss_breakdown": {
+      "known_pre_existing_frigate_nvidia_wrap_gap": 36,
+      "newly_identified_imports_reference_gap_pr_471312": 1
+    },
+    "note": "0 spans remain genuinely unexplained after classification-notes.json's own hand-verified tracing. All 37 mechanically-flagged 'unexplained_loss' spans resolve to one of two disclosed, pre-existing (non-F1D-specific) limitations: (a) frigate.nix/nvidia-container-toolkit's own true-root walk_merge_operands wrap gap (already disclosed since S5-F1B), 36 spans across 6 PRs; (b) a genuinely NEW finding this round's own more rigorous span-based reconciliation surfaced -- angrr's own commonPolicyOptions is referenced only via `imports =`, never `type =`, and has been unreachable by any of F1/F1B/F1C/F1D's own reference-following mechanism since S5-F1's first fix (cdfb4ca) -- 1 span, PR #471312, zero verdict impact, confirmed pre-existing via F1-R's own frozen comparison-report.jsonl."
+  },
+  "mandatory_anchors": {
+    "A_angrr_471312": "corrected as intended -- predicate_not_found->option_not_found, Changed; temporaryRootPolicyOptions.period confirmed genuinely DISCOVERED at its own qualified path (settings.temporary-root-policies.period) in the replay evidence itself, never colliding with the bare watched query",
+    "B_seven_f1_regressions": {
+      "431289": "restored, fully requalified, zero unexplained deltas",
+      "506644": "restored, fully byte-identical to historical",
+      "508427": "restored, fully byte-identical to historical",
+      "440660": "restored, fully requalified, zero unexplained deltas",
+      "428153": "restored, fully byte-identical to historical",
+      "397967": "restored, fully byte-identical to historical -- already-adjudicated finding remains visible",
+      "427260": "restored, fully byte-identical to historical"
+    },
+    "C_rspamd_second_hop": "recovered -- workers.bindSockets.socket/.mode (bindSocketOpts, previously excluded by the one-hop cap) now discovered at its own qualified path, confirmed in the live replay evidence for PR #484133",
+    "D_tayga_second_hop": "recovered -- confirmed directly in the live replay evidence for PR #432528: ipv4.pool.prefixLength and ipv6.pool.prefixLength (addrOpts's own leaves, reached via versionOpts -> pool -> addrOpts) are newly present in discovered_options relative to historical, at their own correctly-qualified paths. Also confirmed via a dedicated hostile unit test reproducing the exact shape.",
+    "E_fourteen_discovery_deltas": {
+      "429967": "provenance_requalification", "494314": "provenance_requalification",
+      "484133": "provenance_requalification", "557329": "provenance_requalification",
+      "374017": "provenance_requalification", "260551": "provenance_requalification",
+      "432528": "provenance_requalification", "438285": "known_pre_existing_limitation",
+      "423934": "known_pre_existing_limitation", "463443": "provenance_requalification",
+      "401840": "known_pre_existing_limitation", "398993": "known_pre_existing_limitation",
+      "480839": "known_pre_existing_limitation", "433539": "known_pre_existing_limitation"
+    },
+    "F_cgit_475112": "unaffected -- confirmed byte-identical to historical in the full replay",
+    "G_guacamole_462487": "unaffected -- confirmed byte-identical to historical in the full replay",
+    "H_fatal_error_controls": "unchanged -- 0 parse_errors, only changed/unchanged diff kinds observed across all 180 PRs"
+  },
+  "eight_collision_prs": {
+    "429967": "resolved", "494314": "resolved", "431289": "resolved", "440660": "resolved",
+    "260551": "resolved", "463443": "resolved", "374017": "resolved",
+    "415326": "unresolved -- wildcard-prefix case (services.wstunnel.clients.*), deliberately untouched, matching kimai's own established precedent",
+    "full_corpus_scan_result": "confirmed via scan-leaf-collisions.py run against the complete 180-PR replay (not a targeted spot-check): exactly 1 collision finding remains in the entire corpus (wstunnel #415326), pre_existing=true (identical to historical), no new collision introduced anywhere"
+  },
+  "k3s_ordering": "confirmed directly in the live replay for PR #374017: both historical and candidate discovered_options arrays are in span-sorted (source-position) order, same length (23), same content -- the collision is gone (requalified), not merely reordered, and the remaining ordering property holds exactly.",
+  "kimai_wildcard": "intact -- two_roots_are_analyzed_independently_real_kimai_transition passes",
+  "reproducibility": {
+    "applicable_manifest_independently_re_derived_from_ledger": true,
+    "compare_replay_reconcile_and_classify_scripts_rerun_twice_byte_identical_output": true,
+    "leaf_collision_scan_rerun_and_stable": true
+  },
+  "final_verdict": "PASS",
+  "scope_note": "This PASS means 25c5b54 satisfies the frozen S5 acceptance corpus under the provenance-qualified discovery model. It does not mean complete Nix semantics are supported, wildcard collision policy is solved, cgit/guacamole are fixed, or run_target's .find() is universally correct -- all explicitly out of scope and unaddressed."
+}

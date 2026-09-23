@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "492892",
+      "module": "nixos/modules/services/misc/sssd.nix",
+      "test": "nixos/tests/sssd-ldap.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "sssd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 31,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 33,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "config"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 57,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sshAuthorizedKeysIntegration"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 79,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "kcm"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 88,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 96,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 121,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "kcm"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 206,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.kcm {"
+        },
+        {
+          "path": [
+            "sshAuthorizedKeysIntegration"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 236,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.sshAuthorizedKeysIntegration {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 121,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 177,
+            "col": 29
+          },
+          "source": "lib.mkIf (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "kcm"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "kcm"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 206,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.kcm {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "sshAuthorizedKeysIntegration"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "sshAuthorizedKeysIntegration"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 236,
+            "col": 6
+          },
+          "source": "lib.mkIf cfg.sshAuthorizedKeysIntegration {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 16,
+            "col": 19
+          },
+          "source": "if x then \"True\" else \"False\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 18,
+            "col": 32
+          },
+          "source": "if lib.isBool v then pyBool v else v",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/sssd.nix",
+            "line": 23,
+            "col": 5
+          },
+          "source": "if cfg.settings == { } then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "etc",
+            "cert.pem",
+            "text"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 28,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "etc",
+            "key.pem",
+            "text"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 29,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openldap",
+            "settings",
+            "children",
+            "olcDatabase={1}mdb",
+            "attrs",
+            "olcSuffix"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 61,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openldap",
+            "settings",
+            "children",
+            "olcDatabase={1}mdb",
+            "attrs",
+            "olcRootPW"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 63,
+            "col": 19
+          }
+        },
+        {
+          "path": [
+            "services",
+            "openldap",
+            "declarativeContents"
+          ],
+          "instance": "machine",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 82,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "sssd",
+            "settings",
+            "sssd",
+            "domains"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 119,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "sssd",
+            "settings"
+          ],
+          "instance": "machine",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/sssd-ldap.nix",
+            "line": 122,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "subIDsIntegration"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}
