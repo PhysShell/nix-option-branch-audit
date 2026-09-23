@@ -878,6 +878,43 @@ fn scan_options(
         }
     }
 
+    // S5-F1C-C: restore stable, historical (pre-F1/F1B) discovery order.
+    // Before the Pass 1 / Pass 2 split existed, every declaration --
+    // true-root or named-binding alike -- was discovered by a SINGLE
+    // unconditional walk in natural document order. Splitting discovery
+    // into two passes (true-root content first, then promoted candidates
+    // appended after) changed nothing about WHICH declarations are
+    // found, but it silently changed the ORDER they land in `out` --
+    // real, demonstrated regression: k3s.nix (PR #374017) has a
+    // pre-existing (not F1B-introduced) duplicate `enable` path; under
+    // the two-pass split, the promoted declarations block (`enable`,
+    // `target`, `content`, `source` -- k3s's own top-level content,
+    // reached via a named submodule) moved from the FRONT of `out` to
+    // the BACK, purely because it's discovered in Pass 2 rather than
+    // Pass 1, even though NEITHER declaration nor its content actually
+    // changed. Since `run_target`'s own gate-1 lookup picks the FIRST
+    // matching path (`.find()`, unmodified, unchanged in this phase --
+    // see the mandate's own explicit boundary: F1C does not redesign
+    // duplicate-candidate selection), a silent order change can silently
+    // change WHICH of two duplicate candidates wins, for a different,
+    // hypothetical watched query -- observable behavior, not cosmetic.
+    //
+    // The fix: every `OptionDecl`'s own `span` already records its real
+    // source position (`file`, `line`, `col`), independent of which pass
+    // discovered it. `rowan`'s tree guarantees non-overlapping child
+    // spans in increasing position order, so for a single well-formed
+    // file, sorting by `(line, col)` exactly reconstructs what a single
+    // unconditional preorder (document-order) traversal would have
+    // produced -- the same order the historical, single-pass v0.4.5
+    // binary always used. A stable sort (`Vec::sort_by` is stable in
+    // Rust) preserves relative order for any two declarations that
+    // happen to share an exact `(line, col)` (not expected for distinct
+    // real declarations, but not relied upon either). Deliberately NOT
+    // sorting by option name or path (would NOT match historical
+    // document order) and NOT relying on hash-map iteration order
+    // (nothing here does).
+    out.sort_by(|a, b| (a.span.line, a.span.col).cmp(&(b.span.line, b.span.col)));
+
     out
 }
 
@@ -8877,6 +8914,143 @@ mod tests {
             "temporaryRootPolicyOptions must stay excluded even with BOTH F1C-A and F1C-B active \
              together -- settingsOptions is a genuine submodule, not an alias, so F1C-B's own \
              recursion correctly does not descend into it; got {opts:?}"
+        );
+    }
+
+    // --- S5-F1C-C: stable two-pass discovery order ----------------------
+    //
+    // F1B-R's own real finding (k3s.nix, PR #374017): splitting discovery
+    // into Pass 1 (true-root content) and Pass 2 (promoted named-binding
+    // content, appended after) preserves WHICH declarations are found,
+    // but silently changed the ORDER they land in `out` relative to the
+    // historical, single-pass v0.4.5 binary -- promoted content always
+    // moved to the end, regardless of where it actually sits in the
+    // source text. Since a pre-existing duplicate path's `run_target`
+    // resolution depends on vector order (`.find()`, first match wins,
+    // unmodified in this phase), an order change is an observable
+    // behavior change, not cosmetic. The fix sorts `out` by source
+    // position (`span.line`, `span.col`) at the very end of
+    // `scan_options`, restoring the exact order a single unconditional
+    // document-order traversal (what v0.4.5 always did) would produce.
+
+    #[test]
+    fn scan_options_promoted_content_is_ordered_by_source_position_not_discovery_pass() {
+        // Minimal reproduction of k3s's own real shape: a named binding
+        // (`helperModule`) declared EARLY in the file (inside the `let`
+        // block, which textually precedes the whole module body),
+        // referenced from a true-root declaration (`things`) that
+        // appears in the MIDDLE of the module body, with further
+        // true-root content both before and after it. Before this fix,
+        // `helperModule`'s own content (discovered in Pass 2) would be
+        // appended after ALL of Pass 1's content, moving `enable`/
+        // `target` (declared earliest in the source, inside the `let`)
+        // past `earlyThing`/`things`/`laterThing` (all declared later,
+        // inside the `in` body) -- wrong relative to source position.
+        // The correct, historical-matching order is document order:
+        // everything inside the `let` sorts before everything inside the
+        // `in` body, since it's textually earlier in the file.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              helperModule = {
+                options = {
+                  enable = lib.mkOption { default = "from-helper"; };
+                  target = lib.mkOption { default = "from-helper-target"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                earlyThing = lib.mkOption { default = "early"; };
+                things = lib.mkOption {
+                  type = lib.types.attrsOf (lib.types.submodule helperModule);
+                  default = { };
+                };
+                laterThing = lib.mkOption { default = "later"; };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        let order: Vec<&str> = opts.iter().map(|o| o.path.last().unwrap().as_str()).collect();
+        assert_eq!(
+            order,
+            vec!["enable", "target", "earlyThing", "things", "laterThing"],
+            "declarations must be ordered by source position (document order), matching what a \
+             single unconditional traversal would produce; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_real_k3s_manifestmodule_duplicate_enable_keeps_historical_order() {
+        // Integration anchor: the real F1B-R counterexample (k3s.nix, PR
+        // #374017). `manifestModule` (declared near the top of the file,
+        // its own `options = {...}` containing `enable`/`target`) is
+        // referenced from `manifests`, itself declared inside
+        // `options.services.k3s = {...}` alongside a DIFFERENT, unrelated
+        // `enable = mkEnableOption "k3s";` (the module's own top-level
+        // enable). Historically (v0.4.5, single-pass), manifestModule's
+        // own `enable` appears FIRST (it's declared earliest in the
+        // source); the module's own top-level `enable` appears later.
+        // This must be preserved exactly, not reordered by which pass
+        // discovered which.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.k3s;
+              manifestModule = lib.types.submodule (
+                { name, config, options, ... }: {
+                  options = {
+                    enable = lib.mkOption {
+                      type = lib.types.bool;
+                      default = true;
+                    };
+                    target = lib.mkOption {
+                      type = lib.types.str;
+                    };
+                  };
+                }
+              );
+            in
+            {
+              options.services.k3s = {
+                enable = lib.mkEnableOption "k3s";
+                role = lib.mkOption {
+                  type = lib.types.str;
+                  default = "server";
+                };
+                manifests = lib.mkOption {
+                  type = lib.types.attrsOf manifestModule;
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "k3s".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        let enable_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["enable"])).collect();
+        assert_eq!(
+            enable_matches.len(),
+            2,
+            "both the manifestModule's own enable and the module's own top-level enable must be \
+             present (a real, pre-existing, unrelated-to-F1C collision); got {opts:?}"
+        );
+        // manifestModule's own `enable` (declared earliest in the source,
+        // inside the `let` block) must sort BEFORE the top-level
+        // `options.services.k3s.enable` (declared later, inside the `in`
+        // body) -- the same relative order v0.4.5's own single-pass walk
+        // always produced.
+        let manifest_enable_pos = opts.iter().position(|o| path_eq(&o.path, &["enable"]) && o.span.line < 20).unwrap();
+        let toplevel_enable_pos = opts.iter().position(|o| path_eq(&o.path, &["enable"]) && o.span.line > 20).unwrap();
+        assert!(
+            manifest_enable_pos < toplevel_enable_pos,
+            "manifestModule's own enable (earlier in source) must sort before the top-level enable \
+             (later in source), matching historical document order; got {opts:?}"
         );
     }
 
