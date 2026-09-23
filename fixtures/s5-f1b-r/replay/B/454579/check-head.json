@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "454579",
+      "module": "nixos/modules/services/network-filesystems/kubo.nix",
+      "test": "nixos/tests/kubo/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "kubo",
+        "settings",
+        "Mounts"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "kubo",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 115,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "user"
+          ],
+          "default_source": "\"ipfs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "ipfs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 124,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "group"
+          ],
+          "default_source": "\"ipfs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "ipfs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 130,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "dataDir"
+          ],
+          "default_source": "if lib.versionAtLeast config.system.stateVersion \"17.09\" then\n            \"/var/lib/ipfs\"\n          else\n            \"/var/lib/ipfs/.ipfs\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 136,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "defaultMode"
+          ],
+          "default_source": "\"online\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "online"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 151,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "autoMount"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 161,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "autoMigrate"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 167,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "enableGC"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 173,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "emptyRepo"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 179,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 185,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "settings",
+            "Addresses",
+            "API"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 190,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "settings",
+            "Addresses",
+            "Gateway"
+          ],
+          "default_source": "\"/ip4/127.0.0.1/tcp/8080\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/ip4/127.0.0.1/tcp/8080"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 204,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "settings",
+            "Addresses",
+            "Swarm"
+          ],
+          "default_source": "[\n                \"/ip4/0.0.0.0/tcp/4001\"\n                \"/ip6/::/tcp/4001\"\n                \"/ip4/0.0.0.0/udp/4001/quic-v1\"\n                \"/ip4/0.0.0.0/udp/4001/quic-v1/webtransport\"\n                \"/ip4/0.0.0.0/udp/4001/webrtc-direct\"\n                \"/ip6/::/udp/4001/quic-v1\"\n                \"/ip6/::/udp/4001/quic-v1/webtransport\"\n                \"/ip6/::/udp/4001/webrtc-direct\"\n              ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 213,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "IPFS"
+          ],
+          "default_source": "\"/ipfs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/ipfs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 228,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "IPNS"
+          ],
+          "default_source": "\"/ipns\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/ipns"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 234,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "MFS"
+          ],
+          "default_source": "\"/mfs\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/mfs"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 240,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "FuseAllowOther"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 246,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "extraFlags"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 271,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "localDiscovery"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 277,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "serviceFdlimit"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 286,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "kubo",
+            "startWhenNeeded"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 293,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "autoMount"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 50,
+            "col": 5
+          },
+          "source": "lib.optional cfg.autoMount \"--mount\""
+        },
+        {
+          "path": [
+            "enableGC"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 51,
+            "col": 8
+          },
+          "source": "lib.optional cfg.enableGC \"--enable-gc\""
+        },
+        {
+          "path": [
+            "localDiscovery"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 58,
+            "col": 13
+          },
+          "source": "if cfg.localDiscovery then \"local-discovery\" else \"server\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 304,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "autoMount"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 369,
+            "col": 41
+          },
+          "source": "lib.mkIf (cfg.autoMount) defaultConfig"
+        },
+        {
+          "path": [
+            "autoMount"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 370,
+            "col": 41
+          },
+          "source": "lib.mkIf (cfg.autoMount) defaultConfig"
+        },
+        {
+          "path": [
+            "autoMount"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 371,
+            "col": 40
+          },
+          "source": "lib.mkIf (cfg.autoMount) defaultConfig"
+        },
+        {
+          "path": [
+            "autoMount"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 376,
+            "col": 7
+          },
+          "source": "if cfg.autoMount then [ cfg.package.systemd_unit ] else [ cfg.package.systemd_unit_hardened ]"
+        },
+        {
+          "path": [
+            "autoMigrate"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 392,
+            "col": 9
+          },
+          "source": "lib.optionalString cfg.autoMigrate ''"
+        },
+        {
+          "path": [
+            "autoMount"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 410,
+            "col": 18
+          },
+          "source": "lib.mkIf cfg.autoMount ''"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 65,
+            "col": 15
+          },
+          "source": "if builtins.isList addrIn then addrIn else [ addrIn ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 73,
+            "col": 15
+          },
+          "source": "if builtins.isList addrIn then addrIn else [ addrIn ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 84,
+            "col": 5
+          },
+          "source": "if s 0 == \"ip4\" && s 2 == \"tcp\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 86,
+            "col": 10
+          },
+          "source": "if s 0 == \"ip6\" && s 2 == \"tcp\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 88,
+            "col": 10
+          },
+          "source": "if s 0 == \"unix\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 99,
+            "col": 5
+          },
+          "source": "if s 0 == \"ip4\" && s 2 == \"udp\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 101,
+            "col": 10
+          },
+          "source": "if s 0 == \"ip6\" && s 2 == \"udp\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/network-filesystems/kubo.nix",
+            "line": 139,
+            "col": 11
+          },
+          "source": "if lib.versionAtLeast config.system.stateVersion \"17.09\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/kubo/default.nix",
+            "line": 2,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "FuseAllowOther"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

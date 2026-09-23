@@ -1,0 +1,445 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "397967",
+      "module": "nixos/modules/services/networking/fedimintd.nix",
+      "test": "nixos/tests/fedimintd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "fedimintd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "fedimintd"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 183,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 32,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment"
+          ],
+          "default_source": "{\n            RUST_BACKTRACE = \"1\";\n          }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 36,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "p2p",
+            "openFirewall"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 49,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "p2p",
+            "port"
+          ],
+          "default_source": "8173",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 54,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "p2p",
+            "bind"
+          ],
+          "default_source": "\"0.0.0.0\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "0.0.0.0"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 59,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "p2p",
+            "url"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 64,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "api",
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 73,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "api",
+            "port"
+          ],
+          "default_source": "8174",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 78,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "api",
+            "bind"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 83,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "api",
+            "url"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 88,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "bitcoin",
+            "network"
+          ],
+          "default_source": "\"signet\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "signet"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 96,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "bitcoin",
+            "rpc",
+            "url"
+          ],
+          "default_source": "\"http://127.0.0.1:38332\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "http://127.0.0.1:38332"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 103,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "bitcoin",
+            "rpc",
+            "kind"
+          ],
+          "default_source": "\"bitcoind\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "bitcoind"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 110,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "bitcoin",
+            "rpc",
+            "secretFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 117,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "consensus",
+            "finalityDelay"
+          ],
+          "default_source": "10",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 132,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/fedimintd-${name}/\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 138,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 150,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "fqdn"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 157,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "path"
+          ],
+          "default_source": "\"/ws/\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/ws/"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 162,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "config"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 168,
+            "col": 11
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "api",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 200,
+            "col": 12
+          },
+          "source": "lib.optional cfg.api.openFirewall cfg.api.port"
+        },
+        {
+          "path": [
+            "p2p",
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 200,
+            "col": 62
+          },
+          "source": "lib.optional cfg.p2p.openFirewall cfg.p2p.port"
+        },
+        {
+          "path": [
+            "bitcoin",
+            "rpc",
+            "secretFile"
+          ],
+          "kind": "NullNeq",
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 210,
+            "col": 17
+          },
+          "source": "if cfg.bitcoin.rpc.secretFile != null then"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/fedimintd.nix",
+            "line": 195,
+            "col": 5
+          },
+          "source": "mkIf (eachFedimintd != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "enable"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "api_ws.openFirewall"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

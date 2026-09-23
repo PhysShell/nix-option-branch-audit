@@ -1,0 +1,109 @@
+{
+  "471312": {
+    "classification": "expected_target_correction",
+    "mechanism": "angrr, the demonstrated F1/F1B target defect. Re-confirmed from the frozen S5-F1B-R replay itself: head's watched 'period' transitions PredicateNotFound (historical, false match against the unrelated temporaryRootPolicyOptions.period) -> OptionNotFound (candidate, correct: the real top-level services.angrr.period is genuinely removed, no other option_prefix-anchored declaration answers to 'period'). Final result Changed, not Unchanged. Matches S5-F1's own intended fix and S5-F1B's own re-verification exactly."
+  },
+
+  "431289": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "One of the 7 F1-R watched-verdict regressions. Watched services.prosody.muc.moderation restored to its exact historical transition (option_not_found->predicate_not_found). mucOpts is referenced directly (dotted, no local `with`) from muc's own true-root mkOption, one hop, resolves correctly under F1B.",
+    "watched_verdict_restored": true,
+    "residual_discovery_delta": {
+      "category": "unexpected_candidate_semantic_delta",
+      "paths_missing_vs_historical": ["enabled", "ssl"],
+      "trace": "prosody.nix's vHostOpts (declares enabled/ssl/domain/extraConfig) is referenced as `virtualHosts = mkOption { type = with types; attrsOf (submodule vHostOpts); ... };` -- a LOCAL `with types;` wraps this specific type field. resolve_ident_binding's ancestor walk for the `vHostOpts` identifier reaches this local NODE_WITH before it would otherwise reach the enclosing let (where vHostOpts IS bound), and with-scoped identifiers are refused (ResolveFailure::UnsupportedScope('with')), pre-existing, conservative behavior in resolve_ident_binding itself, but its APPLICATION here -- gating whether F1B's own new machinery treats vHostOpts as legitimate -- is new to F1B. This is a GENUINELY LEGITIMATE, single-hop reference (virtualHosts really does want vHostOpts's own content) that F1B currently fails to promote, purely because of the local `with` syntax at the reference site. Not the one-hop-cap mechanism (this IS one hop); a separate, real gap in F1B's own type-reference resolution. No watched query in this corpus probes vHostOpts's own leaves, so no verdict impact -- but per the mandate, this is not treated as cosmetic on that basis alone."
+    }
+  },
+
+  "506644": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "One of the 7 F1-R watched-verdict regressions (drupal siteOpts.webRoot). Restored to historical option_not_found->predicate_not_found exactly. Re-verified against fresh real content this round (comparison-report.jsonl shows this PR fully identical to historical -- no residual delta at all for this PR)."
+  },
+  "508427": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "Same drupal siteOpts mechanism as #506644 (configRoot). Fully identical to historical -- no residual delta."
+  },
+  "428153": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "Same drupal siteOpts mechanism (configSyncDir). Fully identical to historical -- no residual delta."
+  },
+  "427260": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "Same drupal siteOpts mechanism (privateFilesDir). Fully identical to historical -- no residual delta."
+  },
+  "397967": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "The critical F1-R regression: fedimintd's already-adjudicated real S5 finding (api_ws.openFirewall). Restored to the exact historical option_not_found->oba001 transition. fedimintdOpts is referenced directly (dotted, no local `with`) from services.fedimintd's own true-root mkOption, one hop. This finding remains visible under 6c2c2aa."
+  },
+  "440660": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "One of the 7 F1-R watched-verdict regressions (prosody httpFileShareOpts.http_external_url). Restored to historical option_not_found->predicate_not_found.",
+    "watched_verdict_restored": true,
+    "residual_discovery_delta": {
+      "category": "unexpected_candidate_semantic_delta",
+      "paths_missing_vs_historical": ["enabled", "ssl"],
+      "trace": "Same vHostOpts / local `with types;` mechanism as #431289 (same file, same cause)."
+    }
+  },
+
+  "429967": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "Watched leaf (http_files) verdict is historical-identical (OptionNotFound both sides, unaffected). discovered_options differs: historical 58/59, candidate 54/55, missing [domain, enabled, ssl] (base and head; 'domain' missing here is the reduction of a pre-existing 3-way collision, see leaf-collision-scan.json). The 'enabled'/'ssl' gap traces to vHostOpts's own local `with types;`-wrapped reference (same mechanism as #431289/#440660, same file). This is F1B's own new type-reference-resolution machinery failing on a genuinely legitimate, single-hop reference -- not a pre-existing, unrelated limitation (F1's own blanket exclusion also hid this content, but for an entirely different, unrelated reason; F1B was specifically designed to no longer do that, and does not, for THIS specific mechanism)."
+  },
+  "494314": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "Same prosody.nix / vHostOpts local-with mechanism as #429967 (watched leaf unaffected)."
+  },
+  "260551": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "Same prosody.nix / vHostOpts local-with mechanism as #429967/#494314. Watched checkConfig (the already-adjudicated real S5 finding from this PR) is declared directly at prosody's own true top level, unaffected -- confirmed identical (option_not_found->oba001, matching historical exactly). The residual discovered_options delta does not touch this finding."
+  },
+  "432528": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "tayga.nix. Watched wkpfStrict (the already-adjudicated real S5 PASS finding) is declared directly at the module's own true top level, unaffected -- confirmed identical (option_not_found->pass, matching historical exactly). Residual delta: 'prefixLength' missing from discovered_options. Traced: `type = with types; nullOr (submodule (addrOpts v));` -- a LOCAL `with types;` wraps this type field, and the reference itself is a function application (`addrOpts v`) rather than a bare `submodule <name>`; resolve_ident_binding still refuses the `addrOpts` identifier because of the local with-scope, same root-cause-A mechanism as the prosody cases, applied to a function-call-wrapped reference instead of a direct one."
+  },
+  "463443": {
+    "classification": "demonstrated_correction_same_root_cause_class",
+    "mechanism": "One of the 7 F1-R watched-verdict regressions (watched leaf 'recommend'). Restored to historical option_not_found->predicate_not_found. A pre-existing, non-F1B-introduced 'profiles' path collision was also observed in this file (leaf-collision-scan.json, pre_existing=true, unaffected by F1B)."
+  },
+
+  "374017": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "k3s.nix. Watched leaf (autoDeployCharts) verdict is historical-identical (option_not_found->predicate_not_found, matching historical exactly -- this PR's own already-known correction is intact). The delta is NOT a missing/added declaration (the discovered_options sets are IDENTICAL, same 23 entries, same spans, same default_source values) -- it is a pure ORDERING difference: k3s.nix genuinely has two distinct 'enable' declarations (module top-level, line 38; and a nested one, line 133 -- a pre-existing, non-F1B-introduced collision, confirmed identical in both historical and candidate, see leaf-collision-scan.json pre_existing=true), plus 'target'/'content'/'source'. Under F1B's two-pass architecture, these four entries belong to a promoted (Pass 2) named submodule and are appended to the output AFTER all of Pass 1's true-root content, rather than interleaved in their original source-document position (which is what the historical, single-pass, unconditional-walk binary produced). Classified unexpected_candidate_semantic_delta, not non_semantic_representation_delta, because in the presence of a real (pre-existing) duplicate-path collision, a vector-order change IS evidence of discovery behavior that could flip which duplicate `run_target`'s own gate-1 `.find()` selects for a different, hypothetical watched query against 'enable' specifically -- directly relevant to the separately disclosed leaf-collision edge case, not merely cosmetic."
+  },
+
+  "484133": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "rspamd.nix. Watched leaf (extraArgs) restored to historical option_not_found->predicate_not_found (a genuine correction, same root-cause class as the 7 F1-R regressions). Residual: 11 entries missing from discovered_options (bindSockets, count, includes, mode, name, owner, rawEntry, socket, source, text, type). Traced: `workers = mkOption { type = with types; attrsOf (submodule workerOpts); ... };` -- a LOCAL `with types;` wraps this reference. workerOpts itself (which declares bindSockets, count, includes, ... among its own leaves) is never promoted because of this local with-scope refusal; bindSocketOpts (nested a further hop inside workerOpts's own now-unwalked content) never even becomes a candidate as a result. Same root-cause-A mechanism as the prosody/tayga cases -- this PR mixes a genuine same-root-cause-class verdict restoration with a genuine unexpected discovery delta; classified unexpected_candidate_semantic_delta because the mandate requires treating any unexplained-as-pre-existing discovery gap this way, not because the watched verdict itself regressed."
+  },
+
+  "557329": {
+    "classification": "unexpected_candidate_semantic_delta",
+    "mechanism": "portmaster.nix. Watched leaf verdict is historical-identical (unaffected). Residual: 7 entries missing (directory, name, package, storeNameRegex, strictHead, strictLast, wrapped). Traced a DIFFERENT, second mechanism (not a `with`-wrap): `profiles = mkOption { type = attrsOf (submodule ({name,...}: {options = {...; packages = mkOption { type = listOf profilePackageType; ...}; };})); };` is a real true-root declaration with an INLINE submodule type; `packages`'s own type references `profilePackageType`, a named let-binding whose OWN value is `types.coercedTo types.package (package: {inherit package;}) packageMatchType` -- itself referencing a SECOND named binding, `packageMatchType` (the actual submodule declaring directory/name/package/storeNameRegex/strictHead/strictLast/wrapped). collect_type_reference_ranges resolves `profilePackageType`'s own reference (added to `referenced`) but does not recursively scan `profilePackageType`'s OWN value for further identifier references, so `packageMatchType` -- referenced only indirectly, through profilePackageType -- never gets added to `referenced` and is never promoted. This is a genuine 'true root -> legitimate intermediate -> legitimate submodule B' case, exactly the shape the mandate's own single-hop check anticipated, though the mechanism is a non-recursive alias scan rather than the one-hop promotion cap itself."
+  },
+
+  "438285": {
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "frigate.nix. Watched leaf ('path', inside cameraFormat.ffmpeg.inputs) is historical-identical (OptionNotFound both sides, unaffected -- confirmed already in the S5-F1B round's own completion report). Residual: 3 entries missing (ffmpeg.inputs, ffmpeg.inputs.path, ffmpeg.inputs.roles), all from cameraFormat, a named let-binding. Root cause: the file's own TRUE-ROOT declaration itself, `options.services.frigate = with types; { ... };`, is wrapped in `with types;` at the point walk_merge_operands would need to unwrap it -- walk_merge_operands only unwraps a literal attrset or a `//`-merge, not a `with` expression. This is a pre-existing, unrelated gap (predates F1 entirely -- Pass 1 never even discovers a true-root declaration in this file, so F1B's own new type-reference machinery never runs at all for it), already disclosed in the S5-F1B round's own completion report (fixtures/s5-f1b/f1b-report.md). Zero functional impact: the recorded bare paths (cameraFormat's own noise) never structurally matched option_prefix in either the historical or candidate binary."
+  },
+  "433539": {
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same frigate.nix / with-wrapped true-root mechanism as #438285."
+  },
+  "423934": {
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "nixos/modules/services/hardware/nvidia-container-toolkit/default.nix. Watched verdict historical-identical (unaffected, already disclosed in S5-F1B's own completion report). Residual: containerPath/hostPath/mountOptions missing (mountType, a named let-binding). Root cause: the file's own TRUE-ROOT declaration is `options = let mountType = {...}; in { hardware.nvidia-container-toolkit = {...}; };` -- the whole `options =` value is a `let...in` expression, which walk_merge_operands also does not unwrap (only literal attrsets / `//`-merges). Same class of gap as #438285/#433539, different wrapper syntax (`let...in` instead of `with`), already disclosed in the S5-F1B completion report."
+  },
+  "401840": {
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same nvidia-container-toolkit / let-in-wrapped true-root mechanism as #423934."
+  },
+  "398993": {
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same nvidia-container-toolkit / let-in-wrapped true-root mechanism as #423934."
+  },
+  "480839": {
+    "classification": "known_pre_existing_limitation",
+    "mechanism": "Same nvidia-container-toolkit / let-in-wrapped true-root mechanism as #423934."
+  }
+}

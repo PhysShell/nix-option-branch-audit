@@ -1,0 +1,948 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "500388",
+      "module": "nixos/modules/services/networking/searx.nix",
+      "test": "nixos/tests/searx.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "searx"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 50,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 57,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "domain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 70,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 78,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redisCreateLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 87,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 96,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "valkey"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 101,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "settingsFile"
+          ],
+          "default_source": "\"${runDir}/settings.yml\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 139,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "faviconsSettings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 156,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "limiterSettings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 184,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configureUwsgi"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 210,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 224,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "uwsgiConfig"
+          ],
+          "default_source": "{\n          http = \":8080\";\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 232,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 259,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 280,
+            "col": 15
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "path": [
+            "redisCreateLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 301,
+            "col": 29
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 308,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.configureNginx true"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 312,
+            "col": 29
+          },
+          "source": "lib.mkIf cfg.configureNginx \"http${"
+        },
+        {
+          "path": [
+            "redisCreateLocally"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 322,
+            "col": 20
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally {"
+        },
+        {
+          "path": [
+            "configureUwsgi"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 328,
+            "col": 15
+          },
+          "source": "mkIf cfg.configureUwsgi {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 346,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs cfg.configureNginx {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 355,
+            "col": 15
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "path": [
+            "configureUwsgi"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 396,
+            "col": 15
+          },
+          "source": "mkIf cfg.configureUwsgi {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 416,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall { allowedTCPPorts = [ cfg.settings.server.port ]; }"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 259,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 280,
+            "col": 15
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redisCreateLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redisCreateLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 301,
+            "col": 29
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 308,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.configureNginx true"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 312,
+            "col": 29
+          },
+          "source": "lib.mkIf cfg.configureNginx \"http${"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "redisCreateLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redisCreateLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 322,
+            "col": 20
+          },
+          "source": "lib.mkIf cfg.redisCreateLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureUwsgi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureUwsgi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 328,
+            "col": 15
+          },
+          "source": "mkIf cfg.configureUwsgi {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 346,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 355,
+            "col": 15
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 369,
+            "col": 12
+          },
+          "source": "optionalAttrs (cfg.environmentFile != null) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "configureUwsgi"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "configureUwsgi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 375,
+            "col": 15
+          },
+          "source": "mkIf (!cfg.configureUwsgi) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 388,
+            "col": 12
+          },
+          "source": "optionalAttrs (cfg.environmentFile != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureUwsgi"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureUwsgi"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 396,
+            "col": 15
+          },
+          "source": "mkIf cfg.configureUwsgi {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 403,
+            "col": 12
+          },
+          "source": "lib.optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 416,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall { allowedTCPPorts = [ cfg.settings.server.port ]; }"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 106,
+            "col": 29
+          },
+          "source": "lib.mkIf (config ? redis) (",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 269,
+            "col": 35
+          },
+          "source": "lib.mkIf (cfg.faviconsSettings != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "faviconsSettings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 272,
+            "col": 34
+          },
+          "source": "lib.mkIf (cfg.limiterSettings != { }) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "limiterSettings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/searx.nix",
+            "line": 313,
+            "col": 13
+          },
+          "source": "lib.optionalString (lib.any lib.id (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "domain"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "searx",
+            "environmentFile"
+          ],
+          "instance": "base",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/searx.nix",
+            "line": 16,
+            "col": 7
+          }
+        },
+        {
+          "path": [],
+          "instance": "fancy",
+          "reason": "dynamic (\"${...}\") attribute name at module root -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/searx.nix",
+            "line": 59,
+            "col": 7
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "openFirewall",
+          "predicate": {
+            "path": [
+              "openFirewall"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/searx.nix",
+              "line": 416,
+              "col": 27
+            },
+            "source": "lib.mkIf cfg.openFirewall { allowedTCPPorts = [ cfg.settings.server.port ]; }"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "openFirewall"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/searx.nix",
+                  "line": 416,
+                  "col": 27
+                },
+                "source": "lib.mkIf cfg.openFirewall { allowedTCPPorts = [ cfg.settings.server.port ]; }"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "openFirewall"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "openFirewall"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/searx.nix",
+                  "line": 416,
+                  "col": 27
+                },
+                "source": "lib.mkIf cfg.openFirewall { allowedTCPPorts = [ cfg.settings.server.port ]; }"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

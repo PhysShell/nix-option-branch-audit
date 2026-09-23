@@ -1,0 +1,31 @@
+{
+  "candidate_commit": "6c2c2aa71f0c9764c8fb7c1bb76473ae5918c5af",
+  "candidate_commit_short": "6c2c2aa",
+  "built_from": "clean git clone + checkout, verified `git status --short` empty and `git rev-parse HEAD == 6c2c2aa71f0c9764c8fb7c1bb76473ae5918c5af` before building -- never the working tree used for editing",
+  "clean_checkout_path": "/tmp/f1br-clean-checkout/repo",
+  "binary_path": "/tmp/f1br-clean-checkout/target/release/oba",
+  "binary_sha256": "db3032775432ad276d6db4debd42265477aa70fe5cd7bb48a546fff2c995cf17",
+  "rustc_version": "rustc 1.100.0-nightly (8925ea358 2026-08-20), toolchain nightly-2026-08-21-x86_64-unknown-linux-gnu",
+  "self_reported_tool_version": "0.4.5",
+  "note": "Cargo.toml version is unchanged (no version bump, per S5-F1B's own scope constraints) -- the candidate binary self-reports the SAME 'tool.version: 0.4.5' string as the historical S5 baseline binary and as the S5-F1-R candidate (cdfb4ca). This is expected and does not indicate the wrong binary was used; candidate identity is established by this file's own binary_sha256 and candidate_commit, not by the self-reported version string.",
+  "baseline_for_comparison": {
+    "release": "v0.4.5",
+    "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+    "artifact_sha256": "c07bed6c37fa3e0f1885099bb3dfc7a7b741531e8a156dc4fa8a7a160bd45800",
+    "note": "the ORIGINAL S5 round's own binary, whose outputs are the historical ground truth this replay compares against -- fixtures/s5-live-pr-shadow/adjudication/**/*.json, untouched by this replay"
+  },
+  "diagnostic_reference_candidate": {
+    "release": "S5-F1 first candidate",
+    "commit": "cdfb4cac31b7346d925a28eb2c4e5c280aeac95d",
+    "commit_short": "cdfb4ca",
+    "note": "F1-R's own frozen replay of cdfb4ca (fixtures/s5-f1-r/), retained read-only as diagnostic context per this round's mandate -- the 21 F1-R deltas (7 verdict regressions + 14 discovery-only) are known anchors this round checks against, not re-executed. This F1B-R round's own acceptance decision is historical (v0.4.5) vs. 6c2c2aa only."
+  },
+  "history_chain": [
+    {"step": "historical S5 under test", "ref": "v0.4.5 / 8f1701a", "verdict": "FAIL"},
+    {"step": "S5-R0 report-integrity fix", "ref": "28a1d58"},
+    {"step": "first F1 candidate", "ref": "cdfb4ca"},
+    {"step": "S5-F1-R full-corpus replay of cdfb4ca", "ref": "baaaec9 / f0a54a3", "verdict": "FAIL"},
+    {"step": "S5-F1B replacement candidate", "ref": "6c2c2aa", "targeted_verification": "complete", "ci": "green"},
+    {"step": "S5-F1B-R full-corpus acceptance replay of 6c2c2aa (this round)", "ref": "in progress"}
+  ]
+}

@@ -1,0 +1,853 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "388978",
+      "module": "nixos/modules/services/databases/mysql.nix",
+      "test": "nixos/tests/mysql/mariadb-galera.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "mysql",
+        "galeraCluster"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "mysql",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 58,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "package"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 60,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "user"
+          ],
+          "default_source": "\"mysql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mysql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 68,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "group"
+          ],
+          "default_source": "\"mysql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mysql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 82,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "dataDir"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 96,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "configFile"
+          ],
+          "default_source": "configFile",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 109,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 131,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "initialDatabases"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 163,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "initialDatabases",
+            "name"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 167,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "initialDatabases",
+            "schema"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 173,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "initialScript"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 197,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "ensureDatabases"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 203,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "ensureUsers"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 218,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "ensureUsers",
+            "name"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 222,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "ensureUsers",
+            "ensurePermissions"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 228,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "role"
+          ],
+          "default_source": "\"none\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "none"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 281,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "serverId"
+          ],
+          "default_source": "1",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 291,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "masterHost"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 297,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "slaveHost"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 302,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "masterUser"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 307,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "masterPassword"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 312,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "mysql",
+            "replication",
+            "masterPort"
+          ],
+          "default_source": "3306",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 317,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 325,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "lib.literalExpression \"pkgs.mariadb-galera\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 327,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "name"
+          ],
+          "default_source": "\"galera\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "galera"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 333,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "sstMethod"
+          ],
+          "default_source": "\"rsync\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rsync"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 339,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "localName"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 349,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "localAddress"
+          ],
+          "default_source": "cfg.galeraCluster.localName",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 355,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "nodeAddresses"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 363,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "clusterPassword"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 370,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "clusterAddress"
+          ],
+          "default_source": "if (cfg.galeraCluster.nodeAddresses == [ ]) then\n              \"\"\n            else\n              \"gcomm://${builtins.concatStringsSep \",\" cfg.galeraCluster.nodeAddresses}\"\n              + lib.optionalString (\n                cfg.galeraCluster.clusterPassword != \"\"\n              ) \"?gmcast.seg=1:${cfg.galeraCluster.clusterPassword}\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 377,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 406,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "galeraCluster",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 459,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.galeraCluster.enable {"
+        },
+        {
+          "path": [
+            "galeraCluster",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 471,
+            "col": 38
+          },
+          "source": "lib.optionalAttrs cfg.galeraCluster.enable {"
+        },
+        {
+          "path": [
+            "galeraCluster",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 529,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.galeraCluster.enable ["
+        },
+        {
+          "path": [
+            "galeraCluster",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 739,
+            "col": 43
+          },
+          "source": "lib.optionals cfg.galeraCluster.enable ["
+        },
+        {
+          "path": [
+            "galeraCluster",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 745,
+            "col": 43
+          },
+          "source": "lib.optionals cfg.galeraCluster.enable ["
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 382,
+            "col": 13
+          },
+          "source": "if (cfg.galeraCluster.nodeAddresses == [ ]) then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "galeraCluster",
+              "nodeAddresses"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 437,
+            "col": 7
+          },
+          "source": "if lib.versionAtLeast config.system.stateVersion \"17.09\" then \"/var/lib/mysql\" else \"/var/mysql\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 456,
+            "col": 8
+          },
+          "source": "lib.mkIf (!isMariaDB) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 547,
+            "col": 9
+          },
+          "source": "if isMariaDB then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 577,
+            "col": 23
+          },
+          "source": "if isMariaDB then cfg.user else \"root\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 580,
+            "col": 13
+          },
+          "source": "lib.optionalString (!hasNotify) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ],
+            [
+              "package"
+            ],
+            [
+              "package",
+              "version"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 589,
+            "col": 13
+          },
+          "source": "lib.optionalString isMariaDB ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 613,
+            "col": 17
+          },
+          "source": "if isMariaDB then \"unix_socket\" else \"auth_socket\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 624,
+            "col": 25
+          },
+          "source": "lib.optionalString (database.schema != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 670,
+            "col": 13
+          },
+          "source": "lib.optionalString (cfg.ensureDatabases != [ ]) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "ensureDatabases"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 680,
+            "col": 15
+          },
+          "source": "if isMariaDB then \"unix_socket\" else \"auth_socket\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/databases/mysql.nix",
+            "line": 693,
+            "col": 18
+          },
+          "source": "if hasNotify then \"notify\" else \"simple\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package"
+            ],
+            [
+              "package"
+            ],
+            [
+              "package",
+              "version"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/mysql/mariadb-galera.nix",
+            "line": 246,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/databases/mysql.nix",
+              "line": 406,
+              "col": 12
+            },
+            "source": "lib.mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/databases/mysql.nix",
+                  "line": 406,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

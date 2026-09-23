@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 1,
+    "inconclusive": 0,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "412653",
+      "module": "nixos/modules/services/web-apps/filebrowser.nix",
+      "test": "nixos/tests/filebrowser.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "filebrowser"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 16,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"filebrowser\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "filebrowser"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 20,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"filebrowser\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "filebrowser"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 26,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 32,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 34,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "address"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 44,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "port"
+          ],
+          "default_source": "8080",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 52,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "root"
+          ],
+          "default_source": "\"/var/lib/filebrowser/data\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/filebrowser/data"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 60,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "database"
+          ],
+          "default_source": "\"/var/lib/filebrowser/database.db\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/filebrowser/database.db"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 68,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "cache-dir"
+          ],
+          "default_source": "\"/var/cache/filebrowser\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/cache/filebrowser"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 76,
+            "col": 13
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 90,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 161,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall [ cfg.settings.port ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 90,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "filebrowser"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 150,
+            "col": 19
+          },
+          "source": "lib.mkIf (cfg.user == \"filebrowser\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "filebrowser"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 157,
+            "col": 20
+          },
+          "source": "lib.mkIf (cfg.group == \"filebrowser\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/filebrowser.nix",
+            "line": 161,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall [ cfg.settings.port ]"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OBA001",
+          "option": "user",
+          "predicate": {
+            "ir": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "user"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": "filebrowser"
+                  }
+                }
+              ]
+            },
+            "refs": [
+              [
+                "user"
+              ]
+            ],
+            "span": {
+              "file": "nixos/modules/services/web-apps/filebrowser.nix",
+              "line": 150,
+              "col": 19
+            },
+            "source": "lib.mkIf (cfg.user == \"filebrowser\") {"
+          },
+          "default_outcome": true,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "user"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "filebrowser"
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "user"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/filebrowser.nix",
+                  "line": 150,
+                  "col": 19
+                },
+                "source": "lib.mkIf (cfg.user == \"filebrowser\") {"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

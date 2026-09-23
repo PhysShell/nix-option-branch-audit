@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "458146",
+      "module": "nixos/modules/services/web-apps/trilium.nix",
+      "test": "nixos/tests/trilium-server.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "trilium-server"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/trilium.nix",
+            "line": 123,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/trilium.nix",
+            "line": 153,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.nginx.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/trilium.nix",
+            "line": 123,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "nginx",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nginx",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/trilium.nix",
+            "line": 153,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.nginx.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "environmentFile"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

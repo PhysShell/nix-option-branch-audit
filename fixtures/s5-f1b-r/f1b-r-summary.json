@@ -1,0 +1,77 @@
+{
+  "round": "S5-F1B-R",
+  "purpose": "frozen full-corpus acceptance replay of candidate 6c2c2aa",
+  "baseline": {"release": "v0.4.5", "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356"},
+  "historical_s5_verdict": "FAIL",
+  "diagnostic_reference": {"candidate": "cdfb4ca", "round": "S5-F1-R", "verdict": "FAIL"},
+  "acceptance_candidate": {"commit": "6c2c2aa71f0c9764c8fb7c1bb76473ae5918c5af", "commit_short": "6c2c2aa", "binary_sha256": "db3032775432ad276d6db4debd42265477aa70fe5cd7bb48a546fff2c995cf17"},
+  "coverage": {
+    "total_frozen_prs": 369,
+    "non_applicable": 189,
+    "applicable": 180,
+    "applicable_re_derived_independently_from_ledger": true,
+    "applicable_evaluated": 180,
+    "window_evaluation_incomplete": 0,
+    "fetch_failures": 0
+  },
+  "comparison": {
+    "identical_to_historical": 158,
+    "changed_vs_historical": 22,
+    "changed_prs": [429967, 494314, 484133, 557329, 431289, 374017, 260551, 432528, 438285, 423934, 506644, 508427, 440660, 471312, 428153, 463443, 397967, 401840, 427260, 398993, 480839, 433539]
+  },
+  "delta_classification_counts": {
+    "expected_target_correction": 1,
+    "demonstrated_correction_same_root_cause_class": 8,
+    "known_pre_existing_limitation": 6,
+    "unexpected_candidate_semantic_delta": 7
+  },
+  "mandatory_anchors": {
+    "A_angrr_471312": "corrected as intended -- predicate_not_found->option_not_found, Changed",
+    "B_seven_f1_regressions": {
+      "431289": "restored",
+      "506644": "restored",
+      "508427": "restored",
+      "440660": "restored",
+      "428153": "restored",
+      "397967": "restored -- already-adjudicated finding remains visible",
+      "427260": "restored"
+    },
+    "C_fourteen_discovery_deltas": {
+      "429967": "unexpected_candidate_semantic_delta",
+      "494314": "unexpected_candidate_semantic_delta",
+      "484133": "unexpected_candidate_semantic_delta",
+      "557329": "unexpected_candidate_semantic_delta",
+      "374017": "unexpected_candidate_semantic_delta",
+      "260551": "unexpected_candidate_semantic_delta",
+      "432528": "unexpected_candidate_semantic_delta",
+      "438285": "known_pre_existing_limitation",
+      "423934": "known_pre_existing_limitation",
+      "463443": "demonstrated_correction_same_root_cause_class",
+      "401840": "known_pre_existing_limitation",
+      "398993": "known_pre_existing_limitation",
+      "480839": "known_pre_existing_limitation",
+      "433539": "known_pre_existing_limitation"
+    },
+    "D_cgit_475112": "unaffected -- identical to historical",
+    "E_guacamole_462487": "unaffected -- identical to historical",
+    "F_fatal_error_controls": "unchanged -- 0 parse_errors, only changed/unchanged diff kinds observed across all 180 PRs, matching historical's 0-error record"
+  },
+  "critical_single_hop_check": {
+    "instruction": "actively hunt for a legitimate true-root -> named submodule A -> named submodule B chain lost solely to the one-hop cap",
+    "finding": "no clean, isolated instance found in this corpus. Two related-but-distinct gaps were found instead: (1) local `with types;`/`with lib.types;` wrapping a type reference blocks resolve_ident_binding regardless of hop count -- confirmed at hop 1 (prosody vHostOpts, rspamd workerOpts, tayga addrOpts) and independently also present at angrr's own hop 2 (temporaryRootPolicyOptions), so the cap's own marginal contribution at hop 2 cannot be isolated from the with-refusal in any case observed; (2) a non-recursive alias-chain gap (portmaster: packages -> profilePackageType (a type alias, not itself an options block) -> packageMatchType, the real submodule) -- structurally the closest match to the mandate's literal 'true root -> legitimate A -> legitimate B' description, though via an alias rather than an options-block-to-options-block hop.",
+    "cap_widened_during_this_round": false
+  },
+  "leaf_collision_edge_case": {
+    "observed_in_frozen_corpus": true,
+    "prs": [415326, 374017, 463443, 429967, 494314, 431289, 260551, 440660],
+    "pre_existing_in_all_cases": "yes for every case checked -- for every one of the 15 (pr, side) occurrences found, the candidate's own colliding-path set is a STRICT SUBSET of the historical v0.4.5 baseline's own (equal or larger) collision set; verified directly (not just per-PR classification == identical), zero new colliding paths anywhere. 6c2c2aa never introduces a NEW collision beyond what already existed pre-F1, only ever reduces the degree of a pre-existing one",
+    "candidate_reordering_effect_observed": "yes -- PR 374017 (k3s) shows a pure vector-order change (no content added/removed) affecting a pre-existing 'enable' collision's own relative ordering, a side effect of the two-pass architecture (promoted content is appended after all true-root content, not interleaved by source position)",
+    "action_taken": "none -- disclosed and evidenced only, not resolved, per mandate scope",
+    "fixed_or_modified_this_round": false
+  },
+  "reproducibility": {
+    "applicable_manifest_independently_re_derived_from_ledger": true,
+    "compare_and_classify_scripts_reproduce_committed_output": "verified locally; CI workflow fixtures/s5-f1b-r.yml added to enforce this on every future push"
+  },
+  "final_verdict": "FAIL"
+}

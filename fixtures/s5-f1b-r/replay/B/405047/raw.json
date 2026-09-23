@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->predicate_not_found": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gitlab.nix",
+        "test": "nixos/tests/gitlab.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gitlab",
+          "secrets"
+        ],
+        "watched_path": "activeRecordPrimaryKeyFile"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "activeRecordPrimaryKeyFile"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "activeRecordPrimaryKeyFile"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

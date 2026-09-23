@@ -1,0 +1,695 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "479174",
+      "module": "nixos/modules/services/web-apps/dokuwiki.nix",
+      "test": "nixos/tests/dokuwiki.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "dokuwiki",
+        "sites",
+        "*"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "page"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 134,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "actor"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 140,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/dokuwiki/${name}/data\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 214,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "acl"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 220,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "aclFile"
+          ],
+          "default_source": "if (config.mergedConfig.useacl && config.acl == null) then\n              \"/var/lib/dokuwiki/${name}/acl.auth.php\"\n            else\n              null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 247,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "pluginsConfig"
+          ],
+          "default_source": "{\n            authad = false;\n            authldap = false;\n            authmysql = false;\n            authpgsql = false;\n          }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 263,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "usersFile"
+          ],
+          "default_source": "if config.mergedConfig.useacl then \"/var/lib/dokuwiki/${name}/users.auth.php\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 276,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 293,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "templates"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 320,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "poolConfig"
+          ],
+          "default_source": "{\n            \"pm\" = \"dynamic\";\n            \"pm.max_children\" = 32;\n            \"pm.start_servers\" = 2;\n            \"pm.min_spare_servers\" = 2;\n            \"pm.max_spare_servers\" = 4;\n            \"pm.max_requests\" = 500;\n          }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 348,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "phpOptions"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 374,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{\n            useacl = true;\n            superuser = \"admin\";\n          }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 391,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "mergedConfig"
+          ],
+          "default_source": "mergeConfig config",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 418,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "assertions"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 432,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "dokuwiki",
+            "sites"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 445,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "dokuwiki",
+            "webserver"
+          ],
+          "default_source": "\"nginx\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "nginx"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 451,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "mergedConfig",
+            "useacl"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 488,
+            "col": 16
+          },
+          "source": "optionalAttrs (cfg.mergedConfig.useacl) {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "settings",
+                      "useacl"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "acl"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "useacl"
+            ],
+            [
+              "acl"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 126,
+            "col": 9
+          },
+          "source": "if cfg.settings.useacl && cfg.acl != null then dokuwikiAclAuthConfig hostName cfg else null"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "usersFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "usersFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 485,
+            "col": 13
+          },
+          "source": "optionalAttrs (cfg.usersFile != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "mergedConfig",
+                  "useacl"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "mergedConfig",
+              "useacl"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 488,
+            "col": 16
+          },
+          "source": "optionalAttrs (cfg.mergedConfig.useacl) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "acl"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "acl"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 490,
+            "col": 17
+          },
+          "source": "if (cfg.acl != null) then \"${dokuwikiAclAuthConfig hostName cfg}\" else \"${toString cfg.aclFile}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "aclFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "aclFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 521,
+            "col": 13
+          },
+          "source": "lib.optional (cfg.aclFile != null)"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "usersFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "usersFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 524,
+            "col": 13
+          },
+          "source": "lib.optional (cfg.usersFile != null)"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "webserver"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "nginx"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "webserver"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 535,
+            "col": 6
+          },
+          "source": "mkIf (cfg.webserver == \"nginx\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "webserver"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "caddy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "webserver"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 587,
+            "col": 6
+          },
+          "source": "mkIf (cfg.webserver == \"caddy\") {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "if isString acl then acl else acl_gen acl",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 67,
+            "col": 5
+          },
+          "source": "if isString v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 70,
+            "col": 10
+          },
+          "source": "if isList v && strings.isConvertibleWithToString v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 72,
+            "col": 10
+          },
+          "source": "if isInt v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 74,
+            "col": 10
+          },
+          "source": "if isBool v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 75,
+            "col": 17
+          },
+          "source": "if v then 1 else 0",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 76,
+            "col": 10
+          },
+          "source": "if isHasAttr \"_file\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 78,
+            "col": 10
+          },
+          "source": "if isHasAttr \"_raw\" then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 88,
+            "col": 9
+          },
+          "source": "if (isAttrs v && (hasAttr \"_file\" v || hasAttr \"_raw\" v)) || !isAttrs v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 112,
+            "col": 9
+          },
+          "source": "if isString pc then pc else pc_gen pc",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "pluginsConfig"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 159,
+            "col": 24
+          },
+          "source": "if isInt x then x else available.${x}",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 250,
+            "col": 13
+          },
+          "source": "if (config.mergedConfig.useacl && config.acl == null) then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 278,
+            "col": 21
+          },
+          "source": "if config.mergedConfig.useacl then \"/var/lib/dokuwiki/${name}/users.auth.php\" else null",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dokuwiki.nix",
+            "line": 472,
+            "col": 12
+          },
+          "source": "mkIf (eachSite != { }) (mkMerge [",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "sites"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "dokuwiki_nginx",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/dokuwiki.nix",
+            "line": 114,
+            "col": 5
+          }
+        },
+        {
+          "path": [],
+          "instance": "dokuwiki_caddy",
+          "reason": "instance config is not a literal attrset (alias, function call, or similar)",
+          "span": {
+            "file": "nixos/tests/dokuwiki.nix",
+            "line": 115,
+            "col": 5
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "extraConfigs"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

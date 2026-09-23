@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "432528",
+      "module": "nixos/modules/services/networking/tayga.nix",
+      "test": "nixos/tests/tayga.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "tayga"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 73,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ipv4"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 77,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ipv6"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 94,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/tayga\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/tayga"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 111,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "tunDevice"
+          ],
+          "default_source": "\"nat64\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "nat64"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 117,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "mappings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 123,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "router",
+            "address"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 51,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "address"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 57,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "pool"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 63,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 138,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "ipv6",
+                    "address"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "ipv6",
+              "address"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 19,
+            "col": 7
+          },
+          "source": "optionalString (cfg.ipv6.address != null) \"ipv6-addr ${cfg.ipv6.address}\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 138,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 39,
+            "col": 63
+          },
+          "source": "if v == 4 then 32 else 128",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 42,
+            "col": 36
+          },
+          "source": "if v == 4 then \"24\" else \"64\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 149,
+            "col": 22
+          },
+          "source": "mkIf config.networking.useNetworkd \"\"",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/tayga.nix",
+            "line": 205,
+            "col": 23
+          },
+          "source": "mkIf config.networking.useNetworkd true",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "networking",
+            "interfaces",
+            "eth1"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/tayga.nix",
+            "line": 48,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "interfaces",
+            "eth1"
+          ],
+          "instance": "router_systemd",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/tayga.nix",
+            "line": 93,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "interfaces",
+            "eth2"
+          ],
+          "instance": "router_systemd",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/tayga.nix",
+            "line": 103,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "interfaces",
+            "eth1"
+          ],
+          "instance": "router_nixos",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/tayga.nix",
+            "line": 157,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "interfaces",
+            "eth2"
+          ],
+          "instance": "router_nixos",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/tayga.nix",
+            "line": 167,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "interfaces",
+            "eth1"
+          ],
+          "instance": "client",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/tayga.nix",
+            "line": 217,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "wkpfStrict"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

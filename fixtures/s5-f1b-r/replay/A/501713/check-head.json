@@ -1,0 +1,507 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "jenkins",
+      "module": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+      "test": "nixos/tests/jenkins.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "jenkins"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 14,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"jenkins\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "jenkins"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 16,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"jenkins\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "jenkins"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 24,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraGroups"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 33,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "home"
+          ],
+          "default_source": "\"/var/lib/jenkins\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/jenkins"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 45,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenAddress"
+          ],
+          "default_source": "\"0.0.0.0\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "0.0.0.0"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 54,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "8080",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 64,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "prefix"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 73,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "packages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 88,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "environment"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 105,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "plugins"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 119,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraOptions"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 135,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraJavaOptions"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 144,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "withCLI"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 153,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 167,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "withCLI"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 173,
+            "col": 10
+          },
+          "source": "lib.optional cfg.withCLI cfg.package"
+        },
+        {
+          "path": [
+            "withCLI"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 177,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs cfg.withCLI {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 167,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "withCLI"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "withCLI"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 173,
+            "col": 10
+          },
+          "source": "lib.optional cfg.withCLI cfg.package"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "withCLI"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "withCLI"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 177,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs cfg.withCLI {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "jenkins"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 183,
+            "col": 20
+          },
+          "source": "lib.optionalAttrs (cfg.group == \"jenkins\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "jenkins"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 187,
+            "col": 19
+          },
+          "source": "lib.optionalAttrs (cfg.user == \"jenkins\") {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "plugins"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "plugins"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 223,
+            "col": 28
+          },
+          "source": "lib.optionalString (cfg.plugins != null) ("
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/continuous-integration/jenkins/default.nix",
+            "line": 257,
+            "col": 26
+          },
+          "source": "lib.mkIf (lib.hasPrefix \"/var/lib/jenkins\" cfg.home) \"jenkins\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "home"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "jenkins",
+            "jobBuilder",
+            "nixJobs"
+          ],
+          "instance": "master",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/jenkins.nix",
+            "line": 63,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "virtualisation",
+            "diskSize"
+          ],
+          "instance": "master",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/jenkins.nix",
+            "line": 76,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "packages"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

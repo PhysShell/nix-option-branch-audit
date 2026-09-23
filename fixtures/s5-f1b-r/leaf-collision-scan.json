@@ -1,0 +1,316 @@
+{
+  "scanned_check_files": 360,
+  "missing_check_files": [],
+  "findings": [
+    {
+      "pr": 429967,
+      "side": "check-base.json",
+      "target": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 429967,
+      "side": "check-head.json",
+      "target": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 494314,
+      "side": "check-base.json",
+      "target": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "extraConfig"
+        ],
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ],
+        [
+          "ssl"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 494314,
+      "side": "check-head.json",
+      "target": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "extraConfig"
+        ],
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ],
+        [
+          "ssl"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 415326,
+      "side": "check-head.json",
+      "target": "wstunnel",
+      "module": "nixos/modules/services/networking/wstunnel.nix",
+      "colliding_paths_candidate": [
+        [
+          "settings"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "settings"
+        ]
+      ],
+      "pre_existing_in_historical": true
+    },
+    {
+      "pr": 431289,
+      "side": "check-base.json",
+      "target": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 431289,
+      "side": "check-head.json",
+      "target": "prosody",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 374017,
+      "side": "check-base.json",
+      "target": "k3s",
+      "module": "nixos/modules/services/cluster/k3s/default.nix",
+      "colliding_paths_candidate": [
+        [
+          "enable"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "enable"
+        ]
+      ],
+      "pre_existing_in_historical": true
+    },
+    {
+      "pr": 374017,
+      "side": "check-head.json",
+      "target": "k3s",
+      "module": "nixos/modules/services/cluster/k3s/default.nix",
+      "colliding_paths_candidate": [
+        [
+          "enable"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "enable"
+        ]
+      ],
+      "pre_existing_in_historical": true
+    },
+    {
+      "pr": 260551,
+      "side": "check-base.json",
+      "target": "260551",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "extraConfig"
+        ],
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ],
+        [
+          "ssl"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 260551,
+      "side": "check-head.json",
+      "target": "260551",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "extraConfig"
+        ],
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ],
+        [
+          "ssl"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 440660,
+      "side": "check-base.json",
+      "target": "440660",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 440660,
+      "side": "check-head.json",
+      "target": "440660",
+      "module": "nixos/modules/services/networking/prosody.nix",
+      "colliding_paths_candidate": [
+        [
+          "domain"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "domain"
+        ],
+        [
+          "extraConfig"
+        ]
+      ],
+      "pre_existing_in_historical": false
+    },
+    {
+      "pr": 463443,
+      "side": "check-base.json",
+      "target": "463443",
+      "module": "nixos/modules/services/hardware/tuned.nix",
+      "colliding_paths_candidate": [
+        [
+          "profiles"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "profiles"
+        ]
+      ],
+      "pre_existing_in_historical": true
+    },
+    {
+      "pr": 463443,
+      "side": "check-head.json",
+      "target": "463443",
+      "module": "nixos/modules/services/hardware/tuned.nix",
+      "colliding_paths_candidate": [
+        [
+          "profiles"
+        ]
+      ],
+      "colliding_paths_historical": [
+        [
+          "profiles"
+        ]
+      ],
+      "pre_existing_in_historical": true
+    }
+  ],
+  "findings_count": 15
+}

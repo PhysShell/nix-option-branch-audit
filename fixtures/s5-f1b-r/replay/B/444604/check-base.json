@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "444604",
+      "module": "nixos/modules/services/networking/yggdrasil.nix",
+      "test": "nixos/tests/yggdrasil.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "yggdrasil"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 35,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 37,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 74,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 89,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openMulticastPort"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 96,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "denyDhcpcdInterfaces"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 111,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "persistentKeys"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 127,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 133,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 146,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "persistentKeys"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 161,
+            "col": 52
+          },
+          "source": "lib.mkIf cfg.persistentKeys {"
+        },
+        {
+          "path": [
+            "persistentKeys"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 207,
+            "col": 20
+          },
+          "source": "lib.optionalString cfg.persistentKeys \"$(cat ${keysPath})\""
+        },
+        {
+          "path": [
+            "persistentKeys"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 227,
+            "col": 31
+          },
+          "source": "lib.optional cfg.persistentKeys keysPath"
+        },
+        {
+          "path": [
+            "openMulticastPort"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 257,
+            "col": 45
+          },
+          "source": "mkIf cfg.openMulticastPort [ 9001 ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 146,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "persistentKeys"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "persistentKeys"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 161,
+            "col": 52
+          },
+          "source": "lib.mkIf cfg.persistentKeys {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "configFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "configFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 206,
+            "col": 20
+          },
+          "source": "lib.optionalString configFileProvided \"$(${binHjson} -c \\\"$CREDENTIALS_DIRECTORY/yggdrasil.conf\\\")\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "persistentKeys"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "persistentKeys"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 207,
+            "col": 20
+          },
+          "source": "lib.optionalString cfg.persistentKeys \"$(cat ${keysPath})\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "persistentKeys"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "persistentKeys"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 227,
+            "col": 31
+          },
+          "source": "lib.optional cfg.persistentKeys keysPath"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "configFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "configFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 228,
+            "col": 28
+          },
+          "source": "mkIf configFileProvided \"yggdrasil.conf:${cfg.configFile}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "group"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 247,
+            "col": 11
+          },
+          "source": "if (cfg.group != null) then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openMulticastPort"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openMulticastPort"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 257,
+            "col": 45
+          },
+          "source": "mkIf cfg.openMulticastPort [ 9001 ]"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 202,
+            "col": 15
+          },
+          "source": "if settingsProvided || configFileProvided || cfg.persistentKeys then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "configFile"
+            ],
+            [
+              "persistentKeys"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/networking/yggdrasil.nix",
+            "line": 205,
+            "col": 20
+          },
+          "source": "lib.optionalString settingsProvided \"'${builtins.toJSON cfg.settings}'\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "yggdrasil",
+            "persistentKeys"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "carol",
+          "span": {
+            "file": "nixos/tests/yggdrasil.nix",
+            "line": 153,
+            "col": 11
+          }
+        }
+      ],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "yggdrasil",
+            "configFile"
+          ],
+          "instance": "alice",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/yggdrasil.nix",
+            "line": 63,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "yggdrasil",
+            "configFile"
+          ],
+          "instance": "bob",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/yggdrasil.nix",
+            "line": 81,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "persistentKeys",
+          "predicate": {
+            "path": [
+              "persistentKeys"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/networking/yggdrasil.nix",
+              "line": 161,
+              "col": 52
+            },
+            "source": "lib.mkIf cfg.persistentKeys {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "yggdrasil",
+                "persistentKeys"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "carol",
+              "span": {
+                "file": "nixos/tests/yggdrasil.nix",
+                "line": 153,
+                "col": 11
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "persistentKeys"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/networking/yggdrasil.nix",
+                  "line": 161,
+                  "col": 52
+                },
+                "source": "lib.mkIf cfg.persistentKeys {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "persistentKeys"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "persistentKeys"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/yggdrasil.nix",
+                  "line": 161,
+                  "col": 52
+                },
+                "source": "lib.mkIf cfg.persistentKeys {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "persistentKeys"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "persistentKeys"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/yggdrasil.nix",
+                  "line": 207,
+                  "col": 20
+                },
+                "source": "lib.optionalString cfg.persistentKeys \"$(cat ${keysPath})\""
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "persistentKeys"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "persistentKeys"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/networking/yggdrasil.nix",
+                  "line": 227,
+                  "col": 31
+                },
+                "source": "lib.optional cfg.persistentKeys keysPath"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

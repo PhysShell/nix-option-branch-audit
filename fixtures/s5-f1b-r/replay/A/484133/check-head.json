@@ -1,0 +1,770 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "rspamd",
+      "module": "nixos/modules/services/mail/rspamd.nix",
+      "test": "nixos/tests/rspamd.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "rspamd"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 305,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 308,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "locals"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 314,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "overrides"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 327,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "localLuaRules"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 340,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "workers"
+          ],
+          "default_source": "{\n          normal = { };\n          controller = { };\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 349,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 377,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 386,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"rspamd\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rspamd"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 398,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"rspamd\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rspamd"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 406,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "postfix",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 415,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "postfix",
+            "config"
+          ],
+          "default_source": "{\n            smtpd_milters = [ \"unix:/run/rspamd/rspamd-milter.sock\" ];\n            non_smtpd_milters = [ \"unix:/run/rspamd/rspamd-milter.sock\" ];\n          }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 421,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 443,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "postfix",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 445,
+            "col": 31
+          },
+          "source": "mkIf cfg.postfix.enable {"
+        },
+        {
+          "path": [
+            "postfix",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 464,
+            "col": 38
+          },
+          "source": "mkIf cfg.postfix.enable cfg.postfix.config"
+        },
+        {
+          "path": [
+            "postfix",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 466,
+            "col": 32
+          },
+          "source": "mkIf cfg.postfix.enable {"
+        },
+        {
+          "path": [
+            "debug"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 493,
+            "col": 50
+          },
+          "source": "optionalString cfg.debug \"-d\""
+        },
+        {
+          "path": [
+            "postfix",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 498,
+            "col": 31
+          },
+          "source": "mkIf cfg.postfix.enable [ postfixCfg.group ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extraConfig"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extraConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 225,
+            "col": 7
+          },
+          "source": "optionalString (cfg.extraConfig != \"\") ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "localLuaRules"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "localLuaRules"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 240,
+            "col": 9
+          },
+          "source": "optional (cfg.localLuaRules != null) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "extraConfig"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "extraConfig"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 294,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs (cfg.extraConfig != \"\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 443,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postfix",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postfix",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 445,
+            "col": 31
+          },
+          "source": "mkIf cfg.postfix.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postfix",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postfix",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 464,
+            "col": 38
+          },
+          "source": "mkIf cfg.postfix.enable cfg.postfix.config"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postfix",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postfix",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 466,
+            "col": 32
+          },
+          "source": "mkIf cfg.postfix.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "debug"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "debug"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 493,
+            "col": 50
+          },
+          "source": "optionalString cfg.debug \"-d\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "postfix",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "postfix",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 498,
+            "col": 31
+          },
+          "source": "mkIf cfg.postfix.enable [ postfixCfg.group ]"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 50,
+            "col": 33
+          },
+          "source": "optionalString options.${option}.isDefined \" ${option}=${config.${option}}\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 52,
+            "col": 9
+          },
+          "source": "if (!(hasPrefix \"/\" config.socket)) then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 96,
+            "col": 16
+          },
+          "source": "if x == \"proxy\" then traceWarning warning \"rspamd_proxy\" else x",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 116,
+            "col": 15
+          },
+          "source": "if (isString each) then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 117,
+            "col": 17
+          },
+          "source": "if (isUnixSocket each) then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 155,
+            "col": 9
+          },
+          "source": "mkIf (name == \"normal\" || name == \"controller\" || name == \"fuzzy\" || name == \"rspamd_proxy\")",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 158,
+            "col": 55
+          },
+          "source": "if name == \"rspamd_proxy\" then \"proxy\" else name",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 169,
+            "col": 17
+          },
+          "source": "if name == \"normal\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 171,
+            "col": 22
+          },
+          "source": "if name == \"controller\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 173,
+            "col": 22
+          },
+          "source": "if name == \"rspamd_proxy\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 181,
+            "col": 41
+          },
+          "source": "if (isString socket) then socket else socket.socket",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 208,
+            "col": 25
+          },
+          "source": "if name == \"rspamd_proxy\" then \"proxy\" else name",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 214,
+            "col": 15
+          },
+          "source": "optionalString (value.enable != null) \"enabled = ${lib.boolToYesNo (value.enable != false)};\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 216,
+            "col": 15
+          },
+          "source": "optionalString (value.count != null) \"count = ${toString value.count};\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 278,
+            "col": 18
+          },
+          "source": "mkIf (config.text != null) (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/mail/rspamd.nix",
+            "line": 290,
+            "col": 31
+          },
+          "source": "if n == \"rspamd_proxy\" then \"proxy\" else n",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "test file's root expression is neither a literal attrset nor a recognized wrapper (e.g. import ./make-test-python.nix (...)) -- entirely unanalyzable",
+          "span": {
+            "file": "nixos/tests/rspamd.nix",
+            "line": 7,
+            "col": 1
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "extraArgs"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}
