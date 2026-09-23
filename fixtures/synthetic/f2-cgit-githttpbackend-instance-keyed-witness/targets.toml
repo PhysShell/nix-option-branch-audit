@@ -1,0 +1,7 @@
+[[target]]
+name = "475112"
+module = "nixos/modules/services/networking/cgit.nix"
+test = "nixos/tests/cgit.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cgit"]
+watch = ["gitHttpBackend.enable"]

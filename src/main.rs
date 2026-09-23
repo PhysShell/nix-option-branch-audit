@@ -3414,21 +3414,127 @@ struct TargetReport {
     verdicts: Vec<Verdict>,
 }
 
-fn path_matches_prefix(full: &[String], prefix: &[String], suffix: &[String]) -> bool {
-    if full.len() != prefix.len() + suffix.len() {
+/// S5-F2 fix (real PR #475112/cgit false OBA001): a test assignment's own
+/// path is `prefix ++ suffix` in the ordinary case -- but when
+/// `option_prefix` itself names an `attrsOf`/`listOf (submodule ...)`
+/// declaration (cgit's real `services.cgit = mkOption { type = attrsOf
+/// (submodule ({...}: {options = {...};})); };`), every REAL test
+/// assignment necessarily also carries a concrete INSTANCE key
+/// (`services.cgit."no-git-http-backend.localhost".gitHttpBackend.enable`)
+/// that the predicate's own reference, resolved generically inside the
+/// submodule's own scope (`cfg.gitHttpBackend.enable`, the same for
+/// every instance), never mentions at all -- `option_prefix` here is
+/// concrete ([services, cgit]), not wildcarded, so nothing about it
+/// already accounts for that extra segment the way a wildcarded prefix
+/// ([services, kimai, sites, "*"]) does.
+///
+/// `allow_instance_key`, when true (only ever passed as true when
+/// `option_prefix_is_instance_keyed_submodule` independently confirmed
+/// this target's own option_prefix really does name such a declaration
+/// -- never assumed, never applied to a target where it wasn't
+/// verified), additionally accepts exactly ONE extra segment sitting
+/// between `prefix` and `suffix`, of ANY concrete value -- the instance
+/// key itself is never compared, only its mere presence and position.
+/// This does not weaken matching to "same leaf name anywhere": `prefix`
+/// must still match content-for-content at its own fixed positions, and
+/// `suffix` must still match content-for-content at ITS own fixed
+/// positions, immediately after the one tolerated segment -- an
+/// unrelated option under a different service, or at a different
+/// relative path within the same service, still fails to match, exactly
+/// as before this fix.
+fn path_matches_prefix(full: &[String], prefix: &[String], suffix: &[String], allow_instance_key: bool) -> bool {
+    if full.len() == prefix.len() + suffix.len() {
+        for (i, p) in prefix.iter().enumerate() {
+            if p != "*" && full[i] != *p {
+                return false;
+            }
+        }
+        for (i, s) in suffix.iter().enumerate() {
+            if full[prefix.len() + i] != *s {
+                return false;
+            }
+        }
+        return true;
+    }
+    if allow_instance_key && full.len() == prefix.len() + 1 + suffix.len() {
+        for (i, p) in prefix.iter().enumerate() {
+            if p != "*" && full[i] != *p {
+                return false;
+            }
+        }
+        // full[prefix.len()] is the concrete instance key -- any value
+        // is accepted here, deliberately: the predicate's own reference
+        // is generic across every instance of this submodule type, so
+        // ANY real instance's own assignment is real evidence for it.
+        for (i, s) in suffix.iter().enumerate() {
+            if full[prefix.len() + 1 + i] != *s {
+                return false;
+            }
+        }
+        return true;
+    }
+    false
+}
+
+/// S5-F2: does `option_prefix`'s own true-root declaration (the same
+/// declaration `scan_options` itself already found, recorded in
+/// `options` at `path == option_prefix` exactly -- re-located here by
+/// its own recorded span, not by a second, independent traversal) have
+/// a `type =` field wrapped in `attrsOf`/`listOf`? If so, this
+/// option_prefix names an attribute-set-of- or list-of-submodules
+/// declaration, where a real, concrete instance key necessarily sits
+/// between `option_prefix` and any of the submodule's own leaf paths in
+/// every real test assignment -- `path_matches_prefix`'s own
+/// `allow_instance_key` tolerance is sound only when this is
+/// independently confirmed, never assumed. A `submodule` NOT wrapped in
+/// `attrsOf`/`listOf` (a single, unkeyed instance, e.g. angrr's real
+/// `settings = mkOption { type = types.submodule settingsOptions; };`)
+/// returns `false` here -- no instance key is ever needed for those,
+/// and tolerating one would only ever widen matching without a real
+/// counterpart to justify it. Reuses `mk_option_field` and
+/// `is_call_named` (the same call-head-name check `is_mk_option_call`
+/// itself is built from) -- no new resolution machinery.
+fn option_prefix_is_instance_keyed_submodule(
+    root: &SyntaxNode,
+    file: &str,
+    src: &str,
+    option_prefix: &[String],
+    options: &[OptionDecl],
+) -> bool {
+    if option_prefix.is_empty() {
         return false;
     }
-    for (i, p) in prefix.iter().enumerate() {
-        if p != "*" && full[i] != *p {
-            return false;
+    let Some(decl) = options.iter().find(|o| o.path == option_prefix) else {
+        return false;
+    };
+    for node in root.descendants() {
+        if node.kind() != NODE_ATTRPATH_VALUE {
+            continue;
         }
-    }
-    for (i, s) in suffix.iter().enumerate() {
-        if full[prefix.len() + i] != *s {
-            return false;
+        if span_of(file, src, &node) != decl.span {
+            continue;
         }
+        let mut children = node.children();
+        let Some(_attrpath) = children.next() else {
+            continue;
+        };
+        let Some(value) = children.next() else {
+            continue;
+        };
+        return mk_option_field(&value, "type")
+            .is_some_and(|type_expr| type_expr_wraps_attrs_of_or_list_of(&type_expr));
     }
-    true
+    false
+}
+
+/// `true` iff `type_expr` contains an `attrsOf (...)`/`listOf (...)`
+/// call anywhere within it (dotted `types.attrsOf`/`lib.types.attrsOf`
+/// or bare `attrsOf` under a recognized `with`, `is_call_named` handles
+/// both the same way `is_mk_option_call` already does elsewhere).
+fn type_expr_wraps_attrs_of_or_list_of(type_expr: &SyntaxNode) -> bool {
+    type_expr
+        .descendants()
+        .any(|n| is_call_named(&n, "attrsOf") || is_call_named(&n, "listOf"))
 }
 
 /// Is `short` a prefix of the absolute target path `prefix ++ suffix`
@@ -3546,6 +3652,7 @@ fn evaluate_predicate_witness(
     options: &[OptionDecl],
     assignments: &[TestAssignment],
     t: &Target,
+    allow_instance_key: bool,
 ) -> PredicateWitnessOutcome {
     let declared_defaults = declared_defaults_for(pred, options);
 
@@ -3565,7 +3672,7 @@ fn evaluate_predicate_witness(
     // mutation testing doesn't waste time chasing it as a live gap.
     let mut instances_assigning_x: Vec<Option<String>> = Vec::new();
     for a in assignments {
-        if path_matches_prefix(&a.path, &t.option_prefix, watched_path)
+        if path_matches_prefix(&a.path, &t.option_prefix, watched_path, allow_instance_key)
             && !instances_assigning_x.contains(&a.instance)
         {
             instances_assigning_x.push(a.instance.clone());
@@ -3576,7 +3683,7 @@ fn evaluate_predicate_witness(
 
     for instance in &instances_assigning_x {
         let Some(x_assignment) = assignments.iter().find(|a| {
-            &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, watched_path)
+            &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, watched_path, allow_instance_key)
         }) else {
             continue; // unreachable: `instance` was derived from this same scan
         };
@@ -3609,7 +3716,7 @@ fn evaluate_predicate_witness(
             // (no assignment at all, vs. an assignment this tool can't
             // classify) must NOT be collapsed by a blanket `.or_else`.
             let assigned = assignments.iter().find(|a| {
-                &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, r)
+                &a.instance == instance && path_matches_prefix(&a.path, &t.option_prefix, r, allow_instance_key)
             });
             let value = match assigned {
                 Some(a) => a.known_value.clone(),
@@ -4232,6 +4339,18 @@ fn run_target(
         &t.cfg_ident,
         &t.option_prefix,
     );
+    // S5-F2: computed once per target, reused everywhere
+    // `path_matches_prefix` needs to know whether a test assignment's
+    // own path may legitimately carry one extra, concrete instance-key
+    // segment beyond `option_prefix` (see
+    // `option_prefix_is_instance_keyed_submodule`'s own doc comment).
+    let allow_instance_key = option_prefix_is_instance_keyed_submodule(
+        module_root.syntax(),
+        &module_file,
+        &module_src,
+        &t.option_prefix,
+        &options,
+    );
     let predicates = scan_predicates(
         &module_file,
         &module_src,
@@ -4325,7 +4444,7 @@ fn run_target(
                     // candidate's attempt instead of an immediate verdict.
                     let matches: Vec<TestAssignment> = assignments
                         .iter()
-                        .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path))
+                        .filter(|a| path_matches_prefix(&a.path, &t.option_prefix, &pred.path, allow_instance_key))
                         .cloned()
                         .collect();
                     matched_assignments.extend(matches.clone());
@@ -4367,8 +4486,14 @@ fn run_target(
             .iter()
             .filter(|p| p.refs.iter().any(|r| r == &watched_path))
         {
-            let outcome =
-                evaluate_predicate_witness(pred, &watched_path, &options, &assignments, t);
+            let outcome = evaluate_predicate_witness(
+                pred,
+                &watched_path,
+                &options,
+                &assignments,
+                t,
+                allow_instance_key,
+            );
             let witnessed = match &outcome {
                 PredicateWitnessOutcome::Witness { .. } => Some(true),
                 PredicateWitnessOutcome::EvidenceNoTransition => Some(false),
