@@ -340,6 +340,58 @@ R4 yet produce no analyzable actionable presentation — a real,
 disclosed risk to S5-B's own recall, not something this freeze round
 resolves.
 
+## 10. Path-overlap diagnostic (added at GO time, metadata-only)
+
+Added when real S5 execution was authorized (commit `1f724e4`'s
+freeze accepted; GO given), before any analyzer result exists. This
+section is **purely additive**: it does not change any value frozen
+in §§0-8 above, does not alter either frozen order, does not exclude
+any PR, does not change the selector, and does not affect stopping,
+adjudication, or the gate.
+
+**Finding**: S5's frozen PRs are all genuinely fresh **PR numbers**
+(none overlaps S1-S4's own 317 examined/excluded PR numbers — that
+was the exclusion policy's own job, unchanged throughout §5). They are
+**not** all previously-unseen module **subjects**: some
+`nixos/modules/services/**` paths touched by S5's frozen cohorts were
+already touched by one of S4's own 187 examined PRs, and some paths
+recur across more than one S5 PR within S5 itself (mechanically
+computed, `fixtures/s5-design/build-path-overlap-diagnostics.py` →
+`path-overlap-diagnostics.jsonl`, cross-checked independently and
+confirmed exact):
+
+| cohort | n | distinct service-module paths | paths repeated within S5 | max repeat | overlaps an S4-examined path |
+|---|---:|---:|---:|---:|---:|
+| S5-A | 150 | 92 | 19 | 3 | 33 (22.0%) |
+| S5-B | 219 | 190 | 47 | 4 | 47 (21.5%) |
+
+This does not violate the current estimand, which is defined over the
+PR population, not the module-subject population. But the final
+report must not claim S5 measures "completely unseen modules" — it
+measures fresh PRs, a meaningfully weaker claim, disclosed explicitly
+here rather than only implicitly through the PR-level Clopper-Pearson
+bound's own ordinary exchangeability/independence approximation
+(itself already a real improvement over the presentation-level
+"four cards from one PR" problem §1 corrected).
+
+**Per-PR fields** (`path-overlap-diagnostics.jsonl`, one row per
+frozen S5 PR, both cohorts): `pr`, `cohort`, `service_module_paths`
+(the PR's own `nixos/modules/services/**` paths),
+`overlaps_s4_service_path` (bool), `s4_overlapping_paths` (the exact
+overlapping subset, for audit), `s5_shared_path_cluster` (map of path
+→ other S5 PR numbers, either cohort, touching that same path — the
+repeated-path/cluster-membership indicator).
+
+**Final report requirement**: report, without creating a second gate,
+for S5-B specifically: actionable rate for S4-path-overlap vs
+path-novel PRs; correctness counts for both groups; number of
+distinct service-module paths represented among actionable PRs;
+concentration of actionable PRs by repeated service path; any obvious
+clustering of failures/INCONCLUSIVE results by path. These diagnostics
+are sensitivity/evidence-boundary reporting only — they must never be
+used to retroactively justify excluding a PR, re-weighting the
+confidence bound, or inventing a second post-hoc pass/fail criterion.
+
 ## Evidence boundaries
 
 This document, and every file committed alongside it in this round,
@@ -351,3 +403,13 @@ kind, and does **not** support any claim about the analyzer's current
 precision, generalization, or deployment readiness. Only a separate,
 explicit GO — and only the real S5-A/S5-B data-gathering and
 adjudication that follows it — can produce that evidence.
+
+**GO received**: real S5 execution was explicitly authorized following
+this freeze's acceptance (commit `1f724e4`), with the diagnostic
+addition above as its sole precondition. Real analyzer execution and
+adjudication begin under a new, separate execution ledger (not this
+frozen protocol document, which stays immutable from this point other
+than this one preregistered addendum) — see the S5 execution scaffold
+under `fixtures/s5-live-pr-shadow/` (mirroring
+`fixtures/s4-live-pr-shadow/`'s own established structure) for the
+in-progress real evidence.

@@ -59,3 +59,11 @@ jobs:
         run: python3 fixtures/s5-design/test_s5_protocol_machinery.py
       - name: Reproduce S5-A/S5-B frozen orders from committed population data (offline, no network)
         run: python3 fixtures/s5-design/reproduce-s5-freeze.py
+      - name: Recompute path-overlap diagnostics and diff against committed output
+        run: |
+          cd fixtures/s5-design
+          python3 build-path-overlap-diagnostics.py
+          git diff --exit-code path-overlap-diagnostics.jsonl path-overlap-summary.json || {
+            echo "::error::path-overlap-diagnostics.jsonl is not reproducible from committed frozen orders -- regenerate and commit"
+            exit 1
+          }

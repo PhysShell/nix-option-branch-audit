@@ -286,6 +286,35 @@ def test_capacity_ledger_exclusion_counts_reconcile_to_survivor_count():
         )
 
 
+def test_path_overlap_diagnostics_cover_every_frozen_pr_exactly_once():
+    """Section 0 of the GO mandate: the diagnostic-only path-overlap
+    annotation must cover every S5-A and S5-B frozen PR exactly once,
+    with no PR added, dropped, or duplicated -- this is metadata, not
+    a re-selection, and must never silently diverge from the frozen
+    orders it annotates."""
+    diag_path = D / "path-overlap-diagnostics.jsonl"
+    a_path = D / "s5a-frozen-order.json"
+    b_path = D / "s5b-frozen-order.json"
+    if not (diag_path.exists() and a_path.exists() and b_path.exists()):
+        print("SKIP  test_path_overlap_diagnostics_cover_every_frozen_pr_exactly_once: not yet written")
+        return
+    a_nums = [r["number"] for r in json.loads(a_path.read_text())]
+    b_nums = [r["number"] for r in json.loads(b_path.read_text())]
+    expected = {("A", n) for n in a_nums} | {("B", n) for n in b_nums}
+
+    rows = [json.loads(l) for l in diag_path.read_text().splitlines() if l.strip()]
+    got = [(r["cohort"], r["pr"]) for r in rows]
+    assert len(got) == len(set(got)), "duplicate (cohort, pr) rows in path-overlap-diagnostics.jsonl"
+    assert set(got) == expected, (
+        f"diagnostic rows must cover every frozen S5-A/S5-B PR exactly once: "
+        f"missing={expected - set(got)}, extra={set(got) - expected}"
+    )
+    for r in rows:
+        assert r["overlaps_s4_service_path"] == bool(r["s4_overlapping_paths"]), (
+            f"pr {r['pr']}: overlaps_s4_service_path must be exactly bool(s4_overlapping_paths)"
+        )
+
+
 def test_duplicate_pr_number_within_a_frozen_order_is_rejected():
     """Synthetic: a frozen-order list with a duplicate PR number must be
     detectable -- this is the general-purpose check a real freeze script

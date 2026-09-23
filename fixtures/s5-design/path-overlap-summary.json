@@ -1,0 +1,20 @@
+[
+  {
+    "cohort": "A",
+    "n": 150,
+    "distinct_service_paths": 92,
+    "repeated_paths_within_s5": 19,
+    "max_repeat_count": 3,
+    "overlaps_s4_service_path_count": 33,
+    "overlaps_s4_service_path_fraction": 0.22
+  },
+  {
+    "cohort": "B",
+    "n": 219,
+    "distinct_service_paths": 190,
+    "repeated_paths_within_s5": 47,
+    "max_repeat_count": 4,
+    "overlaps_s4_service_path_count": 47,
+    "overlaps_s4_service_path_fraction": 0.2146
+  }
+]
