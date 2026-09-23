@@ -1,0 +1,952 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "273833",
+      "module": "nixos/modules/services/web-apps/keycloak.nix",
+      "test": "nixos/tests/keycloak.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "keycloak"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 514,
+            "col": 5
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "database",
+            "useSSL"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 563,
+            "col": 13
+          },
+          "source": "optionals cfg.database.useSSL ["
+        },
+        {
+          "path": [
+            "database",
+            "useSSL"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 575,
+            "col": 16
+          },
+          "source": "optionals cfg.database.useSSL ["
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 514,
+            "col": 5
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "useSSL"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "useSSL"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 563,
+            "col": 13
+          },
+          "source": "optionals cfg.database.useSSL ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "caCert"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "caCert"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 566,
+            "col": 16
+          },
+          "source": "optionals (cfg.database.caCert != null) ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "useSSL"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "useSSL"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 575,
+            "col": 16
+          },
+          "source": "optionals cfg.database.useSSL ["
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "caCert"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "caCert"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 580,
+            "col": 16
+          },
+          "source": "optionals (cfg.database.caCert != null) ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 585,
+            "col": 21
+          },
+          "source": "if cfg.database.type == \"postgresql\" then postgresParams else mariadbParams"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 589,
+            "col": 18
+          },
+          "source": "if cfg.database.type == \"postgresql\" then \"postgres\" else cfg.database.type"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "localhost"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 590,
+            "col": 27
+          },
+          "source": "if databaseActuallyCreateLocally then \"keycloak\" else cfg.database.username"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "localhost"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 594,
+            "col": 31
+          },
+          "source": "if databaseActuallyCreateLocally then \"keycloak\" else cfg.database.name"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "sslCertificate"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "sslCertificateKey"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "sslCertificate"
+            ],
+            [
+              "sslCertificateKey"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 598,
+            "col": 12
+          },
+          "source": "mkIf (cfg.sslCertificate != null && cfg.sslCertificateKey != null) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "And": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "database",
+                          "createLocally"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "database",
+                          "host"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "localhost"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 604,
+            "col": 49
+          },
+          "source": "mkIf createLocalPostgreSQL {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "And": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "database",
+                          "createLocally"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "database",
+                          "host"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "localhost"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 688,
+            "col": 13
+          },
+          "source": "if createLocalPostgreSQL then"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "initialAdminPassword"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "initialAdminPassword"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 720,
+            "col": 16
+          },
+          "source": "lib.optionalAttrs (cfg.initialAdminPassword != null) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "sslCertificate"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "sslCertificateKey"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "sslCertificate"
+            ],
+            [
+              "sslCertificateKey"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 727,
+            "col": 18
+          },
+          "source": "optionals (cfg.sslCertificate != null && cfg.sslCertificateKey != null) ["
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "sslCertificate"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "sslCertificateKey"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "sslCertificate"
+            ],
+            [
+              "sslCertificateKey"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 761,
+            "col": 15
+          },
+          "source": "optionalString (cfg.sslCertificate != null && cfg.sslCertificateKey != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mariadb"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 774,
+            "col": 19
+          },
+          "source": "if cfg.database.type == \"mariadb\" then pkgs.mariadb else pkgs.mysql80"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 46,
+            "col": 39
+          },
+          "source": "optionalString (string != \"\") \"${prefix}${string}\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 98,
+            "col": 9
+          },
+          "source": "if isPath value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 354,
+            "col": 26
+          },
+          "source": "if !(hasPrefix \"/\") x then \"/\" + x else x",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 479,
+            "col": 13
+          },
+          "source": "if isInt v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 481,
+            "col": 18
+          },
+          "source": "if isString v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 483,
+            "col": 18
+          },
+          "source": "if true == v then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 485,
+            "col": 18
+          },
+          "source": "if false == v then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 487,
+            "col": 18
+          },
+          "source": "if isSecret v then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 636,
+            "col": 44
+          },
+          "source": "mkIf createLocalMySQL {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "type"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 673,
+            "col": 22
+          },
+          "source": "if lib.hasSuffix \".json\" baseName then baseName else \"${baseName}.json\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 693,
+            "col": 18
+          },
+          "source": "if createLocalMySQL then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "type"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 766,
+            "col": 51
+          },
+          "source": "lib.optionalString (cfg.realmFiles != [ ]) \"--import-realm\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "realmFiles"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/keycloak.nix",
+            "line": 776,
+            "col": 9
+          },
+          "source": "mkIf createLocalMySQL (mkDefault dbPkg)",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "type"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/keycloak.nix",
+            "line": 189,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/keycloak.nix",
+            "line": 190,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/keycloak.nix",
+            "line": 191,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "realmFiles"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

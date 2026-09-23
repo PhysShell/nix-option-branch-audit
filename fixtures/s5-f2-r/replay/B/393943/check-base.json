@@ -1,0 +1,490 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "393943",
+      "module": "nixos/modules/services/security/cfssl.nix",
+      "test": "nixos/tests/cfssl.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "cfssl"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 13,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/cfssl\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/cfssl"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 15,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 30,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "8888",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 36,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "ca"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 42,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "caKey"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 48,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "caBundle"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 54,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "intBundle"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 60,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "intDir"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 66,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "metadata"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 72,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "remote"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 83,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "configFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 89,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "responder"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 95,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "responderKey"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 101,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "tlsKey"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 107,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "tlsCert"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 113,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "mutualTlsCa"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 119,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "mutualTlsCn"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 125,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "tlsRemoteCa"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 131,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "mutualTlsClientCert"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 137,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "mutualTlsClientKey"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 143,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dbConfig"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 149,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "logLevel"
+          ],
+          "default_source": "1",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 155,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 169,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 169,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 196,
+            "col": 27
+          },
+          "source": "lib.optionalString (v != null) ''-${n}=\"${v}\"''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/security/cfssl.nix",
+            "line": 223,
+            "col": 10
+          },
+          "source": "lib.mkIf (cfg.dataDir == options.services.cfssl.dataDir.default) {",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "dataDir"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "systemd",
+            "services",
+            "cfssl-init",
+            "serviceConfig",
+            "WorkingDirectory"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/cfssl.nix",
+            "line": 25,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "systemd",
+            "services",
+            "cfssl-init",
+            "script"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/cfssl.nix",
+            "line": 27,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "disable"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

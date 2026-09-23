@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "audit-diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "cdc_added_subject": 0,
+    "cdc_removed_subject": 0,
+    "oba_verdict_transitions": {
+      "option_not_found->test_value_unresolved": 1
+    },
+    "cdc_verdict_transitions": {},
+    "new_findings": 0,
+    "resolved_findings": 0,
+    "finding_became_inconclusive": 0,
+    "new_inconclusives": 0,
+    "resolved_inconclusives": 0,
+    "removed_subjects_with_finding": 0,
+    "evidence_changed": 0,
+    "notable_total": 0,
+    "notable": []
+  },
+  "oba": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/monitoring/beszel-agent.nix",
+        "test": "nixos/tests/beszel.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "beszel",
+          "agent"
+        ],
+        "watched_path": "smartmon.enable"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "smartmon.enable"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "TestValueUnresolved",
+            "option": "smartmon.enable",
+            "predicate": {
+              "path": [
+                "smartmon",
+                "enable"
+              ],
+              "kind": {
+                "Truthy": "optionalString"
+              },
+              "span": {
+                "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                "line": 73,
+                "col": 32
+              },
+              "source": "lib.optionalString cfg.smartmon.enable ''"
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "smartmon",
+                    "enable"
+                  ],
+                  "kind": {
+                    "Truthy": "optionalString"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                    "line": 73,
+                    "col": 32
+                  },
+                  "source": "lib.optionalString cfg.smartmon.enable ''"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "smartmon",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "smartmon",
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                    "line": 73,
+                    "col": 32
+                  },
+                  "source": "lib.optionalString cfg.smartmon.enable ''"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "smartmon",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "smartmon",
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                    "line": 88,
+                    "col": 12
+                  },
+                  "source": "lib.optionals cfg.smartmon.enable [ cfg.smartmon.package ]"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "smartmon",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "smartmon",
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                    "line": 112,
+                    "col": 14
+                  },
+                  "source": "lib.optionals cfg.smartmon.enable [ \"disk\" ]"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "smartmon",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "smartmon",
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                    "line": 118,
+                    "col": 31
+                  },
+                  "source": "lib.mkIf cfg.smartmon.enable ["
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "smartmon",
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "smartmon",
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+                    "line": 122,
+                    "col": 33
+                  },
+                  "source": "lib.mkIf cfg.smartmon.enable ["
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ],
+  "cdc": []
+}

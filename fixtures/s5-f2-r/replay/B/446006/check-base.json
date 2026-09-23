@@ -1,0 +1,647 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 2,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "446006-period",
+      "module": "nixos/modules/services/misc/angrr.nix",
+      "test": "nixos/tests/angrr.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "angrr"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 15,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "period"
+          ],
+          "default_source": "\"7d\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "7d"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 17,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "removeRoot"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 25,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ownedOnly"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 32,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "logLevel"
+          ],
+          "default_source": "\"info\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "info"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 40,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 56,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableNixGcIntegration"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 63,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "timer",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 70,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "timer",
+            "dates"
+          ],
+          "default_source": "\"03:00\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "03:00"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 71,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 82,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "removeRoot"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 101,
+            "col": 17
+          },
+          "source": "lib.optionalString cfg.removeRoot \"--remove-root\""
+        },
+        {
+          "path": [
+            "timer",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 111,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.timer.enable {"
+        },
+        {
+          "path": [
+            "enableNixGcIntegration"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 120,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.enableNixGcIntegration {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 82,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "removeRoot"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "removeRoot"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 101,
+            "col": 17
+          },
+          "source": "lib.optionalString cfg.removeRoot \"--remove-root\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "timer",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "timer",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 111,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.timer.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableNixGcIntegration"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableNixGcIntegration"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 120,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.enableNixGcIntegration {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 38,
+            "col": 20
+          },
+          "source": "if b then \"true\" else \"false\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "period"
+        }
+      ]
+    },
+    {
+      "name": "446006-direnv",
+      "module": "nixos/modules/services/misc/angrr.nix",
+      "test": "nixos/tests/angrr.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "programs",
+        "direnv",
+        "angrr"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "angrr",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 15,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "period"
+          ],
+          "default_source": "\"7d\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "7d"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 17,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "removeRoot"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 25,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "ownedOnly"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 32,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "logLevel"
+          ],
+          "default_source": "\"info\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "info"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 40,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "extraArgs"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 56,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "enableNixGcIntegration"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 63,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "timer",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 70,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "angrr",
+            "timer",
+            "dates"
+          ],
+          "default_source": "\"03:00\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "03:00"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 71,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 82,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "removeRoot"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 101,
+            "col": 17
+          },
+          "source": "lib.optionalString cfg.removeRoot \"--remove-root\""
+        },
+        {
+          "path": [
+            "timer",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 111,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.timer.enable {"
+        },
+        {
+          "path": [
+            "enableNixGcIntegration"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 120,
+            "col": 8
+          },
+          "source": "lib.mkIf cfg.enableNixGcIntegration {"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/angrr.nix",
+            "line": 38,
+            "col": 20
+          },
+          "source": "if b then \"true\" else \"false\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "autoUse"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

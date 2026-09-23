@@ -1,0 +1,276 @@
+[
+  {
+    "pr": 431289,
+    "cohort": "A",
+    "target_name": "prosody",
+    "option_prefix": [
+      "services",
+      "prosody",
+      "muc"
+    ],
+    "watch": [
+      "moderation"
+    ],
+    "per_suffix": {
+      "moderation": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 353770,
+    "cohort": "B",
+    "target_name": "353770",
+    "option_prefix": [
+      "services",
+      "syncthing",
+      "settings",
+      "folders"
+    ],
+    "watch": [
+      "ignorePatterns"
+    ],
+    "per_suffix": {
+      "ignorePatterns": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 460724,
+    "cohort": "B",
+    "target_name": "460724",
+    "option_prefix": [
+      "services",
+      "btrbk",
+      "sshAccess"
+    ],
+    "watch": [
+      "extraArgs"
+    ],
+    "per_suffix": {
+      "extraArgs": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 506644,
+    "cohort": "B",
+    "target_name": "506644",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "webRoot"
+    ],
+    "per_suffix": {
+      "webRoot": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 508427,
+    "cohort": "B",
+    "target_name": "508427",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "configRoot"
+    ],
+    "per_suffix": {
+      "configRoot": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 395982,
+    "cohort": "B",
+    "target_name": "395982",
+    "option_prefix": [
+      "services",
+      "openvpn",
+      "servers"
+    ],
+    "watch": [
+      "testserver.authUserPass"
+    ],
+    "per_suffix": {
+      "testserver.authUserPass": {
+        "candidates": [
+          {
+            "form": "instance_block",
+            "instance_key": "testserver",
+            "instance_key_raw": "testserver",
+            "value_text": null,
+            "node": null,
+            "line": 115,
+            "parse_status": "ambiguous_suffix_not_flat_within_instance_block"
+          }
+        ],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 456004,
+    "cohort": "B",
+    "target_name": "456004",
+    "option_prefix": [
+      "services",
+      "snapserver",
+      "settings"
+    ],
+    "watch": [
+      "stream.source"
+    ],
+    "per_suffix": {
+      "stream.source": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 428153,
+    "cohort": "B",
+    "target_name": "428153",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "configSyncDir"
+    ],
+    "per_suffix": {
+      "configSyncDir": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 397967,
+    "cohort": "B",
+    "target_name": "397967",
+    "option_prefix": [
+      "services",
+      "fedimintd"
+    ],
+    "watch": [
+      "api_ws.openFirewall"
+    ],
+    "per_suffix": {
+      "api_ws.openFirewall": {
+        "candidates": [
+          {
+            "form": "instance_block",
+            "instance_key": "mainnet",
+            "instance_key_raw": "\"mainnet\"",
+            "value_text": null,
+            "node": "machine",
+            "line": 15,
+            "parse_status": "ambiguous_suffix_not_flat_within_instance_block"
+          }
+        ],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 475112,
+    "cohort": "B",
+    "target_name": "475112",
+    "option_prefix": [
+      "services",
+      "cgit"
+    ],
+    "watch": [
+      "gitHttpBackend.enable"
+    ],
+    "per_suffix": {
+      "gitHttpBackend.enable": {
+        "candidates": [
+          {
+            "form": "instance_block",
+            "instance_key": "localhost",
+            "instance_key_raw": "\"localhost\"",
+            "value_text": null,
+            "node": "server",
+            "line": 18,
+            "parse_status": "ambiguous_suffix_not_flat_within_instance_block"
+          },
+          {
+            "form": "instance_block",
+            "instance_key": "check.localhost",
+            "instance_key_raw": "\"check.localhost\"",
+            "value_text": null,
+            "node": "server",
+            "line": 44,
+            "parse_status": "ambiguous_suffix_not_flat_within_instance_block"
+          },
+          {
+            "form": "instance_block",
+            "instance_key": "no-git-http-backend.localhost",
+            "instance_key_raw": "\"no-git-http-backend.localhost\"",
+            "value_text": "false",
+            "node": "server",
+            "line": 58
+          }
+        ],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 386406,
+    "cohort": "B",
+    "target_name": "386406",
+    "option_prefix": [
+      "services",
+      "frp",
+      "instances"
+    ],
+    "watch": [
+      "role"
+    ],
+    "per_suffix": {
+      "role": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  },
+  {
+    "pr": 427260,
+    "cohort": "B",
+    "target_name": "427260",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "privateFilesDir"
+    ],
+    "per_suffix": {
+      "privateFilesDir": {
+        "candidates": [],
+        "textually_distinct_values": false
+      }
+    }
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "480700",
+      "module": "nixos/modules/services/web-apps/bluesky-pds.nix",
+      "test": "nixos/tests/bluesky-pds.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "bluesky-pds",
+        "goat"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/bluesky-pds.nix",
+            "line": 190,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "pdsadmin",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/bluesky-pds.nix",
+            "line": 192,
+            "col": 7
+          },
+          "source": "optional cfg.pdsadmin.enable pdsadminWrapper"
+        },
+        {
+          "path": [
+            "goat",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/bluesky-pds.nix",
+            "line": 192,
+            "col": 55
+          },
+          "source": "optional cfg.goat.enable pkgs.atproto-goat"
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/bluesky-pds.nix",
+            "line": 203,
+            "col": 57
+          },
+          "source": "if builtins.isInt v then toString v else v",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "enable"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

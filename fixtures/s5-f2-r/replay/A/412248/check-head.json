@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "sanoid",
+      "module": "nixos/modules/services/backup/sanoid.nix",
+      "test": "nixos/tests/sanoid.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "sanoid",
+        "templates",
+        "*"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/sanoid.nix",
+            "line": 250,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/backup/sanoid.nix",
+            "line": 250,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/sanoid.nix",
+            "line": 155,
+            "col": 12
+          },
+          "source": "if lib.isList v then lib.concatStringsSep \",\" v else lib.generators.mkValueStringDefault { } v",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/sanoid.nix",
+            "line": 159,
+            "col": 9
+          },
+          "source": "if v == null then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/sanoid.nix",
+            "line": 161,
+            "col": 14
+          },
+          "source": "if k == \"processChildrenOnly\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/sanoid.nix",
+            "line": 163,
+            "col": 14
+          },
+          "source": "if k == \"useTemplate\" then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "source",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/sanoid.nix",
+            "line": 26,
+            "col": 9
+          }
+        },
+        {
+          "path": [],
+          "instance": "target",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/sanoid.nix",
+            "line": 78,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "pre_snapshot_script"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

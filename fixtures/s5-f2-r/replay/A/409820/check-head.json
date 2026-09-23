@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "dex",
+      "module": "nixos/modules/services/web-apps/dex.nix",
+      "test": "nixos/tests/dex-oidc.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "dex"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 48,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 52,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 62,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 97,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "optionals (cfg.environmentFile != null) [ cfg.environmentFile ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 97,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "storage",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgres"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "storage",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 103,
+            "col": 13
+          },
+          "source": "optional (cfg.settings.storage.type == \"postgres\") \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "settings",
+                  "storage",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgres"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "settings",
+              "storage",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 124,
+            "col": 23
+          },
+          "source": "optional (cfg.settings.storage.type == \"postgres\") \"/var/run/postgresql\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 162,
+            "col": 12
+          },
+          "source": "optionalAttrs (cfg.environmentFile != null) {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 14,
+            "col": 5
+          },
+          "source": "if client ? secretFile then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 24,
+            "col": 11
+          },
+          "source": "if n == \"staticClients\" then (builtins.map fixClient v) else v",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/dex.nix",
+            "line": 27,
+            "col": 22
+          },
+          "source": "optional (c ? secretFile) c.secretFile",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/dex-oidc.nix",
+            "line": 10,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "package"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

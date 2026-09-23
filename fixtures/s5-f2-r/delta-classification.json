@@ -1,0 +1,10 @@
+[
+  {
+    "pr": 475112,
+    "cohort": "B",
+    "baseline": "f1d-r",
+    "verdict_delta": true,
+    "classification": "A_expected_cgit_correction",
+    "mechanism": "cgit, the decisive and sole anchor for this round. Re-confirmed from the frozen live replay itself (not merely the committed synthetic fixture): head-side watched predicate `gitHttpBackend.enable` (kind Truthy(\"optionalAttrs\"), source `lib.optionalAttrs cfg.gitHttpBackend.enable {`, span nixos/modules/services/networking/cgit.nix:308) transitions F1D-R-baseline OBA001 (witnessed=false, no evidence, matched_test_assignments effectively empty) -> F2-R-candidate PASS (witnessed=true), with the evidence being the real, deliberate assignment `services.cgit.\"no-git-http-backend.localhost\".gitHttpBackend.enable = false;` at nixos/tests/cgit.nix:58, instance `server`, value_source `false`. audit-diff's own oba_verdict_transitions field independently confirms the same fact from a second code path: baseline `option_not_found->oba001` (new_findings:1) -> candidate `option_not_found->pass` (resolved_inconclusives:1). This is exactly S5-F2's own stated purpose and exactly the fix's own intended mechanism (the new `allow_instance_key` tolerance in `path_matches_prefix`, gated by `option_prefix_is_instance_keyed_submodule` independently confirming `services.cgit`'s own true-root declaration is `attrsOf(submodule ...)`-typed) -- verified from the live replay, not assumed from the earlier synthetic fixture or the F2 implementation's own unit tests alone."
+  }
+]

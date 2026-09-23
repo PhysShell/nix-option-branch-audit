@@ -1,0 +1,652 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "494127",
+      "module": "nixos/modules/services/misc/n8n.nix",
+      "test": "nixos/tests/n8n.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "n8n"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "customNodes"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 77,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 88,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environment"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 94,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "GENERIC_TIMEZONE"
+          ],
+          "default_source": "config.time.timeZone",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 120,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_PORT"
+          ],
+          "default_source": "5678",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 128,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_USER_FOLDER"
+          ],
+          "default_source": "\"/var/lib/n8n\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/n8n"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 133,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_DIAGNOSTICS_ENABLED"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 144,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_VERSION_NOTIFICATIONS_ENABLED"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 152,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_CUSTOM_EXTENSIONS"
+          ],
+          "default_source": "if cfg.customNodes != [ ] then toString customNodesDir else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 159,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_RUNNERS_MODE"
+          ],
+          "default_source": "if runnersCfg.enable then \"external\" else \"internal\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 167,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_RUNNERS_BROKER_PORT"
+          ],
+          "default_source": "5679",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 182,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_RUNNERS_BROKER_LISTEN_ADDRESS"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 189,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "N8N_RUNNERS_AUTH_TOKEN_FILE"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 196,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 214,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "environment"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 218,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "environment",
+            "N8N_RUNNERS_AUTH_TOKEN_FILE"
+          ],
+          "default_source": "cfg.environment.N8N_RUNNERS_AUTH_TOKEN_FILE",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 244,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "environment",
+            "N8N_RUNNERS_TASK_BROKER_URI"
+          ],
+          "default_source": "\"http://${cfg.environment.N8N_RUNNERS_BROKER_LISTEN_ADDRESS}:${cfg.environment.N8N_RUNNERS_BROKER_PORT}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 252,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "runners"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 265,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "runners",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 271,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "runners",
+            "command"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 280,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "runners",
+            "healthCheckPort"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 285,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "runners",
+            "args"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 290,
+            "col": 17
+          }
+        },
+        {
+          "path": [
+            "taskRunners",
+            "runners",
+            "environment"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 296,
+            "col": 17
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 325,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 433,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "taskRunners",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "taskRunners",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 175,
+            "col": 23
+          },
+          "source": "if runnersCfg.enable then \"external\" else \"internal\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 325,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 433,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 162,
+            "col": 23
+          },
+          "source": "if cfg.customNodes != [ ] then toString customNodesDir else null",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "customNodes"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 373,
+            "col": 16
+          },
+          "source": "lib.optional (runnersCfg.enable && !anyRunnerEnabled) ''",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "taskRunners",
+              "enable"
+            ],
+            [
+              "taskRunners",
+              "enable"
+            ],
+            [
+              "taskRunners",
+              "runners"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/misc/n8n.nix",
+            "line": 392,
+            "col": 40
+          },
+          "source": "lib.mkIf anyRunnerEnabled {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "taskRunners",
+              "enable"
+            ],
+            [
+              "taskRunners",
+              "runners"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/n8n.nix",
+            "line": 17,
+            "col": 3
+          }
+        },
+        {
+          "path": [
+            "services",
+            "n8n",
+            "environment",
+            "WEBHOOK_URL"
+          ],
+          "instance": "machine_configured",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/n8n.nix",
+            "line": 28,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "n8n",
+            "environment",
+            "N8N_ENCRYPTION_KEY_FILE"
+          ],
+          "instance": "machine_configured",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/n8n.nix",
+            "line": 32,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "n8n",
+            "environment",
+            "N8N_RUNNERS_AUTH_TOKEN_FILE"
+          ],
+          "instance": "machine_configured",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/n8n.nix",
+            "line": 33,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "taskRunners.environment.N8N_RUNNERS_CONFIG_PATH"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

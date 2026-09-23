@@ -1,0 +1,97 @@
+{
+  "round": "S5-F2-R",
+  "purpose": "frozen full-corpus acceptance replay of implementation candidate c647d1b (S5-F2's cgit false-OBA001 fix)",
+  "baseline_for_regression_comparison": {"round": "S5-F1D-R", "commit": "25c5b5468c94f87231eed115e6eba5ad6118e9ff", "verdict": "PASS", "replay_dir": "fixtures/s5-f1d-r/replay"},
+  "historical_reference_for_defect_evidence_only": {"release": "v0.4.5", "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356", "verdict": "FAIL"},
+  "acceptance_candidate": {
+    "commit": "c647d1b33fc1e328cd5f75037770e404a40edcf8",
+    "commit_short": "c647d1b",
+    "note_this_is_the_implementation_commit_not_the_docs_commit": "399a2d531e74cf3b40832feceacdca81c4ce5c83 (S5-F2 investigation/report) was explicitly NOT used to build the candidate -- verified `git diff c647d1b 399a2d5 -- src/` is empty, confirming the docs commit touches no source.",
+    "binary_sha256": "4d16b399e072e48edd5161133a306925646f568a037f07807a7abbe2758a1048",
+    "rustc_version": "rustc 1.100.0-nightly (8925ea358 2026-08-20), toolchain nightly-2026-08-21-x86_64-unknown-linux-gnu",
+    "note": "built from a genuinely clean checkout (/home/tandem/f2r-clean-checkout), git status --short empty, HEAD verified == c647d1b, no cp-based restoration used anywhere in this round"
+  },
+  "coverage": {
+    "total_frozen_prs": 369,
+    "non_applicable": 189,
+    "applicable": 180,
+    "applicable_re_derived_independently_from_ledger": true,
+    "applicable_set_identical_to_f1d_r_manifest": true,
+    "applicable_evaluated": 180,
+    "window_evaluation_incomplete": 0,
+    "fetch_failures": 0
+  },
+  "comparison_vs_f1d_r_baseline": {
+    "identical": 179,
+    "changed": 1,
+    "changed_prs": [475112],
+    "note": "This is the cleanest S5 replay round to date: exactly one PR changed, and it is the one PR this round exists to fix. No other PR in the entire 180-PR applicable corpus shows any delta of any kind relative to the accepted F1D baseline."
+  },
+  "discovery_invariance_check": {
+    "total_checked": 360,
+    "discovery_identical": 360,
+    "discovery_changed_count": 0,
+    "note": "F2 never touches scan_options -- discovered_options is provably untouched for every PR, both sides, confirmed mechanically rather than assumed. This is a stronger invariant than F1D-R had available to it (F1D intentionally changed discovery); F2's own change surface is provably confined to witness matching."
+  },
+  "delta_classification_counts": {
+    "A_expected_cgit_correction": 1
+  },
+  "structurally_eligible_target_manifest": {
+    "methodology": "for every one of the 180 applicable PRs' own targets, option_prefix_is_instance_keyed_submodule was evaluated using a throwaway diagnostic binary built from a clean c647d1b checkout plus one strictly-additive, env-var-gated eprintln! that calls the real function verbatim (never used to produce any of this round's actual replay/comparison/anchor results, which all come from the pure, unmodified candidate binary) -- not a Python reimplementation of the Rust logic.",
+    "total_target_records_scanned": 182,
+    "eligible_count": 12,
+    "eligible_targets": [
+      {"pr": 431289, "option_prefix": ["services","prosody","muc"], "watch": ["moderation"], "container_form": "listOf(submodule ...)", "verified_by_hand": true},
+      {"pr": 353770, "option_prefix": ["services","syncthing","settings","folders"], "watch": ["ignorePatterns"], "container_form": "attrsOf(submodule ...) [inferred, not directly re-read]", "verified_by_hand": false},
+      {"pr": 460724, "option_prefix": ["services","btrbk","sshAccess"], "watch": ["extraArgs"], "container_form": "listOf(submodule ...)", "verified_by_hand": true},
+      {"pr": 506644, "option_prefix": ["services","drupal","sites"], "watch": ["webRoot"], "container_form": "attrsOf(submodule ...) [inferred, not directly re-read]", "verified_by_hand": false},
+      {"pr": 508427, "option_prefix": ["services","drupal","sites"], "watch": ["configRoot"], "container_form": "attrsOf(submodule ...) [inferred, not directly re-read]", "verified_by_hand": false},
+      {"pr": 395982, "option_prefix": ["services","openvpn","servers"], "watch": ["testserver.authUserPass"], "container_form": "attrsOf(submodule ...)", "verified_by_hand": true},
+      {"pr": 456004, "option_prefix": ["services","snapserver","settings"], "watch": ["stream.source"], "container_form": "attrsOf-shaped settings-format type (not necessarily submodule)", "verified_by_hand": true},
+      {"pr": 428153, "option_prefix": ["services","drupal","sites"], "watch": ["configSyncDir"], "container_form": "attrsOf(submodule ...) [inferred, not directly re-read]", "verified_by_hand": false},
+      {"pr": 397967, "option_prefix": ["services","fedimintd"], "watch": ["api_ws.openFirewall"], "container_form": "attrsOf(submodule ...)", "verified_by_hand": true},
+      {"pr": 475112, "option_prefix": ["services","cgit"], "watch": ["gitHttpBackend.enable"], "container_form": "attrsOf(submodule ...)", "verified_by_hand": true},
+      {"pr": 386406, "option_prefix": ["services","frp","instances"], "watch": ["role"], "container_form": "attrsOf(submodule ...)", "verified_by_hand": true},
+      {"pr": 427260, "option_prefix": ["services","drupal","sites"], "watch": ["privateFilesDir"], "container_form": "attrsOf(submodule ...) [inferred, not directly re-read]", "verified_by_hand": false}
+    ],
+    "changed_prs_inside_eligible_set": true,
+    "note": "PR 475112 (the sole changed PR) is confirmed inside this set with a hand-verified attrsOf(submodule) container. No changed PR falls outside the eligible set -- the 'immediately suspicious' condition the mandate warns about does not occur."
+  },
+  "cross_instance_ambiguity_scan": {
+    "scope": "restricted to the 12 structurally eligible targets (a target that cannot admit an instance key cannot exhibit this ambiguity by construction); not merely the changed-PR set",
+    "method": "fork's own text-level regex/bracket-balanced scan over live-fetched real test source for the instance-key-tolerant (prefix+1+suffix) shape specifically, independently spot-verified by hand (direct gh api source read, not delegated) for the 7 most structurally complex/ambiguous cases: cgit #475112, openvpn #395982, fedimintd #397967, frp #386406, snapserver #456004, btrbk #460724, prosody #431289",
+    "result": "cross_instance_outcome_ambiguity_not_observed_in_frozen_S5",
+    "detail": "Every eligible target in the frozen corpus has either zero real assignments to its own watched suffix, or (cgit only) exactly one real assignment among multiple concrete instances -- the other instances demonstrably touch a different, sibling leaf, confirmed by direct source read, not only the scanner's own conservative flag. No target anywhere shows two or more concrete instances assigning genuinely differing values to the same watched predicate.",
+    "newly_disclosed_theoretical_caveat_not_blocking_this_round": "option_prefix_is_instance_keyed_submodule treats attrsOf and listOf identically (both merely require attrsOf/listOf to appear anywhere in the type expression -- it does not require the wrapped element to be a submodule, and does not distinguish the two container kinds). For an attrsOf(submodule), a real Nix instance genuinely IS addressed by a literal attribute name, so a literal instance-key segment in a real test assignment is a faithful signal. For a listOf(submodule) (independently confirmed for prosody #431289's muc and btrbk #460724's sshAccess, both real `with types; listOf (submodule {...})` declarations), a real Nix list element has NO literal name at all -- list membership is positional, not key-addressed -- so a literal single-segment 'instance key' can never legitimately arise between option_prefix and a watched suffix for a genuinely valid Nix config against a listOf-typed option. If a test file's own literal source ever happened to contain a syntactically well-formed but semantically nonsensical attrpath of that shape (which oba's purely-syntactic walker cannot distinguish from a real one), the current gate would accept it as instance-key evidence. This is NOT exercised anywhere in the frozen 180-PR corpus (both real listOf-typed eligible targets show zero matching candidates of any shape), so it does not produce any unsound witness in this replay and does not block this round's PASS -- but it is a real, narrower-than-cgit structural distinction the current gate does not encode, worth recording as its own disclosed item rather than silently generalizing 'attrsOf/listOf' as equivalent for future corpus growth."
+  },
+  "mandatory_anchors": {
+    "cgit_475112": "FIXED as intended -- OBA001(witnessed=false, no evidence) -> PASS(witnessed=true, evidence=services.cgit.\"no-git-http-backend.localhost\".gitHttpBackend.enable=false, nixos/tests/cgit.nix:58, instance=server). audit-diff transition: option_not_found->oba001 (baseline) -> option_not_found->pass (candidate). Base side unaffected (OptionNotFound both sides, predates the option).",
+    "angrr_471312": "byte-identical to F1D-R baseline across raw.json/check-base.json/check-head.json",
+    "seven_f1_regressions": {"431289": "byte-identical", "506644": "byte-identical", "508427": "byte-identical", "440660": "byte-identical", "428153": "byte-identical", "397967": "byte-identical", "427260": "byte-identical"},
+    "rspamd_484133": "byte-identical to F1D-R baseline",
+    "tayga_432528": "byte-identical to F1D-R baseline",
+    "k3s_374017": "byte-identical to F1D-R baseline",
+    "guacamole_462487": "byte-identical to F1D-R baseline across raw.json/check-base.json/check-head.json -- deliberately still unfixed, confirmed unaffected by F2",
+    "kimai_wildcard": "unaffected -- targeted existing regression test still passes; the allow_instance_key gate requires a concrete option_prefix with a real matching OptionDecl, which a wildcard prefix never has"
+  },
+  "eight_collision_prs_full_corpus_rescan": {
+    "result": "exactly 1 finding in the entire 180-PR corpus: wstunnel #415326, pre_existing_in_f1d_r_baseline=true -- identical to F1D-R's own disclosed, unaddressed wildcard-prefix state. No new collision introduced anywhere.",
+    "seven_previously_resolved_collisions": "remain resolved (429967, 494314, 431289, 440660, 260551, 463443, 374017) -- unaffected by F2, confirmed via the full-corpus scan finding nothing for any of them"
+  },
+  "fatal_error_behavior": {
+    "baseline_verdict_kind_counts": {"OptionNotFound": 208, "PredicateNotFound": 108, "TestConfigUnresolved": 21, "PASS": 7, "OBA001": 17, "TestValueUnresolved": 2, "DefaultUnresolved": 1},
+    "candidate_verdict_kind_counts": {"OptionNotFound": 208, "PredicateNotFound": 108, "TestConfigUnresolved": 21, "PASS": 8, "OBA001": 16, "TestValueUnresolved": 2, "DefaultUnresolved": 1},
+    "note": "the only change anywhere is exactly the cgit transition (PASS 7->8, OBA001 17->16) -- no verdict-kind class appears in one side only, 0 parse errors both sides"
+  },
+  "predicate_form_distribution_of_the_one_changed_case": {
+    "cgit_475112": "PredicateKind::Truthy(\"optionalAttrs\") -- H1 form. No other predicate form appears in the corpus's own single delta. Predicate-form-agnosticism of the fix itself was independently confirmed at the implementation-acceptance stage (S5-F2) via 2 dedicated synthetic tests (NegTruthy, H2 Eq) exercising the SAME allow_instance_key code path -- not re-derived here since this round's own frozen corpus happens to exercise only the Truthy form."
+  },
+  "reproducibility": {
+    "applicable_manifest_independently_re_derived_from_ledger_and_confirmed_byte_identical_to_f1d_r_manifest": true,
+    "compare_replay_rerun_independently_by_the_coordinator_byte_identical": true,
+    "leaf_collision_scan_rerun_independently_by_the_coordinator_byte_identical": true,
+    "note": "both re-runs were performed independently by the reviewing session itself (not merely re-trusted from the executing fork's own claim), against the already-written replay artifacts, and produced byte-identical output"
+  },
+  "final_verdict": "PASS",
+  "scope_note": "This PASS establishes that c647d1b satisfies the frozen S5 acceptance corpus for the structurally gated one-instance-key witness model, and that its effect on the frozen corpus is confined to exactly the intended cgit correction with zero collateral change anywhere else. It does NOT establish: that source-order first-match is universally sound for cross-instance disagreement (undisturbed, disclosed limitation, unexercised in this corpus); that listOf-typed submodules' instance-key tolerance is sound in general (a new, narrower, disclosed, currently-unexercised caveat identified in this round -- see cross_instance_ambiguity_scan.newly_disclosed_theoretical_caveat_not_blocking_this_round); that arbitrary nested dynamic instance structures are supported; that wildcard matching is solved; that guacamole is fixed."
+}

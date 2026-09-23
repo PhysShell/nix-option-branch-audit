@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "411451",
+      "module": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+      "test": "nixos/tests/dnscrypt-proxy2.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "dnscrypt-proxy2"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 16,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 20,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "upstreamDefaults"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 39,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "configFile"
+          ],
+          "default_source": "pkgs.runCommand \"dnscrypt-proxy.toml\"\n          {\n            json = builtins.toJSON cfg.settings;\n            passAsFile = [ \"json\" ];\n          }\n          ''\n            ${\n              if cfg.upstreamDefaults then\n                ''\n                  ${pkgs.buildPackages.remarshal}/bin/toml2json ${pkgs.dnscrypt-proxy.src}/dnscrypt-proxy/example-dnscrypt-proxy.toml > example.json\n                  ${pkgs.buildPackages.jq}/bin/jq --slurp add example.json $jsonPath > config.json # merges the two\n                ''\n              else\n                ''\n                  cp $jsonPath config.json\n                ''\n            }\n            ${pkgs.buildPackages.remarshal}/bin/json2toml < config.json > $out\n          ''",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 49,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "upstreamDefaults"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 64,
+            "col": 15
+          },
+          "source": "if cfg.upstreamDefaults then"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 80,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "upstreamDefaults"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "upstreamDefaults"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 64,
+            "col": 15
+          },
+          "source": "if cfg.upstreamDefaults then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/networking/dnscrypt-proxy2.nix",
+            "line": 80,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "package"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

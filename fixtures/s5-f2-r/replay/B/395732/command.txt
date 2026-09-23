@@ -1,0 +1,6 @@
+cd /home/tandem/f2r-scratch/B/395732
+/home/tandem/f2r-clean-checkout/target/release/oba audit-diff --base-root base-root --head-root head-root --targets targets.toml --format json --summary-path summary.md > raw.json  (exit 2)
+cd /home/tandem/f2r-scratch/B/395732
+/home/tandem/f2r-clean-checkout/target/release/oba check --root base-root --targets targets.toml --json > check-base.json  (exit 2)
+cd /home/tandem/f2r-scratch/B/395732
+/home/tandem/f2r-clean-checkout/target/release/oba check --root head-root --targets targets.toml --json > check-head.json  (exit 2)

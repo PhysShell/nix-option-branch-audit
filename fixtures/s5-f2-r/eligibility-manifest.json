@@ -1,0 +1,2814 @@
+[
+  {
+    "pr": 463848,
+    "cohort": "A",
+    "target_name": "gonic",
+    "option_prefix": [
+      "services",
+      "gonic"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 511160,
+    "cohort": "A",
+    "target_name": "goupile",
+    "option_prefix": [
+      "services",
+      "goupile"
+    ],
+    "watch": [
+      "hostName"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 473031,
+    "cohort": "A",
+    "target_name": "roundcube",
+    "option_prefix": [
+      "services",
+      "roundcube"
+    ],
+    "watch": [
+      "maxAttachmentSize"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 457271,
+    "cohort": "A",
+    "target_name": "lightdm",
+    "option_prefix": [
+      "services",
+      "xserver",
+      "displayManager",
+      "lightdm"
+    ],
+    "watch": [
+      "background"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 429967,
+    "cohort": "A",
+    "target_name": "prosody",
+    "option_prefix": [
+      "services",
+      "prosody",
+      "modules"
+    ],
+    "watch": [
+      "http_files"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 494314,
+    "cohort": "A",
+    "target_name": "prosody",
+    "option_prefix": [
+      "services",
+      "prosody"
+    ],
+    "watch": [
+      "authentication"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 367545,
+    "cohort": "A",
+    "target_name": "paperless",
+    "option_prefix": [
+      "services",
+      "paperless"
+    ],
+    "watch": [
+      "passwordFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 510900,
+    "cohort": "A",
+    "target_name": "sshd",
+    "option_prefix": [
+      "services",
+      "openssh"
+    ],
+    "watch": [
+      "moduliFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 417788,
+    "cohort": "A",
+    "target_name": "wastebin",
+    "option_prefix": [
+      "services",
+      "wastebin",
+      "settings"
+    ],
+    "watch": [
+      "WASTEBIN_MAX_BODY_SIZE"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 444033,
+    "cohort": "A",
+    "target_name": "snapserver",
+    "option_prefix": [
+      "services",
+      "snapserver",
+      "settings",
+      "http"
+    ],
+    "watch": [
+      "port"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 398885,
+    "cohort": "A",
+    "target_name": "cockpit",
+    "option_prefix": [
+      "services",
+      "cockpit"
+    ],
+    "watch": [
+      "allowed-origins"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 484133,
+    "cohort": "A",
+    "target_name": "rspamd",
+    "option_prefix": [
+      "services",
+      "rspamd"
+    ],
+    "watch": [
+      "extraArgs"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 409820,
+    "cohort": "A",
+    "target_name": "dex",
+    "option_prefix": [
+      "services",
+      "dex"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 415326,
+    "cohort": "A",
+    "target_name": "wstunnel",
+    "option_prefix": [
+      "services",
+      "wstunnel",
+      "clients",
+      "*"
+    ],
+    "watch": [
+      "extraArgs"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 408902,
+    "cohort": "A",
+    "target_name": "prowlarr",
+    "option_prefix": [
+      "services",
+      "prowlarr"
+    ],
+    "watch": [
+      "dataDir"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 557329,
+    "cohort": "A",
+    "target_name": "portmaster",
+    "option_prefix": [
+      "services",
+      "portmaster"
+    ],
+    "watch": [
+      "profiles"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 473316,
+    "cohort": "A",
+    "target_name": "onlyoffice",
+    "option_prefix": [
+      "services",
+      "onlyoffice"
+    ],
+    "watch": [
+      "loglevel"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 501713,
+    "cohort": "A",
+    "target_name": "jenkins",
+    "option_prefix": [
+      "services",
+      "jenkins"
+    ],
+    "watch": [
+      "packages"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 391057,
+    "cohort": "A",
+    "target_name": "dokuwiki",
+    "option_prefix": [
+      "services",
+      "dokuwiki",
+      "sites",
+      "*"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 431289,
+    "cohort": "A",
+    "target_name": "prosody",
+    "option_prefix": [
+      "services",
+      "prosody",
+      "muc"
+    ],
+    "watch": [
+      "moderation"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 470146,
+    "cohort": "A",
+    "target_name": "n8n",
+    "option_prefix": [
+      "services",
+      "n8n"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 422094,
+    "cohort": "A",
+    "target_name": "syncthing",
+    "option_prefix": [
+      "services",
+      "syncthing"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 461261,
+    "cohort": "A",
+    "target_name": "wakapi",
+    "option_prefix": [
+      "services",
+      "wakapi"
+    ],
+    "watch": [
+      "passwordSalt"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 391799,
+    "cohort": "A",
+    "target_name": "paretosecurity",
+    "option_prefix": [
+      "services",
+      "paretosecurity"
+    ],
+    "watch": [
+      "trayIcon"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 399179,
+    "cohort": "A",
+    "target_name": "homepage-dashboard",
+    "option_prefix": [
+      "services",
+      "homepage-dashboard"
+    ],
+    "watch": [
+      "allowedHosts"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 379377,
+    "cohort": "A",
+    "target_name": "gotenberg",
+    "option_prefix": [
+      "services",
+      "gotenberg"
+    ],
+    "watch": [
+      "pdfEngines"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 374017,
+    "cohort": "A",
+    "target_name": "k3s",
+    "option_prefix": [
+      "services",
+      "k3s"
+    ],
+    "watch": [
+      "autoDeployCharts"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 464621,
+    "cohort": "A",
+    "target_name": "mysql",
+    "option_prefix": [
+      "services",
+      "mysql"
+    ],
+    "watch": [
+      "dataDir"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 412248,
+    "cohort": "A",
+    "target_name": "sanoid",
+    "option_prefix": [
+      "services",
+      "sanoid",
+      "templates",
+      "*"
+    ],
+    "watch": [
+      "pre_snapshot_script"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 472219,
+    "cohort": "A",
+    "target_name": "keycloak",
+    "option_prefix": [
+      "services",
+      "keycloak",
+      "database"
+    ],
+    "watch": [
+      "useSSL"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 506239,
+    "cohort": "A",
+    "target_name": "roundcube",
+    "option_prefix": [
+      "services",
+      "roundcube"
+    ],
+    "watch": [
+      "maxAttachmentSize"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 438467,
+    "cohort": "B",
+    "target_name": "438467",
+    "option_prefix": [
+      "services",
+      "photoprism"
+    ],
+    "watch": [
+      "user"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 353770,
+    "cohort": "B",
+    "target_name": "353770",
+    "option_prefix": [
+      "services",
+      "syncthing",
+      "settings",
+      "folders"
+    ],
+    "watch": [
+      "ignorePatterns"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 413033,
+    "cohort": "B",
+    "target_name": "413033",
+    "option_prefix": [
+      "services",
+      "cockpit"
+    ],
+    "watch": [
+      "showBanner"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 260551,
+    "cohort": "B",
+    "target_name": "260551",
+    "option_prefix": [
+      "services",
+      "prosody"
+    ],
+    "watch": [
+      "checkConfig"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 558042,
+    "cohort": "B",
+    "target_name": "558042",
+    "option_prefix": [
+      "services",
+      "headplane",
+      "settings",
+      "server"
+    ],
+    "watch": [
+      "proxy_auth"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 480700,
+    "cohort": "B",
+    "target_name": "480700",
+    "option_prefix": [
+      "services",
+      "bluesky-pds",
+      "goat"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 482512,
+    "cohort": "B",
+    "target_name": "482512",
+    "option_prefix": [
+      "services",
+      "traefik"
+    ],
+    "watch": [
+      "static"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 498611,
+    "cohort": "B",
+    "target_name": "498611",
+    "option_prefix": [
+      "services",
+      "olivetin"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 462487,
+    "cohort": "B",
+    "target_name": "462487",
+    "option_prefix": [
+      "services",
+      "guacamole-server"
+    ],
+    "watch": [
+      "logbackXml"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 444604,
+    "cohort": "B",
+    "target_name": "444604",
+    "option_prefix": [
+      "services",
+      "yggdrasil"
+    ],
+    "watch": [
+      "persistentKeys"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 432528,
+    "cohort": "B",
+    "target_name": "432528",
+    "option_prefix": [
+      "services",
+      "tayga"
+    ],
+    "watch": [
+      "wkpfStrict"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 438285,
+    "cohort": "B",
+    "target_name": "438285",
+    "option_prefix": [
+      "services",
+      "frigate",
+      "ffmpeg"
+    ],
+    "watch": [
+      "path"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 458146,
+    "cohort": "B",
+    "target_name": "458146",
+    "option_prefix": [
+      "services",
+      "trilium-server"
+    ],
+    "watch": [
+      "environmentFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 403669,
+    "cohort": "B",
+    "target_name": "403669",
+    "option_prefix": [
+      "services",
+      "tandoor-recipes",
+      "database"
+    ],
+    "watch": [
+      "createLocally"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 541493,
+    "cohort": "B",
+    "target_name": "541493",
+    "option_prefix": [
+      "services",
+      "step-ca"
+    ],
+    "watch": [
+      "extraArgs"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 427898,
+    "cohort": "B",
+    "target_name": "427898",
+    "option_prefix": [
+      "services",
+      "hedgedoc"
+    ],
+    "watch": [
+      "configureNginx"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 388953,
+    "cohort": "B",
+    "target_name": "388953",
+    "option_prefix": [
+      "services",
+      "h2o",
+      "vhosts",
+      "*",
+      "tls"
+    ],
+    "watch": [
+      "quic"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 441245,
+    "cohort": "B",
+    "target_name": "441245",
+    "option_prefix": [
+      "services",
+      "snapserver"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 414490,
+    "cohort": "B",
+    "target_name": "414490",
+    "option_prefix": [
+      "services",
+      "displayManager",
+      "ly"
+    ],
+    "watch": [
+      "x11Support"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 382862,
+    "cohort": "B",
+    "target_name": "382862",
+    "option_prefix": [
+      "services",
+      "peering-manager"
+    ],
+    "watch": [
+      "environmentFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 412297,
+    "cohort": "B",
+    "target_name": "412297",
+    "option_prefix": [
+      "services",
+      "taler",
+      "exchange",
+      "settings",
+      "exchange"
+    ],
+    "watch": [
+      "CURRENCY"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 407100,
+    "cohort": "B",
+    "target_name": "407100",
+    "option_prefix": [
+      "services",
+      "photoprism"
+    ],
+    "watch": [
+      "databasePasswordFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 358780,
+    "cohort": "B",
+    "target_name": "358780",
+    "option_prefix": [
+      "services",
+      "graylog"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 509507,
+    "cohort": "B",
+    "target_name": "509507",
+    "option_prefix": [
+      "services",
+      "openssh"
+    ],
+    "watch": [
+      "banner"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 441506,
+    "cohort": "B",
+    "target_name": "441506",
+    "option_prefix": [
+      "services",
+      "opensnitch",
+      "settings",
+      "Audit"
+    ],
+    "watch": [
+      "AudispSocketPath"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 362643,
+    "cohort": "B",
+    "target_name": "362643",
+    "option_prefix": [
+      "services",
+      "mediawiki"
+    ],
+    "watch": [
+      "path"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 514026,
+    "cohort": "B",
+    "target_name": "514026",
+    "option_prefix": [
+      "services",
+      "spire",
+      "agent",
+      "settings",
+      "agent"
+    ],
+    "watch": [
+      "trust_domain"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 436367,
+    "cohort": "B",
+    "target_name": "436367",
+    "option_prefix": [
+      "services",
+      "mihomo"
+    ],
+    "watch": [
+      "processesInfo"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 442520,
+    "cohort": "B",
+    "target_name": "442520",
+    "option_prefix": [
+      "services",
+      "chromadb"
+    ],
+    "watch": [
+      "logFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 432756,
+    "cohort": "B",
+    "target_name": "432756",
+    "option_prefix": [
+      "services",
+      "paretosecurity"
+    ],
+    "watch": [
+      "users"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 410856,
+    "cohort": "B",
+    "target_name": "410856",
+    "option_prefix": [
+      "services",
+      "vmalert"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 408218,
+    "cohort": "B",
+    "target_name": "408218",
+    "option_prefix": [
+      "services",
+      "bazarr"
+    ],
+    "watch": [
+      "dataDir"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 396915,
+    "cohort": "B",
+    "target_name": "396915",
+    "option_prefix": [
+      "services",
+      "homebox",
+      "database"
+    ],
+    "watch": [
+      "createLocally"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 414502,
+    "cohort": "B",
+    "target_name": "414502",
+    "option_prefix": [
+      "services",
+      "mastodon"
+    ],
+    "watch": [
+      "otpSecretFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 428138,
+    "cohort": "B",
+    "target_name": "428138",
+    "option_prefix": [
+      "services",
+      "ncps",
+      "cache"
+    ],
+    "watch": [
+      "signNarinfo"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 445875,
+    "cohort": "B",
+    "target_name": "445875",
+    "option_prefix": [
+      "services",
+      "ncps"
+    ],
+    "watch": [
+      "netrcFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 460724,
+    "cohort": "B",
+    "target_name": "460724",
+    "option_prefix": [
+      "services",
+      "btrbk",
+      "sshAccess"
+    ],
+    "watch": [
+      "extraArgs"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 401384,
+    "cohort": "B",
+    "target_name": "401384",
+    "option_prefix": [
+      "services",
+      "paretosecurity"
+    ],
+    "watch": [
+      "trayIcon"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 389428,
+    "cohort": "B",
+    "target_name": "389428",
+    "option_prefix": [
+      "services",
+      "searx"
+    ],
+    "watch": [
+      "faviconsSettings"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 464654,
+    "cohort": "B",
+    "target_name": "464654",
+    "option_prefix": [
+      "services",
+      "atuin"
+    ],
+    "watch": [
+      "environmentFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 461327,
+    "cohort": "B",
+    "target_name": "461327",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent",
+      "environment"
+    ],
+    "watch": [
+      "SKIP_SYSTEMD"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 516776,
+    "cohort": "B",
+    "target_name": "516776",
+    "option_prefix": [
+      "services",
+      "traccar"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 427876,
+    "cohort": "B",
+    "target_name": "427876",
+    "option_prefix": [
+      "services",
+      "lact"
+    ],
+    "watch": [
+      "settings"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 441886,
+    "cohort": "B",
+    "target_name": "441886",
+    "option_prefix": [
+      "services",
+      "victoriametrics"
+    ],
+    "watch": [
+      "basicAuthPasswordFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 412480,
+    "cohort": "B",
+    "target_name": "412480",
+    "option_prefix": [
+      "services",
+      "jenkins"
+    ],
+    "watch": [
+      "javaPackage"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 411451,
+    "cohort": "B",
+    "target_name": "411451",
+    "option_prefix": [
+      "services",
+      "dnscrypt-proxy2"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 479174,
+    "cohort": "B",
+    "target_name": "479174",
+    "option_prefix": [
+      "services",
+      "dokuwiki",
+      "sites",
+      "*"
+    ],
+    "watch": [
+      "extraConfigs"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 485285,
+    "cohort": "B",
+    "target_name": "485285",
+    "option_prefix": [
+      "services",
+      "n8n",
+      "taskRunners"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 410858,
+    "cohort": "B",
+    "target_name": "410858",
+    "option_prefix": [
+      "services",
+      "kubo",
+      "settings",
+      "Mounts"
+    ],
+    "watch": [
+      "MFS"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 454579,
+    "cohort": "B",
+    "target_name": "454579",
+    "option_prefix": [
+      "services",
+      "kubo",
+      "settings",
+      "Mounts"
+    ],
+    "watch": [
+      "FuseAllowOther"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 405269,
+    "cohort": "B",
+    "target_name": "405269",
+    "option_prefix": [
+      "services",
+      "alloy"
+    ],
+    "watch": [
+      "environmentFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 423934,
+    "cohort": "B",
+    "target_name": "423934",
+    "option_prefix": [
+      "hardware",
+      "nvidia-container-toolkit"
+    ],
+    "watch": [
+      "extraArgs"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 466806,
+    "cohort": "B",
+    "target_name": "466806",
+    "option_prefix": [
+      "services",
+      "gollum"
+    ],
+    "watch": [
+      "local-time"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 386318,
+    "cohort": "B",
+    "target_name": "386318",
+    "option_prefix": [
+      "services",
+      "h2o",
+      "vhosts",
+      "*",
+      "tls"
+    ],
+    "watch": [
+      "host"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 471330,
+    "cohort": "B",
+    "target_name": "471330",
+    "option_prefix": [
+      "services",
+      "openssh"
+    ],
+    "watch": [
+      "enableRecommendedAlgorithms"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 436651,
+    "cohort": "B",
+    "target_name": "436651",
+    "option_prefix": [
+      "services",
+      "homebox"
+    ],
+    "watch": [
+      "user"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 484577,
+    "cohort": "B",
+    "target_name": "484577",
+    "option_prefix": [
+      "services",
+      "n8n"
+    ],
+    "watch": [
+      "customNodes"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 450453,
+    "cohort": "B",
+    "target_name": "450453",
+    "option_prefix": [
+      "services",
+      "searx"
+    ],
+    "watch": [
+      "faviconsSettings"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 366842,
+    "cohort": "B",
+    "target_name": "366842",
+    "option_prefix": [
+      "networking",
+      "networkmanager"
+    ],
+    "watch": [
+      "enableDefaultPlugins"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 409546,
+    "cohort": "B",
+    "target_name": "409546",
+    "option_prefix": [
+      "services",
+      "frp",
+      "instances",
+      "*"
+    ],
+    "watch": [
+      "environmentFiles"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 489143,
+    "cohort": "B",
+    "target_name": "489143",
+    "option_prefix": [
+      "services",
+      "stalwart"
+    ],
+    "watch": [
+      "stateVersion"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 481406,
+    "cohort": "B",
+    "target_name": "481406",
+    "option_prefix": [
+      "services",
+      "vikunja"
+    ],
+    "watch": [
+      "address"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 432765,
+    "cohort": "B",
+    "target_name": "432765",
+    "option_prefix": [
+      "services",
+      "kanidm",
+      "unixd",
+      "settings",
+      "kanidm"
+    ],
+    "watch": [
+      "pam_allowed_login_groups"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 477894,
+    "cohort": "B",
+    "target_name": "477894",
+    "option_prefix": [
+      "services",
+      "keyd",
+      "keyboards",
+      "*"
+    ],
+    "watch": [
+      "ids"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 471565,
+    "cohort": "B",
+    "target_name": "471565",
+    "option_prefix": [
+      "services",
+      "homepage-dashboard"
+    ],
+    "watch": [
+      "environmentFiles"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 273833,
+    "cohort": "B",
+    "target_name": "273833",
+    "option_prefix": [
+      "services",
+      "keycloak"
+    ],
+    "watch": [
+      "realmFiles"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 524915,
+    "cohort": "B",
+    "target_name": "524915",
+    "option_prefix": [
+      "services",
+      "nominatim",
+      "ui"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 424464,
+    "cohort": "B",
+    "target_name": "424464",
+    "option_prefix": [
+      "services",
+      "navidrome"
+    ],
+    "watch": [
+      "plugins"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 524728,
+    "cohort": "B",
+    "target_name": "524728",
+    "option_prefix": [
+      "services",
+      "porxie"
+    ],
+    "watch": [
+      "settings.PORXIE_BLOB_HTTP_CONNECT_TIMEOUT"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 412653,
+    "cohort": "B",
+    "target_name": "412653",
+    "option_prefix": [
+      "services",
+      "filebrowser"
+    ],
+    "watch": [
+      "user"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 416806,
+    "cohort": "B",
+    "target_name": "416806",
+    "option_prefix": [
+      "services",
+      "postgresql"
+    ],
+    "watch": [
+      "package"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 393943,
+    "cohort": "B",
+    "target_name": "393943",
+    "option_prefix": [
+      "services",
+      "cfssl"
+    ],
+    "watch": [
+      "disable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 419908,
+    "cohort": "B",
+    "target_name": "419908",
+    "option_prefix": [
+      "services",
+      "victoriametrics"
+    ],
+    "watch": [
+      "checkConfig"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 456989,
+    "cohort": "B",
+    "target_name": "456989",
+    "option_prefix": [
+      "services",
+      "mpd"
+    ],
+    "watch": [
+      "extraConfig"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 448254,
+    "cohort": "B",
+    "target_name": "448254",
+    "option_prefix": [
+      "services",
+      "avahi"
+    ],
+    "watch": [
+      "debug"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 506644,
+    "cohort": "B",
+    "target_name": "506644",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "webRoot"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 430906,
+    "cohort": "B",
+    "target_name": "430906",
+    "option_prefix": [
+      "services",
+      "homepage-dashboard"
+    ],
+    "watch": [
+      "proxmox"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 405186,
+    "cohort": "B",
+    "target_name": "405186",
+    "option_prefix": [
+      "services",
+      "postgresql"
+    ],
+    "watch": [
+      "recoveryConfig"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 483748,
+    "cohort": "B",
+    "target_name": "483748",
+    "option_prefix": [
+      "services",
+      "caddy"
+    ],
+    "watch": [
+      "httpPort"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 405047,
+    "cohort": "B",
+    "target_name": "405047",
+    "option_prefix": [
+      "services",
+      "gitlab",
+      "secrets"
+    ],
+    "watch": [
+      "activeRecordPrimaryKeyFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 414697,
+    "cohort": "B",
+    "target_name": "414697",
+    "option_prefix": [
+      "services",
+      "kanidm",
+      "provision",
+      "groups"
+    ],
+    "watch": [
+      "overwriteMembers"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 408843,
+    "cohort": "B",
+    "target_name": "408843",
+    "option_prefix": [
+      "services",
+      "mealie"
+    ],
+    "watch": [
+      "extraOptions"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 405610,
+    "cohort": "B",
+    "target_name": "405610",
+    "option_prefix": [
+      "services",
+      "paperless"
+    ],
+    "watch": [
+      "manage"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 425604,
+    "cohort": "B",
+    "target_name": "425604",
+    "option_prefix": [
+      "services",
+      "peertube"
+    ],
+    "watch": [
+      "settings.video_transcription.enabled"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 421882,
+    "cohort": "B",
+    "target_name": "421882",
+    "option_prefix": [
+      "services"
+    ],
+    "watch": [
+      "lanraragi.openFirewall"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 443717,
+    "cohort": "B",
+    "target_name": "443717",
+    "option_prefix": [
+      "services",
+      "pgbackrest"
+    ],
+    "watch": [
+      "commands"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 508427,
+    "cohort": "B",
+    "target_name": "508427",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "configRoot"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 417467,
+    "cohort": "B",
+    "target_name": "417467",
+    "option_prefix": [
+      "services",
+      "renovate"
+    ],
+    "watch": [
+      "environment"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 440660,
+    "cohort": "B",
+    "target_name": "440660",
+    "option_prefix": [
+      "services",
+      "prosody",
+      "httpFileShare"
+    ],
+    "watch": [
+      "http_external_url"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 466504,
+    "cohort": "B",
+    "target_name": "466504",
+    "option_prefix": [
+      "services",
+      "pulseaudio",
+      "tcp"
+    ],
+    "watch": [
+      "port"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 466004,
+    "cohort": "B",
+    "target_name": "466004",
+    "option_prefix": [
+      "services",
+      "ollama"
+    ],
+    "watch": [
+      "acceleration"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 433962,
+    "cohort": "B",
+    "target_name": "433962",
+    "option_prefix": [
+      "services",
+      "greetd"
+    ],
+    "watch": [
+      "useTextGreeter"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 492892,
+    "cohort": "B",
+    "target_name": "492892",
+    "option_prefix": [
+      "services",
+      "sssd"
+    ],
+    "watch": [
+      "subIDsIntegration"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 517396,
+    "cohort": "B",
+    "target_name": "517396",
+    "option_prefix": [
+      "services",
+      "lasuite-meet"
+    ],
+    "watch": [
+      "addons"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 449173,
+    "cohort": "B",
+    "target_name": "449173",
+    "option_prefix": [
+      "services",
+      "dolibarr"
+    ],
+    "watch": [
+      "database.type"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 395982,
+    "cohort": "B",
+    "target_name": "395982",
+    "option_prefix": [
+      "services",
+      "openvpn",
+      "servers"
+    ],
+    "watch": [
+      "testserver.authUserPass"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 471996,
+    "cohort": "B",
+    "target_name": "471996",
+    "option_prefix": [
+      "services",
+      "slurm",
+      "server"
+    ],
+    "watch": [
+      "flags"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 471312,
+    "cohort": "B",
+    "target_name": "471312",
+    "option_prefix": [
+      "services",
+      "angrr"
+    ],
+    "watch": [
+      "period"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 429244,
+    "cohort": "B",
+    "target_name": "429244",
+    "option_prefix": [
+      "services",
+      "tlsrpt"
+    ],
+    "watch": [
+      "reportd.settings.http_script"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 389471,
+    "cohort": "B",
+    "target_name": "389471",
+    "option_prefix": [
+      "services",
+      "navidrome"
+    ],
+    "watch": [
+      "environmentFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 467286,
+    "cohort": "B",
+    "target_name": "467286",
+    "option_prefix": [
+      "services",
+      "postgresql"
+    ],
+    "watch": [
+      "ensureUsers.ensureClauses"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 388978,
+    "cohort": "B",
+    "target_name": "388978",
+    "option_prefix": [
+      "services",
+      "mysql",
+      "galeraCluster"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 376490,
+    "cohort": "B",
+    "target_name": "376490",
+    "option_prefix": [
+      "services",
+      "kanidm"
+    ],
+    "watch": [
+      "provision.extraJsonFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 456004,
+    "cohort": "B",
+    "target_name": "456004",
+    "option_prefix": [
+      "services",
+      "snapserver",
+      "settings"
+    ],
+    "watch": [
+      "stream.source"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 397130,
+    "cohort": "B",
+    "target_name": "397130",
+    "option_prefix": [
+      "services",
+      "kanidm",
+      "provision",
+      "systems",
+      "oauth2"
+    ],
+    "watch": [
+      "imageFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 428153,
+    "cohort": "B",
+    "target_name": "428153",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "configSyncDir"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 463358,
+    "cohort": "B",
+    "target_name": "463358",
+    "option_prefix": [
+      "services",
+      "ollama"
+    ],
+    "watch": [
+      "syncModels"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 460730,
+    "cohort": "B",
+    "target_name": "460730",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent"
+    ],
+    "watch": [
+      "smartmon.enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 466620,
+    "cohort": "B",
+    "target_name": "466620",
+    "option_prefix": [
+      "services",
+      "llama-swap"
+    ],
+    "watch": [
+      "listenAddress"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 486936,
+    "cohort": "B",
+    "target_name": "486936",
+    "option_prefix": [
+      "services",
+      "pretalx"
+    ],
+    "watch": [
+      "environmentFiles"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 494127,
+    "cohort": "B",
+    "target_name": "494127",
+    "option_prefix": [
+      "services",
+      "n8n"
+    ],
+    "watch": [
+      "taskRunners.environment.N8N_RUNNERS_CONFIG_PATH"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 484670,
+    "cohort": "B",
+    "target_name": "484670",
+    "option_prefix": [
+      "services",
+      "omnom",
+      "settings",
+      "server"
+    ],
+    "watch": [
+      "base_url"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 463443,
+    "cohort": "B",
+    "target_name": "463443",
+    "option_prefix": [
+      "services",
+      "tuned"
+    ],
+    "watch": [
+      "recommend"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 347209,
+    "cohort": "B",
+    "target_name": "347209",
+    "option_prefix": [
+      "services",
+      "onlyoffice"
+    ],
+    "watch": [
+      "allowLocalConnections"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 397967,
+    "cohort": "B",
+    "target_name": "397967",
+    "option_prefix": [
+      "services",
+      "fedimintd"
+    ],
+    "watch": [
+      "api_ws.openFirewall"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 475112,
+    "cohort": "B",
+    "target_name": "475112",
+    "option_prefix": [
+      "services",
+      "cgit"
+    ],
+    "watch": [
+      "gitHttpBackend.enable"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 386406,
+    "cohort": "B",
+    "target_name": "386406",
+    "option_prefix": [
+      "services",
+      "frp",
+      "instances"
+    ],
+    "watch": [
+      "role"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 468049,
+    "cohort": "B",
+    "target_name": "468049",
+    "option_prefix": [
+      "services",
+      "radicale"
+    ],
+    "watch": [
+      "user"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 395732,
+    "cohort": "B",
+    "target_name": "395732",
+    "option_prefix": [
+      "services",
+      "docling-serve"
+    ],
+    "watch": [
+      "stateDir"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 515985,
+    "cohort": "B",
+    "target_name": "515985",
+    "option_prefix": [
+      "services",
+      "porxie"
+    ],
+    "watch": [
+      "settings.PORXIE_SERVER_ADMIN_PASSWORD"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 500388,
+    "cohort": "B",
+    "target_name": "500388",
+    "option_prefix": [
+      "services",
+      "searx"
+    ],
+    "watch": [
+      "openFirewall"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 490920,
+    "cohort": "B",
+    "target_name": "490920-traefik",
+    "option_prefix": [
+      "services",
+      "traefik"
+    ],
+    "watch": [
+      "staticConfigFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 490920,
+    "cohort": "B",
+    "target_name": "490920-pangolin",
+    "option_prefix": [
+      "services",
+      "traefik"
+    ],
+    "watch": [
+      "group"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 473479,
+    "cohort": "B",
+    "target_name": "473479",
+    "option_prefix": [
+      "services",
+      "slurm",
+      "rest"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 398420,
+    "cohort": "B",
+    "target_name": "398420",
+    "option_prefix": [
+      "services",
+      "cross-seed"
+    ],
+    "watch": [
+      "useGenConfigDefaults"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 418136,
+    "cohort": "B",
+    "target_name": "418136",
+    "option_prefix": [
+      "services",
+      "openssh"
+    ],
+    "watch": [
+      "generateHostKeys"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 413190,
+    "cohort": "B",
+    "target_name": "413190",
+    "option_prefix": [
+      "services",
+      "lasuite-docs"
+    ],
+    "watch": [
+      "collaborationServer.settings.COLLABORATION_SERVER_ORIGIN"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 449513,
+    "cohort": "B",
+    "target_name": "449513",
+    "option_prefix": [
+      "services",
+      "pgadmin"
+    ],
+    "watch": [
+      "emailServer.enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 492341,
+    "cohort": "B",
+    "target_name": "492341",
+    "option_prefix": [
+      "services",
+      "music-assistant"
+    ],
+    "watch": [
+      "openFirewall"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 438684,
+    "cohort": "B",
+    "target_name": "438684",
+    "option_prefix": [
+      "services",
+      "ncps"
+    ],
+    "watch": [
+      "prometheus.enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 401840,
+    "cohort": "B",
+    "target_name": "401840",
+    "option_prefix": [
+      "hardware",
+      "nvidia-container-toolkit"
+    ],
+    "watch": [
+      "discovery-mode"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 417590,
+    "cohort": "B",
+    "target_name": "417590",
+    "option_prefix": [
+      "services",
+      "onlyoffice"
+    ],
+    "watch": [
+      "wopi"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 386345,
+    "cohort": "B",
+    "target_name": "386345",
+    "option_prefix": [
+      "services",
+      "postgresql"
+    ],
+    "watch": [
+      "systemCallFilter"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 459937,
+    "cohort": "B",
+    "target_name": "459937",
+    "option_prefix": [
+      "services",
+      "xscreensaver"
+    ],
+    "watch": [
+      "hooks"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 446598,
+    "cohort": "B",
+    "target_name": "446598",
+    "option_prefix": [
+      "services",
+      "mopidy"
+    ],
+    "watch": [
+      "configuration"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 458319,
+    "cohort": "B",
+    "target_name": "458319",
+    "option_prefix": [
+      "services",
+      "clickhouse"
+    ],
+    "watch": [
+      "serverConfig"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 445176,
+    "cohort": "B",
+    "target_name": "445176",
+    "option_prefix": [
+      "services",
+      "n8n"
+    ],
+    "watch": [
+      "settings"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 396478,
+    "cohort": "B",
+    "target_name": "396478",
+    "option_prefix": [
+      "services",
+      "taskchampion-sync-server"
+    ],
+    "watch": [
+      "host"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 387829,
+    "cohort": "B",
+    "target_name": "387829",
+    "option_prefix": [
+      "services",
+      "evcc"
+    ],
+    "watch": [
+      "environmentFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 458481,
+    "cohort": "B",
+    "target_name": "458481",
+    "option_prefix": [
+      "services",
+      "writefreely"
+    ],
+    "watch": [
+      "email.smtpPasswordFile"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 392716,
+    "cohort": "B",
+    "target_name": "392716",
+    "option_prefix": [
+      "services",
+      "cyrus-imap"
+    ],
+    "watch": [
+      "sslServerCert"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 433631,
+    "cohort": "B",
+    "target_name": "433631",
+    "option_prefix": [
+      "services",
+      "xserver",
+      "desktopManager",
+      "enlightenment"
+    ],
+    "watch": [
+      "environment.enlightenment.excludePackages"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 427260,
+    "cohort": "B",
+    "target_name": "427260",
+    "option_prefix": [
+      "services",
+      "drupal",
+      "sites"
+    ],
+    "watch": [
+      "privateFilesDir"
+    ],
+    "eligible": true,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 398993,
+    "cohort": "B",
+    "target_name": "398993",
+    "option_prefix": [
+      "hardware",
+      "nvidia-container-toolkit"
+    ],
+    "watch": [
+      "suppressNvidiaDriverAssertion"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 521022,
+    "cohort": "B",
+    "target_name": "521022",
+    "option_prefix": [
+      "services",
+      "opensnitch",
+      "settings"
+    ],
+    "watch": [
+      "DefaultAction"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 480468,
+    "cohort": "B",
+    "target_name": "480468",
+    "option_prefix": [
+      "services",
+      "mediawiki",
+      "database"
+    ],
+    "watch": [
+      "path"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 480839,
+    "cohort": "B",
+    "target_name": "480839",
+    "option_prefix": [
+      "hardware",
+      "nvidia-container-toolkit"
+    ],
+    "watch": [
+      "disable-hooks"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 433539,
+    "cohort": "B",
+    "target_name": "433539",
+    "option_prefix": [
+      "services",
+      "frigate"
+    ],
+    "watch": [
+      "preCheckConfig"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 446006,
+    "cohort": "B",
+    "target_name": "446006-period",
+    "option_prefix": [
+      "services",
+      "angrr"
+    ],
+    "watch": [
+      "period"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 446006,
+    "cohort": "B",
+    "target_name": "446006-direnv",
+    "option_prefix": [
+      "programs",
+      "direnv",
+      "angrr"
+    ],
+    "watch": [
+      "autoUse"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  },
+  {
+    "pr": 488515,
+    "cohort": "B",
+    "target_name": "488515",
+    "option_prefix": [
+      "services",
+      "harmonia",
+      "cache"
+    ],
+    "watch": [
+      "enable"
+    ],
+    "eligible": false,
+    "container_form": null,
+    "method": "diagnostic_binary"
+  }
+]

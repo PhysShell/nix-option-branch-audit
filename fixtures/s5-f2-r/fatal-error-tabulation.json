@@ -1,0 +1,26 @@
+{
+  "baseline_verdict_kind_counts": {
+    "OptionNotFound": 208,
+    "PredicateNotFound": 108,
+    "TestConfigUnresolved": 21,
+    "PASS": 7,
+    "OBA001": 17,
+    "TestValueUnresolved": 2,
+    "DefaultUnresolved": 1
+  },
+  "candidate_verdict_kind_counts": {
+    "OptionNotFound": 208,
+    "PredicateNotFound": 108,
+    "TestConfigUnresolved": 21,
+    "PASS": 8,
+    "OBA001": 16,
+    "TestValueUnresolved": 2,
+    "DefaultUnresolved": 1
+  },
+  "verdict_kinds_only_in_baseline": {},
+  "verdict_kinds_only_in_candidate": {},
+  "baseline_parse_error_count": 0,
+  "candidate_parse_error_count": 0,
+  "baseline_parse_errors": [],
+  "candidate_parse_errors": []
+}
