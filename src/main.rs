@@ -1332,11 +1332,9 @@ fn is_rec_attrset(node: &SyntaxNode) -> bool {
 /// anything `resolve_ident_binding` can't or won't resolve) is simply
 /// not collected -- not an error, just not relevant provenance
 /// evidence.
-fn resolve_type_reference(ident_node: &SyntaxNode) -> Option<rowan::TextRange> {
+fn resolve_type_reference(ident_node: &SyntaxNode) -> Option<SyntaxNode> {
     let name = ident_text(ident_node)?;
-    resolve_ident_binding(ident_node, &name)
-        .ok()
-        .map(|resolved| resolved.text_range())
+    resolve_ident_binding(ident_node, &name, WithPolicy::TransparentForRecognizedTypeNamespace).ok()
 }
 
 /// Scans a real, already-anchored option's own `type = ...` expression
@@ -1358,8 +1356,8 @@ fn collect_type_reference_ranges(
         if node.kind() != NODE_IDENT {
             continue;
         }
-        if let Some(range) = resolve_type_reference(&node) {
-            into.insert(range);
+        if let Some(resolved) = resolve_type_reference(&node) {
+            into.insert(resolved.text_range());
         }
     }
 }
@@ -1609,6 +1607,60 @@ enum ResolveFailure {
 /// until the stack overflows).
 type AliasChain = Vec<String>;
 
+/// S5-F1C-A: how `resolve_ident_binding`'s own ancestor walk treats a
+/// `with` scope encountered along the way. `Refuse` is the original,
+/// unchanged behavior (every call site except type-reference resolution
+/// keeps using it -- predicate/value alias resolution, `cfg_ident`
+/// tracing) -- a `with` is always `UnsupportedScope("with")`, no
+/// exception.
+///
+/// `TransparentForRecognizedTypeNamespace` is new, used ONLY by
+/// `resolve_type_reference` (F1B-R's own demonstrated counterexamples:
+/// prosody's `vHostOpts`, rspamd's `workerOpts`, tayga's `addrOpts`, all
+/// genuinely legitimate, one-hop references that were wrongly refused
+/// solely because the reference itself sits inside a local `with types;`
+/// / `with lib.types;`). Nix's own `with e1; e2` rule is that a lexical
+/// binding (`let`/`rec`/function parameter) for a name in `e2` ALWAYS
+/// takes priority over `e1`'s own attributes, regardless of what `e1`
+/// actually is -- so continuing to look outward past a `with` for a
+/// LEXICAL binding is sound on its own terms, independent of the
+/// with-source's identity. This policy narrows that further, on purpose:
+/// it only continues past a `with` whose own namespace expression is
+/// STATICALLY recognized (`with_namespace_is_recognized_type_namespace`)
+/// as the type namespace (`types` or `lib.types`) the type-reference
+/// resolver actually cares about -- an unrecognized/dynamic with-source
+/// (`with someDynamicExpression; foo`) still refuses immediately, exactly
+/// like `Refuse`, never guessed at. This is deliberately a narrow,
+/// auditable allowlist, not a general "with is always transparent" rule.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum WithPolicy {
+    Refuse,
+    TransparentForRecognizedTypeNamespace,
+}
+
+/// `true` iff `with_node` (a `NODE_WITH`) is `with types; ...` or `with
+/// lib.types; ...` -- a purely syntactic/structural check (the bare
+/// identifier `types`, or a two-segment dotted select `lib.types`),
+/// never an attempt to evaluate what `types`/`lib` actually denote (that
+/// would require real Nix evaluation, out of scope). Reuses the
+/// existing `ident_text`/`as_select` helpers rather than a new parser.
+fn with_namespace_is_recognized_type_namespace(with_node: &SyntaxNode) -> bool {
+    let Some(with_expr) = rnix::ast::With::cast(with_node.clone()) else {
+        return false;
+    };
+    let Some(namespace) = with_expr.namespace() else {
+        return false;
+    };
+    let namespace = namespace.syntax();
+    if ident_text(namespace).as_deref() == Some("types") {
+        return true;
+    }
+    if let Some((root, segs)) = as_select(namespace) {
+        return root == "lib" && segs == ["types"];
+    }
+    false
+}
+
 /// Resolves a bare identifier used at `ident_node`'s position to the
 /// `SyntaxNode` of whatever expression it's lexically bound to, by
 /// walking outward through enclosing scopes and stopping at the first one
@@ -1620,6 +1672,7 @@ type AliasChain = Vec<String>;
 fn resolve_ident_binding(
     ident_node: &SyntaxNode,
     name: &str,
+    with_policy: WithPolicy,
 ) -> Result<SyntaxNode, ResolveFailure> {
     for ancestor in ident_node.ancestors().skip(1) {
         match ancestor.kind() {
@@ -1693,6 +1746,17 @@ fn resolve_ident_binding(
                 }
             }
             NODE_WITH => {
+                if with_policy == WithPolicy::TransparentForRecognizedTypeNamespace
+                    && with_namespace_is_recognized_type_namespace(&ancestor)
+                {
+                    // Nix: a lexical binding always wins over `with`, no
+                    // matter what the with-source turns out to be -- so
+                    // it's sound to keep looking outward for one, exactly
+                    // as if this `with` weren't here, PROVIDED the
+                    // with-source is one this resolver actually
+                    // recognizes (never guessed).
+                    continue;
+                }
                 return Err(ResolveFailure::UnsupportedScope("with"));
             }
             NODE_ATTR_SET => {
@@ -1735,7 +1799,7 @@ fn resolve_alias_recursively<T>(
         c.push(name.to_string());
         return Err(ResolveFailure::Cycle(c));
     }
-    let bound_node = resolve_ident_binding(ident_node, name)?;
+    let bound_node = resolve_ident_binding(ident_node, name, WithPolicy::Refuse)?;
     chain.push(name.to_string());
     let result = lower_bound(&bound_node, chain);
     chain.pop();
@@ -2089,7 +2153,7 @@ fn collect_reachable_refs(
     if node.kind() == NODE_IDENT {
         if let Some(name) = ident_text(node) {
             if !chain.iter().any(|n| n == &name) {
-                if let Ok(bound) = resolve_ident_binding(node, &name) {
+                if let Ok(bound) = resolve_ident_binding(node, &name, WithPolicy::Refuse) {
                     chain.push(name);
                     collect_reachable_refs(&bound, cfg_ident, chain, out);
                     chain.pop();
@@ -7877,6 +7941,488 @@ mod tests {
             opts.iter().any(|o| path_eq(&o.path, &["host"])),
             "wildcard-prefix targets must keep finding named submodule leaves bare-recorded, \
              exactly as before this fix -- kimai's real siteOpts depends on this; got {opts:?}"
+        );
+    }
+
+    // --- S5-F1C-A: scoped `with` resolution ---------------------------
+    //
+    // F1B-R's own real finding: `resolve_ident_binding`'s pre-existing,
+    // conservative `with`-refusal (`ResolveFailure::UnsupportedScope("with")`)
+    // blocked `resolve_type_reference` even for a genuinely legitimate,
+    // ONE-hop reference, whenever the reference itself sits inside a
+    // local `with types;` / `with lib.types;` clause -- real, demonstrated
+    // in prosody's `vHostOpts`, rspamd's `workerOpts`, tayga's `addrOpts`.
+    // Nix's own rule: a lexical (`let`/`rec`) binding for a name always
+    // takes priority over anything a `with` injects, regardless of what
+    // the with-source actually is -- so it's sound to keep looking
+    // outward past a `with` for such a binding. `WithPolicy::
+    // TransparentForRecognizedTypeNamespace` does exactly that, but ONLY
+    // when the with-source is statically recognized as `types` or
+    // `lib.types` -- an unrecognized/dynamic with-source still refuses
+    // immediately, never guessed at.
+
+    #[test]
+    fn scan_options_resolves_with_types_wrapped_type_reference() {
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "from-foo"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = with lib.types; attrsOf (submodule fooOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"]) && o.default_source.as_deref() == Some("\"from-foo\"")),
+            "a one-hop reference wrapped in a LOCAL `with lib.types;` must resolve; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_resolves_bare_with_types_namespace_form() {
+        // Same as above, but `with types;` (bare, not `with lib.types;`)
+        // -- both forms are explicitly named in the mandate.
+        let src = r#"
+            { config, lib, types, ... }:
+            let
+              cfg = config.services.widget;
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "from-foo"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = with types; attrsOf (submodule fooOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "`with types;` (bare) must also resolve; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_resolves_with_types_wrapped_reference_under_listof_and_nullor() {
+        // Corpus-observed wrapper forms: `listOf`/`nullOr`, not just
+        // `attrsOf` -- the fix must not be specific to one combinator,
+        // consistent with `collect_type_reference_ranges`'s own doc
+        // comment (scans ANY bare identifier, never a wrapper allowlist).
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              listHelper = { options = { a = lib.mkOption { default = "list-a"; }; }; };
+              nullHelper = { options = { b = lib.mkOption { default = "null-b"; }; }; };
+            in
+            {
+              options.services.widget = {
+                listThing = lib.mkOption {
+                  type = with lib.types; listOf (submodule listHelper);
+                  default = [ ];
+                };
+                nullThing = lib.mkOption {
+                  type = with lib.types; nullOr (submodule nullHelper);
+                  default = null;
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["a"])), "listOf-wrapped with-reference must resolve; got {opts:?}");
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["b"])), "nullOr-wrapped with-reference must resolve; got {opts:?}");
+    }
+
+    #[test]
+    fn scan_options_with_types_does_not_shadow_a_lexically_closer_binding() {
+        // Hostile control: a name that IS bound in a closer lexical scope
+        // than the `with` must resolve to THAT binding, not be treated as
+        // "belongs to the with namespace" -- exactly Nix's own shadowing
+        // rule (lexical always wins over `with`), and exactly what
+        // `WithPolicy::TransparentForRecognizedTypeNamespace` is supposed
+        // to preserve, not bypass. Both `fooOpts` bindings are plain
+        // module-level `let` bindings (neither nested inside any
+        // `mkOption` call), so this exercises the named-binding promotion
+        // path, not the pre-existing, unrelated inline-submodule (E1/GAP-4)
+        // mechanism -- a nested `let` INSIDE `thing`'s own `type =` field
+        // would instead be discovered via that separate mechanism, with
+        // its own (correctly qualified) path, not this one.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "outer-foo"; };
+                };
+              };
+            in
+            let
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "inner-foo"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = with lib.types; attrsOf (submodule fooOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        let leaf_matches: Vec<_> = opts.iter().filter(|o| path_eq(&o.path, &["leaf"])).collect();
+        assert_eq!(
+            leaf_matches.len(),
+            1,
+            "the inner, lexically-closer fooOpts must win -- outer fooOpts must NOT also be promoted; got {opts:?}"
+        );
+        assert_eq!(
+            leaf_matches[0].default_source.as_deref(),
+            Some("\"inner-foo\""),
+            "resolution must pick the lexically nearest binding, not the with-namespace; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_resolves_through_nested_with_clauses_when_both_are_recognized() {
+        // `with types; with lib.types; ...` -- both recognized layers
+        // stacked directly (unusual, but a real Nix file COULD do this)
+        // -- walking outward must pass through EVERY recognized with
+        // layer, not just the first one encountered.
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.widget;
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "from-foo"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = with types; with lib.types; attrsOf (submodule fooOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "a name reachable past TWO stacked, BOTH-recognized with clauses must resolve; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_an_unrecognized_outer_with_blocks_even_a_nearer_recognized_one() {
+        // The real prosody/rspamd shape (whole-file `with lib;`, a LOCAL
+        // `with types;` on one specific type field, with the referenced
+        // name bound in the SAME let the whole-file with wraps) already
+        // works, because the let is found BEFORE ever needing to pass the
+        // outer with (see the real-prosody/rspamd integration tests
+        // above). This is the sharper case the mandate's safety rule is
+        // actually about: if the ONLY path to a binding requires passing
+        // THROUGH an unrecognized with layer (here, `with pkgs;`, with no
+        // let in between it and the target), resolution must fail closed
+        // -- even though a nearer, recognized `with types;` layer sits in
+        // between. Never guess that skipping the unrecognized layer too
+        // would have been safe.
+        let src = r#"
+            { config, lib, pkgs, ... }:
+            let
+              cfg = config.services.widget;
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "from-foo"; };
+                };
+              };
+            in
+            with pkgs;
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = with types; attrsOf (submodule fooOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "fooOpts is bound in the OUTER let, reachable only by passing the unrecognized `with pkgs;` \
+             layer (the inner, recognized `with types;` alone doesn't reach that far) -- must stay \
+             excluded, never guessed; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_unknown_with_source_stays_unresolved_not_guessed() {
+        // Safety rule: an unrecognized/dynamic with-source must NOT be
+        // treated as transparent -- never guess that a name reached only
+        // through `with someDynamicExpression;` denotes anything at all.
+        let src = r#"
+            { config, lib, pkgs, ... }:
+            let
+              cfg = config.services.widget;
+              fooOpts = {
+                options = {
+                  leaf = lib.mkOption { default = "from-foo"; };
+                };
+              };
+            in
+            {
+              options.services.widget = {
+                thing = lib.mkOption {
+                  type = with pkgs; attrsOf (submodule fooOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "widget".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["leaf"])),
+            "an unrecognized with-source (`with pkgs;`, not `types`/`lib.types`) must NOT be treated \
+             as transparent -- fooOpts must stay excluded, exactly as before this fix; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_angrr_two_hop_defect_stays_excluded_under_with_resolution() {
+        // The angrr counterexample must remain excluded even with F1C-A's
+        // with-transparency active: `settingsOptions` (hop 1, no local
+        // `with`) legitimately promotes, but `temporaryRootPolicyOptions`
+        // (hop 2, reached only via `settingsOptions`'s own promoted
+        // content, itself walked with a THROWAWAY reference set per the
+        // existing one-hop cap) must NOT be promoted just because ITS OWN
+        // local `with lib.types;` reference would now otherwise resolve.
+        // Reproduces the real shape: settings -> settingsOptions (dotted,
+        // promotes) -> temporary-root-policies -> temporaryRootPolicyOptions
+        // (`with lib.types; attrsOf (submodule ...)`, two hops from the
+        // true root).
+        let src = r#"
+            { config, lib, ... }:
+            let
+              cfg = config.services.angrr;
+              temporaryRootPolicyOptions = {
+                options = {
+                  period = lib.mkOption { default = "unrelated-period"; };
+                };
+              };
+              settingsOptions = {
+                options = {
+                  temporary-root-policies = lib.mkOption {
+                    type = with lib.types; attrsOf (submodule temporaryRootPolicyOptions);
+                    default = { };
+                  };
+                };
+              };
+            in
+            {
+              options.services.angrr = {
+                settings = lib.mkOption {
+                  type = lib.types.submodule settingsOptions;
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "angrr".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(
+            opts.iter().any(|o| path_eq(&o.path, &["temporary-root-policies"])),
+            "settingsOptions (hop 1, no local with) must still promote; got {opts:?}"
+        );
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["period"])),
+            "temporaryRootPolicyOptions (hop 2, only reachable via settingsOptions's own promoted \
+             content) must stay excluded -- the one-hop cap, not the with-resolution fix, is what \
+             keeps angrr's real defect closed; got {opts:?}"
+        );
+    }
+
+    #[test]
+    fn scan_options_real_prosody_vhostopts_with_types_reference_resolves() {
+        // Integration anchor: the real F1B-R counterexample (prosody.nix,
+        // PRs #429967/#494314/#431289/#440660/#260551) -- `virtualHosts =
+        // mkOption { type = with types; attrsOf (submodule vHostOpts); };`
+        // is a genuine one-hop true-root reference; vHostOpts's own
+        // `enabled`/`ssl` must now be discoverable.
+        let src = r#"
+            { config, lib, ... }:
+            with lib;
+            let
+              cfg = config.services.prosody;
+              vHostOpts = _: {
+                options = {
+                  enabled = mkOption {
+                    type = types.bool;
+                    default = false;
+                  };
+                  ssl = mkOption {
+                    type = types.nullOr types.str;
+                    default = null;
+                  };
+                };
+              };
+            in
+            {
+              options.services.prosody = {
+                virtualHosts = mkOption {
+                  type = with types; attrsOf (submodule vHostOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "prosody".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["enabled"])), "vHostOpts.enabled must resolve; got {opts:?}");
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["ssl"])), "vHostOpts.ssl must resolve; got {opts:?}");
+    }
+
+    #[test]
+    fn scan_options_real_rspamd_workeropts_with_types_reference_resolves() {
+        // Integration anchor: rspamd.nix (PR #484133) -- `workers =
+        // mkOption { type = with types; attrsOf (submodule workerOpts); };`
+        // workerOpts's own direct leaves (bindSockets, count, includes,
+        // ...) must now resolve. bindSocketOpts (nested a further hop
+        // inside workerOpts's own promoted content) is intentionally NOT
+        // asserted here -- that's a separate, still-capped hop-2 case,
+        // covered by the angrr-shaped test above, not a regression this
+        // test needs to guard.
+        let src = r#"
+            { config, options, pkgs, lib, ... }:
+            with lib;
+            let
+              cfg = config.services.rspamd;
+              workerOpts = { name, options, ... }: {
+                options = {
+                  count = mkOption {
+                    type = types.nullOr types.int;
+                    default = null;
+                  };
+                  includes = mkOption {
+                    type = types.listOf types.str;
+                    default = [ ];
+                  };
+                };
+              };
+            in
+            {
+              options.services.rspamd = {
+                workers = mkOption {
+                  type = with types; attrsOf (submodule workerOpts);
+                  default = { };
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "rspamd".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["count"])), "workerOpts.count must resolve; got {opts:?}");
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["includes"])), "workerOpts.includes must resolve; got {opts:?}");
+    }
+
+    #[test]
+    fn scan_options_real_tayga_addropts_stays_excluded_by_the_unwidened_hop_cap() {
+        // Integration anchor, negative result, HONESTLY documented: the
+        // real tayga.nix case (PR #432528) is NOT fully resolved by
+        // F1C-A alone. `pool = mkOption { type = with types; nullOr
+        // (submodule (addrOpts v)); };` is declared INSIDE versionOpts's
+        // own content (itself a promoted, hop-1 candidate from the true
+        // root `ipv4`/`ipv6`) -- so `addrOpts` is TWO hops from the true
+        // root, exactly like angrr's own temporaryRootPolicyOptions. The
+        // one-hop cap (unchanged, out of scope for F1C per its own
+        // mandate) keeps `addrOpts`'s own `prefixLength`/`address`
+        // excluded regardless of this fix. This is a compound-cause case
+        // -- F1C-A's own with-resolution is necessary but not sufficient
+        // here, and F1C is not authorized to widen the cap to close it.
+        let src = r#"
+            { config, lib, ... }:
+            with lib;
+            let
+              cfg = config.services.tayga;
+              addrOpts = v: {
+                options = {
+                  prefixLength = mkOption { type = types.int; };
+                };
+              };
+              versionOpts = v: {
+                options = {
+                  pool = mkOption {
+                    type = with types; nullOr (submodule (addrOpts v));
+                  };
+                };
+              };
+            in
+            {
+              options.services.tayga = {
+                ipv4 = mkOption {
+                  type = types.submodule (versionOpts 4);
+                };
+              };
+            }
+        "#;
+        let root = rnix::Root::parse(src);
+        assert!(root.errors().is_empty());
+        let prefix = vec!["services".to_string(), "tayga".to_string()];
+        let opts = scan_options("m.nix", src, root.tree().syntax(), "cfg", &prefix);
+        assert!(opts.iter().any(|o| path_eq(&o.path, &["pool"])), "versionOpts (hop 1) must still promote; got {opts:?}");
+        assert!(
+            !opts.iter().any(|o| path_eq(&o.path, &["prefixLength"])),
+            "addrOpts (hop 2 via pool) must stay excluded -- documenting the compound-cause boundary, \
+             not a claim this fix resolves tayga fully; got {opts:?}"
         );
     }
 
