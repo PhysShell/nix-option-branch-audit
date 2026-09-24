@@ -92,11 +92,20 @@ watch "database.socket"
    → OBA001 (every matching assignment's outcome is known, and none of them differ from the default)
 ```
 
-Every verdict is one of `OptionNotFound` / `PredicateNotFound` /
-`DefaultUnresolved` / `TestConfigUnresolved` / `TestValueUnresolved` (all
-**inconclusive** — the tool couldn't establish an opinion, distinct from
-and just as loud as a finding) / `OBA001` (a real finding) / `PASS` (proof
-of a branch-outcome transition). Process exit code is 4-state, not 3 —
+Every verdict is one of `OptionNotFound` / `OptionRelocated` /
+`PredicateNotFound` / `DefaultUnresolved` / `TestConfigUnresolved` /
+`TestValueUnresolved` (all **inconclusive** — the tool couldn't establish
+an opinion, distinct from and just as loud as a finding) / `OBA001` (a
+real finding) / `PASS` (proof of a branch-outcome transition).
+`OptionRelocated` (since v0.5.0) means a statically proven
+rename/relocation was found from the watched option's own complete
+path — a real `mkRenamedOptionModule`/`mkRenamedOptionModuleWith`
+migration edge, not a guess — and carries the destination path
+structurally (`to`). Its own `destination_confirmed` field means the
+rename is known but the destination declaration was NOT independently
+confirmed within the analysis root when `false` — never "not renamed"
+— see `MIGRATION-v0.5.0.md` for the full field-by-field meaning.
+Process exit code is 4-state, not 3 —
 `0` = every watched option resolved to `PASS`; `1` = `FINDING`, at least
 one `OBA001` and nothing inconclusive; `2` = `INCONCLUSIVE`, takes
 precedence over `FINDING` (a run that couldn't fully evaluate everything
