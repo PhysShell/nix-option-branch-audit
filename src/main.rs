@@ -1145,6 +1145,269 @@ fn find_attrset_field(attrset: &SyntaxNode, field: &str) -> Option<SyntaxNode> {
     None
 }
 
+// ---------------------------------------------------------------------
+// S5-F3: static option-migration scanner. Reuses `flatten_apply`/
+// `call_head_name`/`find_attrset_field`/`string_text` verbatim -- no new
+// AST-walking machinery, only a new call-head vocabulary and a small
+// literal-list extractor.
+//
+// Root cause this exists to fix: guacamole PR #462487 moved
+// `services.guacamole-server.logbackXml` to
+// `services.guacamole-client.logbackXml` via a real, statically-literal
+// `lib.mkRenamedOptionModule [...] [...]` call in `imports = [...]`.
+// Before this scanner existed, neither `mkRenamedOptionModule` nor
+// `mkRemovedOptionModule` had ANY handler anywhere in this source file
+// (verified by grep against the accepted F2-R baseline before writing
+// this) -- `run_target`'s own gate-1 miss (`options.iter().find(...)`
+// returns `None`) had no way to distinguish "genuinely gone, reason
+// unknown" from "moved, with real source-level provenance for exactly
+// where" from "deliberately removed, with no replacement" -- all three
+// collapsed into the identical `Verdict::OptionNotFound`, rendered as
+// "FINDING BECAME INCONCLUSIVE / no mkOption declaration found /
+// declaration: not found" even when the source already contained
+// explicit, machine-readable evidence that this was a rename.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MigrationKind {
+    Renamed,
+    Removed,
+}
+
+/// One statically-proven migration directive. `from_path`/`to_path` are
+/// COMPLETE literal option paths (never a bare leaf name -- see
+/// `scan_migrations`'s own doc comment on why identity is never taken
+/// from a terminal segment alone). `to_path` is `None` for `Removed`
+/// (there is no replacement path by definition).
+#[derive(Debug, Clone, PartialEq)]
+struct MigrationEdge {
+    kind: MigrationKind,
+    from_path: Vec<String>,
+    to_path: Option<Vec<String>>,
+    source_file: String,
+    span: Span,
+    helper_form: &'static str,
+}
+
+/// A literal, non-interpolated list of strings, e.g. `[ "a" "b" "c" ]`
+/// (optionally paren-wrapped). Fails (`None`) the instant any element
+/// isn't a plain `NODE_STRING` -- a bare identifier, a computed
+/// expression, an interpolated string, or anything else dynamic makes
+/// the WHOLE list unresolved, never partially guessed. Mirrors
+/// `attrpath_segments`'s own fail-closed discipline, but over `NODE_LIST`
+/// elements (a plain Nix list of strings) rather than `NODE_ATTRPATH`
+/// segments -- `mkRenamedOptionModule`'s own real arguments are lists of
+/// strings, not attribute paths, so this is deliberately a distinct,
+/// narrower helper, not a call to `attrpath_segments` under another
+/// name.
+fn extract_literal_string_list(node: &SyntaxNode) -> Option<Vec<String>> {
+    let node = unwrap_paren(node.clone());
+    if node.kind() != NODE_LIST {
+        return None;
+    }
+    let mut out = Vec::new();
+    for child in node.children() {
+        out.push(string_text(&child)?);
+    }
+    Some(out)
+}
+
+/// Statically recognized migration helpers, in current real nixpkgs
+/// (recorded here, not opportunistically expanded -- see this function's
+/// own doc comment on what was deliberately left out):
+///
+/// - `mkRenamedOptionModule oldPathList newPathList` -- a 2-arg curried
+///   call, both arguments literal string lists. The real, exact guacamole
+///   shape.
+/// - `mkRenamedOptionModuleWith { from = [...]; to = [...]; ... }` --
+///   a 1-arg call whose single argument is an attrset with `from`/`to`
+///   fields (also literal string lists); other fields (`sinceRelease`,
+///   ...) are real in current nixpkgs but irrelevant to this scanner's
+///   own job and are simply ignored, not validated.
+/// - `mkRemovedOptionModule oldPathList replacementMessage` -- a 2-arg
+///   curried call; the second argument (a message string) is not
+///   extracted, only its presence/arity is checked, since this scanner
+///   only ever needs `from_path` for a removal.
+///
+/// Both a bare (`mkRenamedOptionModule`) and `lib.`-qualified
+/// (`lib.mkRenamedOptionModule`) call head are recognized -- the exact
+/// same `call_head_name` convention `HELPER_NAMES`/`is_mk_option_call`
+/// already use elsewhere, not a new lexical policy.
+///
+/// Deliberately NOT recognized, per this round's own explicit scope:
+/// `mkChangedOptionModule`, `mkMergedOptionModule`, any generic module
+/// alias, or any `imports = [...]` entry that isn't one of these three
+/// exact call shapes. Guacamole's own demonstrated root cause never
+/// requires them; adding them opportunistically here would be exactly
+/// the "fix everything noticed along the way" scope creep this project's
+/// own history has repeatedly guarded against.
+fn scan_migrations(file: &str, src: &str, root: &SyntaxNode) -> Vec<MigrationEdge> {
+    let mut out = Vec::new();
+    for node in root.descendants() {
+        if node.kind() != NODE_APPLY {
+            continue;
+        }
+        // Only the outermost Apply of a curried chain -- same
+        // double-reporting guard `scan_predicates`'s own NODE_APPLY
+        // branch already uses.
+        if node
+            .parent()
+            .map(|p| p.kind() == NODE_APPLY)
+            .unwrap_or(false)
+        {
+            continue;
+        }
+        let (head, args) = flatten_apply(&node);
+        let Some(name) = call_head_name(&head) else {
+            continue;
+        };
+        match name.as_str() {
+            "mkRenamedOptionModule" => {
+                if args.len() != 2 {
+                    continue;
+                }
+                let (Some(from_path), Some(to_path)) = (
+                    extract_literal_string_list(&args[0]),
+                    extract_literal_string_list(&args[1]),
+                ) else {
+                    continue;
+                };
+                out.push(MigrationEdge {
+                    kind: MigrationKind::Renamed,
+                    from_path,
+                    to_path: Some(to_path),
+                    source_file: file.to_string(),
+                    span: span_of(file, src, &node),
+                    helper_form: "mkRenamedOptionModule",
+                });
+            }
+            "mkRenamedOptionModuleWith" => {
+                if args.len() != 1 {
+                    continue;
+                }
+                let attrset = unwrap_paren(args[0].clone());
+                let (Some(from_node), Some(to_node)) = (
+                    find_attrset_field(&attrset, "from"),
+                    find_attrset_field(&attrset, "to"),
+                ) else {
+                    continue;
+                };
+                let (Some(from_path), Some(to_path)) = (
+                    extract_literal_string_list(&from_node),
+                    extract_literal_string_list(&to_node),
+                ) else {
+                    continue;
+                };
+                out.push(MigrationEdge {
+                    kind: MigrationKind::Renamed,
+                    from_path,
+                    to_path: Some(to_path),
+                    source_file: file.to_string(),
+                    span: span_of(file, src, &node),
+                    helper_form: "mkRenamedOptionModuleWith",
+                });
+            }
+            "mkRemovedOptionModule" => {
+                if args.len() != 2 {
+                    continue;
+                }
+                let Some(from_path) = extract_literal_string_list(&args[0]) else {
+                    continue;
+                };
+                out.push(MigrationEdge {
+                    kind: MigrationKind::Removed,
+                    from_path,
+                    to_path: None,
+                    source_file: file.to_string(),
+                    span: span_of(file, src, &node),
+                    helper_form: "mkRemovedOptionModule",
+                });
+            }
+            _ => {}
+        }
+    }
+    out
+}
+
+/// Resolves a watched option's own migration status against the exact
+/// `full_path` identity (`option_prefix ++ watched_path`, NEVER a bare
+/// leaf name -- see `scan_migrations`'s own doc comment): `None` when no
+/// edge's `from_path` matches at all (plain disappearance, unaffected by
+/// this round), `Some(&edge)` when exactly ONE `Renamed` edge matches and
+/// no OTHER edge (of either kind) also claims the same `from_path`, and
+/// `None` again -- deliberately, fail-closed -- for every other case:
+/// a matching `Removed` edge alone (hard removal, rendered exactly as
+/// before, never reclassified as a relocation), or two or more edges
+/// (of any kind combination) sharing the same `from_path` (a genuinely
+/// ambiguous source -- "do not pick the first one silently", per this
+/// round's own mandate; no new source-order `.find()` policy is
+/// introduced here).
+fn resolve_unambiguous_rename<'a>(migrations: &'a [MigrationEdge], full_path: &[String]) -> Option<&'a MigrationEdge> {
+    let matching: Vec<&MigrationEdge> = migrations
+        .iter()
+        .filter(|m| m.from_path == full_path)
+        .collect();
+    match matching.as_slice() {
+        [only] if only.kind == MigrationKind::Renamed => Some(only),
+        _ => None,
+    }
+}
+
+/// Cross-file destination confirmation (S5-F3's own "destination
+/// declaration confirmed" claim) -- bounded to `search_root`'s own real
+/// directory tree via the pre-existing, already-reviewed
+/// `collect_nix_files` walker (the SAME one `--census` already uses),
+/// never an arbitrary filesystem-wide search: every candidate file is
+/// checked by re-running `scan_options` with `to_path`'s own PARENT as
+/// `option_prefix` and looking for a real declaration at `to_path`'s own
+/// LAST segment -- exactly the same, already-reviewed mechanism
+/// `run_target` itself uses for its own module, not a second,
+/// independently-maintained declaration scanner. Matches by the
+/// COMPLETE destination path (never a leaf-name-only search, per this
+/// round's own explicit instruction). Fails closed (returns `None`,
+/// never a guess) when `to_path` has fewer than 2 segments (no parent to
+/// scan under), when a candidate file fails to parse, or when MORE THAN
+/// ONE file contains a real declaration at the exact same `to_path` --
+/// an ambiguous destination is not a confirmed one.
+fn locate_migration_destination(search_root: &Path, cfg_ident: &str, to_path: &[String]) -> Option<Span> {
+    if to_path.len() < 2 {
+        return None;
+    }
+    let parent = &to_path[..to_path.len() - 1];
+    let leaf = vec![to_path[to_path.len() - 1].clone()];
+
+    let mut files = Vec::new();
+    if collect_nix_files(search_root, &mut files).is_err() {
+        return None;
+    }
+    files.sort();
+
+    let mut found: Option<Span> = None;
+    for path in &files {
+        let Ok(src) = fs::read_to_string(path) else {
+            continue;
+        };
+        let parse = rnix::Root::parse(&src);
+        if !parse.errors().is_empty() {
+            continue;
+        }
+        let rel = path
+            .strip_prefix(search_root)
+            .unwrap_or(path)
+            .display()
+            .to_string();
+        let options = scan_options(&rel, &src, parse.tree().syntax(), cfg_ident, parent);
+        if let Some(decl) = options.iter().find(|o| o.path == leaf) {
+            if found.is_some() {
+                // Ambiguous destination -- more than one real declaration
+                // at the exact same complete path. Never silently pick
+                // the first one found.
+                return None;
+            }
+            found = Some(decl.span.clone());
+        }
+    }
+    found
+}
+
 /// E1/P1 fix. A recognized nixpkgs option-declaring HELPER call, with
 /// its own KNOWN, stable semantic contract -- a small, explicit,
 /// honestly maintained table of "known helper -> known synthesized
@@ -3158,6 +3421,34 @@ enum Verdict {
     /// found the option (previously it wasn't required -- a silently dead
     /// declaration scanner couldn't have blocked a PASS).
     OptionNotFound { option: String },
+    /// S5-F3: the module has no declaration for this watched path EITHER,
+    /// but -- unlike the plain `OptionNotFound` above -- a real,
+    /// statically-literal `mkRenamedOptionModule`/`mkRenamedOptionModuleWith`
+    /// migration edge exists whose own `from_path` is EXACTLY this
+    /// option's complete path (`option_prefix ++ watched_path`, never a
+    /// bare leaf match). This is a strictly more informative sibling of
+    /// `OptionNotFound`, not a claim that the ORIGINAL finding/predicate
+    /// still holds at the new location -- see `scan_migrations`'s own
+    /// doc comment for why `mkRemovedOptionModule` (a hard removal, no
+    /// replacement path) and an ambiguous multi-edge match both remain
+    /// plain `OptionNotFound` instead, deliberately, so sshd's real
+    /// `banner` removal (`#509507`) and gollum's real `local-time`
+    /// removal (`#466806`) -- both real, previously-adjudicated-as-
+    /// correct hard removals -- are never reclassified as a relocation.
+    OptionRelocated {
+        option: String,
+        /// The destination's own complete path -- never just its
+        /// terminal leaf.
+        to: Vec<String>,
+        /// `true` only when `locate_migration_destination` actually
+        /// found a real declaration at `to`, somewhere under the
+        /// analysis root -- never claimed true merely because a rename
+        /// directive exists.
+        destination_confirmed: bool,
+        migration_source_file: String,
+        migration_span: Span,
+        helper_form: &'static str,
+    },
     /// The declaration was found, but no direct `cfg.<path>` branch
     /// predicate was found in the module (e.g. hidden behind a `let`-bound
     /// alias -- out of MVP scope, and intentionally never folded into a
@@ -3287,6 +3578,7 @@ impl Verdict {
         matches!(
             self,
             Verdict::OptionNotFound { .. }
+                | Verdict::OptionRelocated { .. }
                 | Verdict::PredicateNotFound { .. }
                 | Verdict::DefaultUnresolved { .. }
                 | Verdict::TestValueUnresolved { .. }
@@ -3305,6 +3597,7 @@ impl Verdict {
     fn option(&self) -> &str {
         match self {
             Verdict::OptionNotFound { option }
+            | Verdict::OptionRelocated { option, .. }
             | Verdict::PredicateNotFound { option }
             | Verdict::DefaultUnresolved { option, .. }
             | Verdict::TestValueUnresolved { option, .. }
@@ -3322,6 +3615,7 @@ impl Verdict {
     fn kind(&self) -> VerdictKind {
         match self {
             Verdict::OptionNotFound { .. } => VerdictKind::OptionNotFound,
+            Verdict::OptionRelocated { .. } => VerdictKind::OptionRelocated,
             Verdict::PredicateNotFound { .. } => VerdictKind::PredicateNotFound,
             Verdict::DefaultUnresolved { .. } => VerdictKind::DefaultUnresolved,
             Verdict::TestValueUnresolved { .. } => VerdictKind::TestValueUnresolved,
@@ -3336,6 +3630,7 @@ impl Verdict {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum VerdictKind {
     OptionNotFound,
+    OptionRelocated,
     PredicateNotFound,
     DefaultUnresolved,
     TestValueUnresolved,
@@ -3354,6 +3649,7 @@ impl VerdictKind {
     fn as_str(&self) -> &'static str {
         match self {
             VerdictKind::OptionNotFound => "option_not_found",
+            VerdictKind::OptionRelocated => "option_relocated",
             VerdictKind::PredicateNotFound => "predicate_not_found",
             VerdictKind::DefaultUnresolved => "default_unresolved",
             VerdictKind::TestValueUnresolved => "test_value_unresolved",
@@ -3876,6 +4172,26 @@ fn analyze(root: &Path, manifest: &TargetFile) -> anyhow::Result<AnalysisReport>
             .map_err(|e| anyhow::anyhow!("target {}: test: {e}", t.name))?;
         targets.push(run_target(t, &module_path, &test_path)?);
     }
+    // S5-F3: destination-declaration confirmation for any
+    // `Verdict::OptionRelocated` `run_target` produced -- deliberately a
+    // POST-processing pass here, in `analyze()`, rather than threaded
+    // into `run_target`'s own signature: this is the one place in the
+    // whole call graph that already has the real analysis `root` (the
+    // cross-file search boundary `locate_migration_destination` itself
+    // requires), and every one of `check`/`diff`/`audit`/`audit-diff`
+    // goes through `analyze()`, so every command benefits uniformly.
+    // `run_target` itself, and any test calling it directly, always
+    // reports `destination_confirmed: false` -- honestly reflecting that
+    // it alone never attempts (and never falsely claims) the cross-file
+    // search.
+    for target in &mut targets {
+        for verdict in &mut target.verdicts {
+            if let Verdict::OptionRelocated { to, destination_confirmed, .. } = verdict {
+                *destination_confirmed =
+                    locate_migration_destination(root, &target.cfg_ident, to).is_some();
+            }
+        }
+    }
     Ok(AnalysisReport { targets })
 }
 
@@ -4365,6 +4681,13 @@ fn run_target(
         &t.option_prefix,
     );
     let (assignments, opacity) = scan_test_assignments(&test_file, &test_src, test_root.syntax());
+    // S5-F3: computed once per target, consulted only on a gate-1 miss
+    // below -- see `scan_migrations`'s own doc comment for the real
+    // guacamole root cause this exists to fix, and `resolve_unambiguous_rename`
+    // for why a matching `Removed` edge or an ambiguous multi-edge match
+    // both deliberately fall through to the unchanged plain
+    // `OptionNotFound` path.
+    let migrations = scan_migrations(&module_file, &module_src, module_root.syntax());
 
     let mut matched_assignments = Vec::new();
     let mut verdicts = Vec::new();
@@ -4378,9 +4701,39 @@ fn run_target(
         // this: default_source was previously optional at the point PASS
         // became reachable.
         let Some(decl) = options.iter().find(|o| o.path == watched_path) else {
-            verdicts.push(Verdict::OptionNotFound {
-                option: watched.clone(),
-            });
+            // S5-F3: the full, complete identity a migration edge's own
+            // `from_path` must match -- `option_prefix ++ watched_path`,
+            // never `watched_path` alone (a bare leaf/suffix match would
+            // let an unrelated migration elsewhere in the file falsely
+            // claim this option -- see the hostile controls covering
+            // exactly this).
+            let full_path: Vec<String> = t
+                .option_prefix
+                .iter()
+                .chain(watched_path.iter())
+                .cloned()
+                .collect();
+            if let Some(edge) = resolve_unambiguous_rename(&migrations, &full_path) {
+                verdicts.push(Verdict::OptionRelocated {
+                    option: watched.clone(),
+                    // Present, structurally guaranteed by
+                    // `resolve_unambiguous_rename`'s own match arm
+                    // (`Renamed` always carries `Some(to_path)`).
+                    to: edge.to_path.clone().unwrap_or_default(),
+                    // Filled in by `analyze()`'s own post-processing pass,
+                    // which alone has the analysis root needed for a
+                    // cross-file destination search -- `run_target` itself
+                    // never claims confirmation.
+                    destination_confirmed: false,
+                    migration_source_file: edge.source_file.clone(),
+                    migration_span: edge.span.clone(),
+                    helper_form: edge.helper_form,
+                });
+            } else {
+                verdicts.push(Verdict::OptionNotFound {
+                    option: watched.clone(),
+                });
+            }
             continue;
         };
 
@@ -5315,6 +5668,14 @@ enum Severity {
     Inconclusive,
 }
 
+/// S5-F3: `AuditResult.code` for `Verdict::OptionRelocated`, and the
+/// discriminator `render_github_summary`'s own heading logic uses to
+/// override the generic "FINDING BECAME INCONCLUSIVE"/"NEW INCONCLUSIVE"
+/// headings with an honest "relocated" framing -- reusing the pre-existing
+/// `code` field/plumbing (`push_notable` already copies `result.code`
+/// through verbatim) rather than inventing a second discriminator.
+const OBA_RELOCATED_CODE: &str = "OBA-RELOCATED";
+
 #[derive(Serialize, Debug, Clone, PartialEq)]
 struct AuditResult {
     /// Which real analyzer engine produced this result -- `"oba"` or
@@ -5389,6 +5750,14 @@ struct ObaResultEvidence {
     #[serde(skip_serializing_if = "Option::is_none")]
     default_outcome: Option<bool>,
     test_assignments: usize,
+    /// S5-F3: the migration destination's own complete path, `None` for
+    /// every verdict except `Verdict::OptionRelocated` -- purely
+    /// additive (every other verdict's own JSON is byte-for-byte
+    /// unchanged from before this field existed).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    relocated_to: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    destination_confirmed: Option<bool>,
 }
 
 fn cdc_outcome_to_result(name: &str, outcome: cdc::CdcCandidateOutcome) -> AuditResult {
@@ -5483,6 +5852,40 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: None,
                 default_outcome: None,
                 test_assignments: 0,
+                relocated_to: None,
+                destination_confirmed: None,
+            }),
+        },
+        Verdict::OptionRelocated { option, to, destination_confirmed, migration_source_file, migration_span, helper_form } => AuditResult {
+            engine: "oba",
+            target: target.clone(),
+            verdict: ResultVerdict::Inconclusive,
+            code: Some(OBA_RELOCATED_CODE),
+            severity: Some(Severity::Inconclusive),
+            message: format!(
+                "the watched option's own declaration was renamed/relocated, not merely absent: {} -> {}",
+                option,
+                to.join(".")
+            ),
+            provenance: vec![
+                format!("Nix option: {option}"),
+                "declaration: not found at the original path".to_string(),
+                format!("migration evidence: {helper_form} at {migration_source_file}:{}:{}", migration_span.line, migration_span.col),
+                format!("relocated to: {}", to.join(".")),
+                if *destination_confirmed {
+                    "destination declaration: confirmed".to_string()
+                } else {
+                    "destination declaration: not independently confirmed".to_string()
+                },
+            ],
+            cdc_evidence: None,
+            oba_evidence: Some(ObaResultEvidence {
+                option: option.clone(),
+                predicate_source: None,
+                default_outcome: None,
+                test_assignments: 0,
+                relocated_to: Some(to.clone()),
+                destination_confirmed: Some(*destination_confirmed),
             }),
         },
         Verdict::PredicateNotFound { option } => AuditResult {
@@ -5503,6 +5906,8 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: None,
                 default_outcome: None,
                 test_assignments: 0,
+                relocated_to: None,
+                destination_confirmed: None,
             }),
         },
         Verdict::DefaultUnresolved { option, predicate } => AuditResult {
@@ -5523,6 +5928,8 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: Some(predicate.source().to_string()),
                 default_outcome: None,
                 test_assignments: 0,
+                relocated_to: None,
+                destination_confirmed: None,
             }),
         },
         Verdict::TestValueUnresolved { option, predicate, default_outcome, .. } => AuditResult {
@@ -5544,6 +5951,8 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: Some(predicate.source().to_string()),
                 default_outcome: *default_outcome,
                 test_assignments: 0,
+                relocated_to: None,
+                destination_confirmed: None,
             }),
         },
         Verdict::TestConfigUnresolved { option, predicate, default_outcome, .. } => AuditResult {
@@ -5565,6 +5974,8 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: Some(predicate.source().to_string()),
                 default_outcome: *default_outcome,
                 test_assignments: 0,
+                relocated_to: None,
+                destination_confirmed: None,
             }),
         },
         Verdict::Oba001 { option, predicate, default_outcome, .. } => AuditResult {
@@ -5586,6 +5997,8 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: Some(predicate.source().to_string()),
                 default_outcome: *default_outcome,
                 test_assignments: 0,
+                relocated_to: None,
+                destination_confirmed: None,
             }),
         },
         Verdict::Pass { option, predicate, default_outcome, evidence, .. } => AuditResult {
@@ -5607,6 +6020,8 @@ fn oba_verdict_to_result(option: &str, verdict: &Verdict) -> AuditResult {
                 predicate_source: Some(predicate.source().to_string()),
                 default_outcome: Some(*default_outcome),
                 test_assignments: evidence.len(),
+                relocated_to: None,
+                destination_confirmed: None,
             }),
         },
     }
@@ -5933,6 +6348,7 @@ fn oba_kind_class(kind: VerdictKind) -> ResultVerdict {
         VerdictKind::Oba001 => ResultVerdict::Finding,
         VerdictKind::Pass => ResultVerdict::Pass,
         VerdictKind::OptionNotFound
+        | VerdictKind::OptionRelocated
         | VerdictKind::PredicateNotFound
         | VerdictKind::DefaultUnresolved
         | VerdictKind::TestValueUnresolved
@@ -6207,12 +6623,20 @@ fn transition_origin_for_change(from: ResultVerdict) -> TransitionOrigin {
 ///   the one case the real S3 evidence (`#547038` in S2, and every
 ///   still-correct control in this round) shows this label is honest
 ///   for.
+/// - S5-F3: `OptionRelocated` is deliberately grouped with the
+///   already-analyzable-but-opaque four below, NOT with plain
+///   `OptionNotFound` -- unlike a bare scanner miss, this prior side
+///   already carried real, concrete, source-verified information (a
+///   statically-proven rename edge with a known destination path), so a
+///   later transition away from it is honestly "we already knew
+///   something concrete, and now know more", not "origin unclear".
 /// - `Oba001` / `Pass` (determinate): `VerdictChanged`, unchanged from
 ///   `transition_origin_for_change`'s own logic.
 fn transition_origin_for_oba_change(from: VerdictKind) -> TransitionOrigin {
     match from {
         VerdictKind::OptionNotFound => TransitionOrigin::OriginUnclear,
-        VerdictKind::PredicateNotFound
+        VerdictKind::OptionRelocated
+        | VerdictKind::PredicateNotFound
         | VerdictKind::DefaultUnresolved
         | VerdictKind::TestValueUnresolved
         | VerdictKind::TestConfigUnresolved => TransitionOrigin::AnalysisBecamePossible,
@@ -6359,6 +6783,22 @@ fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
             }
             ("new_inconclusive", Some(TransitionOrigin::OriginUnclear)) => {
                 "NEWLY OBSERVABLE, STILL INCONCLUSIVE (ORIGIN UNCLEAR)"
+            }
+            // S5-F3: the underlying verdict carries real, statically-proven
+            // rename/relocation evidence (`Verdict::OptionRelocated`, see
+            // `OBA_RELOCATED_CODE`'s own doc comment) -- an honest,
+            // specific heading beats the generic "FINDING BECAME
+            // INCONCLUSIVE"/"NEW INCONCLUSIVE" framing exactly the way
+            // S2-F2's own `AnalysisBecamePossible`/`OriginUnclear`
+            // overrides already do above. The bucket itself (and its own
+            // count) is completely unchanged -- guacamole's real
+            // transition still counts as one `finding_became_inconclusive`,
+            // exactly as before this round.
+            ("finding_became_inconclusive", _) if n.code == Some(OBA_RELOCATED_CODE) => {
+                "FINDING'S OPTION WAS RENAMED/RELOCATED"
+            }
+            ("new_inconclusive", _) if n.code == Some(OBA_RELOCATED_CODE) => {
+                "NEWLY INCONCLUSIVE: OPTION WAS RENAMED/RELOCATED"
             }
             ("new_finding", _) => "NEW FINDING",
             ("new_inconclusive", _) => "NEW INCONCLUSIVE",
@@ -6850,6 +7290,12 @@ fn print_human(r: &TargetReport) {
             Verdict::OptionNotFound { option } => {
                 println!("  OPTION_NOT_FOUND  {option}  (declaration scanner found no mkOption for this path)")
             }
+            Verdict::OptionRelocated { option, to, destination_confirmed, helper_form, migration_source_file, migration_span } => println!(
+                "  OPTION_RELOCATED  {option} -> {}  ({helper_form} at {migration_source_file}:{}:{}, destination_confirmed={destination_confirmed})",
+                to.join("."),
+                migration_span.line,
+                migration_span.col,
+            ),
             Verdict::PredicateNotFound { option } => println!(
                 "  PREDICATE_NOT_FOUND  {option}  (no direct cfg.<path> branch found -- likely aliased, out of MVP scope)"
             ),
@@ -10134,8 +10580,9 @@ mod tests {
         })
     }
 
-    const ALL_VERDICT_KINDS: [VerdictKind; 7] = [
+    const ALL_VERDICT_KINDS: [VerdictKind; 8] = [
         VerdictKind::OptionNotFound,
+        VerdictKind::OptionRelocated,
         VerdictKind::PredicateNotFound,
         VerdictKind::DefaultUnresolved,
         VerdictKind::TestValueUnresolved,
@@ -10152,6 +10599,14 @@ mod tests {
     fn verdict_of_kind(kind: VerdictKind, option: &str) -> Verdict {
         match kind {
             VerdictKind::OptionNotFound => Verdict::OptionNotFound { option: option.to_string() },
+            VerdictKind::OptionRelocated => Verdict::OptionRelocated {
+                option: option.to_string(),
+                to: vec!["services".to_string(), "elsewhere".to_string(), option.to_string()],
+                destination_confirmed: false,
+                migration_source_file: "module.nix".to_string(),
+                migration_span: t_span(),
+                helper_form: "mkRenamedOptionModule",
+            },
             VerdictKind::PredicateNotFound => {
                 Verdict::PredicateNotFound { option: option.to_string() }
             }

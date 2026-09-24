@@ -511,17 +511,25 @@ fn genuine_unchanged_field_under_same_structural_identity_stays_unchanged() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
-/// Hostile control (d): a real `mkRenamedOptionModule` relocation (the
-/// SAME general shape as the already-known, separately-tracked
-/// guacamole defect, #462487 -- explicitly OUT OF SCOPE for this fix)
-/// must be completely UNAFFECTED by this change. This fix targets only
-/// the named-`let`/`rec`-bound-auxiliary-submodule class; it does not
-/// add, and must not accidentally add, any rename/move detection. The
-/// tool's own `TargetIdentity` doc comment states this is deliberate:
-/// "no rename/move tracking ... surfaces as Removed + Added, never a
-/// detected 'same target, different path'".
+/// Originally a hostile control confirming a real `mkRenamedOptionModule`
+/// relocation (the same general shape as the guacamole defect, #462487)
+/// stayed completely UNAFFECTED by S5-F1D's own reference-following fix
+/// (which targets only the named-`let`/`rec`-bound-auxiliary-submodule
+/// class, and must never accidentally treat a migration helper as a
+/// submodule reference). That premise has now genuinely, intentionally
+/// changed: S5-F3 adds real, narrow `mkRenamedOptionModule` detection
+/// specifically to fix guacamole's own real defect (a previously
+/// undetected rename rendered as an ordinary, misleading
+/// "FINDING BECAME INCONCLUSIVE" / `OptionNotFound`). This test now
+/// asserts the NEW, correct, intended behavior -- rewritten, not
+/// silently patched, exactly like S5-F1D's own precedent for a test
+/// whose premise improved. `TargetIdentity`'s own "no rename/move
+/// tracking" doc comment is about IDENTITY comparison across
+/// base/head roots (a `diff`-level concept, `compare()`'s own
+/// `TargetDiff::Removed`+`Added` pairing) -- unrelated to, and
+/// unaffected by, S5-F3's own single-side verdict classification.
 #[test]
-fn mk_renamed_option_module_relocation_stays_unaffected_by_this_fix() {
+fn mk_renamed_option_module_relocation_is_now_detected_by_s5_f3() {
     let base_dir = std::env::temp_dir().join("oba-f1-rename-base");
     let head_dir = std::env::temp_dir().join("oba-f1-rename-head");
     std::fs::create_dir_all(&base_dir).unwrap();
@@ -602,12 +610,17 @@ fn mk_renamed_option_module_relocation_stays_unaffected_by_this_fix() {
         .expect("failed to run oba binary");
     assert_eq!(exit_code(&out), 2, "stderr: {}", String::from_utf8_lossy(&out.stderr));
     let v: Value = serde_json::from_slice(&out.stdout).expect("stdout is JSON");
-    // Still not detected as a rename/move -- this fix does not claim to
-    // fix that (guacamole's own defect is a separate, unauthorized-here
-    // class). `oldName` genuinely resolves to OptionNotFound at head,
-    // same as before this fix -- the point is this stays UNCHANGED
-    // behavior, not a new capability.
-    assert_eq!(v["targets"][0]["diff"]["head"]["verdict"]["verdict"], "OptionNotFound");
+    // S5-F3: now genuinely, intentionally detected as a relocation, not
+    // an ordinary OptionNotFound -- `oldName`'s own real
+    // `mkRenamedOptionModule` edge is found, its `to_path` matches this
+    // target's complete watched identity exactly, and (since `newName`
+    // is declared in the SAME file, in this synthetic fixture)
+    // `destination_confirmed` is `true`.
+    let head_verdict = &v["targets"][0]["diff"]["head"]["verdict"];
+    assert_eq!(head_verdict["verdict"], "OptionRelocated");
+    assert_eq!(head_verdict["to"], serde_json::json!(["services", "widget", "newName"]));
+    assert_eq!(head_verdict["destination_confirmed"], true);
+    assert_eq!(head_verdict["helper_form"], "mkRenamedOptionModule");
 
     let _ = std::fs::remove_dir_all(&base_dir);
     let _ = std::fs::remove_dir_all(&head_dir);
