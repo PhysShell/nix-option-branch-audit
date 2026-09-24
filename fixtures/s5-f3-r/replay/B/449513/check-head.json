@@ -1,0 +1,804 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "449513",
+      "module": "nixos/modules/services/admin/pgadmin.nix",
+      "test": "nixos/tests/pgadmin4.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "pgadmin"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 66,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "5050",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 68,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "initialEmail"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 76,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "initialPasswordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 81,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "minimumPasswordLength"
+          ],
+          "default_source": "6",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 90,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 97,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "address"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 98,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "port"
+          ],
+          "default_source": "25",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 103,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "useSSL"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 108,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "useTLS"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 109,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "username"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 110,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "sender"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 115,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "emailServer",
+            "passwordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 122,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 131,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 133,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 143,
+            "col": 12
+          },
+          "source": "lib.mkIf (cfg.enable) {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 144,
+            "col": 43
+          },
+          "source": "lib.mkIf (cfg.openFirewall) [ cfg.port ]"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 152,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs cfg.openFirewall {"
+        },
+        {
+          "path": [
+            "emailServer",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 155,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs cfg.emailServer.enable {"
+        },
+        {
+          "path": [
+            "emailServer",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 216,
+            "col": 12
+          },
+          "source": "lib.optional cfg.emailServer.enable \"email_password:${cfg.emailServer.passwordFile}\""
+        },
+        {
+          "path": [
+            "emailServer",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 256,
+            "col": 9
+          },
+          "source": "lib.optionalString cfg.emailServer.enable ''"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 143,
+            "col": 12
+          },
+          "source": "lib.mkIf (cfg.enable) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 144,
+            "col": 43
+          },
+          "source": "lib.mkIf (cfg.openFirewall) [ cfg.port ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 152,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs cfg.openFirewall {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "emailServer",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "emailServer",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 155,
+            "col": 9
+          },
+          "source": "lib.optionalAttrs cfg.emailServer.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "emailServer",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "emailServer",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 216,
+            "col": 12
+          },
+          "source": "lib.optional cfg.emailServer.enable \"email_password:${cfg.emailServer.passwordFile}\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "emailServer",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "emailServer",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 256,
+            "col": 9
+          },
+          "source": "lib.optionalString cfg.emailServer.enable ''"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 35,
+            "col": 5
+          },
+          "source": "if builtins.isString value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 37,
+            "col": 10
+          },
+          "source": "if value ? _expr then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 39,
+            "col": 10
+          },
+          "source": "if builtins.isInt value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 41,
+            "col": 10
+          },
+          "source": "if builtins.isBool value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 42,
+            "col": 8
+          },
+          "source": "if value then \"True\" else \"False\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 43,
+            "col": 10
+          },
+          "source": "if builtins.isAttrs value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/admin/pgadmin.nix",
+            "line": 45,
+            "col": 10
+          },
+          "source": "if builtins.isList value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": "machine",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/pgadmin4.nix",
+            "line": 15,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pgadmin4.nix",
+            "line": 17,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pgadmin",
+            "initialPasswordFile"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pgadmin4.nix",
+            "line": 34,
+            "col": 11
+          }
+        },
+        {
+          "path": [],
+          "instance": "machine2",
+          "reason": "imports present -- config for this scope may live in an unread file",
+          "span": {
+            "file": "nixos/tests/pgadmin4.nix",
+            "line": 41,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "services",
+            "pgadmin",
+            "initialPasswordFile"
+          ],
+          "instance": "machine2",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/pgadmin4.nix",
+            "line": 50,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "emailServer.enable",
+          "predicate": {
+            "path": [
+              "emailServer",
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "optionalAttrs"
+            },
+            "span": {
+              "file": "nixos/modules/services/admin/pgadmin.nix",
+              "line": 155,
+              "col": 9
+            },
+            "source": "lib.optionalAttrs cfg.emailServer.enable {"
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "emailServer",
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "optionalAttrs"
+                },
+                "span": {
+                  "file": "nixos/modules/services/admin/pgadmin.nix",
+                  "line": 155,
+                  "col": 9
+                },
+                "source": "lib.optionalAttrs cfg.emailServer.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "emailServer",
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "emailServer",
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/admin/pgadmin.nix",
+                  "line": 155,
+                  "col": 9
+                },
+                "source": "lib.optionalAttrs cfg.emailServer.enable {"
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "emailServer",
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "emailServer",
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/admin/pgadmin.nix",
+                  "line": 216,
+                  "col": 12
+                },
+                "source": "lib.optional cfg.emailServer.enable \"email_password:${cfg.emailServer.passwordFile}\""
+              },
+              "witnessed": false
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "emailServer",
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "emailServer",
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/admin/pgadmin.nix",
+                  "line": 256,
+                  "col": 9
+                },
+                "source": "lib.optionalString cfg.emailServer.enable ''"
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

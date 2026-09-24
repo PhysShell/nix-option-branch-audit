@@ -1,0 +1,42 @@
+[
+  {
+    "pr": 510900,
+    "cohort": "A",
+    "baseline": "f2-r",
+    "verdict_delta": true,
+    "classification": "B_additional_sound_relocation_correction",
+    "mechanism": "A different, real sshd PR (not #509507, the banner-removal control) -- `services.openssh.moduliFile` -> `services.openssh.settings.ModuliFile`. Verified directly against the real, live-fetched head source: `lib.mkRenamedOptionModule [ \"services\" \"openssh\" \"moduliFile\" ] [ \"services\" \"openssh\" \"settings\" \"ModuliFile\" ]` at sshd.nix:235, and a real `ModuliFile = lib.mkOption {...};` declaration at sshd.nix:736, in the SAME file. `destination_confirmed = true` -- the only case in the whole frozen corpus where cross-file-capable destination search actually succeeds within the replay's own sparse root (because source and destination happen to share one file here). F2-R's own baseline showed plain OptionNotFound for this target; F3-R correctly, soundly reclassifies it as OptionRelocated with a CONFIRMED destination."
+  },
+  {
+    "pr": 462487,
+    "cohort": "B",
+    "baseline": "f2-r",
+    "verdict_delta": true,
+    "classification": "A_expected_guacamole_correction",
+    "mechanism": "The decisive, primary anchor. Re-confirmed from the frozen live replay itself: head's watched `services.guacamole-server.logbackXml` transitions F2-R-baseline OptionNotFound -> F3-R-candidate OptionRelocated, evidence path `to=[services,guacamole-client,logbackXml]`, `helper_form=mkRenamedOptionModule`, `migration_source_file=nixos/modules/services/web-apps/guacamole-server.nix`, `migration_span.line=12` -- all independently re-verified against the real, live-fetched source at the frozen head SHA. `audit-diff`'s own structured output (`oba_verdict_transitions: {\"oba001->option_relocated\": 1}`, `notable[0].code: \"OBA-RELOCATED\"`) is machine-distinguishable from plain OptionNotFound without parsing prose, satisfying the mandate's own item 7."
+  },
+  {
+    "pr": 410856,
+    "cohort": "B",
+    "baseline": "f2-r",
+    "verdict_delta": true,
+    "classification": "B_additional_sound_relocation_correction",
+    "mechanism": "vmalert's real multi-instance refactor: `services.vmalert.enable` -> `services.vmalert.instances.\"\".enable` (the empty string is a real, literal Nix list element denoting the convention's own 'default instance' placeholder -- not a wildcard, a genuine literal path segment). Verified directly against the real, live-fetched head source: `lib.mkRenamedOptionModule [ \"services\" \"vmalert\" \"enable\" ] [ \"services\" \"vmalert\" \"instances\" \"\" \"enable\" ]` at vmalert.nix:42. F2-R's own baseline showed base=PASS (the real, old-style flat `enable` had a real, witnessed test transition), head=OptionNotFound; F3-R correctly, soundly reclassifies head as OptionRelocated. `destination_confirmed = false`: `locate_migration_destination`'s own parent/leaf split computes `parent=[services,vmalert,instances,\"\"]`, which is not itself a literal `mkOption`-declared true-root (the real declaration lives inside an `attrsOf(submodule)` instance, addressed at runtime by an arbitrary instance key, not by a literal source-level attrpath matching that exact parent) -- an honest, safe `false`, not a bug; the SAME underlying `scan_options`-reuse boundary already disclosed in `fixtures/s5-f3/investigation.md`."
+  },
+  {
+    "pr": 490920,
+    "cohort": "B",
+    "baseline": "f2-r",
+    "verdict_delta": true,
+    "classification": "B_additional_sound_relocation_correction",
+    "mechanism": "traefik's own PRE-EXISTING rename (already present at BASE, unrelated to this specific PR's own changes, which instead re-introduce a direct `staticConfigFile` declaration at HEAD): `services.traefik.staticConfigFile` -> `services.traefik.static.file`. Verified directly against the real, live-fetched BASE source: `mkRenamedOptionModule [ \"services\" \"traefik\" \"staticConfigFile\" ] [ \"services\" \"traefik\" \"static\" \"file\" ]`, and a real `static.file = mkOption {...};` declaration, SAME file, confirmed present. F2-R's own baseline showed base=OptionNotFound (the generic, uninformative verdict); F3-R correctly, soundly reclassifies BASE as OptionRelocated -- this is the one case in the 5 that changes the BASE side rather than HEAD (F3's own gate-1 fix applies uniformly to whichever side `run_target` is called against, per `analyze()`'s own per-root loop; this is expected, not a bug). `destination_confirmed = false`: the real `static.file` declaration is NESTED two levels inside the top-level `options.services.traefik = {...}` flat-dotted block (`static = { file = mkOption{...}; }`), not itself a separate true-root at the exact `[services,traefik,static]` prefix `locate_migration_destination`'s own naive parent/leaf split computes -- the same disclosed `scan_options`-reuse boundary as vmalert above, a different concrete manifestation of it."
+  },
+  {
+    "pr": 392716,
+    "cohort": "B",
+    "baseline": "f2-r",
+    "verdict_delta": true,
+    "classification": "B_additional_sound_relocation_correction",
+    "mechanism": "cyrus-imap's own real rename: `services.cyrus-imap.sslServerCert` -> `services.cyrus-imap.imapdSettings.tls_server_cert`. Verified directly against the real, live-fetched head source: `lib.mkRenamedOptionModule [ \"services\" \"cyrus-imap\" \"sslServerCert\" ] [ \"services\" \"cyrus-imap\" \"imapdSettings\" \"tls_server_cert\" ]` at cyrus-imap.nix:76-78. F2-R's own baseline showed base=PredicateNotFound, head=OptionNotFound; F3-R correctly, soundly reclassifies head as OptionRelocated. `destination_confirmed = false`: `imapdSettings` is a freeform-typed submodule (an arbitrary key-value settings map, not a fixed schema) -- `tls_server_cert` genuinely has no literal `mkOption` declaration anywhere to find; a correct, no-caveat `false` (there is nothing to confirm, not merely something this tool failed to look hard enough for)."
+  }
+]

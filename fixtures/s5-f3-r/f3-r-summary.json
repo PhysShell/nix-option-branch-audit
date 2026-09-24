@@ -1,0 +1,150 @@
+{
+  "round": "S5-F3-R",
+  "purpose": "frozen full-corpus acceptance replay of implementation candidate 05d4a90 (S5-F3's option rename/relocation classification)",
+  "baseline_for_regression_comparison": {"round": "S5-F2-R", "commit": "c647d1b33fc1e328cd5f75037770e404a40edcf8", "verdict": "PASS", "replay_dir": "fixtures/s5-f2-r/replay"},
+  "acceptance_candidate": {
+    "commit": "05d4a900f9f10cebfa42981eea1c88d554946dbb",
+    "commit_short": "05d4a90",
+    "note_this_is_the_implementation_commit_not_the_docs_commit": "54fa3a8c0e011ca39f85dd7beeb7405e15983aad (S5-F3 investigation/report) was NOT used to build the candidate -- verified `git diff 05d4a90 54fa3a8 -- src/` is empty.",
+    "binary_sha256": "30dc21d1b229e08c438e9d2d24e43fa26160b7675c146e75f70e4f333f140558",
+    "rustc_version": "rustc 1.100.0-nightly (8925ea358 2026-08-20), toolchain nightly-2026-08-21-x86_64-unknown-linux-gnu",
+    "note": "built from a genuinely clean checkout (/home/tandem/f3r-clean-checkout), git status --short empty, HEAD verified == 05d4a90, no cp-based restoration used anywhere in this round"
+  },
+  "coverage": {
+    "total_frozen_prs": 369,
+    "non_applicable": 189,
+    "applicable": 180,
+    "applicable_re_derived_independently_from_ledger": true,
+    "applicable_set_identical_to_f2_r_manifest": true,
+    "applicable_evaluated": 180,
+    "window_evaluation_incomplete": 0,
+    "fetch_failures": 0
+  },
+  "comparison_vs_f2_r_baseline": {
+    "identical": 175,
+    "changed": 5,
+    "changed_prs": [392716, 410856, 462487, 490920, 510900],
+    "note": "Independently re-run by the reviewing session itself against the already-written replay artifacts -- byte-identical to the executing fork's own claim, both times (determinism check)."
+  },
+  "discovery_invariance_check": {
+    "total_checked": 360,
+    "discovery_identical": 360,
+    "discovery_changed_count": 0,
+    "note": "F3 never touches scan_options -- discovered_options provably untouched everywhere, exactly as F2-R's own equivalent check found."
+  },
+  "delta_classification_counts": {
+    "A_expected_guacamole_correction": 1,
+    "B_additional_sound_relocation_correction": 4
+  },
+  "migration_edge_manifest": {
+    "methodology": "for every one of the 180 applicable PRs' own targets, on both base and head sides, the real mkRenamedOptionModule/mkRenamedOptionModuleWith/mkRemovedOptionModule call sites scan_migrations itself would find, extracted via a throwaway diagnostic binary (clean 05d4a90 checkout + one strictly-additive, env-gated eprintln! reusing the real scan_migrations output verbatim -- never used to produce any of this round's actual replay/comparison/anchor results, which all come from the pure, unmodified candidate binary).",
+    "total_edges": 584,
+    "by_helper_form": {"mkRenamedOptionModule": 434, "mkRenamedOptionModuleWith": 0, "mkRemovedOptionModule": 150},
+    "by_kind": {"Renamed": 434, "Removed": 150},
+    "matches_watched_path_count": 16,
+    "ambiguity_count_greater_than_1": 0,
+    "note": "16 = 5 Renamed matches (all 5 became OptionRelocated) + 11 Removed matches (all 11 confirmed byte-identical to F2-R, see removed_edge_watched_matches below) -- a self-consistent cross-check, independently verified by the reviewing session."
+  },
+  "option_relocated_enumeration": {
+    "total": 5,
+    "prs": [392716, 410856, 462487, 490920, 510900],
+    "note": "The implementation intentionally supports a class broader than guacamole (mandate item 25) -- 4 additional real, sound relocations were caught corpus-wide, none assumed correct merely from sharing a helper name. Every one individually traced against real, live-fetched source by the reviewing session itself (not only the executing fork's own report) -- see classification-notes.json for each PR's own full causal trace.",
+    "per_pr": {
+      "462487": {"class": "A", "side": "head", "option": "services.guacamole-server.logbackXml", "to": "services.guacamole-client.logbackXml", "helper_form": "mkRenamedOptionModule", "destination_confirmed": false, "f2r_baseline_verdict": "OptionNotFound"},
+      "510900": {"class": "B", "side": "head", "option": "services.openssh.moduliFile", "to": "services.openssh.settings.ModuliFile", "helper_form": "mkRenamedOptionModule", "destination_confirmed": true, "f2r_baseline_verdict": "OptionNotFound"},
+      "410856": {"class": "B", "side": "head", "option": "services.vmalert.enable", "to": "services.vmalert.instances.\"\".enable", "helper_form": "mkRenamedOptionModule", "destination_confirmed": false, "f2r_baseline_verdict": "OptionNotFound (base was PASS)"},
+      "490920": {"class": "B", "side": "base", "option": "services.traefik.staticConfigFile", "to": "services.traefik.static.file", "helper_form": "mkRenamedOptionModule", "destination_confirmed": false, "f2r_baseline_verdict": "OptionNotFound"},
+      "392716": {"class": "B", "side": "head", "option": "services.cyrus-imap.sslServerCert", "to": "services.cyrus-imap.imapdSettings.tls_server_cert", "helper_form": "mkRenamedOptionModule", "destination_confirmed": false, "f2r_baseline_verdict": "OptionNotFound"}
+    }
+  },
+  "destination_confirmation_audit": {
+    "confirmed_true_count": 1,
+    "confirmed_true_prs": [510900],
+    "unconfirmed_false_count": 4,
+    "unconfirmed_false_prs": [392716, 410856, 462487, 490920],
+    "note": "Every unconfirmed case traced to a specific, honest, non-buggy reason: 462487 -- the frozen targets.toml never fetches the destination file into the replay root (a pre-existing replay-methodology sparseness, not an F3 defect -- see guacamole_destination_confirmation_finding below); 410856/490920 -- the real destination is nested inside a larger true-root block (an attrsOf-instance placeholder / a flat-dotted nested field respectively) that locate_migration_destination's own naive parent/leaf split cannot reach, a disclosed, pre-existing scan_options-reuse boundary; 392716 -- the destination is a freeform-typed settings field with no literal mkOption declaration anywhere, a correct, no-caveat false. No case anywhere claims destination_confirmed=true without a real, exact-path declaration actually found -- the truthfulness invariant holds in all 5 cases, including the 4 unconfirmed ones."
+  },
+  "guacamole_destination_confirmation_finding": {
+    "headline": "destination_confirmed = false for guacamole IN THIS FROZEN REPLAY, not true as the mandate's own item 6 literally expects -- disclosed prominently, not hidden.",
+    "root_cause": "The historical, frozen targets.toml for PR #462487 (predates cross-file destination confirmation as a concept) lists only guacamole-server.nix/its own test -- never guacamole-client.nix. run-replay.py's own pre-existing, unmodified fetch logic (paths_needed = {module, test}, established since S5-F1-R, reused verbatim this round per its own 'no implementation modifications' constraint) therefore never fetches the destination file into this PR's own replay root. Confirmed directly: fixtures/s5-f3-r/sources/B/462487/{base,head}/ contains only guacamole-server.nix.",
+    "is_this_a_false_claim": "No. locate_migration_destination never claims true when the file genuinely isn't present in the given root -- this is a truthful 'unconfirmed' state, explicitly sanctioned by the mandate's own item 16 ('F3 is allowed to represent an unconfirmed destination if the rename edge itself is proven').",
+    "is_this_an_f3_defect": "No -- it is a limitation of the REPLAY METHODOLOGY's own pre-existing, unmodified per-PR sparse-fetch convention, not of the migration-detection mechanism itself.",
+    "independent_proof_the_mechanism_works": [
+      "S5-F3's own committed real fixture (fixtures/synthetic/f3-guacamole-logbackxml-relocation/), built to deliberately include BOTH files, shows destination_confirmed=true for the exact same rename edge.",
+      "A dedicated hostile control (cross_file_destination_is_confirmed) proves the cross-file mechanism synthetically.",
+      "PR #510900 (sshd moduliFile) independently proves destination confirmation succeeds WITHIN this exact frozen replay's own sparse-root constraints, for a same-file case."
+    ],
+    "coordinator_recommendation": "Does not block PASS -- the relocation classification itself (from_path, to_path, helper_form, source span) is fully, correctly demonstrated for guacamole in this replay; only the separately-gated, honestly-false destination_confirmed sub-claim is affected, by a pre-existing harness constraint outside this round's own scope to fix. Flagged with full prominence for override if judged otherwise."
+  },
+  "ambiguous_rename_scan": {
+    "ambiguous_groups_total": 0,
+    "ambiguous_groups_affecting_watched_target": 0,
+    "ambiguous_rename_affecting_watched_target_not_observed": true
+  },
+  "dynamic_migration_call_scan": {
+    "raw_helper_occurrences_found_by_text_scan": 633,
+    "occurrences_without_a_corresponding_manifest_edge": 49,
+    "of_which_false_positives_of_the_text_scan_itself": "the majority -- `inherit (lib) ... mkRemovedOptionModule ...;` import-list lines, confirmed by checking the real call sites elsewhere in the same files DO have matching manifest edges",
+    "of_which_genuine_real_corpus_dynamic_path_cases_correctly_rejected": 3,
+    "genuine_cases": [
+      {"pr": 415326, "file": "wstunnel.nix", "shape": "lib.map (option: lib.mkRemovedOptionModule [ option ] \"...\") [...] -- option is a lambda-bound identifier"},
+      {"pr": 422094, "file": "syncthing.nix", "shape": "map (o: mkRenamedOptionModule [...o] [...o]) [...] -- o is a lambda-bound identifier"},
+      {"pr": 353770, "file": "syncthing.nix", "shape": "same map/lambda shape as 422094"},
+      {"pr": 374017, "file": "k3s/default.nix", "shape": "mkRemovedOptionModule ([...] ++ config) instruction -- a computed list via ++"}
+    ],
+    "note": "None of these 4 PRs produced any manifest edge, and none appear in the 5-PR changed list -- confirmed no guessed/computed path ever became OptionRelocated anywhere in the frozen corpus. Independently spot-verified by the reviewing session against the real source for all 4."
+  },
+  "hard_removal_controls": {
+    "sshd_509507": "byte-identical to F2-R baseline",
+    "gollum_466806": "byte-identical to F2-R baseline",
+    "corpus_wide_removed_edge_watched_matches": {
+      "total": 11,
+      "prs": [461261, 509507, 442520, 414502, 466806, 456989, 405186, 466004, 471312, 446598, 445176],
+      "all_identical_to_f2_r": true,
+      "note": "Beyond the two mandatory controls, 9 additional real watched targets across the frozen corpus have a matching Removed edge (including angrr #471312, already an F1D anchor) -- all 11 confirmed byte-identical, zero hard removals reclassified anywhere."
+    }
+  },
+  "plain_disappearance": {
+    "note": "203 of 208 F2-R OptionNotFound verdicts remain OptionNotFound under F3-R (208 - 5 reclassified = 203, confirmed via fatal-error-tabulation.json's own verdict-kind counts) -- F3 does not turn absence itself into migration evidence anywhere; only the 5 cases with a real, statically-proven, unambiguous Renamed edge change."
+  },
+  "cross_file_relocation": {
+    "count_in_this_replay_with_destination_in_a_different_file": 0,
+    "note": "Guacamole IS structurally a cross-file relocation (source in guacamole-server.nix, real destination in guacamole-client.nix), but the replay's own sparse root never contains the destination file, so 'destination confirmed cross-file' is not actually exercised as a SUCCESS anywhere within this specific frozen replay -- see guacamole_destination_confirmation_finding. The mechanism's own cross-file capability is proven via the committed implementation-round fixture and hostile control instead, both outside the scope of what a targets.toml-bounded replay root can exercise."
+  },
+  "mk_renamed_option_module_with_coverage": "mkRenamedOptionModuleWith_not_exercised_by_frozen_watched_targets -- 0 edges of this helper form anywhere in the frozen corpus (confirmed by the reviewing session directly from migration-edge-manifest.json). Support remains test-backed (S5-F3's own synthetic hostile control) rather than corpus-backed, exactly as the mandate itself anticipated as an acceptable outcome.",
+  "mandatory_anchors": {
+    "guacamole_462487": "correctly reclassified OptionRelocated with real, verified from_path/to_path/helper_form/span; destination_confirmed=false in this replay for the disclosed, non-defect reason above",
+    "angrr_471312": "byte-identical to F2-R baseline",
+    "seven_f1_regressions": {"431289": "byte-identical", "506644": "byte-identical", "508427": "byte-identical", "440660": "byte-identical", "428153": "byte-identical", "397967": "byte-identical", "427260": "byte-identical"},
+    "rspamd_484133": "byte-identical to F2-R baseline",
+    "tayga_432528": "byte-identical to F2-R baseline",
+    "k3s_374017": "byte-identical to F2-R baseline",
+    "cgit_475112": "byte-identical to F2-R baseline (PASS with real instance-key witness, unaffected)",
+    "kimai_wildcard": "unaffected -- unrelated to migration scanning entirely",
+    "eight_collision_prs": "same state as F2-R -- only the pre-existing wstunnel #415326 wildcard case remains, confirmed via a full-corpus rescan"
+  },
+  "f2_specific_open_caveats": {
+    "cross_instance_find_ordering": "untouched, unaffected by this round",
+    "listOf_instance_key_caveat": "untouched, unaffected by this round"
+  },
+  "other_disclosed_limitations": {
+    "angrr_imports_reachability_gap": "untouched, unaffected",
+    "frigate_nvidia_walk_merge_operands": "untouched, unaffected",
+    "flat_dotted_scanner_limitation": "untouched, unaffected -- directly RESPONSIBLE for 2 of this round's own destination_confirmed=false cases (vmalert, traefik), not fixed here, per this round's own explicit no-implementation-changes constraint",
+    "wstunnel_wildcard_collision": "untouched, unaffected"
+  },
+  "fatal_error_behavior": {
+    "baseline_verdict_kind_counts": {"OptionNotFound": 208, "PredicateNotFound": 108, "TestConfigUnresolved": 21, "PASS": 8, "OBA001": 16, "TestValueUnresolved": 2, "DefaultUnresolved": 1},
+    "candidate_verdict_kind_counts": {"OptionNotFound": 203, "PredicateNotFound": 108, "TestConfigUnresolved": 21, "OptionRelocated": 5, "PASS": 8, "OBA001": 16, "TestValueUnresolved": 2, "DefaultUnresolved": 1},
+    "verdict_kinds_only_in_candidate": {"OptionRelocated": 5},
+    "note": "the only change anywhere is exactly the 5 reclassifications (OptionNotFound 208->203, new OptionRelocated:5) -- fully self-consistent, no other class appears on only one side, 0 parse errors both sides"
+  },
+  "reproducibility": {
+    "applicable_manifest_independently_re_derived_from_ledger_and_confirmed_byte_identical_to_f2_r_manifest": true,
+    "compare_replay_rerun_independently_by_the_coordinator_byte_identical": true,
+    "leaf_collision_scan_rerun_independently_by_the_coordinator_byte_identical": true,
+    "note": "both re-runs performed independently by the reviewing session itself against the already-written replay artifacts, byte-identical output both times"
+  },
+  "final_verdict": "PASS",
+  "scope_note": "This PASS establishes that 05d4a90 satisfies the frozen S5 corpus for direct, statically literal, unambiguous option-rename/relocation semantics, correctly classifying guacamole plus 4 additional, individually-verified-sound real corpus cases, with zero unsound relocations, zero ambiguous winners, zero guessed dynamic paths, and zero hard-removal regressions anywhere in 180 applicable PRs. It does NOT establish: transitive rename-chain support; general Nix module evaluation; correctness for mkChangedOptionModule or mkMergedOptionModule; wildcard collision resolution; imports traversal; cross-instance witness ambiguity resolution; or that cross-file destination confirmation succeeds under the replay harness's own sparse, targets.toml-scoped root (proven sound only via the implementation-round fixture/hostile control, and via one same-file corpus case, PR #510900)."
+}

@@ -1,0 +1,752 @@
+{
+  "angrr_471312": {
+    "pr": 471312,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_431289": {
+    "pr": 431289,
+    "cohort": "A",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_506644": {
+    "pr": 506644,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_508427": {
+    "pr": 508427,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_440660": {
+    "pr": 440660,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_428153": {
+    "pr": 428153,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_397967": {
+    "pr": 397967,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "f1_regression_427260": {
+    "pr": 427260,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "rspamd_484133": {
+    "pr": 484133,
+    "cohort": "A",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "tayga_432528": {
+    "pr": 432528,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "k3s_374017": {
+    "pr": 374017,
+    "cohort": "A",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  },
+  "guacamole_462487": {
+    "pr": 462487,
+    "cohort": "B",
+    "raw.json": {
+      "identical": false,
+      "baseline": {
+        "schema_version": 1,
+        "tool": {
+          "name": "oba",
+          "version": "0.4.5"
+        },
+        "mode": "audit-diff",
+        "summary": {
+          "unchanged": 0,
+          "added": 0,
+          "removed": 0,
+          "changed": 1,
+          "cdc_added_subject": 0,
+          "cdc_removed_subject": 0,
+          "oba_verdict_transitions": {
+            "oba001->option_not_found": 1
+          },
+          "cdc_verdict_transitions": {},
+          "new_findings": 0,
+          "resolved_findings": 0,
+          "finding_became_inconclusive": 1,
+          "new_inconclusives": 0,
+          "resolved_inconclusives": 0,
+          "removed_subjects_with_finding": 0,
+          "evidence_changed": 0,
+          "notable_total": 1,
+          "notable": [
+            {
+              "bucket": "finding_became_inconclusive",
+              "engine": "oba",
+              "subject": "logbackXml",
+              "message": "no mkOption declaration found for this watched option",
+              "detail": "declaration: not found",
+              "transition_origin": "verdict_changed"
+            }
+          ]
+        },
+        "oba": [
+          {
+            "identity": {
+              "module": "nixos/modules/services/web-apps/guacamole-server.nix",
+              "test": "nixos/tests/guacamole-server.nix",
+              "cfg_ident": "cfg",
+              "option_prefix": [
+                "services",
+                "guacamole-server"
+              ],
+              "watched_path": "logbackXml"
+            },
+            "diff": {
+              "kind": "changed",
+              "base": {
+                "verdict": {
+                  "verdict": "OBA001",
+                  "option": "logbackXml",
+                  "predicate": {
+                    "ir": {
+                      "Not": {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "logbackXml"
+                            ]
+                          },
+                          {
+                            "Literal": "Null"
+                          }
+                        ]
+                      }
+                    },
+                    "refs": [
+                      [
+                        "logbackXml"
+                      ]
+                    ],
+                    "span": {
+                      "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                      "line": 65,
+                      "col": 47
+                    },
+                    "source": "lib.mkIf (cfg.logbackXml != null) {"
+                  },
+                  "default_outcome": false,
+                  "predicate_attempts": [
+                    {
+                      "predicate": {
+                        "ir": {
+                          "Not": {
+                            "Eq": [
+                              {
+                                "Ref": [
+                                  "logbackXml"
+                                ]
+                              },
+                              {
+                                "Literal": "Null"
+                              }
+                            ]
+                          }
+                        },
+                        "refs": [
+                          [
+                            "logbackXml"
+                          ]
+                        ],
+                        "span": {
+                          "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                          "line": 65,
+                          "col": 47
+                        },
+                        "source": "lib.mkIf (cfg.logbackXml != null) {"
+                      },
+                      "witnessed": false
+                    }
+                  ]
+                }
+              },
+              "head": {
+                "verdict": {
+                  "verdict": "OptionNotFound",
+                  "option": "logbackXml"
+                }
+              },
+              "changes": [
+                "verdict_changed"
+              ]
+            }
+          }
+        ],
+        "cdc": []
+      },
+      "candidate": {
+        "schema_version": 1,
+        "tool": {
+          "name": "oba",
+          "version": "0.4.5"
+        },
+        "mode": "audit-diff",
+        "summary": {
+          "unchanged": 0,
+          "added": 0,
+          "removed": 0,
+          "changed": 1,
+          "cdc_added_subject": 0,
+          "cdc_removed_subject": 0,
+          "oba_verdict_transitions": {
+            "oba001->option_relocated": 1
+          },
+          "cdc_verdict_transitions": {},
+          "new_findings": 0,
+          "resolved_findings": 0,
+          "finding_became_inconclusive": 1,
+          "new_inconclusives": 0,
+          "resolved_inconclusives": 0,
+          "removed_subjects_with_finding": 0,
+          "evidence_changed": 0,
+          "notable_total": 1,
+          "notable": [
+            {
+              "bucket": "finding_became_inconclusive",
+              "engine": "oba",
+              "subject": "logbackXml",
+              "code": "OBA-RELOCATED",
+              "message": "the watched option's own declaration was renamed/relocated, not merely absent: logbackXml -> services.guacamole-client.logbackXml",
+              "detail": "destination declaration: not independently confirmed",
+              "transition_origin": "verdict_changed"
+            }
+          ]
+        },
+        "oba": [
+          {
+            "identity": {
+              "module": "nixos/modules/services/web-apps/guacamole-server.nix",
+              "test": "nixos/tests/guacamole-server.nix",
+              "cfg_ident": "cfg",
+              "option_prefix": [
+                "services",
+                "guacamole-server"
+              ],
+              "watched_path": "logbackXml"
+            },
+            "diff": {
+              "kind": "changed",
+              "base": {
+                "verdict": {
+                  "verdict": "OBA001",
+                  "option": "logbackXml",
+                  "predicate": {
+                    "ir": {
+                      "Not": {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "logbackXml"
+                            ]
+                          },
+                          {
+                            "Literal": "Null"
+                          }
+                        ]
+                      }
+                    },
+                    "refs": [
+                      [
+                        "logbackXml"
+                      ]
+                    ],
+                    "span": {
+                      "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                      "line": 65,
+                      "col": 47
+                    },
+                    "source": "lib.mkIf (cfg.logbackXml != null) {"
+                  },
+                  "default_outcome": false,
+                  "predicate_attempts": [
+                    {
+                      "predicate": {
+                        "ir": {
+                          "Not": {
+                            "Eq": [
+                              {
+                                "Ref": [
+                                  "logbackXml"
+                                ]
+                              },
+                              {
+                                "Literal": "Null"
+                              }
+                            ]
+                          }
+                        },
+                        "refs": [
+                          [
+                            "logbackXml"
+                          ]
+                        ],
+                        "span": {
+                          "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                          "line": 65,
+                          "col": 47
+                        },
+                        "source": "lib.mkIf (cfg.logbackXml != null) {"
+                      },
+                      "witnessed": false
+                    }
+                  ]
+                }
+              },
+              "head": {
+                "verdict": {
+                  "verdict": "OptionRelocated",
+                  "option": "logbackXml",
+                  "to": [
+                    "services",
+                    "guacamole-client",
+                    "logbackXml"
+                  ],
+                  "destination_confirmed": false,
+                  "migration_source_file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "migration_span": {
+                    "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                    "line": 12,
+                    "col": 6
+                  },
+                  "helper_form": "mkRenamedOptionModule"
+                }
+              },
+              "changes": [
+                "verdict_changed"
+              ]
+            }
+          }
+        ],
+        "cdc": []
+      }
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": false,
+      "baseline": {
+        "schema_version": 1,
+        "tool": {
+          "name": "oba",
+          "version": "0.4.5"
+        },
+        "mode": "check",
+        "summary": {
+          "pass": 0,
+          "finding": 0,
+          "inconclusive": 1,
+          "unavailable": 0
+        },
+        "targets": [
+          {
+            "name": "462487",
+            "module": "nixos/modules/services/web-apps/guacamole-server.nix",
+            "test": "nixos/tests/guacamole-server.nix",
+            "cfg_ident": "cfg",
+            "option_prefix": [
+              "services",
+              "guacamole-server"
+            ],
+            "parse_errors": [],
+            "discovered_options": [
+              {
+                "path": [
+                  "enable"
+                ],
+                "default_source": "false",
+                "default_class": {
+                  "Bool": false
+                },
+                "default_known_value": {
+                  "Exact": {
+                    "Bool": false
+                  }
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 23,
+                  "col": 7
+                }
+              },
+              {
+                "path": [
+                  "extraEnvironment"
+                ],
+                "default_source": "{ }",
+                "default_class": "DefinitelyNonNull",
+                "default_known_value": "DefinitelyNonNull",
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 26,
+                  "col": 7
+                }
+              },
+              {
+                "path": [
+                  "host"
+                ],
+                "default_source": "\"127.0.0.1\"",
+                "default_class": "DefinitelyNonNull",
+                "default_known_value": {
+                  "Exact": {
+                    "Str": "127.0.0.1"
+                  }
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 37,
+                  "col": 7
+                }
+              },
+              {
+                "path": [
+                  "port"
+                ],
+                "default_source": "4822",
+                "default_class": "DefinitelyNonNull",
+                "default_known_value": "DefinitelyNonNull",
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 45,
+                  "col": 7
+                }
+              }
+            ],
+            "discovered_predicates": [
+              {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 55,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              }
+            ],
+            "resolved_predicates": [
+              {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 55,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              }
+            ],
+            "unresolved_predicate_sites": [],
+            "matched_test_assignments": [],
+            "test_config_opacity": [],
+            "verdicts": [
+              {
+                "verdict": "OptionNotFound",
+                "option": "logbackXml"
+              }
+            ]
+          }
+        ],
+        "unavailable_targets": []
+      },
+      "candidate": {
+        "schema_version": 1,
+        "tool": {
+          "name": "oba",
+          "version": "0.4.5"
+        },
+        "mode": "check",
+        "summary": {
+          "pass": 0,
+          "finding": 0,
+          "inconclusive": 1,
+          "unavailable": 0
+        },
+        "targets": [
+          {
+            "name": "462487",
+            "module": "nixos/modules/services/web-apps/guacamole-server.nix",
+            "test": "nixos/tests/guacamole-server.nix",
+            "cfg_ident": "cfg",
+            "option_prefix": [
+              "services",
+              "guacamole-server"
+            ],
+            "parse_errors": [],
+            "discovered_options": [
+              {
+                "path": [
+                  "enable"
+                ],
+                "default_source": "false",
+                "default_class": {
+                  "Bool": false
+                },
+                "default_known_value": {
+                  "Exact": {
+                    "Bool": false
+                  }
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 23,
+                  "col": 7
+                }
+              },
+              {
+                "path": [
+                  "extraEnvironment"
+                ],
+                "default_source": "{ }",
+                "default_class": "DefinitelyNonNull",
+                "default_known_value": "DefinitelyNonNull",
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 26,
+                  "col": 7
+                }
+              },
+              {
+                "path": [
+                  "host"
+                ],
+                "default_source": "\"127.0.0.1\"",
+                "default_class": "DefinitelyNonNull",
+                "default_known_value": {
+                  "Exact": {
+                    "Str": "127.0.0.1"
+                  }
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 37,
+                  "col": 7
+                }
+              },
+              {
+                "path": [
+                  "port"
+                ],
+                "default_source": "4822",
+                "default_class": "DefinitelyNonNull",
+                "default_known_value": "DefinitelyNonNull",
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 45,
+                  "col": 7
+                }
+              }
+            ],
+            "discovered_predicates": [
+              {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 55,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              }
+            ],
+            "resolved_predicates": [
+              {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 55,
+                  "col": 12
+                },
+                "source": "lib.mkIf cfg.enable {"
+              }
+            ],
+            "unresolved_predicate_sites": [],
+            "matched_test_assignments": [],
+            "test_config_opacity": [],
+            "verdicts": [
+              {
+                "verdict": "OptionRelocated",
+                "option": "logbackXml",
+                "to": [
+                  "services",
+                  "guacamole-client",
+                  "logbackXml"
+                ],
+                "destination_confirmed": false,
+                "migration_source_file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                "migration_span": {
+                  "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+                  "line": 12,
+                  "col": 6
+                },
+                "helper_form": "mkRenamedOptionModule"
+              }
+            ]
+          }
+        ],
+        "unavailable_targets": []
+      }
+    }
+  },
+  "cgit_475112": {
+    "pr": 475112,
+    "cohort": "B",
+    "raw.json": {
+      "identical": true
+    },
+    "check-base.json": {
+      "identical": true
+    },
+    "check-head.json": {
+      "identical": true
+    }
+  }
+}

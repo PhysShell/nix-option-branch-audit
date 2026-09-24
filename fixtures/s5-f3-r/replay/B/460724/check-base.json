@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "460724",
+      "module": "nixos/modules/services/backup/btrbk.nix",
+      "test": "nixos/tests/btrbk.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "btrbk",
+        "sshAccess"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "extraPackages"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 147,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "niceness"
+          ],
+          "default_source": "10",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 160,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "ioSchedulingClass"
+          ],
+          "default_source": "\"best-effort\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "best-effort"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 165,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "instances"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 174,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "instances",
+            "onCalendar"
+          ],
+          "default_source": "\"daily\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "daily"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 180,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "instances",
+            "snapshotOnly"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 188,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "instances",
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 199,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "instances",
+            "settings",
+            "stream_compress"
+          ],
+          "default_source": "\"no\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "no"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 209,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "services",
+            "btrbk",
+            "sshAccess"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 252,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "key"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 258,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "roles"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 262,
+            "col": 15
+          }
+        }
+      ],
+      "discovered_predicates": [],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 38,
+            "col": 5
+          },
+          "source": "if !isAttrs value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 61,
+            "col": 5
+          },
+          "source": "if !isAttrs value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 98,
+            "col": 5
+          },
+          "source": "if config.security.sudo.enable || config.security.sudo-rs.enable then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 100,
+            "col": 10
+          },
+          "source": "if config.security.doas.enable then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 286,
+            "col": 12
+          },
+          "source": "mkIf (sshEnabled || serviceEnabled) {",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "sshAccess"
+            ],
+            [
+              "instances"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 290,
+            "col": 32
+          },
+          "source": "mkIf (sudo_doas == \"sudo\") [ sudoRule ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 291,
+            "col": 35
+          },
+          "source": "mkIf (sudo_doas == \"sudo\") [ sudoRule ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 293,
+            "col": 21
+          },
+          "source": "mkIf (sudo_doas == \"doas\") {",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 338,
+            "col": 11
+          },
+          "source": "optionalString (cfg.niceness >= 1) \"${pkgs.coreutils}/bin/nice -n ${toString cfg.niceness}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "niceness"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 361,
+            "col": 12
+          },
+          "source": "optional (instance.settings.stream_compress != \"no\") (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/backup/btrbk.nix",
+            "line": 369,
+            "col": 13
+          },
+          "source": "if instance.snapshotOnly then \"snapshot\" else \"run\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "archive",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/btrbk.nix",
+            "line": 27,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "etc",
+            "btrbk_key",
+            "text"
+          ],
+          "instance": "archive",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/btrbk.nix",
+            "line": 30,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "main",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/btrbk.nix",
+            "line": 55,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "extraArgs"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,1586 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "458481",
+      "module": "nixos/modules/services/web-apps/writefreely.nix",
+      "test": "nixos/tests/web-apps/writefreely.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "writefreely"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 163,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "stateDir"
+          ],
+          "default_source": "\"/var/lib/writefreely\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/writefreely"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 167,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"writefreely\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "writefreely"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 173,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"writefreely\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "writefreely"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 179,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "host"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 185,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 192,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "app",
+            "theme"
+          ],
+          "default_source": "\"write\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "write"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 205,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "server",
+            "port"
+          ],
+          "default_source": "if cfg.nginx.enable then 18080 else 80",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 213,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "database",
+            "type"
+          ],
+          "default_source": "\"sqlite3\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "sqlite3"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 225,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"writefreely\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "writefreely"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 234,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "if cfg.database.type == \"mysql\" then \"writefreely\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 240,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 247,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 253,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "3306",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 259,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "tls"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 265,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "migrate"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 271,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 277,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "admin",
+            "name"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 288,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "admin",
+            "initialPasswordFile"
+          ],
+          "default_source": "pkgs.writeText \"default-admin-pass\" \"nixos\"",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 294,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "email",
+            "smtpPasswordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 306,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 314,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "nginx",
+            "forceSSL"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 320,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "acme",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 328,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "acme",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 42,
+            "col": 18
+          },
+          "source": "if cfg.acme.enable then \"https\" else \"http\""
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 215,
+            "col": 25
+          },
+          "source": "if cfg.nginx.enable then 18080 else 80"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 336,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "database",
+            "migrate"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 417,
+            "col": 29
+          },
+          "source": "optionalString cfg.database.migrate ''"
+        },
+        {
+          "path": [
+            "database",
+            "migrate"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 464,
+            "col": 29
+          },
+          "source": "optionalString cfg.database.migrate ''"
+        },
+        {
+          "path": [
+            "nginx",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 506,
+            "col": 22
+          },
+          "source": "lib.mkIf cfg.nginx.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "acme",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "acme",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 42,
+            "col": 18
+          },
+          "source": "if cfg.acme.enable then \"https\" else \"http\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "sqlite3"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 50,
+            "col": 7
+          },
+          "source": "if cfg.database.type == \"sqlite3\" then"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 110,
+            "col": 7
+          },
+          "source": "optionalString (cfg.database.passwordFile != null) \"$(head -n1 ${cfg.database.passwordFile})\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "email",
+                    "smtpPasswordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "email",
+              "smtpPasswordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 113,
+            "col": 7
+          },
+          "source": "optionalString ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "nginx",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nginx",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 215,
+            "col": 25
+          },
+          "source": "if cfg.nginx.enable then 18080 else 80"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 242,
+            "col": 19
+          },
+          "source": "if cfg.database.type == \"mysql\" then \"writefreely\" else null"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 336,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "writefreely"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 353,
+            "col": 15
+          },
+          "source": "optionalAttrs (cfg.user == \"writefreely\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "writefreely"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 361,
+            "col": 16
+          },
+          "source": "optionalAttrs (cfg.group == \"writefreely\") { writefreely = { }; }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "sqlite3"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 373,
+            "col": 10
+          },
+          "source": "optional isSqlite \"writefreely-sqlite-init.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 374,
+            "col": 10
+          },
+          "source": "optional isMysql \"writefreely-mysql-init.service\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "mysql"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 375,
+            "col": 10
+          },
+          "source": "optional isMysqlLocal \"mysql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "sqlite3"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 404,
+            "col": 48
+          },
+          "source": "mkIf isSqlite {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "admin",
+                    "initialPasswordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "admin",
+              "initialPasswordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 412,
+            "col": 25
+          },
+          "source": "optional (cfg.admin.initialPasswordFile != null) cfg.admin.initialPasswordFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "migrate"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "migrate"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 417,
+            "col": 29
+          },
+          "source": "optionalString cfg.database.migrate ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "admin",
+                    "name"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "admin",
+              "name"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 421,
+            "col": 25
+          },
+          "source": "optionalString (cfg.admin.name != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 440,
+            "col": 47
+          },
+          "source": "mkIf isMysql {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "mysql"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 442,
+            "col": 15
+          },
+          "source": "optional isMysqlLocal \"mysql.service\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "mysql"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 450,
+            "col": 11
+          },
+          "source": "optional isMysqlLocal cfg.database.passwordFile"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "admin",
+                    "initialPasswordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "admin",
+              "initialPasswordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 451,
+            "col": 14
+          },
+          "source": "optional (cfg.admin.initialPasswordFile != null) cfg.admin.initialPasswordFile"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "mysql"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 456,
+            "col": 24
+          },
+          "source": "optionalString isMysqlLocal ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "migrate"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "migrate"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 464,
+            "col": 29
+          },
+          "source": "optionalString cfg.database.migrate ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "admin",
+                    "name"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "admin",
+              "name"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 468,
+            "col": 25
+          },
+          "source": "optionalString (cfg.admin.name != null) ''"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "type"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "mysql"
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ],
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 488,
+            "col": 22
+          },
+          "source": "mkIf isMysqlLocal {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "nginx",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "nginx",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 506,
+            "col": 22
+          },
+          "source": "lib.mkIf cfg.nginx.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 29,
+            "col": 18
+          },
+          "source": "lib.optionalString (value != null) (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 30,
+            "col": 11
+          },
+          "source": "if builtins.isBool value then if value == true then \"true\" else \"false\" else toString value",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 30,
+            "col": 41
+          },
+          "source": "if value == true then \"true\" else \"false\"",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/writefreely.nix",
+            "line": 388,
+            "col": 31
+          },
+          "source": "optionalString (settings.server.port < 1024) \"cap_net_bind_service\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ],
+            [
+              "settings",
+              "app"
+            ],
+            [
+              "settings",
+              "app",
+              "host"
+            ],
+            [
+              "database",
+              "type"
+            ],
+            [
+              "settings",
+              "database",
+              "filename"
+            ],
+            [
+              "database",
+              "name"
+            ],
+            [
+              "database",
+              "user"
+            ],
+            [
+              "database",
+              "name"
+            ],
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "port"
+            ],
+            [
+              "database",
+              "tls"
+            ],
+            [
+              "settings",
+              "server"
+            ],
+            [
+              "settings",
+              "server",
+              "bind"
+            ],
+            [
+              "settings",
+              "server",
+              "gopher_port"
+            ],
+            [
+              "nginx",
+              "enable"
+            ],
+            [
+              "acme",
+              "enable"
+            ],
+            [
+              "settings",
+              "server",
+              "templates_parent_dir"
+            ],
+            [
+              "settings",
+              "server",
+              "static_parent_dir"
+            ],
+            [
+              "settings",
+              "server",
+              "pages_parent_dir"
+            ],
+            [
+              "settings",
+              "server",
+              "keys_parent_dir"
+            ],
+            [
+              "settings",
+              "email"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/web-apps/writefreely.nix",
+            "line": 39,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/web-apps/writefreely.nix",
+            "line": 43,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "TestConfigUnresolved",
+          "option": "email.smtpPasswordFile",
+          "predicate": {
+            "ir": {
+              "Not": {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "email",
+                      "smtpPasswordFile"
+                    ]
+                  },
+                  {
+                    "Literal": "Null"
+                  }
+                ]
+              }
+            },
+            "refs": [
+              [
+                "email",
+                "smtpPasswordFile"
+              ]
+            ],
+            "span": {
+              "file": "nixos/modules/services/web-apps/writefreely.nix",
+              "line": 113,
+              "col": 7
+            },
+            "source": "optionalString ("
+          },
+          "default_outcome": false,
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "ir": {
+                  "Not": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "email",
+                          "smtpPasswordFile"
+                        ]
+                      },
+                      {
+                        "Literal": "Null"
+                      }
+                    ]
+                  }
+                },
+                "refs": [
+                  [
+                    "email",
+                    "smtpPasswordFile"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/web-apps/writefreely.nix",
+                  "line": 113,
+                  "col": 7
+                },
+                "source": "optionalString ("
+              },
+              "witnessed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

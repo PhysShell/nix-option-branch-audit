@@ -1,0 +1,505 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "onlyoffice",
+      "module": "nixos/modules/services/web-apps/onlyoffice.nix",
+      "test": "nixos/tests/onlyoffice.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "onlyoffice"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 13,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableExampleServer"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 15,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "hostname"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 17,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "securityNonceFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 23,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "jwtSecretFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 42,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "port"
+          ],
+          "default_source": "8000",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 55,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "examplePort"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 61,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "postgresHost"
+          ],
+          "default_source": "\"/run/postgresql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/postgresql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 67,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "postgresName"
+          ],
+          "default_source": "\"onlyoffice\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "onlyoffice"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "postgresPasswordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 79,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "postgresUser"
+          ],
+          "default_source": "\"onlyoffice\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "onlyoffice"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 88,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "rabbitmqUrl"
+          ],
+          "default_source": "\"amqp://guest:guest@localhost:5672\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "amqp://guest:guest@localhost:5672"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 97,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "wopi"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 103,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "loglevel"
+          ],
+          "default_source": "\"WARN\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "WARN"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 105,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 112,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableExampleServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 127,
+            "col": 32
+          },
+          "source": "lib.mkIf cfg.enableExampleServer {"
+        },
+        {
+          "path": [
+            "enableExampleServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 216,
+            "col": 51
+          },
+          "source": "lib.mkIf cfg.enableExampleServer ''"
+        },
+        {
+          "path": [
+            "enableExampleServer"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 221,
+            "col": 39
+          },
+          "source": "lib.mkIf cfg.enableExampleServer ''"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 112,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableExampleServer"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableExampleServer"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 127,
+            "col": 32
+          },
+          "source": "lib.mkIf cfg.enableExampleServer {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableExampleServer"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableExampleServer"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 216,
+            "col": 51
+          },
+          "source": "lib.mkIf cfg.enableExampleServer ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableExampleServer"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableExampleServer"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 221,
+            "col": 39
+          },
+          "source": "lib.mkIf cfg.enableExampleServer ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "postgresPasswordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "postgresPasswordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 322,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.postgresPasswordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "jwtSecretFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "jwtSecretFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/onlyoffice.nix",
+            "line": 326,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.jwtSecretFile != null) ''"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "onlyoffice"
+          ],
+          "instance": "machine",
+          "reason": "inherit binding -- may pull in option-relevant values this walker can't trace",
+          "span": {
+            "file": "nixos/tests/onlyoffice.nix",
+            "line": 12,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "loglevel"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

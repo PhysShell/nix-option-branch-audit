@@ -1,0 +1,222 @@
+[
+  {
+    "pr": 461261,
+    "side": "head",
+    "target": "wakapi",
+    "from_path": [
+      "services",
+      "wakapi",
+      "passwordSalt"
+    ],
+    "option": "passwordSalt",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "passwordSalt"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "passwordSalt"
+    },
+    "identical": true
+  },
+  {
+    "pr": 509507,
+    "side": "head",
+    "target": "509507",
+    "from_path": [
+      "services",
+      "openssh",
+      "banner"
+    ],
+    "option": "banner",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "banner"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "banner"
+    },
+    "identical": true
+  },
+  {
+    "pr": 442520,
+    "side": "head",
+    "target": "442520",
+    "from_path": [
+      "services",
+      "chromadb",
+      "logFile"
+    ],
+    "option": "logFile",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "logFile"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "logFile"
+    },
+    "identical": true
+  },
+  {
+    "pr": 414502,
+    "side": "head",
+    "target": "414502",
+    "from_path": [
+      "services",
+      "mastodon",
+      "otpSecretFile"
+    ],
+    "option": "otpSecretFile",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "otpSecretFile"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "otpSecretFile"
+    },
+    "identical": true
+  },
+  {
+    "pr": 466806,
+    "side": "head",
+    "target": "466806",
+    "from_path": [
+      "services",
+      "gollum",
+      "local-time"
+    ],
+    "option": "local-time",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "local-time"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "local-time"
+    },
+    "identical": true
+  },
+  {
+    "pr": 456989,
+    "side": "head",
+    "target": "456989",
+    "from_path": [
+      "services",
+      "mpd",
+      "extraConfig"
+    ],
+    "option": "extraConfig",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "extraConfig"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "extraConfig"
+    },
+    "identical": true
+  },
+  {
+    "pr": 405186,
+    "side": "head",
+    "target": "405186",
+    "from_path": [
+      "services",
+      "postgresql",
+      "recoveryConfig"
+    ],
+    "option": "recoveryConfig",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "recoveryConfig"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "recoveryConfig"
+    },
+    "identical": true
+  },
+  {
+    "pr": 466004,
+    "side": "head",
+    "target": "466004",
+    "from_path": [
+      "services",
+      "ollama",
+      "acceleration"
+    ],
+    "option": "acceleration",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "acceleration"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "acceleration"
+    },
+    "identical": true
+  },
+  {
+    "pr": 471312,
+    "side": "head",
+    "target": "471312",
+    "from_path": [
+      "services",
+      "angrr",
+      "period"
+    ],
+    "option": "period",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "period"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "period"
+    },
+    "identical": true
+  },
+  {
+    "pr": 446598,
+    "side": "head",
+    "target": "446598",
+    "from_path": [
+      "services",
+      "mopidy",
+      "configuration"
+    ],
+    "option": "configuration",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "configuration"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "configuration"
+    },
+    "identical": true
+  },
+  {
+    "pr": 445176,
+    "side": "head",
+    "target": "445176",
+    "from_path": [
+      "services",
+      "n8n",
+      "settings"
+    ],
+    "option": "settings",
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "settings"
+    },
+    "f3r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "settings"
+    },
+    "identical": true
+  }
+]

@@ -1,0 +1,917 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "483748",
+      "module": "nixos/modules/services/web-servers/caddy/default.nix",
+      "test": "nixos/tests/caddy.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "caddy"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 85,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"caddy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "caddy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 87,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"caddy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "caddy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 101,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/caddy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/caddy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 117,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "logDir"
+          ],
+          "default_source": "\"/var/log/caddy\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/log/caddy"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 134,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "logFormat"
+          ],
+          "default_source": "''\n        level ERROR\n      ''",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "\n        level ERROR\n      "
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 148,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "configFile"
+          ],
+          "default_source": "configFile",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 163,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "adapter"
+          ],
+          "default_source": "if ((cfg.configFile != configFile) || (baseNameOf cfg.configFile) == \"Caddyfile\") then\n          \"caddyfile\"\n        else\n          null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 184,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "resume"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 214,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "globalConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 222,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 242,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "virtualHosts"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 258,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "acmeCA"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 277,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "email"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 298,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "enableReload"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 308,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 324,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 345,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 382,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "enableReload"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 419,
+            "col": 24
+          },
+          "source": "optional cfg.enableReload cfg.configFile"
+        },
+        {
+          "path": [
+            "resume"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 434,
+            "col": 60
+          },
+          "source": "optionalString cfg.resume \"--resume\""
+        },
+        {
+          "path": [
+            "enableReload"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 440,
+            "col": 14
+          },
+          "source": "lib.optional cfg.enableReload \"${lib.getExe cfg.package} reload ${runOptions} --force\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 382,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "email"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "email"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 400,
+            "col": 9
+          },
+          "source": "optionalString (cfg.email != null) \"email ${cfg.email}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "acmeCA"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "acmeCA"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 401,
+            "col": 9
+          },
+          "source": "optionalString (cfg.acmeCA != null) \"acme_ca ${cfg.acmeCA}\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableReload"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableReload"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 419,
+            "col": 24
+          },
+          "source": "optional cfg.enableReload cfg.configFile"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "enableReload"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "enableReload"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 420,
+            "col": 25
+          },
+          "source": "optional (!cfg.enableReload) cfg.configFile"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "adapter"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "adapter"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 425,
+            "col": 13
+          },
+          "source": "optionalString (cfg.adapter != null) \"--adapter ${cfg.adapter}\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "resume"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "resume"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 434,
+            "col": 60
+          },
+          "source": "optionalString cfg.resume \"--resume\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableReload"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableReload"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 440,
+            "col": 14
+          },
+          "source": "lib.optional cfg.enableReload \"${lib.getExe cfg.package} reload ${runOptions} --force\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "dataDir"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "/var/lib/caddy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "dataDir"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 444,
+            "col": 28
+          },
+          "source": "mkIf (cfg.dataDir == \"/var/lib/caddy\") [ \"caddy\" ]"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "logDir"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "/var/log/caddy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "logDir"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 445,
+            "col": 27
+          },
+          "source": "mkIf (cfg.logDir == \"/var/log/caddy\") [ \"caddy\" ]"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "environmentFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "environmentFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 449,
+            "col": 29
+          },
+          "source": "optional (cfg.environmentFile != null) cfg.environmentFile"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "caddy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 458,
+            "col": 19
+          },
+          "source": "optionalAttrs (cfg.user == \"caddy\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "caddy"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 466,
+            "col": 20
+          },
+          "source": "optionalAttrs (cfg.group == \"caddy\") {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 25,
+            "col": 11
+          },
+          "source": "optionalString (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 28,
+            "col": 11
+          },
+          "source": "optionalString (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 31,
+            "col": 11
+          },
+          "source": "optionalString (hostOpts.logFormat != null) ''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 44,
+            "col": 5
+          },
+          "source": "if cfg.settings != { } then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 63,
+            "col": 9
+          },
+          "source": "if pkgs.stdenv.buildPlatform == pkgs.stdenv.hostPlatform then Caddyfile-formatted else Caddyfile",
+          "failure": {
+            "UnsupportedScope": "with"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-servers/caddy/default.nix",
+            "line": 186,
+            "col": 9
+          },
+          "source": "if ((cfg.configFile != configFile) || (baseNameOf cfg.configFile) == \"Caddyfile\") then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "configFile"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "settings"
+            ],
+            [
+              "globalConfig"
+            ],
+            [
+              "extraConfig"
+            ],
+            [
+              "virtualHosts"
+            ],
+            [
+              "globalConfig"
+            ],
+            [
+              "extraConfig"
+            ],
+            [
+              "virtualHosts"
+            ],
+            [
+              "globalConfig"
+            ],
+            [
+              "extraConfig"
+            ],
+            [
+              "virtualHosts"
+            ],
+            [
+              "package"
+            ],
+            [
+              "globalConfig"
+            ],
+            [
+              "extraConfig"
+            ],
+            [
+              "virtualHosts"
+            ],
+            [
+              "package"
+            ],
+            [
+              "globalConfig"
+            ],
+            [
+              "extraConfig"
+            ],
+            [
+              "virtualHosts"
+            ],
+            [
+              "package"
+            ],
+            [
+              "globalConfig"
+            ],
+            [
+              "extraConfig"
+            ],
+            [
+              "virtualHosts"
+            ],
+            [
+              "configFile"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "caddy",
+            "configFile"
+          ],
+          "instance": "webserver",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/caddy.nix",
+            "line": 66,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "caddy",
+            "package"
+          ],
+          "instance": "webserver",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/caddy.nix",
+            "line": 74,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "caddy",
+            "configFile"
+          ],
+          "instance": "webserver",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/caddy.nix",
+            "line": 78,
+            "col": 13
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "httpPort"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

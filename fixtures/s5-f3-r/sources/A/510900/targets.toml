@@ -1,0 +1,7 @@
+[[target]]
+name = "sshd"
+module = "nixos/modules/services/networking/ssh/sshd.nix"
+test = "nixos/tests/openssh.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "openssh"]
+watch = ["moduliFile"]

@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 1,
+    "finding": 0,
+    "inconclusive": 0,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "410856",
+      "module": "nixos/modules/services/monitoring/vmalert.nix",
+      "test": "nixos/tests/victoriametrics/vmalert.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "vmalert"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 40,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 52,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "datasource.url"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 57,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "notifier.url"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 65,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "rule"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 74,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "rules"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 105,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 134,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 134,
+            "col": 12
+          },
+          "source": "mkIf cfg.enable {"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 30,
+            "col": 5
+          },
+          "source": "if value == true then",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/vmalert.nix",
+            "line": 32,
+            "col": 10
+          },
+          "source": "if isList value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [
+        {
+          "path": [
+            "services",
+            "vmalert",
+            "enable"
+          ],
+          "value_source": "true",
+          "value_class": {
+            "Bool": true
+          },
+          "known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "instance": "victoriametrics",
+          "span": {
+            "file": "nixos/tests/victoriametrics/vmalert.nix",
+            "line": 59,
+            "col": 13
+          }
+        }
+      ],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "PASS",
+          "option": "enable",
+          "predicate": {
+            "path": [
+              "enable"
+            ],
+            "kind": {
+              "Truthy": "mkIf"
+            },
+            "span": {
+              "file": "nixos/modules/services/monitoring/vmalert.nix",
+              "line": 134,
+              "col": 12
+            },
+            "source": "mkIf cfg.enable {"
+          },
+          "default_outcome": false,
+          "evidence": [
+            {
+              "path": [
+                "services",
+                "vmalert",
+                "enable"
+              ],
+              "value_source": "true",
+              "value_class": {
+                "Bool": true
+              },
+              "known_value": {
+                "Exact": {
+                  "Bool": true
+                }
+              },
+              "instance": "victoriametrics",
+              "span": {
+                "file": "nixos/tests/victoriametrics/vmalert.nix",
+                "line": 59,
+                "col": 13
+              }
+            }
+          ],
+          "predicate_attempts": [
+            {
+              "predicate": {
+                "path": [
+                  "enable"
+                ],
+                "kind": {
+                  "Truthy": "mkIf"
+                },
+                "span": {
+                  "file": "nixos/modules/services/monitoring/vmalert.nix",
+                  "line": 134,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            },
+            {
+              "predicate": {
+                "ir": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "enable"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                "refs": [
+                  [
+                    "enable"
+                  ]
+                ],
+                "span": {
+                  "file": "nixos/modules/services/monitoring/vmalert.nix",
+                  "line": 134,
+                  "col": 12
+                },
+                "source": "mkIf cfg.enable {"
+              },
+              "witnessed": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "pr": 510900,
+    "side": "head",
+    "target": "sshd",
+    "option_prefix": [
+      "services",
+      "openssh"
+    ],
+    "option": "moduliFile",
+    "f3r_verdict": {
+      "verdict": "OptionRelocated",
+      "option": "moduliFile",
+      "to": [
+        "services",
+        "openssh",
+        "settings",
+        "ModuliFile"
+      ],
+      "destination_confirmed": true,
+      "migration_source_file": "nixos/modules/services/networking/ssh/sshd.nix",
+      "migration_span": {
+        "file": "nixos/modules/services/networking/ssh/sshd.nix",
+        "line": 235,
+        "col": 6
+      },
+      "helper_form": "mkRenamedOptionModule"
+    },
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "moduliFile"
+    }
+  },
+  {
+    "pr": 462487,
+    "side": "head",
+    "target": "462487",
+    "option_prefix": [
+      "services",
+      "guacamole-server"
+    ],
+    "option": "logbackXml",
+    "f3r_verdict": {
+      "verdict": "OptionRelocated",
+      "option": "logbackXml",
+      "to": [
+        "services",
+        "guacamole-client",
+        "logbackXml"
+      ],
+      "destination_confirmed": false,
+      "migration_source_file": "nixos/modules/services/web-apps/guacamole-server.nix",
+      "migration_span": {
+        "file": "nixos/modules/services/web-apps/guacamole-server.nix",
+        "line": 12,
+        "col": 6
+      },
+      "helper_form": "mkRenamedOptionModule"
+    },
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "logbackXml"
+    }
+  },
+  {
+    "pr": 410856,
+    "side": "head",
+    "target": "410856",
+    "option_prefix": [
+      "services",
+      "vmalert"
+    ],
+    "option": "enable",
+    "f3r_verdict": {
+      "verdict": "OptionRelocated",
+      "option": "enable",
+      "to": [
+        "services",
+        "vmalert",
+        "instances",
+        "",
+        "enable"
+      ],
+      "destination_confirmed": false,
+      "migration_source_file": "nixos/modules/services/monitoring/vmalert.nix",
+      "migration_span": {
+        "file": "nixos/modules/services/monitoring/vmalert.nix",
+        "line": 42,
+        "col": 6
+      },
+      "helper_form": "mkRenamedOptionModule"
+    },
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "enable"
+    }
+  },
+  {
+    "pr": 490920,
+    "side": "base",
+    "target": "490920-traefik",
+    "option_prefix": [
+      "services",
+      "traefik"
+    ],
+    "option": "staticConfigFile",
+    "f3r_verdict": {
+      "verdict": "OptionRelocated",
+      "option": "staticConfigFile",
+      "to": [
+        "services",
+        "traefik",
+        "static",
+        "file"
+      ],
+      "destination_confirmed": false,
+      "migration_source_file": "nixos/modules/services/web-servers/traefik.nix",
+      "migration_span": {
+        "file": "nixos/modules/services/web-servers/traefik.nix",
+        "line": 56,
+        "col": 6
+      },
+      "helper_form": "mkRenamedOptionModule"
+    },
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "staticConfigFile"
+    }
+  },
+  {
+    "pr": 392716,
+    "side": "head",
+    "target": "392716",
+    "option_prefix": [
+      "services",
+      "cyrus-imap"
+    ],
+    "option": "sslServerCert",
+    "f3r_verdict": {
+      "verdict": "OptionRelocated",
+      "option": "sslServerCert",
+      "to": [
+        "services",
+        "cyrus-imap",
+        "imapdSettings",
+        "tls_server_cert"
+      ],
+      "destination_confirmed": false,
+      "migration_source_file": "nixos/modules/services/mail/cyrus-imap.nix",
+      "migration_span": {
+        "file": "nixos/modules/services/mail/cyrus-imap.nix",
+        "line": 76,
+        "col": 6
+      },
+      "helper_form": "mkRenamedOptionModule"
+    },
+    "f2r_verdict": {
+      "verdict": "OptionNotFound",
+      "option": "sslServerCert"
+    }
+  }
+]

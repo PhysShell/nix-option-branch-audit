@@ -1,0 +1,7 @@
+[[target]]
+name = "410856"
+module = "nixos/modules/services/monitoring/vmalert.nix"
+test = "nixos/tests/victoriametrics/vmalert.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "vmalert"]
+watch = ["enable"]

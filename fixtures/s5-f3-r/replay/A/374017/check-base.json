@@ -1,0 +1,1149 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "k3s",
+      "module": "nixos/modules/services/cluster/k3s/default.nix",
+      "test": "nixos/tests/k3s/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "k3s"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "manifests",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 38,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "manifests",
+            "target"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 44,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "manifests",
+            "content"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 53,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "manifests",
+            "source"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 64,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 133,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "role"
+          ],
+          "default_source": "\"server\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "server"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 137,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "serverAddr"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 159,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "clusterInit"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 172,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "token"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 194,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "tokenFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 205,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraFlags"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 211,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "disableAgent"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 221,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "environmentFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 227,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "configPath"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 235,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "manifests"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 241,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "charts"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 329,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "containerdConfigTemplate"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 347,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "images"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 367,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "gracefulNodeShutdown",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 392,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "gracefulNodeShutdown",
+            "shutdownGracePeriod"
+          ],
+          "default_source": "\"30s\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "30s"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 399,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "gracefulNodeShutdown",
+            "shutdownGracePeriodCriticalPods"
+          ],
+          "default_source": "\"10s\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "10s"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 409,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraKubeletConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 420,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "extraKubeProxyConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 438,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 457,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "gracefulNodeShutdown",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 492,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs (cfg.gracefulNodeShutdown.enable) {"
+        },
+        {
+          "path": [
+            "clusterInit"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 539,
+            "col": 17
+          },
+          "source": "lib.optional cfg.clusterInit \"--cluster-init\""
+        },
+        {
+          "path": [
+            "disableAgent"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 540,
+            "col": 17
+          },
+          "source": "lib.optional cfg.disableAgent \"--disable-agent\""
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "containerdConfigTemplate"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "containerdConfigTemplate"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 122,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.containerdConfigTemplate != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 457,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "And": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "role"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "agent"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "configPath"
+                        ]
+                      },
+                      {
+                        "Literal": "Null"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "serverAddr"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": ""
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "role"
+            ],
+            [
+              "configPath"
+            ],
+            [
+              "serverAddr"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 468,
+            "col": 11
+          },
+          "source": "lib.optional ("
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "And": [
+                  {
+                    "And": [
+                      {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "role"
+                            ]
+                          },
+                          {
+                            "Literal": {
+                              "Str": "agent"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Eq": [
+                          {
+                            "Ref": [
+                              "configPath"
+                            ]
+                          },
+                          {
+                            "Literal": "Null"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "tokenFile"
+                        ]
+                      },
+                      {
+                        "Literal": "Null"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "token"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": ""
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "role"
+            ],
+            [
+              "configPath"
+            ],
+            [
+              "tokenFile"
+            ],
+            [
+              "token"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 471,
+            "col": 11
+          },
+          "source": "lib.optional"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "gracefulNodeShutdown",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "gracefulNodeShutdown",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 492,
+            "col": 12
+          },
+          "source": "lib.optionalAttrs (cfg.gracefulNodeShutdown.enable) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "role"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "agent"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "role"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 526,
+            "col": 18
+          },
+          "source": "if cfg.role == \"agent\" then \"exec\" else \"notify\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "clusterInit"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "clusterInit"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 539,
+            "col": 17
+          },
+          "source": "lib.optional cfg.clusterInit \"--cluster-init\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "disableAgent"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "disableAgent"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 540,
+            "col": 17
+          },
+          "source": "lib.optional cfg.disableAgent \"--disable-agent\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "serverAddr"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "serverAddr"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 541,
+            "col": 17
+          },
+          "source": "lib.optional (cfg.serverAddr != \"\") \"--server ${cfg.serverAddr}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "token"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "token"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 542,
+            "col": 17
+          },
+          "source": "lib.optional (cfg.token != \"\") \"--token ${cfg.token}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "tokenFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "tokenFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 543,
+            "col": 17
+          },
+          "source": "lib.optional (cfg.tokenFile != null) \"--token-file ${cfg.tokenFile}\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "configPath"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "configPath"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 544,
+            "col": 17
+          },
+          "source": "lib.optional (cfg.configPath != null) \"--config ${cfg.configPath}\""
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 27,
+            "col": 15
+          },
+          "source": "if (lib.hasSuffix \".yaml\" name || lib.hasSuffix \".yml\" name) then name else name + \".yaml\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 75,
+            "col": 20
+          },
+          "source": "lib.mkIf (config.content != null) (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 83,
+            "col": 17
+          },
+          "source": "if builtins.isList value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 104,
+            "col": 24
+          },
+          "source": "if (lib.hasSuffix \".tgz\" name) then name else name + \".tgz\"",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 110,
+            "col": 7
+          },
+          "source": "lib.optionalString (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "manifests"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 113,
+            "col": 7
+          },
+          "source": "lib.optionalString (cfg.charts != { }) \"${pkgs.coreutils-full}/bin/mkdir -p ${chartDir}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "charts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 114,
+            "col": 7
+          },
+          "source": "lib.optionalString (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "images"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 459,
+            "col": 8
+          },
+          "source": "lib.optional (cfg.role != \"server\" && cfg.manifests != { })",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "role"
+            ],
+            [
+              "manifests"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 462,
+            "col": 11
+          },
+          "source": "lib.optional (cfg.role != \"server\" && cfg.charts != { })",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "role"
+            ],
+            [
+              "charts"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 465,
+            "col": 11
+          },
+          "source": "lib.optional (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "disableAgent"
+            ],
+            [
+              "images"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 523,
+            "col": 16
+          },
+          "source": "lib.optional config.boot.zfs.enabled config.boot.zfs.package",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 545,
+            "col": 17
+          },
+          "source": "lib.optional (kubeletParams != { }) \"--kubelet-arg=config=${kubeletConfig}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "gracefulNodeShutdown",
+              "enable"
+            ],
+            [
+              "gracefulNodeShutdown"
+            ],
+            [
+              "extraKubeletConfig"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/cluster/k3s/default.nix",
+            "line": 546,
+            "col": 17
+          },
+          "source": "lib.optional (cfg.extraKubeProxyConfig != { }) \"--kube-proxy-arg=config=${kubeProxyConfig}\"",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "extraKubeProxyConfig"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 10,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 13,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 14,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 17,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 24,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 27,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/k3s/default.nix",
+            "line": 28,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "autoDeployCharts"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

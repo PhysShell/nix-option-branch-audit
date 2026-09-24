@@ -1,0 +1,7 @@
+[[target]]
+name = "392716"
+module = "nixos/modules/services/mail/cyrus-imap.nix"
+test = "nixos/tests/cyrus-imap.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cyrus-imap"]
+watch = ["sslServerCert"]

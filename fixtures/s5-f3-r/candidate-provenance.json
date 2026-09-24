@@ -1,0 +1,42 @@
+{
+  "candidate_commit": "05d4a900f9f10cebfa42981eea1c88d554946dbb",
+  "candidate_commit_short": "05d4a90",
+  "note_on_commit_choice": "The mandate is explicit: the binary under replay must be built from 05d4a90 (the F3 implementation commit), not from 54fa3a8 (the F3 investigation/report documentation-only commit that follows it). Verified: `git diff 05d4a90 54fa3a8 -- src/` is empty (54fa3a8 only adds fixtures/s5-f3/*.md) -- provenance discipline point, honored precisely as instructed.",
+  "built_from": "clean git clone + checkout, verified `git status --short` empty and `git rev-parse HEAD == 05d4a900f9f10cebfa42981eea1c88d554946dbb` before building -- never the working tree used for editing. No `cp`-based restoration was used anywhere in this build.",
+  "clean_checkout_path": "/home/tandem/f3r-clean-checkout/repo",
+  "build_location_note": "Built under /home/tandem (real disk), not /tmp (tmpfs), following the established precedent after a real disk-exhaustion incident there in an earlier round.",
+  "binary_path": "/home/tandem/f3r-clean-checkout/target/release/oba",
+  "binary_sha256": "30dc21d1b229e08c438e9d2d24e43fa26160b7675c146e75f70e4f333f140558",
+  "rustc_version": "rustc 1.100.0-nightly (8925ea358 2026-08-20), toolchain nightly-2026-08-21-x86_64-unknown-linux-gnu",
+  "build_command": "CARGO_TARGET_DIR=/home/tandem/f3r-clean-checkout/target rustup run nightly-2026-08-21-x86_64-unknown-linux-gnu cargo build --release",
+  "self_reported_tool_version": "0.4.5",
+  "note": "Cargo.toml version is unchanged (no version bump, per this round's own scope constraints) -- the candidate binary self-reports the same 'tool.version: 0.4.5' string as every prior candidate. Candidate identity is established by this file's own binary_sha256 and candidate_commit, not by the self-reported version string.",
+  "baseline_for_comparison": {
+    "round": "S5-F2-R",
+    "commit": "c647d1b33fc1e328cd5f75037770e404a40edcf8",
+    "commit_short": "c647d1b",
+    "verdict": "PASS",
+    "replay_dir": "fixtures/s5-f2-r/replay",
+    "note": "Per this round's own mandate: the primary regression baseline for F3 is the accepted F2 candidate, using the committed S5-F2-R replay artifacts (fixtures/s5-f2-r/replay/**/*.json) directly -- NOT the raw historical v0.4.5 S5 output. F3 must not be penalized for intentional F1D/F2 provenance changes already accepted by 58b28b2/c04c5af."
+  },
+  "historical_reference_for_defect_evidence_only": {
+    "release": "v0.4.5",
+    "commit": "8f1701a289ddab8bc23f23a25cc0937863fa0356",
+    "note": "Still relevant for the guacamole defect's own historical evidence and other adjudicated historical findings -- not used as the regression-comparison baseline this round."
+  },
+  "history_chain": [
+    {"step": "historical S5 under test", "ref": "v0.4.5 / 8f1701a", "verdict": "FAIL"},
+    {"step": "S5-R0 report-integrity fix", "ref": "28a1d58"},
+    {"step": "first F1 candidate", "ref": "cdfb4ca"},
+    {"step": "S5-F1-R full-corpus replay of cdfb4ca", "ref": "baaaec9 / f0a54a3", "verdict": "FAIL"},
+    {"step": "S5-F1B replacement candidate", "ref": "6c2c2aa"},
+    {"step": "S5-F1B-R full-corpus replay of 6c2c2aa", "ref": "44edf38", "verdict": "FAIL"},
+    {"step": "S5-F1C (with-resolution, alias-chain, stable ordering)", "ref": "d272ccf / 2054cbb / 26acad9 / f94959f"},
+    {"step": "S5-F1D (remove one-hop cap, provenance-qualified paths)", "ref": "25c5b54 / 892231a"},
+    {"step": "S5-F1D-R full-corpus acceptance replay of 25c5b54", "ref": "58b28b2", "verdict": "PASS"},
+    {"step": "S5-F2 (cgit false OBA001 fix -- allow_instance_key)", "ref": "c647d1b / 399a2d5"},
+    {"step": "S5-F2-R full-corpus acceptance replay of c647d1b", "ref": "c04c5af", "verdict": "PASS"},
+    {"step": "S5-F3 (guacamole rename/relocation semantics)", "ref": "05d4a90 / 54fa3a8"},
+    {"step": "S5-F3-R full-corpus acceptance replay of 05d4a90 (this round)", "ref": "in progress"}
+  ]
+}

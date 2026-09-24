@@ -1,0 +1,2717 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "414502",
+      "module": "nixos/modules/services/web-apps/mastodon.nix",
+      "test": "nixos/tests/web-apps/mastodon/default.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "mastodon"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 264,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 266,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"mastodon\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mastodon"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 289,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"mastodon\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mastodon"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 302,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "streamingProcesses"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 310,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "webPort"
+          ],
+          "default_source": "55001",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 319,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "webProcesses"
+          ],
+          "default_source": "2",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 324,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "webThreads"
+          ],
+          "default_source": "5",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 329,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sidekiqPort"
+          ],
+          "default_source": "55002",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 335,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sidekiqThreads"
+          ],
+          "default_source": "25",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 341,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sidekiqProcesses"
+          ],
+          "default_source": "{\n          all = {\n            jobClasses = [ ];\n            threads = null;\n          };\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 347,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sidekiqProcesses",
+            "jobClasses"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 353,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "sidekiqProcesses",
+            "threads"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 364,
+            "col": 15
+          }
+        },
+        {
+          "path": [
+            "vapidPublicKeyFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/vapid-public-key\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/vapid-public-key"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 399,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "vapidPrivateKeyFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/vapid-private-key\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/vapid-private-key"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 414,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "localDomain"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 429,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "activeRecordEncryptionDeterministicKeyFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/active-record-encryption-deterministic-key\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/active-record-encryption-deterministic-key"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 435,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "activeRecordEncryptionKeyDerivationSaltFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/active-record-encryption-key-derivation-salt\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/active-record-encryption-key-derivation-salt"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 450,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "activeRecordEncryptionPrimaryKeyFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/active-record-encryption-primary-key\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/active-record-encryption-primary-key"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 465,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "secretKeyBaseFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/secret-key-base\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/secret-key-base"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 480,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "otpSecretFile"
+          ],
+          "default_source": "\"/var/lib/mastodon/secrets/otp-secret\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/mastodon/secrets/otp-secret"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 493,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "trustedProxy"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 506,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "enableUnixSocket"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 516,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 527,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "host"
+          ],
+          "default_source": "if cfg.redis.createLocally && !cfg.redis.enableUnixSocket then \"127.0.0.1\" else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 533,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "port"
+          ],
+          "default_source": "if cfg.redis.createLocally && !cfg.redis.enableUnixSocket then 31637 else null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 542,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 551,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "redis",
+            "enableUnixSocket"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 558,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 566,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"/run/postgresql\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/run/postgresql"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 572,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "if cfg.database.createLocally then null else 5432",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 579,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"mastodon\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mastodon"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 590,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "user"
+          ],
+          "default_source": "\"mastodon\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "mastodon"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 596,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 602,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "createLocally"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 614,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "authenticate"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 620,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "host"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 626,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "port"
+          ],
+          "default_source": "25",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 632,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "fromAddress"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 638,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "user"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 643,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "smtp",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 650,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "elasticsearch",
+            "host"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 661,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "elasticsearch",
+            "port"
+          ],
+          "default_source": "9200",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 670,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "elasticsearch",
+            "prefix"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 676,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "elasticsearch",
+            "preset"
+          ],
+          "default_source": "\"single_node_cluster\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "single_node_cluster"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 686,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "elasticsearch",
+            "user"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 699,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "elasticsearch",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 706,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "package"
+          ],
+          "default_source": "pkgs.mastodon",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 716,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraConfig"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 723,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "extraEnvFiles"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 731,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "automaticMigrations"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 740,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "mediaAutoRemove",
+            "enable"
+          ],
+          "default_source": "true",
+          "default_class": {
+            "Bool": true
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": true
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 749,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "mediaAutoRemove",
+            "startAt"
+          ],
+          "default_source": "\"daily\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "daily"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 760,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "mediaAutoRemove",
+            "olderThanDays"
+          ],
+          "default_source": "30",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 771,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "smtp",
+            "authenticate"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 55,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs cfg.smtp.authenticate { SMTP_LOGIN = cfg.smtp.user; }"
+        },
+        {
+          "path": [
+            "automaticMigrations"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 133,
+            "col": 8
+          },
+          "source": "lib.optional cfg.automaticMigrations \"mastodon-init-db.service\""
+        },
+        {
+          "path": [
+            "database",
+            "createLocally"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 581,
+            "col": 21
+          },
+          "source": "if cfg.database.createLocally then null else 5432"
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 783,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "path": [
+            "smtp",
+            "authenticate"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 921,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.smtp.authenticate ''"
+        },
+        {
+          "path": [
+            "automaticMigrations"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 946,
+            "col": 45
+          },
+          "source": "lib.mkIf cfg.automaticMigrations {"
+        },
+        {
+          "path": [
+            "enableUnixSocket"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1018,
+            "col": 15
+          },
+          "source": "if cfg.enableUnixSocket then"
+        },
+        {
+          "path": [
+            "mediaAutoRemove",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1046,
+            "col": 55
+          },
+          "source": "lib.mkIf cfg.mediaAutoRemove.enable {"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1064,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "path": [
+            "enableUnixSocket"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1081,
+            "col": 17
+          },
+          "source": "if cfg.enableUnixSocket then"
+        },
+        {
+          "path": [
+            "configureNginx"
+          ],
+          "kind": {
+            "Truthy": "optional"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1148,
+            "col": 45
+          },
+          "source": "lib.optional cfg.configureNginx config.services.nginx.user"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "elasticsearch",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 43,
+            "col": 20
+          },
+          "source": "if (cfg.elasticsearch.host != null) then \"true\" else \"false\""
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "redis",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "redis",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 47,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.redis.host != null) { REDIS_HOST = cfg.redis.host; }"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "redis",
+                    "port"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "redis",
+              "port"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 48,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.redis.port != null) { REDIS_PORT = toString cfg.redis.port; }"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "enableUnixSocket"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 49,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.redis.createLocally && cfg.redis.enableUnixSocket) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "/run/postgresql"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "port"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "host"
+            ],
+            [
+              "database",
+              "port"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 52,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.database.host != \"/run/postgresql\" && cfg.database.port != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smtp",
+                  "authenticate"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smtp",
+              "authenticate"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 55,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs cfg.smtp.authenticate { SMTP_LOGIN = cfg.smtp.user; }"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "elasticsearch",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 56,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.elasticsearch.host != null) { ES_HOST = cfg.elasticsearch.host; }"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "elasticsearch",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 57,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.elasticsearch.host != null) { ES_PORT = toString cfg.elasticsearch.port; }"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "elasticsearch",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "elasticsearch",
+                        "prefix"
+                      ]
+                    },
+                    {
+                      "Literal": "Null"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "host"
+            ],
+            [
+              "elasticsearch",
+              "prefix"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 58,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.elasticsearch.host != null && cfg.elasticsearch.prefix != null) {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "elasticsearch",
+                    "host"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 61,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.elasticsearch.host != null) { ES_PRESET = cfg.elasticsearch.preset; }"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "elasticsearch",
+                    "user"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 62,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.elasticsearch.user != null) { ES_USER = cfg.elasticsearch.user; }"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Or": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "redis",
+                          "host"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "127.0.0.1"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "redis",
+                          "enableUnixSocket"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "host"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 131,
+            "col": 5
+          },
+          "source": "lib.optional redisActuallyCreateLocally \"redis-mastodon.service\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "/run/postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 132,
+            "col": 8
+          },
+          "source": "lib.optional databaseActuallyCreateLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "automaticMigrations"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "automaticMigrations"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 133,
+            "col": 8
+          },
+          "source": "lib.optional cfg.automaticMigrations \"mastodon-init-db.service\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "redis",
+                        "enableUnixSocket"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 536,
+            "col": 21
+          },
+          "source": "if cfg.redis.createLocally && !cfg.redis.enableUnixSocket then \"127.0.0.1\" else null"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Not": {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "redis",
+                        "enableUnixSocket"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 545,
+            "col": 21
+          },
+          "source": "if cfg.redis.createLocally && !cfg.redis.enableUnixSocket then 31637 else null"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "createLocally"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 581,
+            "col": 21
+          },
+          "source": "if cfg.database.createLocally then null else 5432"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 783,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable ("
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "redis",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "redis",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 915,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.redis.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 918,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.database.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "smtp",
+                  "authenticate"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smtp",
+              "authenticate"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 921,
+            "col": 15
+          },
+          "source": "lib.optionalString cfg.smtp.authenticate ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "elasticsearch",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "elasticsearch",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 924,
+            "col": 15
+          },
+          "source": "lib.optionalString (cfg.elasticsearch.passwordFile != null) ''"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "automaticMigrations"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "automaticMigrations"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 946,
+            "col": 45
+          },
+          "source": "lib.mkIf cfg.automaticMigrations {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "And": [
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "createLocally"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "/run/postgresql"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 948,
+            "col": 13
+          },
+          "source": "lib.optionalString (!databaseActuallyCreateLocally) ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "And": [
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "createLocally"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "/run/postgresql"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 971,
+            "col": 15
+          },
+          "source": "lib.optionalString (!databaseActuallyCreateLocally) ''"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "/run/postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 976,
+            "col": 14
+          },
+          "source": "if databaseActuallyCreateLocally then config.services.postgresql.package else pkgs.postgresql"
+        },
+        {
+          "ir": {
+            "Not": {
+              "And": [
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "createLocally"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Bool": true
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Eq": [
+                    {
+                      "Ref": [
+                        "database",
+                        "host"
+                      ]
+                    },
+                    {
+                      "Literal": {
+                        "Str": "/run/postgresql"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 980,
+            "col": 16
+          },
+          "source": "lib.optionalAttrs (!databaseActuallyCreateLocally) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "/run/postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1001,
+            "col": 16
+          },
+          "source": "lib.optional databaseActuallyCreateLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "/run/postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1004,
+            "col": 16
+          },
+          "source": "lib.optional databaseActuallyCreateLocally \"postgresql.target\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableUnixSocket"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1018,
+            "col": 15
+          },
+          "source": "if cfg.enableUnixSocket then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "mediaAutoRemove",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "mediaAutoRemove",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1046,
+            "col": 55
+          },
+          "source": "lib.mkIf cfg.mediaAutoRemove.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1064,
+            "col": 26
+          },
+          "source": "lib.mkIf cfg.configureNginx {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enableUnixSocket"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1081,
+            "col": 17
+          },
+          "source": "if cfg.enableUnixSocket then"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "smtp",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "smtp",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "127.0.0.1"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "smtp",
+              "createLocally"
+            ],
+            [
+              "smtp",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1107,
+            "col": 28
+          },
+          "source": "lib.mkIf (cfg.smtp.createLocally && cfg.smtp.host == \"127.0.0.1\") {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Or": [
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "redis",
+                          "host"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Str": "127.0.0.1"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "redis",
+                          "enableUnixSocket"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "host"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1112,
+            "col": 43
+          },
+          "source": "lib.mkIf redisActuallyCreateLocally ("
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "redis",
+                    "enableUnixSocket"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Bool": true
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1117,
+            "col": 14
+          },
+          "source": "lib.mkIf (!cfg.redis.enableUnixSocket) {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "database",
+                      "host"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Str": "/run/postgresql"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "createLocally"
+            ],
+            [
+              "database",
+              "host"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1123,
+            "col": 31
+          },
+          "source": "lib.mkIf databaseActuallyCreateLocally {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mastodon"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1135,
+            "col": 12
+          },
+          "source": "lib.mkIf (cfg.user == \"mastodon\") {"
+        },
+        {
+          "ir": {
+            "And": [
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "createLocally"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              },
+              {
+                "Eq": [
+                  {
+                    "Ref": [
+                      "redis",
+                      "enableUnixSocket"
+                    ]
+                  },
+                  {
+                    "Literal": {
+                      "Bool": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "refs": [
+            [
+              "redis",
+              "createLocally"
+            ],
+            [
+              "redis",
+              "enableUnixSocket"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1143,
+            "col": 12
+          },
+          "source": "lib.mkIf (cfg.redis.createLocally && cfg.redis.enableUnixSocket) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "configureNginx"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "configureNginx"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 1148,
+            "col": 45
+          },
+          "source": "lib.optional cfg.configureNginx config.services.nginx.user"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 138,
+            "col": 42
+          },
+          "source": "lib.optional (value != null) ''${name}=\"${toString value}\"''",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/mastodon.nix",
+            "line": 167,
+            "col": 29
+          },
+          "source": "if processCfg.threads == null then cfg.sidekiqThreads else processCfg.threads",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": [
+            [
+              "sidekiqThreads"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/web-apps/mastodon/default.nix",
+            "line": 16,
+            "col": 3
+          }
+        },
+        {
+          "path": [],
+          "instance": null,
+          "reason": "unrecognized test-spec-root entry -- not a known harness-metadata key and not nodes/containers; may itself define test scenario config (e.g. `name = runTest { nodes = ...; };`) this walker can't see into",
+          "span": {
+            "file": "nixos/tests/web-apps/mastodon/default.nix",
+            "line": 17,
+            "col": 3
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "otpSecretFile"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

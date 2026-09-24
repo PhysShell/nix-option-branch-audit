@@ -1,0 +1,345 @@
+[
+  {
+    "pr": 444033,
+    "side": "base",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 16,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 444033,
+    "side": "base",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 17,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 444033,
+    "side": "head",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 16,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 444033,
+    "side": "head",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 17,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 415326,
+    "side": "head",
+    "file": "nixos/modules/services/networking/wstunnel.nix",
+    "line": 86,
+    "raw_text": "lib.mkRemovedOptionModule [ option ] ''"
+  },
+  {
+    "pr": 415326,
+    "side": "head",
+    "file": "nixos/modules/services/networking/wstunnel.nix",
+    "line": 215,
+    "raw_text": "lib.mkRemovedOptionModule [ option ] ''"
+  },
+  {
+    "pr": 422094,
+    "side": "base",
+    "file": "nixos/modules/services/networking/syncthing.nix",
+    "line": 818,
+    "raw_text": "(o: mkRenamedOptionModule [ \"services\" \"syncthing\" \"declarative\" o ] [ \"services\" \"syncthing\" o ])"
+  },
+  {
+    "pr": 422094,
+    "side": "head",
+    "file": "nixos/modules/services/networking/syncthing.nix",
+    "line": 818,
+    "raw_text": "(o: mkRenamedOptionModule [ \"services\" \"syncthing\" \"declarative\" o ] [ \"services\" \"syncthing\" o ])"
+  },
+  {
+    "pr": 461261,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/wakapi.nix",
+    "line": 22,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 374017,
+    "side": "base",
+    "file": "nixos/modules/services/cluster/k3s/default.nix",
+    "line": 11,
+    "raw_text": "lib.mkRemovedOptionModule ("
+  },
+  {
+    "pr": 374017,
+    "side": "head",
+    "file": "nixos/modules/services/cluster/k3s/default.nix",
+    "line": 11,
+    "raw_text": "lib.mkRemovedOptionModule ("
+  },
+  {
+    "pr": 472219,
+    "side": "base",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 18,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 472219,
+    "side": "base",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 19,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 472219,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 18,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 472219,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 19,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 353770,
+    "side": "base",
+    "file": "nixos/modules/services/networking/syncthing.nix",
+    "line": 833,
+    "raw_text": "(o: mkRenamedOptionModule [ \"services\" \"syncthing\" \"declarative\" o ] [ \"services\" \"syncthing\" o ])"
+  },
+  {
+    "pr": 353770,
+    "side": "head",
+    "file": "nixos/modules/services/networking/syncthing.nix",
+    "line": 862,
+    "raw_text": "(o: mkRenamedOptionModule [ \"services\" \"syncthing\" \"declarative\" o ] [ \"services\" \"syncthing\" o ])"
+  },
+  {
+    "pr": 482512,
+    "side": "head",
+    "file": "nixos/modules/services/web-servers/traefik.nix",
+    "line": 33,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 441245,
+    "side": "head",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 16,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 441245,
+    "side": "head",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 17,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 450453,
+    "side": "head",
+    "file": "nixos/modules/services/networking/searx.nix",
+    "line": 15,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 477894,
+    "side": "head",
+    "file": "nixos/modules/services/hardware/keyd.nix",
+    "line": 11,
+    "raw_text": "inherit (lib.modules) mkDefault mkIf mkRemovedOptionModule;"
+  },
+  {
+    "pr": 273833,
+    "side": "base",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 18,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 273833,
+    "side": "base",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 19,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 273833,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 18,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 273833,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/keycloak.nix",
+    "line": 19,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 416806,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 416806,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 416806,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 416806,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 405186,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 405186,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 405186,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 405186,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 517396,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+    "line": 18,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 517396,
+    "side": "head",
+    "file": "nixos/modules/services/web-apps/lasuite-meet.nix",
+    "line": 19,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 467286,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 467286,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 467286,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 467286,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 456004,
+    "side": "base",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 16,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 456004,
+    "side": "base",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 17,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 456004,
+    "side": "head",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 16,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 456004,
+    "side": "head",
+    "file": "nixos/modules/services/audio/snapserver.nix",
+    "line": 17,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 490920,
+    "side": "base",
+    "file": "nixos/modules/services/web-servers/traefik.nix",
+    "line": 33,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 386345,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 31,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 386345,
+    "side": "base",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 32,
+    "raw_text": "mkRenamedOptionModule"
+  },
+  {
+    "pr": 386345,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 34,
+    "raw_text": "mkRemovedOptionModule"
+  },
+  {
+    "pr": 386345,
+    "side": "head",
+    "file": "nixos/modules/services/databases/postgresql.nix",
+    "line": 35,
+    "raw_text": "mkRenamedOptionModule"
+  }
+]

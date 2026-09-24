@@ -1,0 +1,384 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "388953",
+      "module": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+      "test": "nixos/tests/web-servers/h2o/basic.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "h2o",
+        "vhosts",
+        "*",
+        "tls"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "serverName"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 18,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "serverAliases"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 28,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "host"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 41,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "http"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 51,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "http",
+            "port"
+          ],
+          "default_source": "config.services.h2o.defaultHTTPListenPort",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 55,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "tls"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 73,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "port"
+          ],
+          "default_source": "config.services.h2o.defaultTLSListenPort",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 77,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "policy"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 88,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "redirectCode"
+          ],
+          "default_source": "301",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 101,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "identity"
+          ],
+          "default_source": "[ ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 113,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "identity",
+            "key-file"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 117,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "identity",
+            "certificate-file"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 124,
+            "col": 21
+          }
+        },
+        {
+          "path": [
+            "tls",
+            "extraSettings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 155,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "acme"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 178,
+            "col": 5
+          }
+        },
+        {
+          "path": [
+            "acme",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 182,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "acme",
+            "useHost"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 191,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "acme",
+            "root"
+          ],
+          "default_source": "\"/var/lib/acme/acme-challenge\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/acme/acme-challenge"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 205,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-servers/h2o/vhost-options.nix",
+            "line": 221,
+            "col": 5
+          }
+        }
+      ],
+      "discovered_predicates": [],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "h2o",
+            "defaultHTTPListenPort"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-servers/h2o/basic.nix",
+            "line": 48,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "h2o",
+            "defaultTLSListenPort"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-servers/h2o/basic.nix",
+            "line": 49,
+            "col": 11
+          }
+        },
+        {
+          "path": [
+            "services",
+            "h2o",
+            "hosts"
+          ],
+          "instance": "server",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/web-servers/h2o/basic.nix",
+            "line": 51,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "services",
+            "h2o",
+            "hosts"
+          ],
+          "instance": "server",
+          "reason": "dynamic (\"${...}\") attribute name -- can't be statically resolved to an option path",
+          "span": {
+            "file": "nixos/tests/web-servers/h2o/basic.nix",
+            "line": 60,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "networking",
+            "firewall",
+            "allowedTCPPorts"
+          ],
+          "instance": "server",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/web-servers/h2o/basic.nix",
+            "line": 102,
+            "col": 11
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "quic"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

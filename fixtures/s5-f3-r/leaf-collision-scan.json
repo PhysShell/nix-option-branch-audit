@@ -1,0 +1,24 @@
+{
+  "scanned_check_files": 360,
+  "missing_check_files": [],
+  "findings": [
+    {
+      "pr": 415326,
+      "side": "check-head.json",
+      "target": "wstunnel",
+      "module": "nixos/modules/services/networking/wstunnel.nix",
+      "colliding_paths_candidate": [
+        [
+          "settings"
+        ]
+      ],
+      "colliding_paths_f2r_baseline": [
+        [
+          "settings"
+        ]
+      ],
+      "pre_existing_in_f2r_baseline": true
+    }
+  ],
+  "findings_count": 1
+}

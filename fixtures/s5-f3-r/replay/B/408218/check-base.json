@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "408218",
+      "module": "nixos/modules/services/misc/bazarr.nix",
+      "test": "nixos/tests/bazarr.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "bazarr"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 13,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 17,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "listenPort"
+          ],
+          "default_source": "6767",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 23,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"bazarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "bazarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 29,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"bazarr\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "bazarr"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 35,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 43,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 67,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall {"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 43,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 67,
+            "col": 27
+          },
+          "source": "lib.mkIf cfg.openFirewall {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "bazarr"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 71,
+            "col": 19
+          },
+          "source": "lib.mkIf (cfg.user == \"bazarr\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "bazarr"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/misc/bazarr.nix",
+            "line": 79,
+            "col": 20
+          },
+          "source": "lib.mkIf (cfg.group == \"bazarr\") {"
+        }
+      ],
+      "unresolved_predicate_sites": [],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "services",
+            "bazarr",
+            "listenPort"
+          ],
+          "instance": "machine",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/bazarr.nix",
+            "line": 15,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "dataDir"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

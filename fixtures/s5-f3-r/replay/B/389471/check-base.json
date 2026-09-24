@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.4.5"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "389471",
+      "module": "nixos/modules/services/audio/navidrome.nix",
+      "test": "nixos/tests/navidrome.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "navidrome"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 28,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 32,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "Address"
+          ],
+          "default_source": "\"127.0.0.1\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "127.0.0.1"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 37,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "Port"
+          ],
+          "default_source": "4533",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 43,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "settings",
+            "EnableInsightsCollector"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 49,
+            "col": 13
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"navidrome\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "navidrome"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 63,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"navidrome\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "navidrome"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 69,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 75,
+            "col": 7
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 88,
+            "col": 5
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 168,
+            "col": 45
+          },
+          "source": "mkIf cfg.openFirewall [ cfg.settings.Port ]"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 88,
+            "col": 5
+          },
+          "source": "mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "user"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "navidrome"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "user"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 159,
+            "col": 21
+          },
+          "source": "mkIf (cfg.user == \"navidrome\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "group"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "navidrome"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "group"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 166,
+            "col": 22
+          },
+          "source": "mkIf (cfg.group == \"navidrome\") { navidrome = { }; }"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 168,
+            "col": 45
+          },
+          "source": "mkIf cfg.openFirewall [ cfg.settings.Port ]"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 116,
+            "col": 15
+          },
+          "source": "optional (cfg.settings ? DataFolder) cfg.settings.DataFolder",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 117,
+            "col": 18
+          },
+          "source": "optional (cfg.settings ? CacheFolder) cfg.settings.CacheFolder",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 125,
+            "col": 18
+          },
+          "source": "optional (cfg.settings ? MusicFolder) cfg.settings.MusicFolder",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "settings"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/audio/navidrome.nix",
+            "line": 126,
+            "col": 18
+          },
+          "source": "lib.optionals config.services.resolved.enable [",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "environmentFile"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}
