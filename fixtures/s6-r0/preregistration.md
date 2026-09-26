@@ -1,5 +1,21 @@
 # S6-R0: preregistration for a fresh out-of-sample validation of released `v0.5.0`
 
+> **AMENDED by S6-R0A** (`R0A-protocol-errata.md`) — found by static
+> re-review, before any S6 candidate data existed. Three methodological
+> inconsistencies were corrected there: (1) the population-fetch script
+> below was unsafe against GitHub Search API's own 1000-result cap;
+> (2) the expansion stopping rule (section 11) referenced an
+> arithmetically-unsatisfiable per-batch NC1 check; (3) the PR-vs-target
+> unit model was ambiguous, and NC2/NC3/NC4's own denominators
+> (sections 5.2-5.4) were inconsistent between this file and
+> `target-construction-protocol.md`. **This file itself is left
+> unedited below, as the immutable original record** — read
+> `R0A-protocol-errata.md` for the corrected rules before executing
+> anything (`population-and-sampling.py`, `pilot-accounting.py`,
+> `target-construction-protocol.md`, and `adjudication-rubric.md` have
+> all been updated in place to the corrected model; this document has
+> not, by design).
+
 This document freezes every design decision for S6 BEFORE any P0
 census, P1 pilot, or adjudication happens. Nothing here changes after
 results are seen. If a later round finds this design was flawed, the

@@ -1,5 +1,12 @@
 # S6 target-construction protocol (frozen before any P1 PR is examined)
 
+**Amended by S6-R0A** (`R0A-protocol-errata.md` items 4-5): the unit
+model, the NC2/NC3/NC4 denominators, and the multi-target budget cap
+below are the CORRECTED versions — the original S6-R0 text conflated
+"PR" and "target" as one unit and let a PR's own non-derivation leak
+into the target-level NC3/NC4 denominators. See the errata for the
+full rationale; this file states only the corrected rule.
+
 Purpose: make NC2 ("target derivability without large amounts of
 manual invention") a checkable fact, not a post-hoc impression. For
 each of the 15 P1-sampled PRs, apply these exact steps, in order, and
@@ -26,20 +33,44 @@ it").
    `mkEnableOption`/`mkPackageOption` call in either its base or head
    version (a syntactic grep, not a semantic judgment). If none, record
    `target_not_mechanically_derivable: no option-declaring file
-   changed` and STOP for this PR (this PR still counts toward the NC3/
-   NC4 denominators as "no substantive target," not silently dropped).
+   changed` and STOP for this PR. **(S6-R0A correction)**: this PR
+   contributes ZERO derived targets and counts as a non-derivation
+   toward NC2's own PR-level denominator ONLY — it contributes NOTHING
+   to NC3/NC4 (both now target-level; a PR with no derived target has
+   no target to be substantive or adjudicable about, so it is simply
+   absent from those two counts, not present as a placeholder "no
+   substantive target" entry the way the original S6-R0 text
+   incorrectly implied).
 
-3. **Identify the candidate watched option**: among the option
+3. **Identify the candidate watched option(s)**: among the option
    declarations in the changed module file(s), select the one(s)
    the diff itself directly touches (the declaration's own source
    lines appear in the diff — added, removed, or modified). If the
    diff touches more than one independent option declaration in the
-   same file, construct ONE target per touched declaration (do not
-   pick "the most interesting one" — every touched declaration in
-   scope becomes its own target, mechanically). If the diff touches
-   zero option declarations directly (e.g., only touches `config =`
-   logic, not `options =`), record `target_not_mechanically_derivable:
-   no option declaration in the diff itself` and STOP.
+   same file, construct ONE target per touched declaration, in the
+   order those declarations appear in the file (top to bottom by
+   source position) — do not pick "the most interesting one," and do
+   not reorder by any judgment. If the diff touches zero option
+   declarations directly (e.g., only touches `config =` logic, not
+   `options =`), record `target_not_mechanically_derivable: no option
+   declaration in the diff itself` and STOP (same NC2-only accounting
+   as step 2, above).
+
+   **Target-multiplicity budget cap (S6-R0A item 4)**: process the 15
+   sampled PRs in their own frozen sample order (the order
+   `select_p1_sample` returned them in); within each PR, process its
+   own touched declarations in the source-position order just
+   described. Accept targets into the pilot until the pilot-wide
+   `MAX_TARGETS_TOTAL = 30` cap (`pilot-accounting.py`) is reached;
+   every target beyond the cap is recorded as
+   `target_construction_incomplete_due_to_budget_cap` — never silently
+   dropped, never adjudicated, and excluded from every NC count. This
+   cap is a pre-committed COST bound (roughly two independently-touched
+   declarations per sampled PR, on average) decided now, in R0A,
+   before any real PR is examined — never adjusted after seeing how
+   many targets a real batch actually produces. See
+   `pilot-accounting.apply_target_cap` for the exact, tested
+   implementation.
 
 4. **Derive `option_prefix`/`watch`**: `option_prefix` is the
    declaration's own path up to but not including its final segment;
@@ -72,15 +103,47 @@ it").
    target record from step 6, exactly as every prior S-round's own
    replay tooling already does.
 
-## NC2's own operational definition, restated
+## Unit model and NC2/NC3/NC4, restated precisely (S6-R0A correction)
 
-A PR counts as a **successful mechanical derivation** (contributes to
-the NC2 numerator) if it reaches step 6 for at least one target,
-without any step above requiring information or discretion beyond what
-that step itself specifies. A PR that stops at step 2, 3, or 5 is a
-**mechanical non-derivation** (does NOT count toward the NC2
-numerator, but DOES count toward the fixed 15-PR denominator — it is
-not discarded or replaced).
+**Sampling unit**: PR (exactly 15, fixed). **Analysis/adjudication
+unit**: target (zero, one, or several per PR, per step 3's own
+multi-target rule, subject to the pilot-wide budget cap).
+
+Five counters, kept explicitly distinct (never conflated):
+
+- `sampled_pr_count` = 15 (fixed).
+- `derived_pr_count` = number of the 15 PRs that reach step 6 for at
+  least one target (regardless of how many targets that PR itself
+  produced).
+- `derived_target_count` = total number of targets accepted into the
+  pilot across all 15 PRs, after the budget cap (`pilot-accounting.
+  apply_target_cap`'s own `accepted` list length).
+- `substantive_target_count` = of `derived_target_count`, how many
+  reach a substantive `oba` result (not `INPUT_OR_HARNESS_FAILURE`).
+- `adjudicated_target_count` (a.k.a. "adjudicable" in NC4) = of
+  `substantive_target_count`, how many receive a trustworthy,
+  non-`ORACLE_AMBIGUOUS` adjudication.
+
+**NC2** (`pilot_accounting.nc2_pr_level`): numerator `derived_pr_count`,
+denominator `sampled_pr_count` (= 15, always). A PR that stops at step
+2, 3, or 5 is a mechanical non-derivation — it affects NC2's own
+denominator (it was sampled) but contributes NOTHING to NC3/NC4 (it
+produced no target to be substantive or adjudicable about). KILL:
+`derived_pr_count < 9`.
+
+**NC3** (`pilot_accounting.nc3_target_level`): numerator
+`substantive_target_count`, denominator `derived_target_count`
+(TARGETS, never PRs, and never inflated by a PR's own non-derivation).
+KILL: `substantive_target_count < ceil(0.7 * derived_target_count)`.
+
+**NC4** (`pilot_accounting.nc4_target_level`): numerator
+`adjudicated_target_count`, denominator `substantive_target_count`.
+KILL: `adjudicated_target_count < ceil(0.7 * substantive_target_count)`.
+
+A target cut by the budget cap (`target_construction_incomplete_due_to_
+budget_cap`) is excluded from ALL FIVE counters above — it was never
+attempted, so it can be neither a derivation, a substantive result, nor
+an adjudication.
 
 ## What this protocol deliberately does NOT attempt
 

@@ -1,5 +1,11 @@
 # S6 adjudication rubric (frozen before any P1 result is examined)
 
+**Unit note (S6-R0A)**: every "P1 case" below is a **target**, not a
+PR — one sampled PR may yield several targets (see
+`target-construction-protocol.md`'s own S6-R0A correction), and every
+one of them is adjudicated independently, up to the pilot-wide
+`MAX_TARGETS_TOTAL` budget cap.
+
 ## Oracle procedure (item 10)
 
 For every P1 target that reaches a substantive `oba` result (not
@@ -58,7 +64,7 @@ design, not something this rubric pretends is fully blinded.
 
 ## Reviewer escalation rule (item 12)
 
-One primary reviewer decides every P1 case via the blinded procedure
+One primary reviewer decides every P1 target via the blinded procedure
 above. A second, INDEPENDENT reviewer (a fresh process/agent instance
 with no memory of the primary reviewer's own written answer, given
 only the same evidence packet and the same blinded question) is
