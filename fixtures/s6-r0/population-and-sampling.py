@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
-"""S6-R0C (amends S6-R0B, commit ccdfbe9, which amends S6-R0A, commit
-0cb69b0, which amends S6-R0, commit 218bf47 -- see
-R0C-final-pre-P0-guards.md for the full rationale): frozen,
-deterministic population/census/sampling specification for the future
-S6 pilot (P0 census, P1 sample selection), with a correctly PAGINATING
-real search implementation, bounded/observable retry semantics, a
-temporal-window MATURITY guard (a window is never queried before its
-own exclusive upper bound has actually elapsed), and a changed-file
-COMPLETENESS guard (GitHub's own `/pulls/{n}/files` endpoint cannot
-represent more than 3000 files; the PR's own authoritative
-`changed_files` metadata count is cross-checked before any file list is
-trusted).
+"""S6-R0D (amends S6-R0C, commit 62bdec7, which amends S6-R0B, commit
+ccdfbe9, which amends S6-R0A, commit 0cb69b0, which amends S6-R0,
+commit 218bf47 -- see R0D-window-increment-amendment.md for the full
+rationale): frozen, deterministic population/census/sampling
+specification for the future S6 pilot (P0 census, P1 sample selection),
+with a correctly PAGINATING real search implementation,
+bounded/observable retry semantics, a temporal-window MATURITY guard (a
+window is never queried before its own exclusive upper bound has
+actually elapsed), a changed-file COMPLETENESS guard (GitHub's own
+`/pulls/{n}/files` endpoint cannot represent more than 3000 files; the
+PR's own authoritative `changed_files` metadata count is cross-checked
+before any file list is trusted), and a cheaper initial P0 kill-gate
+window (3 days, not 7 -- P0 only needs to answer one cheap density
+question, and 3 days is a deliberately chosen middle ground between a
+single, potentially unrepresentative day and an overpriced week).
 
 NOT EXECUTED against the real post-v0.5.0 candidate window as part of
-S6-R0/S6-R0A/S6-R0B/S6-R0C. Every function here is unit-testable via
-dependency injection (`search_fn`, `page_fetch_fn`, `raw_fetch_fn`,
+S6-R0/S6-R0A/S6-R0B/S6-R0C/S6-R0D. Every function here is unit-testable
+via dependency injection (`search_fn`, `page_fetch_fn`, `raw_fetch_fn`,
 `metadata_fetch_fn`, `sleep_fn`, `now_fn`) against synthetic/mocked
 responses only -- see `test_population_and_sampling.py`, which uses no
 real network call and no S6 candidate date. The first real execution
@@ -27,7 +30,8 @@ Every number here (window increment, hard cap, census cap, NC
 thresholds, target cap, seed, MAX_FETCH_ATTEMPTS,
 GITHUB_PR_FILES_HARD_CAP) is frozen in fixtures/s6-r0/preregistration.md
 as amended by R0A-protocol-errata.md, R0B-execution-tooling-errata.md,
-and R0C-final-pre-P0-guards.md, and restated here only so the code and
+R0C-final-pre-P0-guards.md, and R0D-window-increment-amendment.md, and
+restated here only so the code and
 the prose can never silently drift apart.
 """
 import subprocess
@@ -48,8 +52,19 @@ RELEASE_COMMIT_SHORT = "0a6f192"
 # the frozen anchor.
 LOWER_BOUND = datetime(2026, 9, 24, 5, 46, 5, tzinfo=timezone.utc)
 
-WINDOW_INCREMENT_DAYS = 7
-WINDOW_HARD_CAP_DAYS = 42
+WINDOW_INCREMENT_DAYS = 3  # S6-R0D: was 7 -- P0 only needs to answer one
+                            # cheap question ("is there enough potentially
+                            # relevant volume in the fresh stream?"); 7 days
+                            # overpays for that first kill-gate, 1 day risks
+                            # landing in an unrepresentative slice, 3 is the
+                            # deliberately chosen middle -- see
+                            # R0D-window-increment-amendment.md. Same clean
+                            # arithmetic extension shape as before (3 -> +3
+                            # -> +3 -> ...), just a smaller unit.
+WINDOW_HARD_CAP_DAYS = 42  # unchanged -- the overall "give up" ceiling is
+                            # untouched by S6-R0D; only the per-check
+                            # granularity got cheaper (14 three-day steps
+                            # instead of 6 seven-day steps to reach it).
 CENSUS_CAP = 100          # max PRs whose changed-files are fetched per window-check
 NC1_THRESHOLD = 20        # min potentially_relevant PRs required to stop extending
 P1_SAMPLE_SIZE = 15
@@ -565,9 +580,9 @@ def check_leakage(pr_numbers, exclusion_path="fixtures/s6-r0/excluded-pr-identit
 if __name__ == "__main__":
     raise SystemExit(
         "This script is a frozen SPECIFICATION for S6-R0/S6-R0A/S6-R0B/"
-        "S6-R0C. It is committed but not executed against the real "
-        "candidate window by any of these rounds. Running it against "
-        "real post-v0.5.0 data is P0/P1 work and requires a separate, "
-        "later, explicit GO -- and cannot succeed before the frozen "
-        "initial window's own upper bound has actually elapsed."
+        "S6-R0C/S6-R0D. It is committed but not executed against the "
+        "real candidate window by any of these rounds. Running it "
+        "against real post-v0.5.0 data is P0/P1 work and requires a "
+        "separate, later, explicit GO -- and cannot succeed before the "
+        "frozen initial window's own upper bound has actually elapsed."
     )

@@ -1,5 +1,13 @@
 # S6-R0C: final pre-P0 execution guards for S6-R0/R0A/R0B
 
+> **FURTHER AMENDED by S6-R0D** (`R0D-window-increment-amendment.md`):
+> the initial P0 window this document's own maturity guard governs
+> shrunk from 7 days to 3 (a reasoned cost adjustment, not a bug fix,
+> made while still blind to any S6 data) — first eligible P0 execution
+> time is now `2026-09-27T05:46:05Z`, not `2026-10-01T05:46:05Z`. The
+> maturity guard MECHANISM itself (`census`'s own `now_utc < upper`
+> check) is unaffected.
+
 **Parent protocol commits**: S6-R0 preregistration
 `218bf4727b86ba3234252bc636e4329dcdd22414`; S6-R0A amendment
 `0cb69b0fb3b3a50643af6a406cf080dee657d705`; S6-R0B amendment

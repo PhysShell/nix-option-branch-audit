@@ -25,7 +25,13 @@
 > not elapsed yet) and a changed-file COMPLETENESS guard (GitHub's own
 > `/pulls/{n}/files` endpoint cannot represent more than 3000 files per
 > PR) — both execution preconditions/safeguards, no scientific/sampling
-> semantics changed.
+> semantics changed. **Further amended by S6-R0D**
+> (`R0D-window-increment-amendment.md`): the initial P0 window shrunk
+> from 7 days to 3 (extension increment likewise `+3`, hard cap
+> unchanged at 42 days) — a deliberate, reasoned cost adjustment made
+> while still fully blind to any S6 candidate data, not a response to
+> one. First eligible P0 execution time is now `2026-09-27T05:46:05Z`,
+> not `2026-10-01T05:46:05Z`.
 
 This document freezes every design decision for S6 BEFORE any P0
 census, P1 pilot, or adjudication happens. Nothing here changes after

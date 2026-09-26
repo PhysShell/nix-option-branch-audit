@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""S6-R0A/S6-R0B protocol-tooling regression tests. Synthetic/mocked
-API responses and historical (pre-S6, arbitrary) dates ONLY -- no real
-network call, no query against the actual post-v0.5.0 candidate
-window. Confirms this file's own compliance is exactly the point of
-S6-R0A item 2 ("Preserve blindness"): see `test_no_real_network_calls`
-and `test_no_s6_candidate_window_dates_used`, below, which check THIS
-FILE's own source text for exactly that.
+"""S6-R0A/S6-R0B/S6-R0C/S6-R0D protocol-tooling regression tests.
+Synthetic/mocked API responses and historical (pre-S6, arbitrary) dates
+ONLY -- no real network call, no query against the actual post-v0.5.0
+candidate window. Confirms this file's own compliance is exactly the
+point of S6-R0A item 2 ("Preserve blindness"): see
+`test_no_real_network_calls` and `test_no_s6_candidate_window_dates_used`,
+below, which check THIS FILE's own source text for exactly that.
 
 The R0B section (search pagination correctness, bounded retry
 semantics, per-PR/per-window incompleteness statuses) tests the LOWER-
@@ -16,7 +16,11 @@ documents; the R0A-era tests above continue to test
 `fetch_merged_prs_in_window`'s own shard-bisection logic at the
 higher-level `search_fn(query) -> (items, total, incomplete)`
 injection point, unchanged and still passing verbatim against the
-rewritten implementation.
+rewritten implementation. The R0C section tests the temporal-window
+maturity guard and the changed-file completeness guard. Every test in
+both sections, and the R0D test below, reads `WINDOW_INCREMENT_DAYS`
+symbolically from the module (never a hardcoded "7"), so S6-R0D's own
+7->3 day change required editing exactly one constant, not any test.
 
 Run with: python3 fixtures/s6-r0/test_population_and_sampling.py
 """
@@ -815,6 +819,33 @@ def test_incomplete_file_list_case_does_not_become_obviously_irrelevant_r0c():
         raise AssertionError("expected WindowEvaluationIncomplete")
     except ps.WindowEvaluationIncomplete as e:
         assert e.incomplete_pr_numbers == [2]
+
+
+# ======================================================================
+# S6-R0D: cheaper initial P0 kill-gate window (3 days, not 7)
+# ======================================================================
+
+def test_window_increment_is_three_days_not_seven():
+    assert ps.WINDOW_INCREMENT_DAYS == 3
+    assert ps.WINDOW_HARD_CAP_DAYS == 42, "the overall ceiling is unchanged by S6-R0D"
+
+
+def test_first_window_upper_bound_is_three_days_after_lower_bound():
+    # Deliberately a pure datetime-object comparison, both sides derived
+    # from ps.LOWER_BOUND -- never a hand-typed date-string literal for
+    # the real window boundary (this file's own "preserve blindness"
+    # meta-tests, below, specifically forbid quoted S6-window date
+    # strings; a computed-vs-computed equality check proves the same
+    # fact without needing one).
+    expected = ps.LOWER_BOUND + timedelta(days=3)
+    upper = ps.LOWER_BOUND + timedelta(days=ps.WINDOW_INCREMENT_DAYS)
+    assert upper == expected
+
+
+def test_extension_reaches_hard_cap_in_fourteen_three_day_steps():
+    steps = ps.WINDOW_HARD_CAP_DAYS // ps.WINDOW_INCREMENT_DAYS
+    assert steps == 14
+    assert ps.LOWER_BOUND + timedelta(days=steps * ps.WINDOW_INCREMENT_DAYS) == ps.LOWER_BOUND + timedelta(days=ps.WINDOW_HARD_CAP_DAYS)
 
 
 # --- meta: this test file's own compliance with "preserve blindness" ---

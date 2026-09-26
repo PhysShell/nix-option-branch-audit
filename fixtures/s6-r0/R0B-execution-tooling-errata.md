@@ -6,7 +6,9 @@
 > Search API's own 1000-result cap this document fixed) — both
 > execution preconditions/safeguards, found still before any S6
 > candidate data existed. This document's own two fixes (pagination,
-> retry semantics) are unaffected and remain in force.
+> retry semantics) are unaffected and remain in force. **Further
+> amended by S6-R0D** (`R0D-window-increment-amendment.md`): initial P0
+> window shrunk 7 days -> 3 (a reasoned cost adjustment, not a bug fix).
 
 **Parent protocol commits**: S6-R0 preregistration
 `218bf4727b86ba3234252bc636e4329dcdd22414`; S6-R0A amendment

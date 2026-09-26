@@ -11,6 +11,9 @@
 > (`R0C-final-pre-P0-guards.md`): a temporal-window maturity guard and a
 > changed-file completeness guard (GitHub's own 3000-file
 > `/pulls/{n}/files` cap) — execution preconditions/safeguards only.
+> **Further amended by S6-R0D** (`R0D-window-increment-amendment.md`):
+> initial P0 window shrunk 7 days -> 3 (a reasoned cost adjustment made
+> while still blind to any S6 data, not a response to one).
 
 **Original preregistration commit**: `218bf4727b86ba3234252bc636e4329dcdd22414`.
 
