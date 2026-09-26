@@ -19,7 +19,13 @@
 > R0A's own tooling (Search API pagination was never actually
 > implemented; the retry semantics R0A froze in prose were never
 > implemented in code) corrected, still before any S6 candidate data
-> existed.
+> existed. **Further amended by S6-R0C**
+> (`R0C-final-pre-P0-guards.md`): a temporal-window MATURITY guard (the
+> frozen initial window's own upper bound, `2026-10-01T05:46:05Z`, had
+> not elapsed yet) and a changed-file COMPLETENESS guard (GitHub's own
+> `/pulls/{n}/files` endpoint cannot represent more than 3000 files per
+> PR) — both execution preconditions/safeguards, no scientific/sampling
+> semantics changed.
 
 This document freezes every design decision for S6 BEFORE any P0
 census, P1 pilot, or adjudication happens. Nothing here changes after

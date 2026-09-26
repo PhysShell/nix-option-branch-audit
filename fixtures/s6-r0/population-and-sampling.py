@@ -1,24 +1,34 @@
 #!/usr/bin/env python3
-"""S6-R0B (amends S6-R0A, commit 0cb69b0, which amends S6-R0, commit
-218bf47 -- see R0B-execution-tooling-errata.md for the full rationale):
-frozen, deterministic population/census/sampling specification for the
-future S6 pilot (P0 census, P1 sample selection), now with a correctly
-PAGINATING real search implementation and bounded, observable retry
-semantics for both population queries and per-PR changed-file fetches.
+"""S6-R0C (amends S6-R0B, commit ccdfbe9, which amends S6-R0A, commit
+0cb69b0, which amends S6-R0, commit 218bf47 -- see
+R0C-final-pre-P0-guards.md for the full rationale): frozen,
+deterministic population/census/sampling specification for the future
+S6 pilot (P0 census, P1 sample selection), with a correctly PAGINATING
+real search implementation, bounded/observable retry semantics, a
+temporal-window MATURITY guard (a window is never queried before its
+own exclusive upper bound has actually elapsed), and a changed-file
+COMPLETENESS guard (GitHub's own `/pulls/{n}/files` endpoint cannot
+represent more than 3000 files; the PR's own authoritative
+`changed_files` metadata count is cross-checked before any file list is
+trusted).
 
 NOT EXECUTED against the real post-v0.5.0 candidate window as part of
-S6-R0/S6-R0A/S6-R0B. Every function here is unit-testable via
+S6-R0/S6-R0A/S6-R0B/S6-R0C. Every function here is unit-testable via
 dependency injection (`search_fn`, `page_fetch_fn`, `raw_fetch_fn`,
-`sleep_fn`) against synthetic/mocked responses only -- see
-`test_population_and_sampling.py`, which uses no real network call and
-no S6 candidate date. The first real execution against the actual
-window remains P0 and requires a separate, later, explicit GO.
+`metadata_fetch_fn`, `sleep_fn`, `now_fn`) against synthetic/mocked
+responses only -- see `test_population_and_sampling.py`, which uses no
+real network call and no S6 candidate date. The first real execution
+against the actual window remains P0 and requires a separate, later,
+explicit GO -- and cannot succeed before the frozen window's own upper
+bound has actually elapsed, enforced mechanically by this file's own
+maturity guard, not merely by operator discipline.
 
 Every number here (window increment, hard cap, census cap, NC
-thresholds, target cap, seed, MAX_FETCH_ATTEMPTS) is frozen in
-fixtures/s6-r0/preregistration.md as amended by R0A-protocol-errata.md
-and R0B-execution-tooling-errata.md, and restated here only so the code
-and the prose can never silently drift apart.
+thresholds, target cap, seed, MAX_FETCH_ATTEMPTS,
+GITHUB_PR_FILES_HARD_CAP) is frozen in fixtures/s6-r0/preregistration.md
+as amended by R0A-protocol-errata.md, R0B-execution-tooling-errata.md,
+and R0C-final-pre-P0-guards.md, and restated here only so the code and
+the prose can never silently drift apart.
 """
 import subprocess
 import json
@@ -64,6 +74,19 @@ SEARCH_PAGE_SIZE = 100
 # S6-R0B item 5: frozen, bounded retry budget for every real network
 # call this tooling makes. No unbounded retry loop anywhere.
 MAX_FETCH_ATTEMPTS = 3
+
+# S6-R0C item 3: GitHub's own documented hard ceiling on how many files
+# `GET /repos/{owner}/{repo}/pulls/{pull_number}/files` can represent,
+# REGARDLESS of pagination -- a PR with more changed files than this
+# cannot have its full file list proven complete via that endpoint at
+# all (unlike the Search API's own 1000-result cap, this one cannot be
+# worked around by subdividing the QUERY -- there is only one PR, its
+# own file count is what it is). The PR resource's own top-level
+# `changed_files` field is a SEPARATE, independently-computed diff-stat
+# integer, not itself subject to this same 3000-item listing cap, which
+# is exactly why comparing "reported changed_files" against "retrieved
+# file count" is a valid authoritative completeness check.
+GITHUB_PR_FILES_HARD_CAP = 3000
 
 
 def obviously_irrelevant_or_potentially_relevant(changed_files):
@@ -166,6 +189,36 @@ class WindowEvaluationIncomplete(Exception):
         )
 
 
+class WindowNotMatured(Exception):
+    """S6-R0C item 1-2: raised BEFORE any GitHub candidate query is
+    performed (population or otherwise) when `now_utc < upper` for the
+    window under evaluation -- the frozen window's own population does
+    not fully exist yet; querying it now would silently measure a
+    truncated, still-in-progress population and call it "the frozen
+    window," which is a different, unauthorized experiment. Applies
+    identically to the initial window AND to every later NC1 extension
+    (`find_final_window`'s own loop calls `census` again for each
+    extended `upper`, and this same guard fires again there -- no
+    separate extension-specific logic is needed). Distinct from both
+    `STOP_LOW_YIELD` (a genuine low-density result) and
+    `window_evaluation_incomplete` (missing classification data for an
+    already-fully-existing population) -- an immature window is neither
+    of those; it simply cannot be evaluated yet.
+    """
+    def __init__(self, now_utc, required_upper_bound):
+        self.now_utc = now_utc
+        self.required_upper_bound = required_upper_bound
+        super().__init__(
+            f"window_not_matured: now={now_utc.isoformat()} < required upper "
+            f"bound {required_upper_bound.isoformat()} -- no GitHub candidate "
+            f"query was performed"
+        )
+
+
+def _default_now():
+    return datetime.now(timezone.utc)
+
+
 def _shard_query(shard_lo_date, shard_hi_date):
     # merged: is an INCLUSIVE date..date range in GitHub's own search
     # syntax -- shard_hi_date here is the LAST included calendar date,
@@ -195,6 +248,21 @@ def _raw_fetch_changed_files(pr_number):
         capture_output=True, text=True, timeout=60, check=True,
     )
     return out.stdout.splitlines()
+
+
+def _raw_fetch_pr_changed_files_count(pr_number):
+    """The PR resource's OWN top-level `changed_files` field (`GET
+    /repos/{owner}/{repo}/pulls/{pull_number}`) -- an independently
+    computed diff-stat integer, not the `/files` LISTING endpoint's own
+    output, and not subject to that endpoint's own 3000-item cap. This
+    is the authoritative count `fetch_changed_files` cross-checks the
+    actually-retrieved file list against, per S6-R0C item 3.
+    """
+    out = subprocess.run(
+        ["gh", "api", f"repos/{REPO}/pulls/{pr_number}", "--jq", ".changed_files"],
+        capture_output=True, text=True, timeout=60, check=True,
+    )
+    return int(out.stdout.strip())
 
 
 def _search_page(query, page, page_fetch_fn=None):
@@ -326,18 +394,59 @@ def fetch_merged_prs_in_window(lower, upper, search_fn=None, sleep_fn=None):
     return filtered
 
 
-def fetch_changed_files(pr_number, raw_fetch_fn=None, sleep_fn=None):
-    """Per-PR changed-file fetch, bounded-retried
-    (`MAX_FETCH_ATTEMPTS`). Raises `ChangedFileFetchIncomplete` (never
-    propagates a raw `subprocess`/network exception) once the retry
-    budget is exhausted -- the caller (`census`) is responsible for
-    recording this per-PR, not for the whole window.
+def fetch_changed_files(pr_number, raw_fetch_fn=None, metadata_fetch_fn=None, sleep_fn=None):
+    """Per-PR changed-file fetch, bounded-retried (`MAX_FETCH_ATTEMPTS`)
+    at every step, now with S6-R0C's own completeness guard:
+
+    1. Fetch the PR's own authoritative `changed_files` metadata count
+       FIRST (cheap: one object, no pagination) -- before attempting the
+       potentially-expensive file-list fetch at all.
+    2. If that count exceeds `GITHUB_PR_FILES_HARD_CAP` (3000), fail
+       closed immediately -- the `/files` listing endpoint literally
+       cannot represent this PR's own complete file list, no amount of
+       pagination fixes that, and no file-list fetch is even attempted
+       (item 6's own network-cost discipline).
+    3. Otherwise, fetch the actual file list (bounded-retried,
+       pagination-complete per S6-R0B) and require
+       `len(retrieved) == reported_count` -- any mismatch is ALSO
+       incompleteness, never silently accepted.
+
+    Raises `ChangedFileFetchIncomplete` (never a raw `subprocess`/
+    network exception) for every failure mode above -- the caller
+    (`census`) is responsible for recording this per-PR, not for the
+    whole window.
     """
+    metadata_fetch_fn = metadata_fetch_fn or _raw_fetch_pr_changed_files_count
     raw_fetch_fn = raw_fetch_fn or _raw_fetch_changed_files
+
     try:
-        return with_retry(lambda: raw_fetch_fn(pr_number), sleep_fn=sleep_fn)
+        reported_count = with_retry(lambda: metadata_fetch_fn(pr_number), sleep_fn=sleep_fn)
     except Exception as e:
-        raise ChangedFileFetchIncomplete(pr_number, str(e))
+        raise ChangedFileFetchIncomplete(
+            pr_number, f"metadata fetch failed after {MAX_FETCH_ATTEMPTS} attempts: {e}"
+        )
+
+    if reported_count > GITHUB_PR_FILES_HARD_CAP:
+        raise ChangedFileFetchIncomplete(
+            pr_number,
+            f"reported_changed_files_exceeds_github_{GITHUB_PR_FILES_HARD_CAP}_file_api_limit "
+            f"(reported_count={reported_count})",
+        )
+
+    try:
+        files = with_retry(lambda: raw_fetch_fn(pr_number), sleep_fn=sleep_fn)
+    except Exception as e:
+        raise ChangedFileFetchIncomplete(
+            pr_number, f"file list fetch failed after {MAX_FETCH_ATTEMPTS} attempts: {e}"
+        )
+
+    if len(files) != reported_count:
+        raise ChangedFileFetchIncomplete(
+            pr_number,
+            f"retrieved_file_count({len(files)}) != reported_changed_file_count({reported_count})",
+        )
+
+    return files
 
 
 def systematic_sample(ordered_list, cap):
@@ -353,8 +462,12 @@ def systematic_sample(ordered_list, cap):
     return [ordered_list[i] for i in idx]
 
 
-def census(lower, upper, search_fn=None, changed_files_fn=None, sleep_fn=None):
+def census(lower, upper, search_fn=None, changed_files_fn=None, sleep_fn=None, now_fn=None):
     """One window-check: returns `(inspected_count, potentially_relevant_list)`.
+
+    Raises `WindowNotMatured` (S6-R0C items 1-2), BEFORE any network
+    call of any kind, if `now_utc < upper` -- the window's own
+    population does not fully exist yet.
 
     Raises `PopulationIncompleteError` (or its `PopulationQueryIncomplete`
     subclass) if the population fetch itself cannot be proven complete --
@@ -366,6 +479,11 @@ def census(lower, upper, search_fn=None, changed_files_fn=None, sleep_fn=None):
     window-check (never silently treated as "irrelevant," never treated
     as a genuine NC1 low-density result that would trigger extension).
     """
+    now_fn = now_fn or _default_now
+    now = now_fn()
+    if now < upper:
+        raise WindowNotMatured(now, upper)
+
     changed_files_fn = changed_files_fn or (lambda n: fetch_changed_files(n, sleep_fn=sleep_fn))
     merged = fetch_merged_prs_in_window(lower, upper, search_fn=search_fn, sleep_fn=sleep_fn)
     inspected = systematic_sample(merged, CENSUS_CAP)
@@ -384,20 +502,26 @@ def census(lower, upper, search_fn=None, changed_files_fn=None, sleep_fn=None):
     return len(inspected), relevant
 
 
-def find_final_window(search_fn=None, changed_files_fn=None, sleep_fn=None):
+def find_final_window(search_fn=None, changed_files_fn=None, sleep_fn=None, now_fn=None):
     """The frozen window-extension loop (preregistration.md "Temporal
     freshness" / "Kill-first protocol" NC1 -- a WINDOW-level gate,
     evaluated only here, never per expansion-batch; see
     R0A-protocol-errata.md item 3). Returns either (lower, upper,
     relevant) on success, raises `SystemExit` on NC1 KILL
-    (`STOP_LOW_YIELD`), or propagates `WindowEvaluationIncomplete`/
-    `PopulationIncompleteError` UNCAUGHT -- an incomplete window-check
-    is never silently treated as either a pass or a genuine low-yield
-    extension trigger (S6-R0B item 4).
+    (`STOP_LOW_YIELD`), or propagates `WindowNotMatured` (S6-R0C)/
+    `WindowEvaluationIncomplete`/`PopulationIncompleteError` UNCAUGHT --
+    an immature or incomplete window-check is never silently treated as
+    either a pass or a genuine low-yield extension trigger (S6-R0B item
+    4, S6-R0C items 1-2). Applying the SAME per-call maturity check
+    inside `census` to every extension step, with no separate
+    extension-specific logic, is exactly what makes "the 14-day
+    extension's own upper bound hasn't elapsed yet" surface correctly
+    as `WindowNotMatured`, carrying that exact 14-day upper bound, the
+    first time `census` is called with it -- never skipped ahead to.
     """
     upper = LOWER_BOUND + timedelta(days=WINDOW_INCREMENT_DAYS)
     while True:
-        n_inspected, relevant = census(LOWER_BOUND, upper, search_fn, changed_files_fn, sleep_fn)
+        n_inspected, relevant = census(LOWER_BOUND, upper, search_fn, changed_files_fn, sleep_fn, now_fn)
         if len(relevant) >= NC1_THRESHOLD:
             return LOWER_BOUND, upper, relevant
         if (upper - LOWER_BOUND).days >= WINDOW_HARD_CAP_DAYS:
@@ -440,9 +564,10 @@ def check_leakage(pr_numbers, exclusion_path="fixtures/s6-r0/excluded-pr-identit
 
 if __name__ == "__main__":
     raise SystemExit(
-        "This script is a frozen SPECIFICATION for S6-R0/S6-R0A/S6-R0B. "
-        "It is committed but not executed against the real candidate "
-        "window by any of these rounds. Running it against real "
-        "post-v0.5.0 data is P0/P1 work and requires a separate, later, "
-        "explicit GO."
+        "This script is a frozen SPECIFICATION for S6-R0/S6-R0A/S6-R0B/"
+        "S6-R0C. It is committed but not executed against the real "
+        "candidate window by any of these rounds. Running it against "
+        "real post-v0.5.0 data is P0/P1 work and requires a separate, "
+        "later, explicit GO -- and cannot succeed before the frozen "
+        "initial window's own upper bound has actually elapsed."
     )

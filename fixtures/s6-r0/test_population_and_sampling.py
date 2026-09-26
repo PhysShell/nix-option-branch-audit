@@ -581,7 +581,7 @@ def _flaky_raw_fetch(fail_times):
 
 def test_changed_file_transient_failure_then_success():
     fn = _flaky_raw_fetch(fail_times=1)
-    files = ps.fetch_changed_files(123, raw_fetch_fn=fn)
+    files = ps.fetch_changed_files(123, raw_fetch_fn=fn, metadata_fetch_fn=lambda n: 1)
     assert files == ["nixos/modules/services/foo.nix"]
     assert fn.calls.count(123) == 2
 
@@ -589,7 +589,7 @@ def test_changed_file_transient_failure_then_success():
 def test_changed_file_fails_all_attempts_raises_changed_file_fetch_incomplete():
     fn = _flaky_raw_fetch(fail_times=999)  # always fails
     try:
-        ps.fetch_changed_files(123, raw_fetch_fn=fn)
+        ps.fetch_changed_files(123, raw_fetch_fn=fn, metadata_fetch_fn=lambda n: 1)
         raise AssertionError("expected ChangedFileFetchIncomplete")
     except ps.ChangedFileFetchIncomplete as e:
         assert e.pr_number == 123
@@ -630,8 +630,14 @@ def test_incomplete_census_propagates_through_find_final_window_not_extended_as_
     def changed_files_fn(n):
         raise ps.ChangedFileFetchIncomplete(n, "simulated")
 
+    # Matured well past even the hard-cap window, so S6-R0C's own
+    # maturity guard never interferes with what THIS test is actually
+    # checking (WindowEvaluationIncomplete propagation) -- maturity has
+    # its own dedicated tests, below.
+    matured_now = lambda: ps.LOWER_BOUND + timedelta(days=ps.WINDOW_HARD_CAP_DAYS + 1)
+
     try:
-        ps.find_final_window(search_fn=search, changed_files_fn=changed_files_fn)
+        ps.find_final_window(search_fn=search, changed_files_fn=changed_files_fn, now_fn=matured_now)
         raise AssertionError("expected WindowEvaluationIncomplete to propagate")
     except ps.WindowEvaluationIncomplete:
         pass
@@ -640,6 +646,175 @@ def test_incomplete_census_propagates_through_find_final_window_not_extended_as_
             "an incomplete census must never be silently reinterpreted as a "
             "genuine NC1 low-yield result triggering window extension/KILL"
         )
+
+
+# ======================================================================
+# S6-R0C: temporal-window maturity guard + changed-file completeness
+# ======================================================================
+
+def _fixed_now(dt):
+    return lambda: dt
+
+
+# --- window maturity ----------------------------------------------------
+
+def test_now_before_upper_is_blocked_with_zero_population_calls():
+    upper = HIST_UPPER
+    now_fn = _fixed_now(upper - timedelta(seconds=1))
+
+    def search_fn(query):
+        raise AssertionError("no GitHub candidate query may be performed before maturity")
+
+    try:
+        ps.census(HIST_LOWER, upper, search_fn=search_fn, now_fn=now_fn)
+        raise AssertionError("expected WindowNotMatured")
+    except ps.WindowNotMatured as e:
+        assert e.required_upper_bound == upper
+
+
+def test_now_exactly_at_upper_is_permitted():
+    upper = HIST_UPPER
+    now_fn = _fixed_now(upper)  # now == upper -- the exclusive bound has just elapsed
+    q = ps._shard_query(HIST_LOWER.date(), (upper - timedelta(microseconds=1)).date())
+    search = _mock_search({q: ([], 0, False)})
+    # Must not raise WindowNotMatured -- reaching the (empty) relevant
+    # list at all proves the population query was actually attempted.
+    n_inspected, relevant = ps.census(HIST_LOWER, upper, search_fn=search, now_fn=now_fn)
+    assert relevant == []
+
+
+def test_now_after_upper_is_permitted():
+    upper = HIST_UPPER
+    now_fn = _fixed_now(upper + timedelta(days=1))
+    q = ps._shard_query(HIST_LOWER.date(), (upper - timedelta(microseconds=1)).date())
+    search = _mock_search({q: ([], 0, False)})
+    n_inspected, relevant = ps.census(HIST_LOWER, upper, search_fn=search, now_fn=now_fn)
+    assert relevant == []
+
+
+def test_extension_window_immature_does_not_reinterpret_earlier_result_as_low_yield():
+    # First (7-day) window matures and evaluates cleanly with too few
+    # relevant PRs (NC1 fails); the SECOND (14-day) extension's own
+    # upper bound has not matured -- must surface as WindowNotMatured
+    # carrying THAT 14-day upper bound, never silently skipped past and
+    # never reported as STOP_LOW_YIELD for the (already fully evaluated,
+    # genuinely low-yield) first window.
+    first_upper = ps.LOWER_BOUND + timedelta(days=ps.WINDOW_INCREMENT_DAYS)
+    second_upper = ps.LOWER_BOUND + timedelta(days=2 * ps.WINDOW_INCREMENT_DAYS)
+    now_fn = _fixed_now(first_upper + timedelta(seconds=1))  # first matured, second not
+
+    q1 = ps._shard_query(ps.LOWER_BOUND.date(), (first_upper - timedelta(microseconds=1)).date())
+    search = _mock_search({q1: ([], 0, False)})  # zero relevant -- genuinely low yield
+
+    try:
+        ps.find_final_window(search_fn=search, now_fn=now_fn)
+        raise AssertionError("expected WindowNotMatured for the second (14-day) window")
+    except ps.WindowNotMatured as e:
+        assert e.required_upper_bound == second_upper
+    except SystemExit:
+        raise AssertionError(
+            "the first window's own genuine low yield must never be reported as "
+            "STOP_LOW_YIELD when the real reason execution stopped is that the "
+            "SECOND window has not matured yet"
+        )
+    assert search.calls == [q1], "the second window's own query must never be attempted before maturity"
+
+
+# --- changed-file completeness -------------------------------------------
+
+def _metadata(count):
+    return lambda pr_number: count
+
+
+def _files(n):
+    return [f"nixos/modules/services/f{i}.nix" for i in range(n)]
+
+
+def test_changed_files_reported_zero_retrieved_zero():
+    files = ps.fetch_changed_files(1, raw_fetch_fn=lambda n: [], metadata_fetch_fn=_metadata(0))
+    assert files == []
+
+
+def test_changed_files_reported_one_retrieved_one():
+    files = ps.fetch_changed_files(1, raw_fetch_fn=lambda n: _files(1), metadata_fetch_fn=_metadata(1))
+    assert len(files) == 1
+
+
+def test_changed_files_reported_2999_retrieved_2999():
+    files = ps.fetch_changed_files(1, raw_fetch_fn=lambda n: _files(2999), metadata_fetch_fn=_metadata(2999))
+    assert len(files) == 2999
+
+
+def test_changed_files_reported_exactly_3000_retrieved_3000():
+    files = ps.fetch_changed_files(1, raw_fetch_fn=lambda n: _files(3000), metadata_fetch_fn=_metadata(3000))
+    assert len(files) == 3000
+
+
+def test_changed_files_reported_3001_fails_closed_without_attempting_file_list_fetch():
+    def raw_fetch_fn(n):
+        raise AssertionError("the /files endpoint must never be queried once reported_count exceeds the cap")
+
+    try:
+        ps.fetch_changed_files(1, raw_fetch_fn=raw_fetch_fn, metadata_fetch_fn=_metadata(3001))
+        raise AssertionError("expected ChangedFileFetchIncomplete")
+    except ps.ChangedFileFetchIncomplete as e:
+        assert "3001" in str(e) and "exceeds_github_3000" in str(e)
+
+
+def test_changed_files_count_mismatch_is_incomplete():
+    files_fn = lambda n: _files(49)  # only 49 actually retrieved
+    try:
+        ps.fetch_changed_files(1, raw_fetch_fn=files_fn, metadata_fetch_fn=_metadata(50))
+        raise AssertionError("expected ChangedFileFetchIncomplete")
+    except ps.ChangedFileFetchIncomplete as e:
+        assert "49" in str(e) and "50" in str(e)
+
+
+def test_changed_files_metadata_transient_failure_then_success():
+    calls = []
+
+    def metadata_fetch_fn(n):
+        calls.append(n)
+        if len(calls) == 1:
+            raise RuntimeError("simulated transient failure")
+        return 1
+
+    files = ps.fetch_changed_files(1, raw_fetch_fn=lambda n: _files(1), metadata_fetch_fn=metadata_fetch_fn)
+    assert len(files) == 1
+    assert len(calls) == 2
+
+
+def test_changed_files_metadata_fails_all_attempts():
+    def metadata_fetch_fn(n):
+        raise RuntimeError("simulated permanent failure")
+
+    try:
+        ps.fetch_changed_files(1, raw_fetch_fn=lambda n: _files(1), metadata_fetch_fn=metadata_fetch_fn)
+        raise AssertionError("expected ChangedFileFetchIncomplete")
+    except ps.ChangedFileFetchIncomplete as e:
+        assert e.pr_number == 1
+
+
+def test_incomplete_file_list_case_does_not_become_obviously_irrelevant_r0c():
+    # Same shape as R0B's own equivalent test, but driven through the
+    # NEW completeness-guard failure mode (count mismatch) rather than a
+    # raw fetch exception -- confirms census() treats EVERY
+    # ChangedFileFetchIncomplete cause identically (never inspects
+    # `.cause` to decide relevance).
+    q = ps._shard_query(HIST_LOWER.date(), (HIST_UPPER - timedelta(microseconds=1)).date())
+    merged_items = _items([1, 2], ["2020-01-01T00:00:00Z", "2020-01-02T00:00:00Z"])
+    search = _mock_search({q: (merged_items, 2, False)})
+
+    def changed_files_fn(n):
+        if n == 1:
+            return ["nixos/modules/services/foo.nix"]
+        raise ps.ChangedFileFetchIncomplete(n, "reported_changed_files_exceeds_github_3000_file_api_limit (reported_count=5000)")
+
+    try:
+        ps.census(HIST_LOWER, HIST_UPPER, search_fn=search, changed_files_fn=changed_files_fn)
+        raise AssertionError("expected WindowEvaluationIncomplete")
+    except ps.WindowEvaluationIncomplete as e:
+        assert e.incomplete_pr_numbers == [2]
 
 
 # --- meta: this test file's own compliance with "preserve blindness" ---

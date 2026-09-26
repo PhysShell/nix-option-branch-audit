@@ -1,5 +1,13 @@
 # S6-R0B: execution-tooling errata for S6-R0/S6-R0A
 
+> **FURTHER AMENDED by S6-R0C** (`R0C-final-pre-P0-guards.md`): a
+> temporal-window maturity guard and a changed-file completeness guard
+> (GitHub's own 3000-file `/pulls/{n}/files` cap, distinct from the
+> Search API's own 1000-result cap this document fixed) — both
+> execution preconditions/safeguards, found still before any S6
+> candidate data existed. This document's own two fixes (pagination,
+> retry semantics) are unaffected and remain in force.
+
 **Parent protocol commits**: S6-R0 preregistration
 `218bf4727b86ba3234252bc636e4329dcdd22414`; S6-R0A amendment
 `0cb69b0fb3b3a50643af6a406cf080dee657d705`.

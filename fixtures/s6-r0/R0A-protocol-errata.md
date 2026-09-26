@@ -7,7 +7,10 @@
 > never implemented in code) were found and corrected there, still
 > before any S6 candidate data existed. This document's own scientific/
 > sampling corrections (unit model, NC2-4 denominators, expansion-gate
-> fix) are unaffected and remain in force.
+> fix) are unaffected and remain in force. **Further amended by S6-R0C**
+> (`R0C-final-pre-P0-guards.md`): a temporal-window maturity guard and a
+> changed-file completeness guard (GitHub's own 3000-file
+> `/pulls/{n}/files` cap) — execution preconditions/safeguards only.
 
 **Original preregistration commit**: `218bf4727b86ba3234252bc636e4329dcdd22414`.
 
