@@ -14,7 +14,12 @@
 > anything (`population-and-sampling.py`, `pilot-accounting.py`,
 > `target-construction-protocol.md`, and `adjudication-rubric.md` have
 > all been updated in place to the corrected model; this document has
-> not, by design).
+> not, by design). **Further amended by S6-R0B**
+> (`R0B-execution-tooling-errata.md`): two execution-level bugs in
+> R0A's own tooling (Search API pagination was never actually
+> implemented; the retry semantics R0A froze in prose were never
+> implemented in code) corrected, still before any S6 candidate data
+> existed.
 
 This document freezes every design decision for S6 BEFORE any P0
 census, P1 pilot, or adjudication happens. Nothing here changes after

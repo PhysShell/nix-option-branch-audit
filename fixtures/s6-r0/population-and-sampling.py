@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
-"""S6-R0A (amends S6-R0, commit 218bf47 -- see R0A-protocol-errata.md
-for the full rationale): frozen, deterministic population/census/
-sampling specification for the future S6 pilot (P0 census, P1 sample
-selection).
+"""S6-R0B (amends S6-R0A, commit 0cb69b0, which amends S6-R0, commit
+218bf47 -- see R0B-execution-tooling-errata.md for the full rationale):
+frozen, deterministic population/census/sampling specification for the
+future S6 pilot (P0 census, P1 sample selection), now with a correctly
+PAGINATING real search implementation and bounded, observable retry
+semantics for both population queries and per-PR changed-file fetches.
 
 NOT EXECUTED against the real post-v0.5.0 candidate window as part of
-S6-R0 or S6-R0A. Every function here is unit-testable via dependency
-injection (`search_fn`) against synthetic/mocked responses only -- see
+S6-R0/S6-R0A/S6-R0B. Every function here is unit-testable via
+dependency injection (`search_fn`, `page_fetch_fn`, `raw_fetch_fn`,
+`sleep_fn`) against synthetic/mocked responses only -- see
 `test_population_and_sampling.py`, which uses no real network call and
 no S6 candidate date. The first real execution against the actual
 window remains P0 and requires a separate, later, explicit GO.
 
 Every number here (window increment, hard cap, census cap, NC
-thresholds, target cap, seed) is frozen in
-fixtures/s6-r0/preregistration.md (as amended by R0A-protocol-errata.md)
-and restated here only so the code and the prose can never silently
-drift apart.
+thresholds, target cap, seed, MAX_FETCH_ATTEMPTS) is frozen in
+fixtures/s6-r0/preregistration.md as amended by R0A-protocol-errata.md
+and R0B-execution-tooling-errata.md, and restated here only so the code
+and the prose can never silently drift apart.
 """
 import subprocess
 import json
@@ -48,14 +51,19 @@ MAX_TARGETS_TOTAL = 30    # S6-R0A item 4: a pre-committed COST bound, not deriv
 SEED = int(RELEASE_COMMIT_SHORT, 16)  # same convention as historical S5:
                                        # seed = int(<release-commit-short-sha>, 16)
 
-# GitHub Search API's own documented constraint (S6-R0A item 1): a
-# single search query's own results are retrievable up to at most this
-# many items via pagination, REGARDLESS of `--paginate` and regardless
-# of how large `total_count` itself reports. `total_count` above this
-# value means the query's own true match set exceeds what can be
-# retrieved -- the query's own shard must be subdivided BEFORE its
-# items are trusted, never after silently truncated pagination.
+# GitHub Search API's own documented constraint: a single search
+# query's own results are retrievable up to at most this many items via
+# pagination, REGARDLESS of how large `total_count` itself reports.
+# `total_count` above this value means the query's own true match set
+# exceeds what can be retrieved -- the query's own shard must be
+# subdivided BEFORE its items are trusted, never after silently
+# truncated pagination.
 SEARCH_API_RESULT_CAP = 1000
+SEARCH_PAGE_SIZE = 100
+
+# S6-R0B item 5: frozen, bounded retry budget for every real network
+# call this tooling makes. No unbounded retry loop anywhere.
+MAX_FETCH_ATTEMPTS = 3
 
 
 def obviously_irrelevant_or_potentially_relevant(changed_files):
@@ -76,44 +84,86 @@ def obviously_irrelevant_or_potentially_relevant(changed_files):
     return "obviously_irrelevant"
 
 
+def with_retry(fn, max_attempts=MAX_FETCH_ATTEMPTS, sleep_fn=None):
+    """S6-R0B item 5: the one, shared, bounded-retry primitive every
+    real network call in this file goes through. Calls `fn()` up to
+    `max_attempts` times, returning on first success; re-raises the
+    LAST exception once attempts are exhausted. `sleep_fn(attempt)` is
+    an optional injectable backoff hook (a real production wiring MAY
+    pass real GitHub rate-limit-aware backoff here later; every test in
+    this round passes `None`, so no test ever sleeps in real time).
+    Attempt count is observable indirectly: a mock's own call count,
+    asserted by the caller after the fact.
+    """
+    last_exc = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return fn()
+        except Exception as e:  # noqa: BLE001 -- any failure is a retry candidate here
+            last_exc = e
+            if sleep_fn and attempt < max_attempts:
+                sleep_fn(attempt)
+    raise last_exc
+
+
 class PopulationIncompleteError(Exception):
     """Raised when a temporal shard cannot be proven complete even at
     the finest supported granularity (one whole UTC day -- GitHub
-    Search's own `merged:` qualifier has no finer resolution). Per
-    S6-R0A item 7: population incompleteness is special -- it can bias
-    WHO gets sampled, so it must fail the entire affected window
-    evaluation, never merely skip the offending shard and continue.
+    Search's own `merged:` qualifier has no finer resolution), OR when
+    a population query's own retry budget is exhausted (see
+    `PopulationQueryIncomplete`, below). Per S6-R0A item 7: population
+    incompleteness is special -- it can bias WHO gets sampled, so it
+    must fail the entire affected window evaluation, never merely skip
+    the offending shard and continue.
     """
 
 
-def _real_github_search(query):
-    """Default `search_fn`: one real GitHub Search API call, returning
-    (item_dicts, total_count, incomplete_results) exactly as the API's
-    own response envelope reports them -- never just the item list,
-    since `total_count`/`incomplete_results` are exactly the
-    completeness evidence S6-R0A item 1 requires inspecting BEFORE
-    consuming a shard's own results.
+class PopulationQueryIncomplete(PopulationIncompleteError):
+    """S6-R0B item 3: a population query (first-page metadata fetch, or
+    a later page of an already-proven-bounded shard) failed all
+    `MAX_FETCH_ATTEMPTS` retries -- a DIFFERENT failure mode from "this
+    shard is too large to trust" (`PopulationIncompleteError`'s own
+    day-granularity-floor case): here the population's own true size is
+    simply UNKNOWN due to a transient fetch failure, not known-and-too-
+    large. Both fail the whole window evaluation identically -- this
+    subclass exists only to carry a more specific, correctly-labeled
+    cause, not to be handled differently by any caller.
     """
-    out = subprocess.run(
-        ["gh", "api", "-X", "GET", "search/issues", "-f", f"q={query}", "-f", "per_page=100"],
-        capture_output=True, text=True, timeout=60, check=True,
-    )
-    data = json.loads(out.stdout)
-    items = [{"number": it["number"], "merged_at": it["pull_request"]["merged_at"]}
-             for it in data["items"]]
-    return items, data["total_count"], data.get("incomplete_results", False)
 
 
-def _paginate_search(query, search_fn, per_shard_cap=SEARCH_API_RESULT_CAP):
-    """Fetches every page for ONE already-proven-complete shard's own
-    query (total_count already confirmed <= per_shard_cap by the
-    caller). `search_fn` here is expected to itself page internally
-    (the real implementation uses `gh api ... --paginate`); this
-    wrapper exists purely so tests can inject a single mocked call
-    without needing to simulate real pagination.
+class ChangedFileFetchIncomplete(Exception):
+    """S6-R0B item 3: a single PR's own changed-file list could not be
+    retrieved after `MAX_FETCH_ATTEMPTS` attempts. PER-PR, not
+    window-wide -- the caller (`census`) is responsible for recording
+    this PR's own number rather than silently dropping it, and per
+    item 3's own explicit instruction, must NEVER reclassify it as
+    "obviously_irrelevant" (unknown is not the same fact as irrelevant).
     """
-    items, total_count, incomplete_results = search_fn(query)
-    return items, total_count, incomplete_results
+    def __init__(self, pr_number, cause):
+        self.pr_number = pr_number
+        self.cause = cause
+        super().__init__(f"changed_file_fetch_incomplete: PR {pr_number}: {cause}")
+
+
+class WindowEvaluationIncomplete(Exception):
+    """S6-R0B item 4: at least one systematically-sampled P0 census
+    record's own changed-file fetch failed all retries. An unknown
+    relevance classification must never silently count as irrelevant
+    (which would just be absorbed into a possibly-too-low NC1 count)
+    and must never be treated as a genuine low-density NC1 result
+    (which would incorrectly trigger window EXTENSION -- extension is
+    for observed low relevance density, never for missing
+    classification data). This window-check is itself incomplete and
+    must be reported as such, distinctly from both `PASS NC1` and
+    `STOP_LOW_YIELD`.
+    """
+    def __init__(self, incomplete_pr_numbers):
+        self.incomplete_pr_numbers = list(incomplete_pr_numbers)
+        super().__init__(
+            f"window_evaluation_incomplete: changed-file fetch failed for "
+            f"{len(self.incomplete_pr_numbers)} census record(s) after "
+            f"{MAX_FETCH_ATTEMPTS} attempts each: {self.incomplete_pr_numbers}"
+        )
 
 
 def _shard_query(shard_lo_date, shard_hi_date):
@@ -124,36 +174,123 @@ def _shard_query(shard_lo_date, shard_hi_date):
             f"merged:{shard_lo_date.isoformat()}..{shard_hi_date.isoformat()}")
 
 
-def fetch_merged_prs_in_window(lower, upper, search_fn=None):
-    """Deterministic temporal-sharding population fetch (S6-R0A item 1).
+# --- real (production) primitives -- each independently injectable ----
+
+def _gh_api_search_page(query, page, per_page):
+    """One real HTTP call: page `page` (1-indexed) of `query`, `per_page`
+    items per page. Returns the raw parsed JSON response body.
+    """
+    out = subprocess.run(
+        ["gh", "api", "-X", "GET", "search/issues",
+         "-f", f"q={query}", "-f", f"page={page}", "-f", f"per_page={per_page}"],
+        capture_output=True, text=True, timeout=60, check=True,
+    )
+    return json.loads(out.stdout)
+
+
+def _raw_fetch_changed_files(pr_number):
+    out = subprocess.run(
+        ["gh", "api", f"repos/{REPO}/pulls/{pr_number}/files", "--paginate",
+         "--jq", ".[].filename"],
+        capture_output=True, text=True, timeout=60, check=True,
+    )
+    return out.stdout.splitlines()
+
+
+def _search_page(query, page, page_fetch_fn=None):
+    """One page, normalized to `(items, total_count, incomplete_results)`
+    -- the shared shape both the metadata-only first-page check and the
+    full-retrieval loop below consume identically.
+    """
+    page_fetch_fn = page_fetch_fn or _gh_api_search_page
+    raw = page_fetch_fn(query, page, SEARCH_PAGE_SIZE)
+    items = [{"number": it["number"], "merged_at": it["pull_request"]["merged_at"]}
+             for it in raw["items"]]
+    return items, raw["total_count"], raw.get("incomplete_results", False)
+
+
+def default_paginated_search(query, page_fetch_fn=None, sleep_fn=None):
+    """S6-R0B items 1-2: the REAL default `search_fn`. Two-phase:
+
+    Phase 1 (cheap): fetch page 1 only, to learn `total_count`/
+    `incomplete_results` BEFORE deciding whether full retrieval is even
+    safe -- never downloads pages 2..N merely to discover the shard is
+    oversized (item 2's own cost requirement).
+
+    Phase 2 (only for a shard already proven `total_count <= cap` and
+    not `incomplete_results`): retrieve every remaining page. Each
+    individual page fetch goes through the same bounded `with_retry`
+    budget; exhausting it on ANY page raises `PopulationQueryIncomplete`
+    (a `PopulationIncompleteError` subclass), which the caller
+    (`fetch_merged_prs_in_window`) does not catch -- it propagates and
+    fails the whole window evaluation, exactly like the existing
+    day-granularity-floor case.
+
+    Returns `(items, total_count, incomplete_results)` -- for an
+    oversized/incomplete shard, `items` from phase 1 alone is returned
+    (the caller's own bisection logic never consumes it in that case,
+    only `total_count`/`incomplete_results`, so returning a partial list
+    here is harmless and avoids wasted phase-2 fetches).
+    """
+    try:
+        items_p1, total_count, incomplete_results = with_retry(
+            lambda: _search_page(query, 1, page_fetch_fn), sleep_fn=sleep_fn
+        )
+    except Exception as e:
+        raise PopulationQueryIncomplete(
+            f"query {query!r}: page 1 fetch failed after {MAX_FETCH_ATTEMPTS} attempts: {e}"
+        )
+
+    if incomplete_results or total_count > SEARCH_API_RESULT_CAP:
+        return items_p1, total_count, incomplete_results
+
+    all_items = list(items_p1)
+    total_pages = -(-total_count // SEARCH_PAGE_SIZE)  # ceil division
+    for page in range(2, total_pages + 1):
+        try:
+            page_items, _, page_incomplete = with_retry(
+                lambda page=page: _search_page(query, page, page_fetch_fn), sleep_fn=sleep_fn
+            )
+        except Exception as e:
+            raise PopulationQueryIncomplete(
+                f"query {query!r}: page {page} fetch failed after {MAX_FETCH_ATTEMPTS} attempts: {e}"
+            )
+        if page_incomplete:
+            raise PopulationQueryIncomplete(
+                f"query {query!r}: page {page} itself reported incomplete_results"
+            )
+        all_items.extend(page_items)
+
+    return all_items, total_count, incomplete_results
+
+
+def fetch_merged_prs_in_window(lower, upper, search_fn=None, sleep_fn=None):
+    """Deterministic temporal-sharding population fetch.
 
     Splits [lower, upper) into whole-UTC-day shards, queries each
-    shard's own `total_count`/`incomplete_results`, and recursively
-    bisects (by TIME interval only -- never by content/relevance) any
-    shard whose own `total_count` exceeds `SEARCH_API_RESULT_CAP` or
-    whose own `incomplete_results` flag is set, until every accepted
-    shard is provably complete. A single-UTC-day shard that still
-    cannot be proven complete raises `PopulationIncompleteError` --
-    there is no finer granularity to subdivide into (GitHub's own
-    `merged:` qualifier is date-only), so this is the genuine floor of
-    what this method can prove, and S6-R0A requires failing closed
-    here rather than accepting a possibly-truncated result.
+    shard's own `total_count`/`incomplete_results` (via `search_fn`,
+    defaulting to `default_paginated_search`), and recursively bisects
+    (by TIME interval only -- never by content/relevance) any shard
+    whose own `total_count` exceeds `SEARCH_API_RESULT_CAP` or whose own
+    `incomplete_results` flag is set, until every accepted shard is
+    provably complete. A single-UTC-day shard that still cannot be
+    proven complete raises `PopulationIncompleteError` -- there is no
+    finer granularity to subdivide into (GitHub's own `merged:`
+    qualifier is date-only), so this is the genuine floor of what this
+    method can prove.
 
     Returns the deduplicated, `(merged_at, number)`-sorted list of
     `{number, merged_at}` records with `merged_at` inside `[lower,
     upper)` (exact timestamp bound, applied client-side after the
     date-granularity server-side query).
     """
-    search_fn = search_fn or _real_github_search
+    search_fn = search_fn or (lambda q: default_paginated_search(q, sleep_fn=sleep_fn))
     accepted = {}  # number -> record, dedup across adjacent shards' own inclusive-date overlap
 
-    # date-based shard queue; each entry is (date_lo, date_hi) inclusive
     stack = [(lower.date(), (upper - timedelta(microseconds=1)).date())]
     while stack:
         date_lo, date_hi = stack.pop()
-        items, total_count, incomplete_results = _paginate_search(
-            _shard_query(date_lo, date_hi), search_fn
-        )
+        items, total_count, incomplete_results = search_fn(_shard_query(date_lo, date_hi))
         if incomplete_results or total_count > SEARCH_API_RESULT_CAP:
             if date_lo == date_hi:
                 raise PopulationIncompleteError(
@@ -169,10 +306,14 @@ def fetch_merged_prs_in_window(lower, upper, search_fn=None):
         # consistency check -- what we actually retrieved must match
         # what the API itself claims exists in this shard. A mismatch
         # here is ALSO population incompleteness, not silently accepted.
-        if len(items) != total_count:
+        # Dedup BEFORE comparing to total_count -- a duplicate item
+        # returned twice within a shard's own pagination is a distinct,
+        # real possibility to guard against, not merely a cross-shard one.
+        unique_numbers = {it["number"] for it in items}
+        if len(unique_numbers) != total_count:
             raise PopulationIncompleteError(
                 f"shard {date_lo}..{date_hi} claims total_count={total_count} "
-                f"but only {len(items)} items were actually retrieved"
+                f"but only {len(unique_numbers)} unique items were actually retrieved"
             )
         for it in items:
             accepted[it["number"]] = it  # dedup by PR number across overlapping shard edges
@@ -185,13 +326,18 @@ def fetch_merged_prs_in_window(lower, upper, search_fn=None):
     return filtered
 
 
-def fetch_changed_files(pr_number):
-    out = subprocess.run(
-        ["gh", "api", f"repos/{REPO}/pulls/{pr_number}/files", "--paginate",
-         "--jq", ".[].filename"],
-        capture_output=True, text=True, timeout=60, check=True,
-    )
-    return out.stdout.splitlines()
+def fetch_changed_files(pr_number, raw_fetch_fn=None, sleep_fn=None):
+    """Per-PR changed-file fetch, bounded-retried
+    (`MAX_FETCH_ATTEMPTS`). Raises `ChangedFileFetchIncomplete` (never
+    propagates a raw `subprocess`/network exception) once the retry
+    budget is exhausted -- the caller (`census`) is responsible for
+    recording this per-PR, not for the whole window.
+    """
+    raw_fetch_fn = raw_fetch_fn or _raw_fetch_changed_files
+    try:
+        return with_retry(lambda: raw_fetch_fn(pr_number), sleep_fn=sleep_fn)
+    except Exception as e:
+        raise ChangedFileFetchIncomplete(pr_number, str(e))
 
 
 def systematic_sample(ordered_list, cap):
@@ -207,33 +353,51 @@ def systematic_sample(ordered_list, cap):
     return [ordered_list[i] for i in idx]
 
 
-def census(lower, upper, search_fn=None, changed_files_fn=None):
-    """One window-check: returns (inspected_count, potentially_relevant_list).
-    Raises `PopulationIncompleteError` if the population fetch itself
-    cannot be proven complete -- this ALWAYS aborts the whole
-    window-check (S6-R0A item 7), never just the one shard.
+def census(lower, upper, search_fn=None, changed_files_fn=None, sleep_fn=None):
+    """One window-check: returns `(inspected_count, potentially_relevant_list)`.
+
+    Raises `PopulationIncompleteError` (or its `PopulationQueryIncomplete`
+    subclass) if the population fetch itself cannot be proven complete --
+    this ALWAYS aborts the whole window-check.
+
+    Raises `WindowEvaluationIncomplete` (S6-R0B item 4) if any
+    systematically-sampled census record's own changed-file fetch
+    exhausts its retry budget -- this ALSO always aborts the whole
+    window-check (never silently treated as "irrelevant," never treated
+    as a genuine NC1 low-density result that would trigger extension).
     """
-    changed_files_fn = changed_files_fn or fetch_changed_files
-    merged = fetch_merged_prs_in_window(lower, upper, search_fn=search_fn)
+    changed_files_fn = changed_files_fn or (lambda n: fetch_changed_files(n, sleep_fn=sleep_fn))
+    merged = fetch_merged_prs_in_window(lower, upper, search_fn=search_fn, sleep_fn=sleep_fn)
     inspected = systematic_sample(merged, CENSUS_CAP)
     relevant = []
+    incomplete = []
     for r in inspected:
-        files = changed_files_fn(r["number"])
+        try:
+            files = changed_files_fn(r["number"])
+        except ChangedFileFetchIncomplete:
+            incomplete.append(r["number"])
+            continue
         if obviously_irrelevant_or_potentially_relevant(files) == "potentially_relevant":
             relevant.append(r)
+    if incomplete:
+        raise WindowEvaluationIncomplete(incomplete)
     return len(inspected), relevant
 
 
-def find_final_window(search_fn=None, changed_files_fn=None):
+def find_final_window(search_fn=None, changed_files_fn=None, sleep_fn=None):
     """The frozen window-extension loop (preregistration.md "Temporal
     freshness" / "Kill-first protocol" NC1 -- a WINDOW-level gate,
     evaluated only here, never per expansion-batch; see
     R0A-protocol-errata.md item 3). Returns either (lower, upper,
-    relevant) on success, or raises on NC1 KILL.
+    relevant) on success, raises `SystemExit` on NC1 KILL
+    (`STOP_LOW_YIELD`), or propagates `WindowEvaluationIncomplete`/
+    `PopulationIncompleteError` UNCAUGHT -- an incomplete window-check
+    is never silently treated as either a pass or a genuine low-yield
+    extension trigger (S6-R0B item 4).
     """
     upper = LOWER_BOUND + timedelta(days=WINDOW_INCREMENT_DAYS)
     while True:
-        n_inspected, relevant = census(LOWER_BOUND, upper, search_fn, changed_files_fn)
+        n_inspected, relevant = census(LOWER_BOUND, upper, search_fn, changed_files_fn, sleep_fn)
         if len(relevant) >= NC1_THRESHOLD:
             return LOWER_BOUND, upper, relevant
         if (upper - LOWER_BOUND).days >= WINDOW_HARD_CAP_DAYS:
@@ -251,11 +415,12 @@ def select_sample(pool, seed, n, already_used_numbers=()):
     own `seed = int(<short-sha>, 16); random.Random(seed).shuffle(pool)`.
     `already_used_numbers` supports the leakage-replacement rule
     (section 2/6 of preregistration.md) and the expansion rule's own
-    "next unused indices" requirement (R0A item 3): excluded numbers
-    are removed from the pool BEFORE shuffling, so the Nth call with a
-    growing exclusion set deterministically yields "the next N PRs
-    that were never used before," not a re-shuffle that could
-    reintroduce an already-used PR at a new position.
+    "next unused indices" requirement: excluded numbers are removed
+    from the pool BEFORE shuffling, then the SAME seed re-shuffles the
+    reduced pool deterministically -- a fresh, reproducible draw, not a
+    promise that every other previously-selected PR keeps its exact
+    prior position (see R0A-protocol-errata.md item 4's own note on
+    this).
     """
     remaining = [r for r in pool if r["number"] not in set(already_used_numbers)]
     shuffled = list(remaining)
@@ -275,8 +440,9 @@ def check_leakage(pr_numbers, exclusion_path="fixtures/s6-r0/excluded-pr-identit
 
 if __name__ == "__main__":
     raise SystemExit(
-        "This script is a frozen SPECIFICATION for S6-R0/S6-R0A. It is "
-        "committed but not executed against the real candidate window by "
-        "either round. Running it against real post-v0.5.0 data is P0/P1 "
-        "work and requires a separate, later, explicit GO."
+        "This script is a frozen SPECIFICATION for S6-R0/S6-R0A/S6-R0B. "
+        "It is committed but not executed against the real candidate "
+        "window by any of these rounds. Running it against real "
+        "post-v0.5.0 data is P0/P1 work and requires a separate, later, "
+        "explicit GO."
     )

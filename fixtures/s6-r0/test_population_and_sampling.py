@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
-"""S6-R0A protocol-tooling regression tests. Synthetic/mocked API
-responses and historical (pre-S6, arbitrary) dates ONLY -- no real
+"""S6-R0A/S6-R0B protocol-tooling regression tests. Synthetic/mocked
+API responses and historical (pre-S6, arbitrary) dates ONLY -- no real
 network call, no query against the actual post-v0.5.0 candidate
 window. Confirms this file's own compliance is exactly the point of
 S6-R0A item 2 ("Preserve blindness"): see `test_no_real_network_calls`
 and `test_no_s6_candidate_window_dates_used`, below, which check THIS
 FILE's own source text for exactly that.
+
+The R0B section (search pagination correctness, bounded retry
+semantics, per-PR/per-window incompleteness statuses) tests the LOWER-
+LEVEL primitives (`default_paginated_search`, `with_retry`,
+`fetch_changed_files`, `census`'s own incompleteness handling)
+introduced to fix the two real execution bugs R0B's own errata
+documents; the R0A-era tests above continue to test
+`fetch_merged_prs_in_window`'s own shard-bisection logic at the
+higher-level `search_fn(query) -> (items, total, incomplete)`
+injection point, unchanged and still passing verbatim against the
+rewritten implementation.
 
 Run with: python3 fixtures/s6-r0/test_population_and_sampling.py
 """
@@ -361,6 +372,276 @@ def test_expansion_continues_when_neither_stop_condition_met():
     assert pa.expansion_stopping_decision(history) == "CONTINUE"
 
 
+# ======================================================================
+# S6-R0B: search pagination correctness + bounded retry semantics
+# ======================================================================
+
+def _mock_pages(pages_by_number, total_count, incomplete_results=False):
+    """`page_fetch_fn`-shaped mock: `pages_by_number` maps page number
+    (1-indexed) -> list of (pr_number, merged_at) tuples for that page.
+    Returns a callable matching `_gh_api_search_page`'s own raw-JSON
+    return shape, plus `.calls` (a list of page numbers actually
+    requested, in order) for asserting exactly which pages were/weren't
+    fetched.
+    """
+    calls = []
+
+    def fn(query, page, per_page):
+        calls.append(page)
+        items = [{"number": n, "pull_request": {"merged_at": m}} for n, m in pages_by_number.get(page, [])]
+        return {"items": items, "total_count": total_count, "incomplete_results": incomplete_results}
+
+    fn.calls = calls
+    return fn
+
+
+def _mock_pages_failing_on(fail_pages, pages_by_number, total_count, fail_times=None):
+    """Like `_mock_pages`, but the request for any page number in
+    `fail_pages` raises an exception the FIRST `fail_times[page]` times
+    it is called (default: every time, for an "always fails" page), then
+    (if `fail_times` allows) succeeds normally afterward. Lets a single
+    mock express "transient failure then success" and "fails all
+    attempts" for the SAME kind of call.
+    """
+    fail_times = fail_times or {}
+    call_counts = {}
+
+    def fn(query, page, per_page):
+        call_counts[page] = call_counts.get(page, 0) + 1
+        limit = fail_times.get(page, float("inf")) if page in fail_pages else 0
+        if call_counts[page] <= limit:
+            raise RuntimeError(f"simulated transient failure on page {page}, attempt {call_counts[page]}")
+        items = [{"number": n, "pull_request": {"merged_at": m}} for n, m in pages_by_number.get(page, [])]
+        return {"items": items, "total_count": total_count, "incomplete_results": False}
+
+    fn.call_counts = call_counts
+    return fn
+
+
+def _rows(numbers, day="2020-01-01T00:00:00Z"):
+    return [(n, day) for n in numbers]
+
+
+def test_total_count_zero_returns_empty_no_extra_pages():
+    fn = _mock_pages({1: []}, total_count=0)
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert items == [] and total == 0 and incomplete is False
+    assert fn.calls == [1]
+
+
+def test_total_count_one_single_page():
+    fn = _mock_pages({1: _rows([42])}, total_count=1)
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert [it["number"] for it in items] == [42]
+    assert fn.calls == [1], "a single-item result must never request a second page"
+
+
+def test_total_count_exactly_one_page_size_no_second_page_fetched():
+    n = ps.SEARCH_PAGE_SIZE  # 100
+    fn = _mock_pages({1: _rows(range(1, n + 1))}, total_count=n)
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert len(items) == n
+    assert fn.calls == [1], "total_count == one page's own size must not fetch a second page"
+
+
+def test_total_count_one_over_page_size_fetches_second_page():
+    n = ps.SEARCH_PAGE_SIZE + 1  # 101
+    fn = _mock_pages({1: _rows(range(1, ps.SEARCH_PAGE_SIZE + 1)), 2: _rows([n])}, total_count=n)
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert len(items) == n
+    assert fn.calls == [1, 2]
+
+
+def test_multi_page_350_fetches_four_pages_in_order():
+    total = 350
+    pages = {
+        1: _rows(range(1, 101)), 2: _rows(range(101, 201)),
+        3: _rows(range(201, 301)), 4: _rows(range(301, 351)),
+    }
+    fn = _mock_pages(pages, total_count=total)
+    items, got_total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert len(items) == total
+    assert fn.calls == [1, 2, 3, 4]
+    assert {it["number"] for it in items} == set(range(1, 351))
+
+
+def test_total_count_exactly_at_cap_fetches_all_ten_pages():
+    total = ps.SEARCH_API_RESULT_CAP  # 1000
+    pages = {p: _rows(range((p - 1) * 100 + 1, p * 100 + 1)) for p in range(1, 11)}
+    fn = _mock_pages(pages, total_count=total)
+    items, got_total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert len(items) == total
+    assert fn.calls == list(range(1, 11))
+
+
+def test_total_count_one_over_cap_never_fetches_a_second_page():
+    # S6-R0B item 2: must not download remaining pages merely to learn
+    # total_count > cap -- the whole point of the two-phase design.
+    fn = _mock_pages({1: _rows(range(1, 101))}, total_count=ps.SEARCH_API_RESULT_CAP + 1)
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert total == ps.SEARCH_API_RESULT_CAP + 1
+    assert fn.calls == [1], "an oversized shard's own page 1 is fetched (to learn total_count), never page 2+"
+
+
+def test_incomplete_results_on_page_one_never_fetches_further_pages():
+    fn = _mock_pages({1: _rows([1])}, total_count=1, incomplete_results=True)
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert incomplete is True
+    assert fn.calls == [1]
+
+
+def test_page_mismatch_is_caught_by_the_shard_level_consistency_check():
+    # total_count says 350 but the pages together only produce 340
+    # unique items -- a real, if different, form of incompleteness the
+    # SHARD-level (fetch_merged_prs_in_window) consistency check must
+    # still catch, even though default_paginated_search's own per-page
+    # fetches all individually "succeeded."
+    total = 350
+    pages = {
+        1: _rows(range(1, 101)), 2: _rows(range(101, 201)),
+        3: _rows(range(201, 301)), 4: _rows(range(301, 341)),  # only 40 here, not 50
+    }
+    page_fn = _mock_pages(pages, total_count=total)
+
+    def search_fn(query):
+        return ps.default_paginated_search(query, page_fetch_fn=page_fn)
+
+    try:
+        ps.fetch_merged_prs_in_window(HIST_LOWER, HIST_UPPER, search_fn=search_fn)
+        raise AssertionError("expected PopulationIncompleteError")
+    except ps.PopulationIncompleteError:
+        pass
+
+
+def test_duplicate_item_within_one_shards_own_pages_is_caught():
+    # PR 5 appears on both page 1 and page 2 of the SAME shard's own
+    # result -- total_count=101 literal item count, but only 100
+    # UNIQUE PR numbers -- must be caught, not silently deduplicated
+    # into a false "complete" shard.
+    pages = {1: _rows(range(1, 101)), 2: _rows([5])}  # 5 already on page 1
+    page_fn = _mock_pages(pages, total_count=101)
+
+    def search_fn(query):
+        return ps.default_paginated_search(query, page_fetch_fn=page_fn)
+
+    try:
+        ps.fetch_merged_prs_in_window(HIST_LOWER, HIST_UPPER, search_fn=search_fn)
+        raise AssertionError("expected PopulationIncompleteError")
+    except ps.PopulationIncompleteError:
+        pass
+
+
+def test_later_page_failure_after_retries_raises_population_query_incomplete():
+    fn = _mock_pages_failing_on(
+        fail_pages={2}, pages_by_number={1: _rows(range(1, 101)), 2: _rows([101])},
+        total_count=101,
+    )
+    try:
+        ps.default_paginated_search("q", page_fetch_fn=fn)
+        raise AssertionError("expected PopulationQueryIncomplete")
+    except ps.PopulationQueryIncomplete:
+        pass
+    assert fn.call_counts[2] == ps.MAX_FETCH_ATTEMPTS
+
+
+# --- retry/status behavior ---------------------------------------------
+
+def test_population_query_transient_failure_then_success():
+    fn = _mock_pages_failing_on(
+        fail_pages={1}, pages_by_number={1: _rows([1])}, total_count=1, fail_times={1: 1},
+    )
+    items, total, incomplete = ps.default_paginated_search("q", page_fetch_fn=fn)
+    assert [it["number"] for it in items] == [1]
+    assert fn.call_counts[1] == 2, "must succeed on the second attempt, not retry needlessly further"
+
+
+def test_population_query_fails_all_attempts_raises_population_query_incomplete():
+    fn = _mock_pages_failing_on(fail_pages={1}, pages_by_number={}, total_count=1)
+    try:
+        ps.default_paginated_search("q", page_fetch_fn=fn)
+        raise AssertionError("expected PopulationQueryIncomplete")
+    except ps.PopulationQueryIncomplete:
+        pass
+    assert fn.call_counts[1] == ps.MAX_FETCH_ATTEMPTS
+
+
+def _flaky_raw_fetch(fail_times):
+    calls = []
+
+    def fn(pr_number):
+        calls.append(pr_number)
+        n = len([c for c in calls if c == pr_number])
+        if n <= fail_times:
+            raise RuntimeError(f"simulated transient failure, attempt {n}")
+        return ["nixos/modules/services/foo.nix"]
+
+    fn.calls = calls
+    return fn
+
+
+def test_changed_file_transient_failure_then_success():
+    fn = _flaky_raw_fetch(fail_times=1)
+    files = ps.fetch_changed_files(123, raw_fetch_fn=fn)
+    assert files == ["nixos/modules/services/foo.nix"]
+    assert fn.calls.count(123) == 2
+
+
+def test_changed_file_fails_all_attempts_raises_changed_file_fetch_incomplete():
+    fn = _flaky_raw_fetch(fail_times=999)  # always fails
+    try:
+        ps.fetch_changed_files(123, raw_fetch_fn=fn)
+        raise AssertionError("expected ChangedFileFetchIncomplete")
+    except ps.ChangedFileFetchIncomplete as e:
+        assert e.pr_number == 123
+    assert fn.calls.count(123) == ps.MAX_FETCH_ATTEMPTS
+
+
+def test_failed_changed_file_classification_does_not_become_obviously_irrelevant():
+    # census() must raise WindowEvaluationIncomplete for this PR, never
+    # silently classify it either way.
+    q = ps._shard_query(HIST_LOWER.date(), (HIST_UPPER - timedelta(microseconds=1)).date())
+    merged_items = _items([1, 2], ["2020-01-01T00:00:00Z", "2020-01-02T00:00:00Z"])
+    search = _mock_search({q: (merged_items, 2, False)})
+
+    def changed_files_fn(n):
+        if n == 1:
+            return ["nixos/modules/services/foo.nix"]  # relevant
+        raise ps.ChangedFileFetchIncomplete(n, "simulated")
+
+    try:
+        ps.census(HIST_LOWER, HIST_UPPER, search_fn=search, changed_files_fn=changed_files_fn)
+        raise AssertionError("expected WindowEvaluationIncomplete")
+    except ps.WindowEvaluationIncomplete as e:
+        assert e.incomplete_pr_numbers == [2]
+
+
+def test_incomplete_census_propagates_through_find_final_window_not_extended_as_low_yield():
+    # A census that raises WindowEvaluationIncomplete must propagate
+    # OUT of find_final_window directly -- it must never be caught and
+    # treated as "not enough relevant PRs yet, extend the window."
+    # Every date here is DERIVED from ps.LOWER_BOUND itself (the
+    # already-frozen constant), never a hand-typed literal S6-window
+    # date -- see this file's own "preserve blindness" meta-tests.
+    one_day_in = ps.LOWER_BOUND + timedelta(days=1)
+    q = ps._shard_query(ps.LOWER_BOUND.date(), (ps.LOWER_BOUND + timedelta(days=ps.WINDOW_INCREMENT_DAYS) - timedelta(microseconds=1)).date())
+    merged_items = _items([1], [one_day_in.isoformat().replace("+00:00", "Z")])
+    search = _mock_search({q: (merged_items, 1, False)})
+
+    def changed_files_fn(n):
+        raise ps.ChangedFileFetchIncomplete(n, "simulated")
+
+    try:
+        ps.find_final_window(search_fn=search, changed_files_fn=changed_files_fn)
+        raise AssertionError("expected WindowEvaluationIncomplete to propagate")
+    except ps.WindowEvaluationIncomplete:
+        pass
+    except SystemExit:
+        raise AssertionError(
+            "an incomplete census must never be silently reinterpreted as a "
+            "genuine NC1 low-yield result triggering window extension/KILL"
+        )
+
+
 # --- meta: this test file's own compliance with "preserve blindness" ---
 
 def _source_excluding_named_functions(*fn_names):
@@ -393,16 +674,23 @@ def test_no_real_network_calls():
 
 
 def test_no_s6_candidate_window_dates_used():
-    # Checks for the real S6 candidate window's own dates used as an
-    # actual `datetime(...)` construction, not this function's own
-    # necessary mention of the pattern it forbids, and not the module
-    # docstring's own factual reference to when v0.5.0 was released
-    # (a fact about the ALREADY-PUBLISHED release, not the future
-    # candidate population -- see preregistration.md section 3).
+    # Checks for the real S6 candidate window's own dates used either as
+    # an actual `datetime(...)` construction OR as a quoted ISO date
+    # string literal (the shape a hand-typed mock merged_at would take)
+    # -- not this function's own necessary mention of the patterns it
+    # forbids, and not the module docstring's own factual, unquoted
+    # prose reference to when v0.5.0 was released (a fact about the
+    # ALREADY-PUBLISHED release, not the future candidate population --
+    # see preregistration.md section 3). A quoted-string check
+    # specifically requires a leading quote character before the date,
+    # which a prose mention like "(2026-09-24)" never has.
     src = _source_excluding_named_functions("test_no_s6_candidate_window_dates_used")
-    forbidden = ("datetime(2026, 9,", "datetime(2026,9,", "datetime(2026, 10,", "datetime(2026,10,")
+    forbidden = (
+        "datetime(2026, 9,", "datetime(2026,9,", "datetime(2026, 10,", "datetime(2026,10,",
+        '"2026-09-2', "'2026-09-2", '"2026-10-', "'2026-10-",
+    )
     assert not any(pat in src for pat in forbidden), (
-        "no real S6 candidate-window date may be constructed in this test file"
+        "no real S6 candidate-window date may be constructed or quoted in this test file"
     )
 
 

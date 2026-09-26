@@ -1,5 +1,14 @@
 # S6-R0A: protocol errata for S6-R0 (commit `218bf47`)
 
+> **FURTHER AMENDED by S6-R0B** (`R0B-execution-tooling-errata.md`) --
+> two execution-level bugs in the tooling THIS document's own fixes
+> introduced (real Search API pagination was never actually
+> implemented; the retry semantics this document froze in prose were
+> never implemented in code) were found and corrected there, still
+> before any S6 candidate data existed. This document's own scientific/
+> sampling corrections (unit model, NC2-4 denominators, expansion-gate
+> fix) are unaffected and remain in force.
+
 **Original preregistration commit**: `218bf4727b86ba3234252bc636e4329dcdd22414`.
 
 **Confirmation, stated explicitly and verified against the actual
