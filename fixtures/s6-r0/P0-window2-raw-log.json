@@ -1,0 +1,1008 @@
+{
+  "outcome": "WindowNotMatured",
+  "message": "window_not_matured: now=2026-09-30T10:55:07.831395+00:00 < required upper bound 2026-10-03T05:46:05+00:00 -- no GitHub candidate query was performed",
+  "started": "2026-09-30T10:48:25.642400+00:00",
+  "finished": "2026-09-30T10:55:07.831470+00:00",
+  "inspection_log": [
+    {
+      "pr_number": 565944,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566267,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566355,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566270,
+      "n_files": 24,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 566138,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566079,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565645,
+      "n_files": 4,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566208,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566472,
+      "n_files": 5,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566505,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566376,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566455,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566492,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566380,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566402,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 550661,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566554,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566414,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566587,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566614,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566652,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566592,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565247,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566654,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564377,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 553712,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 559783,
+      "n_files": 5,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566645,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 563107,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 552123,
+      "n_files": 2,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 565917,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566743,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566496,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565987,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566510,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565354,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565067,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566768,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565554,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566622,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564559,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 554452,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566684,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566677,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564934,
+      "n_files": 27,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566857,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566844,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565939,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564864,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566134,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566871,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566646,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565052,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 555910,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566849,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566317,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566345,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 563375,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566607,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566546,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566511,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566426,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566794,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566792,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566731,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566374,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566721,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566915,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566862,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566922,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566952,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566950,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 556110,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 559961,
+      "n_files": 5,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566998,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567012,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 535029,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566604,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 553138,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567065,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 562582,
+      "n_files": 4,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 567124,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567095,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566930,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567043,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567138,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564642,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567151,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 550626,
+      "n_files": 20,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 562286,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566673,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567175,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567216,
+      "n_files": 4,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566509,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 560114,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567241,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567270,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 553470,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567316,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567164,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565944,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564304,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565595,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566476,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 557139,
+      "n_files": 5,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566353,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566561,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566564,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566574,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566578,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566661,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566251,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 558001,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 559823,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 547371,
+      "n_files": 1,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 553227,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565356,
+      "n_files": 4,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566816,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 529257,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 563434,
+      "n_files": 3,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 565808,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565454,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566494,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566841,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566584,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566775,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566499,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566385,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566734,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566902,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566936,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 562017,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566460,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567061,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567021,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 563510,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567103,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 556895,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567152,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 562287,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 560908,
+      "n_files": 1,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 560113,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567219,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 559966,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567319,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565369,
+      "n_files": 2,
+      "classification": "potentially_relevant"
+    },
+    {
+      "pr_number": 567334,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567388,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567020,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 560561,
+      "n_files": 11,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 465246,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566126,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567010,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567500,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567465,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567533,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567417,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567610,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567619,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566382,
+      "n_files": 3,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567601,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567673,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567336,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 566352,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567763,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567760,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567576,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567220,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 421305,
+      "n_files": 6,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567708,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567589,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564195,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567916,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567276,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567948,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567889,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567041,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567453,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567990,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567757,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568004,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567559,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567537,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568012,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567279,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 564674,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 567906,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568053,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568050,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568201,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568076,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568262,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568306,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568270,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 557301,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565242,
+      "n_files": 2,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568310,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568002,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 568032,
+      "n_files": 1,
+      "classification": "obviously_irrelevant"
+    },
+    {
+      "pr_number": 565163,
+      "n_files": 4,
+      "classification": "obviously_irrelevant"
+    }
+  ]
+}
