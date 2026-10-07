@@ -5564,23 +5564,18 @@ fn run_diff(
         .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
-    let base_analysis = analyze(base_root, &manifest)?;
-    let head_analysis = analyze(head_root, &manifest)?;
+    // G1 (this round): share `run_audit_diff`'s own already-tested
+    // asymmetric-presence handling (S1-F1) -- a target whose
+    // module/test is absent on exactly one side is real PR-diff
+    // algebra (a brand-new or since-deleted module), never a TOOL_ERROR,
+    // same as `audit-diff` already treats it. `module_birth_paths` is
+    // unused here (`run_diff`'s own JSON/text output has no
+    // birth/test-only distinction to report), hence `_`.
+    let (entries, base_inconclusive_flag, head_inconclusive_flag, _module_birth_paths) =
+        compute_oba_diff_entries(base_root, head_root, &manifest)?;
+    let comparison = ComparisonReport { entries };
 
-    let comparison =
-        compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
-
-    let inconclusive_side = |report: &AnalysisReport| {
-        report
-            .targets
-            .iter()
-            .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
-    };
-    let exit_code = if inconclusive_side(&base_analysis) || inconclusive_side(&head_analysis) {
-        2
-    } else {
-        0
-    };
+    let exit_code = if base_inconclusive_flag || head_inconclusive_flag { 2 } else { 0 };
 
     let mut unchanged = 0;
     let mut added = 0;
@@ -6829,6 +6824,120 @@ fn render_github_summary(summary: &AuditDiffSummary, exit_code: i32) -> String {
     out
 }
 
+/// G1 (this round): the OBA half of a base/head comparison, factored
+/// out of `run_audit_diff` unchanged so `run_diff` can share the exact
+/// same, already-tested asymmetric-presence semantics instead of
+/// calling `analyze()` directly on a manifest that might contain a
+/// target whose module/test is genuinely absent on one side (S1-F1's
+/// own real incident: 2/30 real PRs, both "init module", hard-failed
+/// as TOOL_ERROR under the naive direct-`analyze()` path `run_diff`
+/// still used before this round). See `run_audit_diff`'s own prior
+/// doc comment, reproduced in spirit here: a target whose module+test
+/// exist on BOTH sides goes through `analyze()`/`compare()` completely
+/// unchanged; a target absent on exactly ONE side is real PR-diff
+/// algebra (a brand-new or since-deleted module), not a tool error,
+/// and becomes a real `Added`/`Removed` entry; a target absent on
+/// BOTH sides is a genuine manifest/input error (nothing in this
+/// comparison could ever say anything about it) and still propagates
+/// as a real, fatal error via `?`.
+///
+/// Returns `(entries, base_inconclusive, head_inconclusive,
+/// module_birth_paths)` -- `module_birth_paths` (S2-F2) is the set of
+/// `module` paths that are `Added` because the MODULE ITSELF is new,
+/// as opposed to an existing module whose TEST only is missing; a
+/// caller that doesn't need the birth/test-only distinction (`run_diff`
+/// today) is free to ignore it.
+fn compute_oba_diff_entries(
+    base_root: &Path,
+    head_root: &Path,
+    manifest: &TargetFile,
+) -> anyhow::Result<(Vec<ComparisonEntry>, bool, bool, std::collections::HashSet<PathBuf>)> {
+    let inconclusive_side = |report: &AnalysisReport| {
+        report
+            .targets
+            .iter()
+            .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
+    };
+    let mut module_birth_paths: std::collections::HashSet<PathBuf> = std::collections::HashSet::new();
+    if manifest.target.is_empty() {
+        return Ok((Vec::new(), false, false, module_birth_paths));
+    }
+    let mut both_present = Vec::new();
+    let mut only_on_head = Vec::new();
+    let mut only_on_base = Vec::new();
+    for t in &manifest.target {
+        let base_module = resolve_within_root_if_exists(base_root, &t.module)?;
+        let base_test = resolve_within_root_if_exists(base_root, &t.test)?;
+        let head_module = resolve_within_root_if_exists(head_root, &t.module)?;
+        let head_test = resolve_within_root_if_exists(head_root, &t.test)?;
+        let on_base = base_module.is_some() && base_test.is_some();
+        let on_head = head_module.is_some() && head_test.is_some();
+        match (on_base, on_head) {
+            (true, true) => both_present.push(t.clone()),
+            (false, true) => {
+                if base_module.is_none() {
+                    module_birth_paths.insert(t.module.clone());
+                }
+                only_on_head.push(t.clone());
+            }
+            (true, false) => only_on_base.push(t.clone()),
+            (false, false) => anyhow::bail!(
+                "target {}: module/test present under NEITHER --base-root nor --head-root -- a real manifest/input error, not a PR-introduced module addition or removal",
+                t.name
+            ),
+        }
+    }
+
+    let mut entries = Vec::new();
+    let mut base_inconclusive = false;
+    let mut head_inconclusive = false;
+
+    if !both_present.is_empty() {
+        let sub = TargetFile { target: both_present, cdc_target: Vec::new() };
+        let base_analysis = analyze(base_root, &sub)?;
+        let head_analysis = analyze(head_root, &sub)?;
+        let comparison =
+            compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
+        base_inconclusive |= inconclusive_side(&base_analysis);
+        head_inconclusive |= inconclusive_side(&head_analysis);
+        entries.extend(comparison.entries);
+    }
+    if !only_on_head.is_empty() {
+        let sub = TargetFile { target: only_on_head, cdc_target: Vec::new() };
+        let head_analysis = analyze(head_root, &sub)?;
+        head_inconclusive |= inconclusive_side(&head_analysis);
+        let head_index = index_by_identity(&head_analysis, CompareSide::Head)
+            .map_err(|e| anyhow::anyhow!("{e}"))?;
+        for (identity, verdict) in head_index {
+            entries.push(ComparisonEntry {
+                identity,
+                diff: TargetDiff::Added { head: Box::new(TargetOutcome { verdict: verdict.clone() }) },
+            });
+        }
+    }
+    if !only_on_base.is_empty() {
+        let sub = TargetFile { target: only_on_base, cdc_target: Vec::new() };
+        let base_analysis = analyze(base_root, &sub)?;
+        base_inconclusive |= inconclusive_side(&base_analysis);
+        let base_index = index_by_identity(&base_analysis, CompareSide::Base)
+            .map_err(|e| anyhow::anyhow!("{e}"))?;
+        for (identity, verdict) in base_index {
+            entries.push(ComparisonEntry {
+                identity,
+                diff: TargetDiff::Removed { base: Box::new(TargetOutcome { verdict: verdict.clone() }) },
+            });
+        }
+    }
+    // invariant 2 (order-independence): the three passes above are
+    // each individually sorted by identity, but their concatenation
+    // is not -- one real final sort restores it, regardless of the
+    // manifest's own target order or which partition a target fell
+    // into.
+    entries.sort_by(|a, b| a.identity.cmp(&b.identity));
+
+    Ok((entries, base_inconclusive, head_inconclusive, module_birth_paths))
+}
+
 fn run_audit_diff(
     base_root: &Path,
     head_root: &Path,
@@ -6842,115 +6951,8 @@ fn run_audit_diff(
         .map_err(|e| anyhow::anyhow!("parsing targets manifest {}: {e}", targets_path.display()))?;
     validate_manifest(&manifest).map_err(|e| anyhow::anyhow!("invalid targets manifest: {e}"))?;
 
-    // OBA half: reuse `analyze()`/`compare()` completely unchanged for
-    // every target whose module+test genuinely exist on BOTH sides --
-    // this is the EXACT machinery `oba diff` already ships, tested, and
-    // relies on. S1-F1 (a real nixpkgs PR shadow audit): a target whose
-    // module is absent on exactly ONE side is real PR-diff algebra (a
-    // brand-new or since-deleted module -- S1 found this hard-failing
-    // as a real TOOL_ERROR on 2/30 real PRs, all literally titled "init
-    // module"), so it's partitioned out BEFORE calling `analyze()` on
-    // the whole manifest and handled as a real `Added`/`Removed`
-    // (mirroring exactly how CDC's own half already treats a candidate
-    // that's unanalyzable on only one side). A target absent on BOTH
-    // sides is a genuine manifest/input error -- nothing in this
-    // comparison could ever say anything about it.
-    let inconclusive_side = |report: &AnalysisReport| {
-        report
-            .targets
-            .iter()
-            .any(|t| !t.parse_errors.is_empty() || t.verdicts.iter().any(|v| v.is_inconclusive()))
-    };
-    // S2-F2 (a real nixpkgs PR shadow audit): S2 found technically
-    // correct findings that read as "this PR introduced a problem" when
-    // the real event was "this PR merely made an already-existing
-    // branch analyzable for the first time" (e.g. a brand-new test file
-    // added for a module that already existed, or a declaration
-    // refactor the scanner now recognizes). `module_birth_paths` tracks
-    // which `Added` targets are absent on `--base-root` because the
-    // MODULE ITSELF is new (a real "this PR created this"), as opposed
-    // to the module already existing there with only its TEST missing
-    // (a real "this PR only made it observable") -- the distinction
-    // `transition_origin` (below) needs to tell the two apart honestly.
-    let mut module_birth_paths: std::collections::HashSet<PathBuf> = std::collections::HashSet::new();
-    let (oba_entries, base_oba_inconclusive, head_oba_inconclusive) = if manifest.target.is_empty() {
-        (Vec::new(), false, false)
-    } else {
-        let mut both_present = Vec::new();
-        let mut only_on_head = Vec::new();
-        let mut only_on_base = Vec::new();
-        for t in &manifest.target {
-            let base_module = resolve_within_root_if_exists(base_root, &t.module)?;
-            let base_test = resolve_within_root_if_exists(base_root, &t.test)?;
-            let head_module = resolve_within_root_if_exists(head_root, &t.module)?;
-            let head_test = resolve_within_root_if_exists(head_root, &t.test)?;
-            let on_base = base_module.is_some() && base_test.is_some();
-            let on_head = head_module.is_some() && head_test.is_some();
-            match (on_base, on_head) {
-                (true, true) => both_present.push(t.clone()),
-                (false, true) => {
-                    if base_module.is_none() {
-                        module_birth_paths.insert(t.module.clone());
-                    }
-                    only_on_head.push(t.clone());
-                }
-                (true, false) => only_on_base.push(t.clone()),
-                (false, false) => anyhow::bail!(
-                    "target {}: module/test present under NEITHER --base-root nor --head-root -- a real manifest/input error, not a PR-introduced module addition or removal",
-                    t.name
-                ),
-            }
-        }
-
-        let mut entries = Vec::new();
-        let mut base_inconclusive = false;
-        let mut head_inconclusive = false;
-
-        if !both_present.is_empty() {
-            let sub = TargetFile { target: both_present, cdc_target: Vec::new() };
-            let base_analysis = analyze(base_root, &sub)?;
-            let head_analysis = analyze(head_root, &sub)?;
-            let comparison =
-                compare(&base_analysis, &head_analysis).map_err(|e| anyhow::anyhow!("{e}"))?;
-            base_inconclusive |= inconclusive_side(&base_analysis);
-            head_inconclusive |= inconclusive_side(&head_analysis);
-            entries.extend(comparison.entries);
-        }
-        if !only_on_head.is_empty() {
-            let sub = TargetFile { target: only_on_head, cdc_target: Vec::new() };
-            let head_analysis = analyze(head_root, &sub)?;
-            head_inconclusive |= inconclusive_side(&head_analysis);
-            let head_index = index_by_identity(&head_analysis, CompareSide::Head)
-                .map_err(|e| anyhow::anyhow!("{e}"))?;
-            for (identity, verdict) in head_index {
-                entries.push(ComparisonEntry {
-                    identity,
-                    diff: TargetDiff::Added { head: Box::new(TargetOutcome { verdict: verdict.clone() }) },
-                });
-            }
-        }
-        if !only_on_base.is_empty() {
-            let sub = TargetFile { target: only_on_base, cdc_target: Vec::new() };
-            let base_analysis = analyze(base_root, &sub)?;
-            base_inconclusive |= inconclusive_side(&base_analysis);
-            let base_index = index_by_identity(&base_analysis, CompareSide::Base)
-                .map_err(|e| anyhow::anyhow!("{e}"))?;
-            for (identity, verdict) in base_index {
-                entries.push(ComparisonEntry {
-                    identity,
-                    diff: TargetDiff::Removed { base: Box::new(TargetOutcome { verdict: verdict.clone() }) },
-                });
-            }
-        }
-        // invariant 2 (order-independence): the three passes above are
-        // each individually sorted by identity, but their concatenation
-        // is not -- one real final sort restores it, regardless of the
-        // manifest's own target order or which partition a target fell
-        // into.
-        entries.sort_by(|a, b| a.identity.cmp(&b.identity));
-
-        (entries, base_inconclusive, head_inconclusive)
-    };
+    let (oba_entries, base_oba_inconclusive, head_oba_inconclusive, module_birth_paths) =
+        compute_oba_diff_entries(base_root, head_root, &manifest)?;
 
     // CDC half: real, new for P3b -- run_cdc_candidate for every
     // declared candidate against BOTH roots (each root's own real
@@ -11663,5 +11665,133 @@ mod tests {
         )
         .unwrap_err();
         assert!(format!("{err}").contains("present under NEITHER"));
+    }
+
+    // =======================================================================
+    // G1: `oba diff` (plain, not `audit-diff`) gains the exact same
+    // asymmetric-presence handling `run_audit_diff` already had (S1-F1),
+    // via the shared `compute_oba_diff_entries`. Before this round,
+    // `run_diff` called `analyze()` directly on the whole manifest and
+    // hard-failed (TOOL_ERROR, exit 3) on a brand-new or since-deleted
+    // module -- reproduced below (item 7 doubles as the pre-fix
+    // regression check for item 6/3's own scenario) and in
+    // `reports/analyze-new-module-support.md`'s own "minimal reproducer"
+    // section.
+    // =======================================================================
+
+    #[test]
+    fn run_diff_module_birth_is_added_not_tool_error() {
+        // Kill-test item 3 (new module / option added) and item 7
+        // (a missing side is never silently treated as "nothing to
+        // report" -- it must show up as a real Added entry).
+        let code = run_diff(
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/after-with-module"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/targets.toml"),
+            true,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+    }
+
+    #[test]
+    fn run_diff_module_death_is_removed_not_tool_error() {
+        // Kill-test item 6: deletion must remain distinguishable from
+        // addition -- the reverse of the birth case above, not the same
+        // outcome relabeled.
+        let code = run_diff(
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/after-with-module"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/targets.toml"),
+            true,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+    }
+
+    #[test]
+    fn run_diff_module_missing_on_both_sides_is_still_a_real_tool_error() {
+        // The one case this round deliberately leaves as a fatal error:
+        // absent on BOTH sides is a genuine manifest/input error, not PR
+        // diff algebra -- `compute_oba_diff_entries` itself still `bail!`s.
+        let err = run_diff(
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/before-empty"),
+            Path::new("fixtures/synthetic/audit-diff-module-lifecycle/targets.toml"),
+            true,
+        )
+        .unwrap_err();
+        assert!(format!("{err}").contains("present under NEITHER"));
+    }
+
+    #[test]
+    fn run_diff_new_module_nested_submodule_options_all_discovered() {
+        // Kill-test items 1-4: a single mkOption, a nested `options={}`
+        // attrset, `mkOption{type=submodule{options=...}}` (the GAP-4
+        // shape GO-D's own contract audit established), and multiple
+        // newly added options in the same brand-new module -- all in one
+        // fixture rather than four near-duplicate directories.
+        let code = run_diff(
+            Path::new("fixtures/synthetic/diff-new-module-nested-options/before-empty"),
+            Path::new("fixtures/synthetic/diff-new-module-nested-options/after-with-module"),
+            Path::new("fixtures/synthetic/diff-new-module-nested-options/targets.toml"),
+            true,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+        let code = code.unwrap();
+        // settings.foo.bar / settings.baz: real, found declarations ->
+        // PredicateNotFound, not a crash; code 2 (inconclusive), never 3.
+        assert_eq!(code, 2);
+    }
+
+    #[test]
+    fn run_diff_wrong_prefix_on_new_module_is_not_silently_accepted() {
+        // Kill-test item 9: a target whose `option_prefix` is wrong
+        // (ends in the `mkOption`-wrapped `settings` container, per
+        // GO-D's own established contract -- not a real walkable root)
+        // must still report `OptionNotFound` on the HEAD side, never a
+        // false `PASS`/false discovery merely because BASE is absent.
+        // Isolated into its own fixture manifest (rather than reusing
+        // `diff-new-module-nested-options`' own 2-correct-target
+        // manifest) so a regression here can't hide behind those two
+        // targets' own correct results.
+        let code = run_diff(
+            Path::new("fixtures/synthetic/diff-new-module-nested-options/before-empty"),
+            Path::new("fixtures/synthetic/diff-new-module-nested-options/after-with-module"),
+            Path::new("fixtures/synthetic/diff-wrong-prefix-new-module/targets.toml"),
+            true,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+    }
+
+    #[test]
+    fn run_diff_malformed_head_on_new_module_still_fails_normally() {
+        // Kill-test item 8: a brand-new module whose HEAD source is
+        // itself malformed must still surface as inconclusive (parse
+        // error), never silently treated as a valid new-module PASS
+        // just because the asymmetric-presence path is now taken.
+        let code = run_diff(
+            Path::new("fixtures/synthetic/diff-new-module-nested-options/before-empty"),
+            Path::new("fixtures/synthetic/diff-malformed-head/head-malformed"),
+            Path::new("fixtures/synthetic/diff-malformed-head/targets.toml"),
+            true,
+        );
+        assert!(code.is_ok(), "expected a real (inconclusive) comparison, not a hard error, got {code:?}");
+        assert_eq!(code.unwrap(), 2, "a parse error on the new module's own HEAD source must still be inconclusive, not a silent clean result");
+    }
+
+    #[test]
+    fn run_diff_existing_module_both_sides_unchanged_behavior_preserved() {
+        // Kill-test item 10: the ordinary, long-supported case (module
+        // exists on both sides, content identical) must still go
+        // through the normal `both_present` path -- not every target
+        // becomes "Added" just because this round touched the diff
+        // code path.
+        let code = run_diff(
+            Path::new("fixtures/synthetic/diff-existing-module-unchanged/base"),
+            Path::new("fixtures/synthetic/diff-existing-module-unchanged/head"),
+            Path::new("fixtures/synthetic/diff-existing-module-unchanged/targets.toml"),
+            true,
+        );
+        assert!(code.is_ok(), "expected a real comparison, got {code:?}");
+        assert_eq!(code.unwrap(), 2, "PredicateNotFound both sides -> inconclusive, but via the ordinary both_present path, not Added");
     }
 }

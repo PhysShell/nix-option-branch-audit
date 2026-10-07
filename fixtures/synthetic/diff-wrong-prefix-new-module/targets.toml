@@ -1,0 +1,13 @@
+# G1 kill-test item 9, isolated from diff-new-module-nested-options'
+# own 2 correct targets so a regression here can't hide behind their
+# correct results: option_prefix ends in the mkOption-wrapped
+# `settings` container (per GO-D's own established contract, not a
+# real walkable root) -- must stay OptionNotFound on HEAD, never a
+# false discovery/PASS merely because BASE is absent.
+[[target]]
+name = "wrong_prefix"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "g1demo", "settings"]
+watch = ["nonexistent"]

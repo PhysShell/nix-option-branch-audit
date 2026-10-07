@@ -1,0 +1,11 @@
+# G1 kill-test item 10: module exists, identical, on both sides --
+# must go through the ordinary `both_present` path and report
+# Unchanged-shaped results, never "Added" just because this round
+# touched the diff code path.
+[[target]]
+name = "existing_both_sides"
+module = "nixos/modules/services/x/module.nix"
+test = "nixos/modules/services/x/test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "g1demo"]
+watch = ["settings.foo.bar"]

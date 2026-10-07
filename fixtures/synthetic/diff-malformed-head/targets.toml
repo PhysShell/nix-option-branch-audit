@@ -1,0 +1,7 @@
+[[target]]
+name = "g1_malformed_head"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "g1broken"]
+watch = ["enable"]

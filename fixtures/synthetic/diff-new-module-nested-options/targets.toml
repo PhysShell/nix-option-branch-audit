@@ -1,0 +1,30 @@
+# G1: a brand-new module (both options are declared inside a nested
+# `options = {...}` block, itself inside `settings`'s own `mkOption`
+# call -- the GAP-4 shape, not a flat-dotted leaf) with TWO newly
+# added options, exercising kill-test items 1-4 together (a single
+# mkOption; a nested options={} attrset; mkOption{submodule{options}};
+# multiple newly added options) without multiplying near-duplicate
+# fixture directories.
+[[target]]
+name = "g1_settings_foo_bar"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "g1demo"]
+watch = ["settings.foo.bar"]
+
+[[target]]
+name = "g1_settings_baz"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "g1demo"]
+watch = ["settings.baz"]
+
+[[target]]
+name = "g1_wrong_prefix_still_not_found"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "g1demo", "settings"]
+watch = ["nonexistent"]
