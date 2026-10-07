@@ -1,5 +1,20 @@
 # S6-R1 P1: independent defect confirmation -- `CONFIRMED_NEW_DEFECT`
 
+> **RETRACTED by `fixtures/s6-r1/P1-target-semantics-audit.md`**
+> (GO-D, verdict `TARGET_INVALID_DEFECT_RETRACTED`): the `#568429`/
+> `#508090` targets this document adjudicates were constructed with an
+> `option_prefix`/`watch` split that does not match `oba`'s own
+> documented contract. Re-run on the same frozen `v0.5.0` binary and
+> the same real base/head source with a contract-correct target split,
+> all 4 declarations ARE discovered, with sensible evidence-backed
+> verdicts (one real, witnessed `PASS`). There is no discoverability
+> defect in `oba` itself here. Both reviewers below correctly
+> adjudicated a flawed target record -- a target-construction defect
+> upstream of blind adjudication, not a failure of blinding. The body
+> below is left unedited, per this project's own historical-record-
+> preservation convention; read `P1-target-semantics-audit.md` for the
+> real current status.
+
 **Parent**: `fixtures/s6-r1/P1-adjudication-and-accounting.md` (`cda489c`).
 **Scope of this round, exactly as authorized**: "GO: defect-confirmation
 only" -- a second, genuinely independent blind-then-reveal adjudication

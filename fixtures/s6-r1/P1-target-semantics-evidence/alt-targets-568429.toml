@@ -1,0 +1,15 @@
+[[target]]
+name = "alt_568429_settings_server_port"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["settings.server.port"]
+
+[[target]]
+name = "alt_568429_settings_oauth_auth_dir"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["settings.oauth.auth-dir"]
