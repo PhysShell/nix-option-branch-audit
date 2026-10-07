@@ -89,7 +89,47 @@ fine (see the `sanity` row). It is a constraint on how `option_prefix`
 must be constructed: it must name an actual options-block root, never
 an interior submodule-wrapped option's own name.
 
-## Real-world precedent already in this repository (found while mapping to GAP-4, not part of the synthetic matrix itself)
+## Correction (added after this document's own original commit `b16cd41`, body below left unedited per this project's own historical-record-preservation convention)
+
+**The "real-world precedent" section immediately below is WRONG and
+its claim is unsupported.** Verified directly against the real source
+(`fixtures/kimai/after/module.nix`): kimai's `database` is a PLAIN
+Nix attribute set (`database = { host = mkOption {...}; port =
+mkOption {...}; ...};`) directly inside `siteOpts`'s own single
+`options = {...}` block -- it is **never** itself wrapped in its own
+`mkOption { type = submodule {...}; }` call. Structurally this is this
+matrix's own **M2** shape (flat-dotted, no intervening submodule-
+wrapped container at all), not M0/M3's shape (an interior option
+declared via its own real `mkOption` call, whose submodule type then
+contains a further nested `options={...}` block) -- which is the exact
+shape `#568429`/`#508090`'s real targets and this matrix's own
+boundary pair actually test. Kimai's case therefore never exercised
+the GAP-4 recursion mechanism this document is about at all, and is
+not evidence either for or against which `option_prefix`/`watch`
+split is correct for the mkOption-wrapped-container shape. Likewise,
+`h2-case15-xandikos-real-nested-submodule-collision`
+(`targets/golden.toml`) is a NEGATIVE regression test (asserting the
+bare collision-prone path now correctly returns `OptionNotFound`), not
+a positive test that watching the real nested path succeeds -- it is
+not a working precedent for the FAIL-side OR the PASS-side convention
+either.
+
+**Net effect on this document's own conclusions**: the synthetic
+matrix itself (M0/M2/M3/M6/sanity/M1-deep/M1-shallow), the minimal
+PASS/FAIL pair, and the mechanism explanation are all unaffected --
+none of them depended on the kimai citation. Only the "real-world
+precedent" framing is withdrawn: there is no existing established
+convention in this project, either way, for the mkOption-wrapped-
+container shape. The "GAP-4 mapping" verdict below (inconclusive) and
+the `BOUNDARY_IDENTIFIED` final verdict both already stated this
+inconclusiveness as the headline result and are, if anything,
+reinforced rather than weakened by this correction -- there is now
+even less basis for assuming either convention is "the established
+one." Whether `#568429`/`#508090`'s own target construction was
+itself valid per `oba`'s real public contract is unresolved by this
+document and is the subject of a separate GO-D audit.
+
+## Real-world precedent already in this repository (found while mapping to GAP-4, not part of the synthetic matrix itself) -- SECTION WITHDRAWN, SEE CORRECTION ABOVE
 
 This project's own existing, long-frozen real targets already follow
 the PASS-side convention, not the FAIL-side one, for structurally
