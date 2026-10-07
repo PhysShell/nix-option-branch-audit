@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 2,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/monitoring/beszel-agent.nix",
+        "test": "nixos/tests/beszel.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "beszel",
+          "agent",
+          "environment"
+        ],
+        "watched_path": "GPU_COLLECTOR"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/monitoring/beszel-agent.nix",
+        "test": "nixos/tests/beszel.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "beszel",
+          "agent",
+          "environment"
+        ],
+        "watched_path": "SKIP_GPU"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    }
+  ]
+}

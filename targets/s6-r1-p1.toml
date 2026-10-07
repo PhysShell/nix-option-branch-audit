@@ -1,0 +1,229 @@
+# S6-R1 P1: 28 mechanically-derived targets from the 5 PRs (of 15 sampled)
+# that reached target-construction-protocol.md step 6, in frozen sample
+# order. See fixtures/s6-r1/P1-target-construction.md for the per-PR
+# derivation record and fixtures/s6-r1/P1-adjudication-and-accounting.md
+# for the real oba results and adjudication. module/test paths are
+# root-relative; base/head source for each PR was fetched into its own
+# scratch tree (not part of this repo) keyed by the PR's own base_sha/
+# merge_commit_sha, recorded per-target in the target-construction doc.
+
+[[target]]
+name = "pr508090_SKIP_GPU"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent", "environment"]
+watch = ["SKIP_GPU"]
+
+[[target]]
+name = "pr508090_GPU_COLLECTOR"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent", "environment"]
+watch = ["GPU_COLLECTOR"]
+[[target]]
+name = "pr568429_settings"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["settings"]
+
+[[target]]
+name = "pr568429_settings_server_port"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi", "settings"]
+watch = ["server.port"]
+
+[[target]]
+name = "pr568429_settings_oauth_auth_dir"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi", "settings"]
+watch = ["oauth.auth-dir"]
+
+[[target]]
+name = "pr568429_openFirewall"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["openFirewall"]
+[[target]]
+name = "pr563823_aclPolicies"
+module = "nixos/modules/services/web-apps/rundeck.nix"
+test = "nixos/tests/rundeck.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "rundeck"]
+watch = ["aclPolicies"]
+[[target]]
+name = "pr443747_enable"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["enable"]
+
+[[target]]
+name = "pr443747_package"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["package"]
+
+[[target]]
+name = "pr443747_domain"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["domain"]
+
+[[target]]
+name = "pr443747_path"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["path"]
+
+[[target]]
+name = "pr443747_filters"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["filters"]
+
+[[target]]
+name = "pr443747_rootDir"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["rootDir"]
+
+[[target]]
+name = "pr443747_enableDefaultRootIndex"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["enableDefaultRootIndex"]
+
+[[target]]
+name = "pr443747_enableUserDirs"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["enableUserDirs"]
+
+[[target]]
+name = "pr443747_listenStreams"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["listenStreams"]
+
+[[target]]
+name = "pr443747_extraArgs"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["extraArgs"]
+[[target]]
+name = "pr568048_enable"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["enable"]
+
+[[target]]
+name = "pr568048_package"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["package"]
+
+[[target]]
+name = "pr568048_user"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["user"]
+
+[[target]]
+name = "pr568048_group"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["group"]
+
+[[target]]
+name = "pr568048_home"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["home"]
+
+[[target]]
+name = "pr568048_modelsDir"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["modelsDir"]
+
+[[target]]
+name = "pr568048_host"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["host"]
+
+[[target]]
+name = "pr568048_port"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["port"]
+
+[[target]]
+name = "pr568048_settings"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["settings"]
+
+[[target]]
+name = "pr568048_loadModels"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["loadModels"]
+
+[[target]]
+name = "pr568048_openFirewall"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["openFirewall"]
+

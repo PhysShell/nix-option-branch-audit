@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 4,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/cliproxyapi.nix",
+        "test": "nixos/tests/cliproxyapi.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "cliproxyapi"
+        ],
+        "watched_path": "openFirewall"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/cliproxyapi.nix",
+        "test": "nixos/tests/cliproxyapi.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "cliproxyapi"
+        ],
+        "watched_path": "settings"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/cliproxyapi.nix",
+        "test": "nixos/tests/cliproxyapi.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "cliproxyapi",
+          "settings"
+        ],
+        "watched_path": "oauth.auth-dir"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/cliproxyapi.nix",
+        "test": "nixos/tests/cliproxyapi.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "cliproxyapi",
+          "settings"
+        ],
+        "watched_path": "server.port"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    }
+  ]
+}

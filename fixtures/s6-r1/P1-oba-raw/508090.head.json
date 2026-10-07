@@ -1,0 +1,653 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 2,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "pr508090_SKIP_GPU",
+      "module": "nixos/modules/services/monitoring/beszel-agent.nix",
+      "test": "nixos/tests/beszel.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "beszel",
+        "agent",
+        "environment"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 74,
+            "col": 5
+          },
+          "source": "lib.optionals cfg.smartmon.enable ["
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 198,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 199,
+            "col": 32
+          },
+          "source": "lib.optionalString cfg.smartmon.enable ''"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 254,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ cfg.smartmon.package ]"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 272,
+            "col": 14
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ \"disk\" ]"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 313,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall ["
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 66,
+            "col": 5
+          },
+          "source": "lib.optionals (cfg.smartmon.enable && cfg.smartmon.deviceAllow != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 69,
+            "col": 8
+          },
+          "source": "lib.optionals (!cfg.smartmon.enable || cfg.smartmon.deviceAllow != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 70,
+            "col": 39
+          },
+          "source": "lib.optionals config.boot.zfs.enabled [ \"/dev/zfs rw\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 149,
+            "col": 15
+          },
+          "source": "lib.optionals (hasVideoDriver \"nvidia\") [ \"nvidia-smi\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 150,
+            "col": 18
+          },
+          "source": "lib.optionals (hasVideoDriver \"amdgpu\") [ \"amd_sysfs\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 151,
+            "col": 18
+          },
+          "source": "lib.optionals (hasVideoDriver \"intel\") [ \"intel_sysfs\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 244,
+            "col": 9
+          },
+          "source": "if lib.isBool value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 246,
+            "col": 14
+          },
+          "source": "if lib.isList value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 255,
+            "col": 12
+          },
+          "source": "lib.optionals config.boot.zfs.enabled [ config.boot.zfs.package ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 268,
+            "col": 11
+          },
+          "source": "lib.optionals config.virtualisation.docker.enable [ \"docker\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 269,
+            "col": 14
+          },
+          "source": "lib.optionals (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 281,
+            "col": 23
+          },
+          "source": "lib.mkIf (deviceAllowList != [ ]) deviceAllowList",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ],
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ],
+            [
+              "environment",
+              "SKIP_GPU"
+            ],
+            [
+              "environment",
+              "GPU_COLLECTOR"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 315,
+            "col": 9
+          },
+          "source": "if (builtins.hasAttr \"PORT\" cfg.environment) then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "environment"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "agentHost",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/beszel.nix",
+            "line": 51,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "SKIP_GPU"
+        }
+      ]
+    },
+    {
+      "name": "pr508090_GPU_COLLECTOR",
+      "module": "nixos/modules/services/monitoring/beszel-agent.nix",
+      "test": "nixos/tests/beszel.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "beszel",
+        "agent",
+        "environment"
+      ],
+      "parse_errors": [],
+      "discovered_options": [],
+      "discovered_predicates": [
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 74,
+            "col": 5
+          },
+          "source": "lib.optionals cfg.smartmon.enable ["
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 198,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 199,
+            "col": 32
+          },
+          "source": "lib.optionalString cfg.smartmon.enable ''"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 254,
+            "col": 12
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ cfg.smartmon.package ]"
+        },
+        {
+          "path": [
+            "smartmon",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionals"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 272,
+            "col": 14
+          },
+          "source": "lib.optionals cfg.smartmon.enable [ \"disk\" ]"
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 313,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall ["
+        }
+      ],
+      "resolved_predicates": [],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 66,
+            "col": 5
+          },
+          "source": "lib.optionals (cfg.smartmon.enable && cfg.smartmon.deviceAllow != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 69,
+            "col": 8
+          },
+          "source": "lib.optionals (!cfg.smartmon.enable || cfg.smartmon.deviceAllow != [ ]) (",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 70,
+            "col": 39
+          },
+          "source": "lib.optionals config.boot.zfs.enabled [ \"/dev/zfs rw\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 149,
+            "col": 15
+          },
+          "source": "lib.optionals (hasVideoDriver \"nvidia\") [ \"nvidia-smi\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 150,
+            "col": 18
+          },
+          "source": "lib.optionals (hasVideoDriver \"amdgpu\") [ \"amd_sysfs\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 151,
+            "col": 18
+          },
+          "source": "lib.optionals (hasVideoDriver \"intel\") [ \"intel_sysfs\" ]",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 244,
+            "col": 9
+          },
+          "source": "if lib.isBool value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 246,
+            "col": 14
+          },
+          "source": "if lib.isList value then",
+          "failure": "UnsupportedExpression",
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 255,
+            "col": 12
+          },
+          "source": "lib.optionals config.boot.zfs.enabled [ config.boot.zfs.package ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 268,
+            "col": 11
+          },
+          "source": "lib.optionals config.virtualisation.docker.enable [ \"docker\" ]",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 269,
+            "col": 14
+          },
+          "source": "lib.optionals (",
+          "failure": {
+            "UnsupportedScope": "function parameter"
+          },
+          "refs": []
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 281,
+            "col": 23
+          },
+          "source": "lib.mkIf (deviceAllowList != [ ]) deviceAllowList",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ],
+            [
+              "smartmon",
+              "enable"
+            ],
+            [
+              "smartmon",
+              "deviceAllow"
+            ],
+            [
+              "environment",
+              "SKIP_GPU"
+            ],
+            [
+              "environment",
+              "GPU_COLLECTOR"
+            ]
+          ]
+        },
+        {
+          "span": {
+            "file": "nixos/modules/services/monitoring/beszel-agent.nix",
+            "line": 315,
+            "col": 9
+          },
+          "source": "if (builtins.hasAttr \"PORT\" cfg.environment) then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "environment"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "agentHost",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/beszel.nix",
+            "line": 51,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "OptionNotFound",
+          "option": "GPU_COLLECTOR"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}

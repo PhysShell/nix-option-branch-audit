@@ -1,0 +1,1333 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "check",
+  "summary": {
+    "pass": 0,
+    "finding": 0,
+    "inconclusive": 1,
+    "unavailable": 0
+  },
+  "targets": [
+    {
+      "name": "pr563823_aclPolicies",
+      "module": "nixos/modules/services/web-apps/rundeck.nix",
+      "test": "nixos/tests/rundeck.nix",
+      "cfg_ident": "cfg",
+      "option_prefix": [
+        "services",
+        "rundeck"
+      ],
+      "parse_errors": [],
+      "discovered_options": [
+        {
+          "path": [
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 59,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "adminUser"
+          ],
+          "default_source": "\"admin\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "admin"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 63,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "adminPasswordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 70,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "user"
+          ],
+          "default_source": "\"rundeck\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rundeck"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 76,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "group"
+          ],
+          "default_source": "\"rundeck\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rundeck"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 82,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "serverHostname"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 88,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "serverURL"
+          ],
+          "default_source": "\"${scheme}://${cfg.serverHostname}:${toString effectivePort}\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 94,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "serverPort"
+          ],
+          "default_source": "4440",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 106,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "serverUUID"
+          ],
+          "default_source": "\"\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": ""
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 112,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "dataDir"
+          ],
+          "default_source": "\"/var/lib/rundeck\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/var/lib/rundeck"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 118,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "configDir"
+          ],
+          "default_source": "\"/etc/rundeck\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "/etc/rundeck"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 124,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "javaOpts"
+          ],
+          "default_source": "[\n          \"-Xmx1024m\"\n          \"-Xms256m\"\n          \"-XX:MaxMetaspaceSize=256m\"\n          \"-server\"\n        ]",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 130,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "aclPolicies"
+          ],
+          "default_source": "{\n          \"admin.aclpolicy\" = ''\n            description: Admin, all access.\n            context:\n              project: '.*'\n            for:\n              resource:\n                - allow: '*'\n              adhoc:\n                - allow: '*'\n              job:\n                - allow: '*'\n              node:\n                - allow: '*'\n              runner:\n                - allow: '*'\n            by:\n              group: admin\n\n            ---\n\n            description: Admin, all access.\n            context:\n              application: 'rundeck'\n            for:\n              resource:\n                - allow: '*'\n              project:\n                - allow: '*'\n              project_acl:\n                - allow: '*'\n              storage:\n                - allow: '*'\n            by:\n              group: admin\n          '';\n        }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 141,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "sshKeyType"
+          ],
+          "default_source": "\"rsa\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rsa"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 212,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 221,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "startTimeout"
+          ],
+          "default_source": "180",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 227,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "database",
+            "type"
+          ],
+          "default_source": "\"h2\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "h2"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 235,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "host"
+          ],
+          "default_source": "\"localhost\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "localhost"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 245,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "port"
+          ],
+          "default_source": "if cfg.database.type == \"postgresql\" then\n              5432\n            else if cfg.database.type == \"mysql\" then\n              3306\n            else\n              null",
+          "default_class": "Unknown",
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 251,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "name"
+          ],
+          "default_source": "\"rundeck\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rundeck"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 271,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "username"
+          ],
+          "default_source": "\"rundeck\"",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": {
+            "Exact": {
+              "Str": "rundeck"
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 277,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "database",
+            "passwordFile"
+          ],
+          "default_source": "null",
+          "default_class": "Null",
+          "default_known_value": {
+            "Exact": "Null"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 283,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "settings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 291,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "frameworkSettings"
+          ],
+          "default_source": "{ }",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 315,
+            "col": 7
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "enable"
+          ],
+          "default_source": "false",
+          "default_class": {
+            "Bool": false
+          },
+          "default_known_value": {
+            "Exact": {
+              "Bool": false
+            }
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 334,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "port"
+          ],
+          "default_source": "4443",
+          "default_class": "DefinitelyNonNull",
+          "default_known_value": "DefinitelyNonNull",
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 336,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "keyStore"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 342,
+            "col": 9
+          }
+        },
+        {
+          "path": [
+            "ssl",
+            "keyStorePasswordFile"
+          ],
+          "default_source": null,
+          "default_class": null,
+          "default_known_value": null,
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 348,
+            "col": 9
+          }
+        }
+      ],
+      "discovered_predicates": [
+        {
+          "path": [
+            "ssl",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 11,
+            "col": 19
+          },
+          "source": "if cfg.ssl.enable then cfg.ssl.port else cfg.serverPort"
+        },
+        {
+          "path": [
+            "ssl",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 12,
+            "col": 12
+          },
+          "source": "if cfg.ssl.enable then \"https\" else \"http\""
+        },
+        {
+          "path": [
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 357,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "path": [
+            "ssl",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalAttrs"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 404,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs cfg.ssl.enable {"
+        },
+        {
+          "path": [
+            "ssl",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "optionalString"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 668,
+            "col": 11
+          },
+          "source": "lib.optionalString cfg.ssl.enable ("
+        },
+        {
+          "path": [
+            "openFirewall"
+          ],
+          "kind": {
+            "Truthy": "mkIf"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 688,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall ["
+        },
+        {
+          "path": [
+            "ssl",
+            "enable"
+          ],
+          "kind": {
+            "Truthy": "if"
+          },
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 689,
+            "col": 8
+          },
+          "source": "if cfg.ssl.enable then cfg.ssl.port else cfg.serverPort"
+        }
+      ],
+      "resolved_predicates": [
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ssl",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ssl",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 11,
+            "col": 19
+          },
+          "source": "if cfg.ssl.enable then cfg.ssl.port else cfg.serverPort"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ssl",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ssl",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 12,
+            "col": 12
+          },
+          "source": "if cfg.ssl.enable then \"https\" else \"http\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "sshKeyType"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "rsa"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "sshKeyType"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 43,
+            "col": 9
+          },
+          "source": "lib.optionalString (cfg.sshKeyType == \"rsa\") \"-b 4096\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 254,
+            "col": 13
+          },
+          "source": "if cfg.database.type == \"postgresql\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 256,
+            "col": 18
+          },
+          "source": "if cfg.database.type == \"mysql\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 357,
+            "col": 12
+          },
+          "source": "lib.mkIf cfg.enable {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "h2"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 378,
+            "col": 9
+          },
+          "source": "if cfg.database.type == \"h2\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 380,
+            "col": 14
+          },
+          "source": "if cfg.database.type == \"postgresql\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "h2"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 386,
+            "col": 9
+          },
+          "source": "if cfg.database.type == \"h2\" then"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 388,
+            "col": 14
+          },
+          "source": "if cfg.database.type == \"postgresql\" then"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 395,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.database.passwordFile != null) {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "h2"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 398,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.database.type == \"h2\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 401,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs (cfg.database.type == \"mysql\") {"
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ssl",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ssl",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 404,
+            "col": 8
+          },
+          "source": "lib.optionalAttrs cfg.ssl.enable {"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "serverUUID"
+                  ]
+                },
+                {
+                  "Literal": {
+                    "Str": ""
+                  }
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "serverUUID"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 425,
+            "col": 31
+          },
+          "source": "if cfg.serverUUID != \"\" then cfg.serverUUID else \"@SERVER_UUID@\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 585,
+            "col": 10
+          },
+          "source": "lib.optional (cfg.database.type == \"mysql\") \"mysql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 586,
+            "col": 10
+          },
+          "source": "lib.optional (cfg.database.type == \"postgresql\") \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "mysql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 588,
+            "col": 9
+          },
+          "source": "lib.optional (cfg.database.type == \"mysql\") \"mysql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "database",
+                  "type"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": "postgresql"
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "database",
+              "type"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 589,
+            "col": 12
+          },
+          "source": "lib.optional (cfg.database.type == \"postgresql\") \"postgresql.service\""
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "serverUUID"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": ""
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "serverUUID"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 648,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.serverUUID == \"\") ''"
+        },
+        {
+          "ir": {
+            "Not": {
+              "Eq": [
+                {
+                  "Ref": [
+                    "database",
+                    "passwordFile"
+                  ]
+                },
+                {
+                  "Literal": "Null"
+                }
+              ]
+            }
+          },
+          "refs": [
+            [
+              "database",
+              "passwordFile"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 664,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.database.passwordFile != null) ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ssl",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ssl",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 668,
+            "col": 11
+          },
+          "source": "lib.optionalString cfg.ssl.enable ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "serverUUID"
+                ]
+              },
+              {
+                "Literal": {
+                  "Str": ""
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "serverUUID"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 673,
+            "col": 11
+          },
+          "source": "lib.optionalString (cfg.serverUUID == \"\") ("
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "openFirewall"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "openFirewall"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 688,
+            "col": 43
+          },
+          "source": "lib.mkIf cfg.openFirewall ["
+        },
+        {
+          "ir": {
+            "Eq": [
+              {
+                "Ref": [
+                  "ssl",
+                  "enable"
+                ]
+              },
+              {
+                "Literal": {
+                  "Bool": true
+                }
+              }
+            ]
+          },
+          "refs": [
+            [
+              "ssl",
+              "enable"
+            ]
+          ],
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 689,
+            "col": 8
+          },
+          "source": "if cfg.ssl.enable then cfg.ssl.port else cfg.serverPort"
+        }
+      ],
+      "unresolved_predicate_sites": [
+        {
+          "span": {
+            "file": "nixos/modules/services/web-apps/rundeck.nix",
+            "line": 17,
+            "col": 5
+          },
+          "source": "if lib.versionAtLeast cfg.package.version \"6\" then",
+          "failure": "UnsupportedExpression",
+          "refs": [
+            [
+              "package",
+              "version"
+            ]
+          ]
+        }
+      ],
+      "matched_test_assignments": [],
+      "test_config_opacity": [
+        {
+          "path": [
+            "environment",
+            "systemPackages"
+          ],
+          "instance": "rundeck",
+          "reason": "value is not a literal (alias, function call, or similar) -- may contain further nested options this walker can't see",
+          "span": {
+            "file": "nixos/tests/rundeck.nix",
+            "line": 33,
+            "col": 9
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "PredicateNotFound",
+          "option": "aclPolicies"
+        }
+      ]
+    }
+  ],
+  "unavailable_targets": []
+}
