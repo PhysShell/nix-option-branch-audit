@@ -1,0 +1,81 @@
+# S6-R1 P1 GO-B: corrected target manifest for the 7 targets whose
+# option_prefix/watch split changed under GO-D's contract (2 of
+# #568429's 4, both of #508090's 2) or needed no change (the other 2
+# of #568429's 4, #563823's 1). The 21 targets from #443747/#568048 are
+# NOT included here -- see fixtures/s6-r1/P1-harness-repair.md
+# (NOT_EVALUABLE_BY_CURRENT_PROTOCOL). Old targets remain, unedited, in
+# targets/s6-r1-p1.toml.
+
+[[target]]
+name = "pr568429_settings"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["settings"]
+# UNCHANGED from targets/s6-r1-p1.toml -- already contract-correct
+# (watches a direct top-level leaf under the true root, no interior
+# mkOption-wrapped container in the path).
+
+[[target]]
+name = "pr568429_openFirewall"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["openFirewall"]
+# UNCHANGED -- same reasoning as pr568429_settings above.
+
+[[target]]
+name = "pr568429_settings_server_port"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["settings.server.port"]
+# CORRECTED: old option_prefix=[...,"settings"], watch=["server.port"]
+# (PREFIX_ROOT_ERROR + WATCH_PATH_ERROR -- option_prefix ended on the
+# mkOption-wrapped "settings" container instead of the true module
+# root; watch supplied only the final hop instead of the full relative
+# path). See fixtures/s6-r1/P1-target-semantics-audit.md.
+
+[[target]]
+name = "pr568429_settings_oauth_auth_dir"
+module = "nixos/modules/services/misc/cliproxyapi.nix"
+test = "nixos/tests/cliproxyapi.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "cliproxyapi"]
+watch = ["settings.oauth.auth-dir"]
+# CORRECTED -- same category and reasoning as the target above.
+
+[[target]]
+name = "pr563823_aclPolicies"
+module = "nixos/modules/services/web-apps/rundeck.nix"
+test = "nixos/tests/rundeck.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "rundeck"]
+watch = ["aclPolicies"]
+# UNCHANGED -- verified directly against the real head source
+# (rundeck.nix): aclPolicies is a flat leaf directly inside the
+# module's own top-level options={} block, no interior mkOption-wrapped
+# container at all. Already contract-correct.
+
+[[target]]
+name = "pr508090_SKIP_GPU"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent"]
+watch = ["environment.SKIP_GPU"]
+# CORRECTED: old option_prefix=[...,"environment"], watch=["SKIP_GPU"]
+# -- same PREFIX_ROOT_ERROR + WATCH_PATH_ERROR category as #568429's
+# pair above.
+
+[[target]]
+name = "pr508090_GPU_COLLECTOR"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent"]
+watch = ["environment.GPU_COLLECTOR"]
+# CORRECTED -- same category and reasoning as the target above.
