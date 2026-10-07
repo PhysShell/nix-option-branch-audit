@@ -1,0 +1,87 @@
+[[target]]
+name = "pr568048_enable"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["enable"]
+
+[[target]]
+name = "pr568048_package"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["package"]
+
+[[target]]
+name = "pr568048_user"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["user"]
+
+[[target]]
+name = "pr568048_group"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["group"]
+
+[[target]]
+name = "pr568048_home"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["home"]
+
+[[target]]
+name = "pr568048_modelsDir"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["modelsDir"]
+
+[[target]]
+name = "pr568048_host"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["host"]
+
+[[target]]
+name = "pr568048_port"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["port"]
+
+[[target]]
+name = "pr568048_settings"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["settings"]
+
+[[target]]
+name = "pr568048_loadModels"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["loadModels"]
+
+[[target]]
+name = "pr568048_openFirewall"
+module = "nixos/modules/services/misc/ollaya.nix"
+test = "nixos/tests/ollaya.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "ollaya"]
+watch = ["openFirewall"]

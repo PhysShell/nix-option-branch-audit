@@ -1,0 +1,79 @@
+[[target]]
+name = "pr443747_enable"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["enable"]
+
+[[target]]
+name = "pr443747_package"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["package"]
+
+[[target]]
+name = "pr443747_domain"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["domain"]
+
+[[target]]
+name = "pr443747_path"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["path"]
+
+[[target]]
+name = "pr443747_filters"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["filters"]
+
+[[target]]
+name = "pr443747_rootDir"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["rootDir"]
+
+[[target]]
+name = "pr443747_enableDefaultRootIndex"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["enableDefaultRootIndex"]
+
+[[target]]
+name = "pr443747_enableUserDirs"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["enableUserDirs"]
+
+[[target]]
+name = "pr443747_listenStreams"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["listenStreams"]
+
+[[target]]
+name = "pr443747_extraArgs"
+module = "nixos/modules/services/misc/gophernicus.nix"
+test = "nixos/tests/gophernicus.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "gophernicus"]
+watch = ["extraArgs"]

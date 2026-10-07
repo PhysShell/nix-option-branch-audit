@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 10,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "domain"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "domain"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PASS",
+            "option": "enable",
+            "predicate": {
+              "path": [
+                "enable"
+              ],
+              "kind": {
+                "Truthy": "mkIf"
+              },
+              "span": {
+                "file": "nixos/modules/services/misc/gophernicus.nix",
+                "line": 137,
+                "col": 12
+              },
+              "source": "lib.mkIf cfg.enable {"
+            },
+            "default_outcome": false,
+            "evidence": [
+              {
+                "path": [
+                  "services",
+                  "gophernicus",
+                  "enable"
+                ],
+                "value_source": "true",
+                "value_class": {
+                  "Bool": true
+                },
+                "known_value": {
+                  "Exact": {
+                    "Bool": true
+                  }
+                },
+                "instance": "machine",
+                "span": {
+                  "file": "nixos/tests/gophernicus.nix",
+                  "line": 24,
+                  "col": 9
+                }
+              }
+            ],
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "enable"
+                  ],
+                  "kind": {
+                    "Truthy": "mkIf"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/misc/gophernicus.nix",
+                    "line": 137,
+                    "col": 12
+                  },
+                  "source": "lib.mkIf cfg.enable {"
+                },
+                "witnessed": true
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/gophernicus.nix",
+                    "line": 137,
+                    "col": 12
+                  },
+                  "source": "lib.mkIf cfg.enable {"
+                },
+                "witnessed": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "enableDefaultRootIndex"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "TestConfigUnresolved",
+            "option": "enableDefaultRootIndex",
+            "predicate": {
+              "path": [
+                "enableDefaultRootIndex"
+              ],
+              "kind": {
+                "Truthy": "optionals"
+              },
+              "span": {
+                "file": "nixos/modules/services/misc/gophernicus.nix",
+                "line": 171,
+                "col": 14
+              },
+              "source": "lib.optionals cfg.enableDefaultRootIndex ["
+            },
+            "default_outcome": true,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "enableDefaultRootIndex"
+                  ],
+                  "kind": {
+                    "Truthy": "optionals"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/misc/gophernicus.nix",
+                    "line": 171,
+                    "col": 14
+                  },
+                  "source": "lib.optionals cfg.enableDefaultRootIndex ["
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "enableDefaultRootIndex"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "enableDefaultRootIndex"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/gophernicus.nix",
+                    "line": 171,
+                    "col": 14
+                  },
+                  "source": "lib.optionals cfg.enableDefaultRootIndex ["
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "enableUserDirs"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "TestConfigUnresolved",
+            "option": "enableUserDirs",
+            "predicate": {
+              "path": [
+                "enableUserDirs"
+              ],
+              "kind": {
+                "Truthy": "if"
+              },
+              "span": {
+                "file": "nixos/modules/services/misc/gophernicus.nix",
+                "line": 193,
+                "col": 23
+              },
+              "source": "if cfg.enableUserDirs then \"read-only\" else true"
+            },
+            "default_outcome": true,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "enableUserDirs"
+                  ],
+                  "kind": {
+                    "Truthy": "if"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/misc/gophernicus.nix",
+                    "line": 193,
+                    "col": 23
+                  },
+                  "source": "if cfg.enableUserDirs then \"read-only\" else true"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "enableUserDirs"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "enableUserDirs"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/gophernicus.nix",
+                    "line": 193,
+                    "col": 23
+                  },
+                  "source": "if cfg.enableUserDirs then \"read-only\" else true"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "extraArgs"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "extraArgs"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "filters"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "filters"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "listenStreams"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "listenStreams"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "package"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "package"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "path"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "path"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/gophernicus.nix",
+        "test": "nixos/tests/gophernicus.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "gophernicus"
+        ],
+        "watched_path": "rootDir"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "rootDir"
+          }
+        }
+      }
+    }
+  ]
+}

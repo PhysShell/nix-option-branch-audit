@@ -1,0 +1,706 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 11,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "enable"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PASS",
+            "option": "enable",
+            "predicate": {
+              "path": [
+                "enable"
+              ],
+              "kind": {
+                "Truthy": "mkIf"
+              },
+              "span": {
+                "file": "nixos/modules/services/misc/ollaya.nix",
+                "line": 109,
+                "col": 12
+              },
+              "source": "lib.mkIf cfg.enable {"
+            },
+            "default_outcome": false,
+            "evidence": [
+              {
+                "path": [
+                  "services",
+                  "ollaya",
+                  "enable"
+                ],
+                "value_source": "true",
+                "value_class": {
+                  "Bool": true
+                },
+                "known_value": {
+                  "Exact": {
+                    "Bool": true
+                  }
+                },
+                "instance": "machine",
+                "span": {
+                  "file": "nixos/tests/ollaya.nix",
+                  "line": 15,
+                  "col": 9
+                }
+              }
+            ],
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "enable"
+                  ],
+                  "kind": {
+                    "Truthy": "mkIf"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 109,
+                    "col": 12
+                  },
+                  "source": "lib.mkIf cfg.enable {"
+                },
+                "witnessed": true
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "enable"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "enable"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 109,
+                    "col": 12
+                  },
+                  "source": "lib.mkIf cfg.enable {"
+                },
+                "witnessed": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "group"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "TestConfigUnresolved",
+            "option": "group",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "user"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "group"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "user"
+                ],
+                [
+                  "group"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/misc/ollaya.nix",
+                "line": 110,
+                "col": 13
+              },
+              "source": "lib.mkIf staticUser {"
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "user"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "group"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "user"
+                    ],
+                    [
+                      "group"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 110,
+                    "col": 13
+                  },
+                  "source": "lib.mkIf staticUser {"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "user"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "group"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "user"
+                    ],
+                    [
+                      "group"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 129,
+                    "col": 9
+                  },
+                  "source": "lib.optionalAttrs staticUser {"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "home"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "home"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "host"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "host"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "loadModels"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "loadModels"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "modelsDir"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "modelsDir"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "openFirewall"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "TestConfigUnresolved",
+            "option": "openFirewall",
+            "predicate": {
+              "path": [
+                "openFirewall"
+              ],
+              "kind": {
+                "Truthy": "optional"
+              },
+              "span": {
+                "file": "nixos/modules/services/misc/ollaya.nix",
+                "line": 222,
+                "col": 43
+              },
+              "source": "lib.optional cfg.openFirewall cfg.port"
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "openFirewall"
+                  ],
+                  "kind": {
+                    "Truthy": "optional"
+                  },
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 222,
+                    "col": 43
+                  },
+                  "source": "lib.optional cfg.openFirewall cfg.port"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "openFirewall"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "openFirewall"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 222,
+                    "col": 43
+                  },
+                  "source": "lib.optional cfg.openFirewall cfg.port"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "package"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "package"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "port"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "port"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "settings"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings"
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/ollaya.nix",
+        "test": "nixos/tests/ollaya.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "ollaya"
+        ],
+        "watched_path": "user"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "TestConfigUnresolved",
+            "option": "user",
+            "predicate": {
+              "ir": {
+                "And": [
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "user"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "Not": {
+                      "Eq": [
+                        {
+                          "Ref": [
+                            "group"
+                          ]
+                        },
+                        {
+                          "Literal": "Null"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "refs": [
+                [
+                  "user"
+                ],
+                [
+                  "group"
+                ]
+              ],
+              "span": {
+                "file": "nixos/modules/services/misc/ollaya.nix",
+                "line": 110,
+                "col": 13
+              },
+              "source": "lib.mkIf staticUser {"
+            },
+            "default_outcome": false,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "user"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "group"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "user"
+                    ],
+                    [
+                      "group"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 110,
+                    "col": 13
+                  },
+                  "source": "lib.mkIf staticUser {"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "And": [
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "user"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Not": {
+                          "Eq": [
+                            {
+                              "Ref": [
+                                "group"
+                              ]
+                            },
+                            {
+                              "Literal": "Null"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "user"
+                    ],
+                    [
+                      "group"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/services/misc/ollaya.nix",
+                    "line": 129,
+                    "col": 9
+                  },
+                  "source": "lib.optionalAttrs staticUser {"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
