@@ -1,0 +1,7 @@
+[[target]]
+name = "m1_shallow_prefix_freeform"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthBoundary"]
+watch = ["outer.inner"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "sanity_enable"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthBoundary"]
+watch = ["enable"]

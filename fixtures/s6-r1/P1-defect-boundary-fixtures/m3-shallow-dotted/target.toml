@@ -1,0 +1,7 @@
+[[target]]
+name = "m3_shallow_prefix_dotted_watch"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthBoundary"]
+watch = ["outer.inner"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "m6_shallow_prefix_two_element_watch"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthBoundary"]
+watch = ["outer", "inner"]

@@ -1,0 +1,7 @@
+[[target]]
+name = "m0_outer_inner"
+module = "module.nix"
+test = "test.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "synthBoundary", "outer"]
+watch = ["inner"]
