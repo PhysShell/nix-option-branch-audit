@@ -1,0 +1,15 @@
+[[target]]
+name = "pr508090_SKIP_GPU"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent", "environment"]
+watch = ["SKIP_GPU"]
+
+[[target]]
+name = "pr508090_GPU_COLLECTOR"
+module = "nixos/modules/services/monitoring/beszel-agent.nix"
+test = "nixos/tests/beszel.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "beszel", "agent", "environment"]
+watch = ["GPU_COLLECTOR"]
