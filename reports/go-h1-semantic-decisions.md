@@ -376,3 +376,21 @@ Wording refinement: none applied. The reviewer's gaps are rule silences and conf
 **PROTOCOL-REDESIGN-PARTIAL.** Five constructs have rules, mechanical or reviewer-owned classifications, or explicit ambiguity states, and the reviewer separated the distinctions for them. Control dependence from an enclosing gate, and whether such a dependency is eligible under U3, are not decided. The GO-I handoff is not written, because READY was not reached. GO-I, GO-G1 and GO-J are not started. oba is not modified.
 
 Next step, for the user: decide whether a predicate reached only through a W gate (CONTROL_DEPENDENT_ONLY) is a dependency of W for eligibility under U3. The answer determines whether C1a becomes V_VALID with a category, or stays V_INVALID with no category. Until that is decided, a further round would only restate this one.
+
+## GO-H1D closure (owner ruling, 2026-10-08)
+
+Status: verdict PROTOCOL-REDESIGN-READY, conditional on the closure clauses being accepted. No fresh reviewer has checked the closure clauses. GO-I is not started.
+
+Ruling applied: control dependence alone does not make an inner predicate a valid Layer-A target for W. C1a (beszel-agent.nix:211, inside the lib.mkIf at :209 gated by openFirewall) is CONTROL_DEPENDENT_ONLY. Its V state is V_INVALID with NO_WATCHED_PREDICATE_DEPENDENCY, and it has no E category. The gate at :209 is a valid predicate on W when it is itself changed (C1b, V_VALID, E_DIRECT). No composite predicate is synthesized.
+
+Closure rules added (all in work/go-h/eligibility-rubric.json, h1d_closure and the h1d_* sections it names):
+- derivation_scope: a hunk derives W when it changes W's own attribute, a predicate with a W path or a W gate, or an ancestor whose reach is undecided. Data terms do not derive W. A predicate with no W relation does not derive W.
+- Blob identity per commit (h1d_gating_primitives.per_commit_blobs): mkIf is pinned at B by blob equality; lib.filter is pinned at F through lib/lists.nix at F, whose blob differs from E.
+- Clarifications: "transparent" in the causal-relevance edge means tracing under let_binding_rule, which is how C4d reaches GPU_COLLECTOR. K5 governs over case parentheticals. The I3 E_NO clause applies only to all-data hunks. A predicate introduced by an EC10 rewrite is a changed predicate. Predicate hunks are validated against the side where W is declared.
+- New states: UNRESOLVED (dependency), PARENT_DEFAULT_REACH (V_AMBIGUOUS), DECLARING_MODULE_UNSTATED (E_AMBIGUOUS).
+
+Reviewer's 17 gaps, by class: 12 MECHANICAL, 1 OWNER_RULING (gap 3), 3 AMBIGUITY_STATE (gaps 8, 9, 17), 1 REVIEWER_OWNED (gap 16, the V3 submodule container for C5a). The reviewer record is not edited.
+
+Open after closure, reported as such and not decided: C5a depends on the reviewer-owned V3 decision. C7c is E_AMBIGUOUS pending the EC10 reviewer decision on the boolToYesNo rewrite (EQ3). C3a is V_AMBIGUOUS (PARENT_DEFAULT_REACH). C3b, C4a-C4c and C6d are UNRESOLVED. C6c's category is E_AMBIGUOUS (DECLARING_MODULE_UNSTATED).
+
+Next step for the user: decide whether the closure clauses need one fresh review round before GO-I. GO-I, GO-G1 and GO-J are not started, and oba is not modified.

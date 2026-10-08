@@ -1,6 +1,6 @@
 {
   "schema": "go-h-eligibility-rubric/6.0",
-  "status": "GO-H1D candidate (schema 6.0), pending one fresh reviewer check. Blocks named h1d_* override the corresponding v5 text where they conflict; v5 is kept as eligibility-rubric.v5.json. Prior status: GO-H1C candidate (schema 5.0), pending one bounded fresh reviewer check. Scope and U1-U4 unchanged. Supersedes v4 (eligibility-rubric.v4.json, GO-H1B). v5 changes: h1c_* rules (callee resolution, mixed predicates, causal relevance, let transparency, let-bound defaults, gating versus data, higher-order calls, library binding, exact-source identity, ambiguity, GO-I boundary); A1 corrected so that completed search and absence are separate conditions.",
+  "status": "GO-H1D closure (schema 6.0): verdict PROTOCOL-REDESIGN-READY after the owner ruling of 2026-10-08; see h1d_closure. The closure clauses are controller-drafted and not reviewed by a fresh reviewer. Prior status, superseded where it conflicts: GO-H1D candidate (schema 6.0), pending one fresh reviewer check. Blocks named h1d_* override the corresponding v5 text where they conflict; v5 is kept as eligibility-rubric.v5.json. Prior status: GO-H1C candidate (schema 5.0), pending one bounded fresh reviewer check. Scope and U1-U4 unchanged. Supersedes v4 (eligibility-rubric.v4.json, GO-H1B). v5 changes: h1c_* rules (callee resolution, mixed predicates, causal relevance, let transparency, let-bound defaults, gating versus data, higher-order calls, library binding, exact-source identity, ambiguity, GO-I boundary); A1 corrected so that completed search and absence are separate conditions.",
   "purpose": "Assign each PR hunk an E category from source semantics only. Must not consult oba output, test presence, derivability (D), target validity (V), witnessability (W), or any historical verdict.",
   "scope": {
     "in": "Changes to an option's semantics (declaration, default, type, apply, readOnly, path) that are traceable to an option-dependent branch predicate; changes to a boolean predicate that directly or indirectly consumes option state and controls selection, emission, enabling, rejection or branch choice.",
@@ -304,6 +304,11 @@
       "version": "6.0",
       "id": "H1D",
       "change": "Adds h1d_* blocks: control dependence (DATA_DEPENDENT / CONTROL_DEPENDENT_ONLY / INDEPENDENT); explicit V states with named invalid reasons and ambiguity; callee resolution by identity at the exact SHA (names are not resolution); pinned G0(ii) and selection primitives with tree and blob SHAs; freeform keys (declared versus freeform-only); namespace and computed-key closure with enum expansion evidence; helper and interprocedural rules including the boolToYesNo split between predicate eligibility and expression equivalence; probe status (diagnostic, non-scoring); verdict criterion; GO-I boundary additions. Forward-only: H1C records are not edited; the H1C P10 label (E_NO for an unchanged helper definition) is superseded for future changes to that definition."
+    },
+    {
+      "version": "6.0",
+      "id": "H1D-closure",
+      "change": "Applies the owner ruling of 2026-10-08 (C1a: CONTROL_DEPENDENT_ONLY is insufficient; V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY; no E category). Replaces the derivation_precondition text with derivation_scope. Narrows NO_WATCHED_PREDICATE_DEPENDENCY to CONTROL_DEPENDENT_ONLY. Adds UNRESOLVED dependency, PARENT_DEFAULT_REACH and DECLARING_MODULE_UNSTATED. Adds per-commit blob identity for the alias chains. Adds clarifications K_T, K5_governs, I3_scope, changed_predicate, ec10_category, side_for_predicate_hunks, declaring_module_unstated. Verdict PROTOCOL-REDESIGN-READY. Forward-only: the H1D reviewer record and H1C records are not edited."
     }
   ],
   "known_gaps": [
@@ -484,16 +489,18 @@
     "states": {
       "DATA_DEPENDENT": "The watched option W reaches an operand of predicate Q through an accepted edge of h1c_causal_relevance: direct read, exact alias under T1-T6, transparent let, lambda iteration, or the helper call-site chain of h1d_interprocedural I2.",
       "CONTROL_DEPENDENT_ONLY": "Q is not DATA_DEPENDENT on W, but Q is evaluated only under a G0 gate whose condition is DATA_DEPENDENT on W, directly or through a further gate. The gate chain is recorded.",
-      "INDEPENDENT": "Neither of the above holds."
+      "INDEPENDENT": "Neither of the above holds.",
+      "UNRESOLVED": "Q's dependence on W cannot be decided: a path to W is unbounded, or an open key or unresolved callee lies on it (h1c_causal_relevance unbounded; h1d_namespace_closure N2/N3; h1d_freeform F5; h1d_callee_resolution K3/K5; h1d_interprocedural I5). Never treated as INDEPENDENT. The V state is V_AMBIGUOUS (UNRESOLVED_DEPENDENCY); the category is E_AMBIGUOUS when Q is otherwise eligible."
     },
     "rules": {
       "C1": "Only DATA_DEPENDENT predicates are watched predicate dependencies. CONTROL_DEPENDENT_ONLY never establishes a dependency on W, however many gates separate Q from W.",
       "C2": "A gate that is itself DATA_DEPENDENT on W is a predicate on W in its own right, classified under h1c_gating_vs_data at its own position.",
       "C3": "A changed predicate that is CONTROL_DEPENDENT_ONLY or INDEPENDENT of W is not a dependency of W. It affects the validity of W only through h1d_validity_states.",
-      "C4": "An option-semantic change (default, type, apply, readOnly) to W is E-eligible only when some DATA_DEPENDENT eligible predicate reads W (D3 under U3). Gate predicates on W satisfy this; predicates reached only through W do not."
+      "C4": "An option-semantic change (default, type, apply, readOnly) to W is E-eligible only when some DATA_DEPENDENT eligible predicate reads W (D3 under U3). Gate predicates on W satisfy this; predicates reached only through W do not.",
+      "C5": "Owner ruling 2026-10-08. Control dependence alone does not make an inner predicate dependent on W. Q is a valid target for W only if W contributes to Q's boolean value through an accepted data or semantic edge. A predicate reached only through a W gate is CONTROL_DEPENDENT_ONLY: the target is invalid (NO_WATCHED_PREDICATE_DEPENDENCY) and no E category is assigned from that invalid target. The enclosing W-dependent gate is its own predicate under C2. No composite predicate such as W && Q is synthesized unless a source predicate, or a separately specified reachability layer, introduces it."
     },
     "worked_examples_diagnostic": {
-      "beszel_openFirewall": "At e2497c3a, beszel-agent.nix:209 is lib.mkIf cfg.openFirewall [...], a G0(ii) gate that reads openFirewall: DATA_DEPENDENT. The if at :211 reads cfg.environment and is CONTROL_DEPENDENT_ONLY on openFirewall (C1).",
+      "beszel_openFirewall": "At e2497c3a, beszel-agent.nix:209 is lib.mkIf cfg.openFirewall [...], a G0(ii) gate that reads openFirewall: DATA_DEPENDENT. The if at :211 reads cfg.environment and is CONTROL_DEPENDENT_ONLY on openFirewall (C1). Owner ruling (C5): C1a is V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY with no E category. The gate at :209 is a valid predicate on W when it is itself changed (C1b).",
       "beszel_environment": "The if at :211 is DATA_DEPENDENT on environment (builtins.hasAttr reads cfg.environment) and its role is P_CONTROL (G0(i)). Its category follows declaration_module_governs for environment. The declaration of environment is not in the H1D probe, so no category is asserted here."
     }
   },
@@ -509,8 +516,8 @@
       "PREFIX_CONTRACT_VIOLATION": "V2 fails: option_prefix ends in a declaration rather than a container.",
       "WATCH_PATH_NOT_DECLARED": "V3 fails: a watch segment is not declared in the module on that side.",
       "FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION": "The watch path names a key matched only by freeformType and not declared as an option (h1d_freeform F2).",
-      "FOREIGN_ONLY_DEPENDENCY": "The changed predicate reads no W path, is not gated by W, and its operands are all foreign (h1c_mixed_predicate M2).",
-      "NO_WATCHED_PREDICATE_DEPENDENCY": "The changed predicate is CONTROL_DEPENDENT_ONLY on W (gated by W), or is INDEPENDENT of W with no foreign operand (for example a predicate over constants)."
+      "FOREIGN_ONLY_DEPENDENCY": "The changed predicate reads no W path, is not gated by W, and its operands are all foreign (h1c_mixed_predicate M2). Inert under derivation_scope: a derived target has a W path, so this reason is not reached. Retained for the record.",
+      "NO_WATCHED_PREDICATE_DEPENDENCY": "The derived target's changed predicates are all CONTROL_DEPENDENT_ONLY on W, and none is DATA_DEPENDENT on W (owner ruling 2026-10-08, C5). Applies only to a target derived under derivation_precondition. No E category is assigned from this state."
     },
     "ambiguity_states": [
       "V4_UNRESOLVED_CONTAINER",
@@ -519,7 +526,9 @@
       "OPEN_NAMESPACE_RECEIVER (h1d_namespace_closure N2)",
       "DYNAMIC_KEY_OPEN (h1d_namespace_closure N3)",
       "FREEFORM_DYNAMIC_KEY (h1d_freeform F5)",
-      "HELPER_UNRESOLVED (h1d_interprocedural I5)"
+      "HELPER_UNRESOLVED (h1d_interprocedural I5)",
+      "UNRESOLVED_DEPENDENCY (h1d_control_dependence UNRESOLVED)",
+      "PARENT_DEFAULT_REACH (h1d_closure gap 9)"
     ],
     "precedence": [
       "1. V_INVALID when every changed predicate on the target is decided (no unresolved dependency path) and none is DATA_DEPENDENT on W. The reason set is recorded; the order of invalid_reasons above names the first reason when several apply.",
@@ -527,7 +536,7 @@
       "3. V_VALID when at least one changed predicate is DATA_DEPENDENT on W, or C4 holds for an option-semantic change, and checks V1-V3 and S1 pass and V4 is not unresolved.",
       "4. A DATA_DEPENDENT changed predicate on W makes the target not invalid, even when other changed predicates on the same target are CONTROL_DEPENDENT_ONLY or foreign-only. Those are recorded and do not change the target state."
     ],
-    "derivation_precondition": "A V state is computed only for a target derived from a changed predicate on W or an option-semantic change to W. A target with neither is not derived: its hunks are classified by G1 (E_NO) and it is not reported as V_INVALID. Without this precondition the reason NO_WATCHED_PREDICATE_DEPENDENCY would fire on every data-only hunk.",
+    "derivation_precondition": "derivation_scope (GO-H1D closure). A hunk derives target W when it changes (a) W's own declaration or an option-semantic attribute of W (C4); (b) a predicate Q that is DATA_DEPENDENT on W, or CONTROL_DEPENDENT_ONLY on W through a gate chain whose gate is DATA_DEPENDENT on W (C1); or (c) an ancestor option of W whose change has undecided reach to W (PARENT_DEFAULT_REACH, which then gives V_AMBIGUOUS). A changed data term (G1) does not derive W, even inside a W-gated block. A changed predicate that is INDEPENDENT of W, with no W path and no W gate, does not derive W: the hunk has no V state for W and no category for W. An unresolved W path (ambiguity_states) derives W with V_AMBIGUOUS, not 'not derived'. A case that supplies no changed term does not derive W.",
     "aggregation_note": "The mechanical part of target-validity/1 remains (V1-V3 failure is INVALID; V4 unresolved is AMBIGUOUS; S1 is reviewer-owned). V_VALID additionally needs precedence 3. V_INVALID carries no E category. V_AMBIGUOUS hunks take E_AMBIGUOUS. The v2 target-validity rubric records these states."
   },
   "h1d_callee_resolution": {
@@ -614,7 +623,45 @@
         "equivalence_class": "not applicable"
       }
     ],
-    "unlisted": "A primitive not listed here is P_UNKNOWN (G2) until pinned with the same fields at the exact SHA."
+    "unlisted": "A primitive not listed here is P_UNKNOWN (G2) until pinned with the same fields at the exact SHA.",
+    "per_commit_blobs": {
+      "rule": "Identity at a commit holds when every file in the alias chain has, at that commit, the blob recorded here (K2, same-SHA resolution). A blob recorded for one commit does not establish identity at another commit.",
+      "lib/default.nix": {
+        "E": "56baba8708c5f72254d83d7f218097462def4c62",
+        "B": "56baba8708c5f72254d83d7f218097462def4c62",
+        "F": "56baba8708c5f72254d83d7f218097462def4c62"
+      },
+      "lib/modules.nix": {
+        "E": "74ff0f04eb1e15d7063f2dc606bf5385b7e4c890",
+        "B": "74ff0f04eb1e15d7063f2dc606bf5385b7e4c890",
+        "F": "64a86c55407f8c5b5d85906432c311125ff2648e"
+      },
+      "lib/lists.nix": {
+        "E": "819b6d7fc6ed5a31d13b33d8fce9b2bab508f489",
+        "B": "9932d410bd98dd02563fc3a455dbcc4b8078f7be",
+        "F": "8d9ec38b9a28aafbf4f01a1535767c29f1c4f3ba"
+      },
+      "lib/strings.nix": {
+        "E": "ccd8457289b58216ddaec1f5533fb5a0733663ea",
+        "B": "ccd8457289b58216ddaec1f5533fb5a0733663ea",
+        "F": "ccd8457289b58216ddaec1f5533fb5a0733663ea"
+      },
+      "lib/trivial.nix": {
+        "E": "f333440ee384619abf43ec01b81a1e5703dadd57",
+        "B": "f333440ee384619abf43ec01b81a1e5703dadd57",
+        "F": "f333440ee384619abf43ec01b81a1e5703dadd57"
+      },
+      "lib/attrsets.nix": {
+        "E": "a70567260a51daad33c1cb87813c4922c698f126",
+        "B": "a70567260a51daad33c1cb87813c4922c698f126",
+        "F": "a70567260a51daad33c1cb87813c4922c698f126"
+      },
+      "closed_by_blob": {
+        "lib.mkIf at B (C1b)": "lib/default.nix and lib/modules.nix blobs equal the E entries. Definition lib/modules.nix:1579-1582; chain lib/default.nix:71, 482, 496.",
+        "lib.filter at F (C4d)": "lib/default.nix equal to E. lib/lists.nix at F: inherit (builtins) at :18 includes filter; filter at :25. Chain lib/default.nix:268 inherit (self.lists) and :278 filter.",
+        "lib.mkIf at F": "Not used by any H1D decision. The F modules.nix blob differs and is not pinned here."
+      }
+    }
   },
   "h1d_freeform": {
     "purpose": "H1D.5. Freeform keys against declared suboptions.",
@@ -689,9 +736,177 @@
     ]
   },
   "h1d_verdict": {
-    "verdict": "PROTOCOL-REDESIGN-PARTIAL",
-    "blocking_construct": "A predicate reached only through a W gate (CONTROL_DEPENDENT_ONLY). Exemplar: beszel-agent.nix:211 inside lib.mkIf cfg.openFirewall at :209 (base e2497c3a). C1 gives V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY, and V_INVALID carries no E category; the reviewer gave E_NO. Whether such a dependency is eligible under U3 is a scope question for the user.",
-    "reviewer_record": "work/go-h/independent-review/h1d-review-record.txt",
-    "go_i_handoff": "not issued; READY not reached"
+    "verdict": "PROTOCOL-REDESIGN-READY",
+    "basis": "h1d_closure. The owner ruling closes C1a. Every reviewer gap has exactly one class (12 MECHANICAL, 1 OWNER_RULING, 3 AMBIGUITY_STATE, 1 REVIEWER_OWNED). No construct is left without a mechanical rule, a reviewer-owned rule, an ambiguity state or a D limitation.",
+    "blocking_construct": "none",
+    "conditions": [
+      "The closure clauses (derivation_scope, clarifications, per_commit_blobs, the new states) are controller-drafted and have not been reviewed by a fresh reviewer. The owner may require one review round before GO-I.",
+      "REVIEWER_OWNED items remain open for their cases until recorded with evidence: C5a (V3 submodule container); C7c (EC10 EQ3 decision).",
+      "AMBIGUITY_STATE cases are reported with that state and are not decided: C3a (PARENT_DEFAULT_REACH); C3b, C4a-C4c, C6d (UNRESOLVED); C6c (DECLARING_MODULE_UNSTATED category)."
+    ],
+    "reviewer_record": "work/go-h/independent-review/h1d-review-record.txt (not edited; its 17 gaps are classified in h1d_closure.gap_classification)",
+    "go_i_handoff": "Issued as the boundary statement in h1d_go_i_boundary. GO-I is not started and requires a separate user instruction."
+  },
+  "h1d_closure": {
+    "purpose": "GO-H1D closure. Applies the owner ruling of 2026-10-08 to C1a and classifies each of the reviewer's 17 rule gaps. Every gap has exactly one class. The classification is controller-drafted and has not been reviewed by a fresh reviewer. The reviewer record is not edited.",
+    "classes": {
+      "MECHANICAL": "decided by a rule text in this rubric",
+      "REVIEWER_OWNED": "decided by a reviewer, recorded with evidence",
+      "AMBIGUITY_STATE": "a named state; the case is reported with that state, not with a category",
+      "D_LIMITATION": "a capability limit of the D stage; not used in GO-H1D",
+      "OWNER_RULING": "decided by the owner"
+    },
+    "owner_ruling_2026_10_08": "Control dependence alone does not make an inner predicate dependent on watched option W for Layer A. A predicate is a valid Layer-A target for W only if W contributes to its boolean value through an accepted data or semantic dependency edge. If W only controls whether the predicate is reached or evaluated, the state is CONTROL_DEPENDENT_ONLY and is insufficient. For C1a / beszel-agent.nix:211: the inner predicate is not a valid target; V_INVALID with NO_WATCHED_PREDICATE_DEPENDENCY / CONTROL_DEPENDENT_ONLY; no E category is assigned from the invalid target; a changed inner predicate that depends on another watched option is evaluated for that option separately; the enclosing W-dependent gate may be a valid Layer-A predicate where applicable. No composite predicate such as W && inner is synthesized unless a source predicate or a separately specified reachability layer introduces it.",
+    "clarifications": {
+      "K_T": "In h1c_causal_relevance, accepted edge 4 ('transparent let binding') means transparent for tracing under predicate_rule.let_binding_rule. It does not mean an h1c_let_alias_transparency alias. A function-call right-hand side is not an alias, but it is traced when it is a pure expression of named option paths and static values, as activeCollectors is in C4d.",
+      "K5_governs": "K5 governs. A lib.* name with no SHA at the case's commit is P_UNKNOWN, including for synthetic cases. A case parenthetical ('classify as written', 'may be checked at E') supplies no SHA.",
+      "I3_scope": "The I3 caller clause (E_NO for a data-position call-site change) applies only when every changed term in the hunk is G1 data. A hunk that changes a predicate is decided by I1 and I4.",
+      "changed_predicate": "Any predicate term in the after-state of a hunk that differs from the before-state is a changed predicate, including one introduced by an EC10 rewrite. Its EC10 status does not change its V state.",
+      "ec10_category": "A rewrite decided EQ3 takes E_AMBIGUOUS under ec10_equivalence until the reviewer decision is recorded, as in C7c.",
+      "side_for_predicate_hunks": "For a hunk whose changed term is a predicate or a helper body, V1-V3 run against the side and module where W is declared. For option-semantic changes, target-validity side_rule governs.",
+      "declaring_module_unstated": "If the module declaring W or an operand is not stated or not resolved, the category is E_AMBIGUOUS (DECLARING_MODULE_UNSTATED). declaration_module_governs is not applied without a declaring module."
+    },
+    "case_results_after_closure": {
+      "C1a": "CONTROL_DEPENDENT_ONLY on W; gate beszel-agent.nix:209 is DATA_DEPENDENT on openFirewall. Role P_CONTROL. Category none of the four. V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY. Classes: OWNER_RULING; MECHANICAL (derivation_scope).",
+      "C1b": "DATA_DEPENDENT (direct read at :209). Role P_GATING (G0(ii); lib.mkIf identity at B by blob). E_DIRECT. V_VALID.",
+      "C2a": "INDEPENDENT (only operand is foreign). Role P_UNKNOWN (K5). Not derived (derivation_scope). No category for W, no V state.",
+      "C2b": "INDEPENDENT (no operand). Role P_UNKNOWN (K5). Not derived. No category for W, no V state.",
+      "C3a": "No changed W attribute. Parent default at speechd.nix:38 with undecided reach. V_AMBIGUOUS (PARENT_DEFAULT_REACH). E_AMBIGUOUS. F2 applies once the reach is decided.",
+      "C3b": "UNRESOLVED (DYNAMIC_KEY_OPEN on the only path). Role P_UNKNOWN (K5). V_AMBIGUOUS. E_AMBIGUOUS.",
+      "C4a": "UNRESOLVED (CALLEE_UNKNOWN: no SHA, K5; the parenthetical supplies none). Role P_UNKNOWN. V_AMBIGUOUS. E_AMBIGUOUS.",
+      "C4b": "UNRESOLVED (myFilter has no visible definition, K3). Role P_UNKNOWN. V_AMBIGUOUS. E_AMBIGUOUS.",
+      "C4c": "UNRESOLVED (bare filter under with lib; R3 fails). Role P_UNKNOWN. V_AMBIGUOUS. E_AMBIGUOUS.",
+      "C4d": "DATA_DEPENDENT: the lambda iterates activeCollectors, which let_binding_rule traces to GPU_COLLECTOR (lambda_over_option_attrset). Role P_SELECTION (lib.filter at F, identity by blob: lib/lists.nix:18 and :25, lib/default.nix:268 and :278). E_DIRECT. V_VALID. The controller verified the library blobs; the beszel-agent.nix lines are reviewer-read at F and were not re-verified.",
+      "C5a": "DATA_DEPENDENT (mpd.nix:438 inside lib.optionals, G0(ii)), and the W default change at :180 (C4). Role P_GATING. E_DIRECT. V_VALID on the reviewer-owned V3 decision for the settings submodule (gap 16).",
+      "C5b": "No changed term supplied. Not derived. No category, no V state.",
+      "C6a": "DATA_DEPENDENT (ncdns.nix:189 and :199; exact alias cfgs at :8). Role P_GATING. E_DIRECT. V_VALID. Namespace closure N1 is recorded and is not needed for V.",
+      "C6b": "DATA_DEPENDENT (movim.nix:793 and :805). Role P_GATING. E_DIRECT. V_VALID. The computed key at :628 is CLOSED by N3(ii) and N4 with domain {mariadb, postgresql} (type at :478-481).",
+      "C6c": "DATA_DEPENDENT (direct read in the changed mkIf). Role P_UNKNOWN (K5). E_AMBIGUOUS (DECLARING_MODULE_UNSTATED). V_VALID; the open receiver is off the path.",
+      "C6d": "UNRESOLVED (N3(i): x has call sites outside the file). Role P_UNKNOWN. V_AMBIGUOUS. E_AMBIGUOUS.",
+      "C7a": "DATA_DEPENDENT through I2 (positive evidence at locate.nix:244 and :276). Role P_CONTROL (I1). E_INDIRECT (I3). V_VALID; V1-V3 run against locate.nix (side_for_predicate_hunks).",
+      "C7b": "The changed term is G1 data (interpolation). Not a predicate. E_NO (I3 data-only clause). Not derived (derivation_scope).",
+      "C7c": "The new if reads cfg.pruneBindMounts directly: DATA_DEPENDENT. Role P_CONTROL (I1). The hunk changes a predicate, so the I3 clause does not apply. The rewrite is EQ3 (L2 with forbidden_automatic), so E_AMBIGUOUS pending the reviewer's EC10 decision. V_VALID (changed_predicate)."
+    },
+    "gap_classification": [
+      {
+        "gap": 1,
+        "exposed_by": "C1a, C2a, C2b, C3a",
+        "silence": "'changed predicate on W' is undefined for CONTROL_DEPENDENT_ONLY and INDEPENDENT predicates",
+        "class": "MECHANICAL",
+        "closure": "derivation_scope in h1d_validity_states.derivation_precondition"
+      },
+      {
+        "gap": 2,
+        "exposed_by": "C1a",
+        "silence": "A non-derived predicate hunk is routed to G1, which presupposes a P_DATA_ONLY boolean",
+        "class": "MECHANICAL",
+        "closure": "C1a is derived under derivation_scope, so G1 is not reached. G1 applies only to data-only hunks."
+      },
+      {
+        "gap": 3,
+        "exposed_by": "C1a",
+        "silence": "The E_NO clause names T_NONE, which needs an absence record",
+        "class": "OWNER_RULING",
+        "closure": "Owner ruling C5: C1a has no E category. E_NO is not assigned to an invalid target."
+      },
+      {
+        "gap": 4,
+        "exposed_by": "C2a, C2b, C3b, C4a-C4c, C6c, C6d",
+        "silence": "lib.mkIf and lib.filter with no SHA: K5 gives P_UNKNOWN, while 'classify as written' points the other way",
+        "class": "MECHANICAL",
+        "closure": "K5 governs (clarifications.K5_governs). The choice does not change any V state or category in these cases."
+      },
+      {
+        "gap": 5,
+        "exposed_by": "C1b, C4d",
+        "silence": "The primitive table pins E only; B and F identities were read directly",
+        "class": "MECHANICAL",
+        "closure": "h1d_gating_primitives.per_commit_blobs. Identity holds where every alias-chain file has the recorded blob at that commit."
+      },
+      {
+        "gap": 6,
+        "exposed_by": "C6b",
+        "silence": "lib.optionalAttrs (movim.nix:58 and :61) has no table entry",
+        "class": "MECHANICAL",
+        "closure": "Unlisted names are P_UNKNOWN (h1d_gating_primitives). These lines are not used for the C6b result."
+      },
+      {
+        "gap": 7,
+        "exposed_by": "C4d",
+        "silence": "let_binding_rule (tracing) and h1c_let_alias_transparency (aliases) both use 'transparent'; a function-call RHS is not an alias",
+        "class": "MECHANICAL",
+        "closure": "clarifications.K_T: the causal-relevance edge means tracing under let_binding_rule. T5 applies to aliases only."
+      },
+      {
+        "gap": 8,
+        "exposed_by": "C3b, C6d",
+        "silence": "The three dependency states have no UNRESOLVED state",
+        "class": "AMBIGUITY_STATE",
+        "closure": "UNRESOLVED added to h1d_control_dependence.states. V_AMBIGUOUS (UNRESOLVED_DEPENDENCY)."
+      },
+      {
+        "gap": 9,
+        "exposed_by": "C3a, C5b",
+        "silence": "C4 covers an option-semantic change 'to W'; the default at speechd.nix:38 is on the parent option",
+        "class": "AMBIGUITY_STATE",
+        "closure": "PARENT_DEFAULT_REACH: C3a is V_AMBIGUOUS and E_AMBIGUOUS. C5b supplies no changed term and is not derived."
+      },
+      {
+        "gap": 10,
+        "exposed_by": "C7c",
+        "silence": "Whether a pending EQ3 rewrite that introduces a DATA_DEPENDENT predicate is a changed predicate for V",
+        "class": "MECHANICAL",
+        "closure": "clarifications.changed_predicate: yes. V_VALID from the new predicate."
+      },
+      {
+        "gap": 11,
+        "exposed_by": "C7b, C7c",
+        "silence": "I3 gives E_NO for a data-position call-site change; I1 gives the new if P_CONTROL",
+        "class": "MECHANICAL",
+        "closure": "I3_scope: the E_NO clause applies only when every changed term is G1 data. C7c's category follows the EQ3 rule."
+      },
+      {
+        "gap": 12,
+        "exposed_by": "C7a",
+        "silence": "V1-V3 module when the changed predicate is in another module",
+        "class": "MECHANICAL",
+        "closure": "clarifications.side_for_predicate_hunks: V1-V3 run against the side and module where W is declared."
+      },
+      {
+        "gap": 13,
+        "exposed_by": "C2a",
+        "silence": "V_INVALID carries no E category, but P_UNKNOWN with option operands is E_AMBIGUOUS",
+        "class": "MECHANICAL",
+        "closure": "The E_AMBIGUOUS rule applies to a derived target (V_AMBIGUOUS). C2a is not derived, so there is no category for W."
+      },
+      {
+        "gap": 14,
+        "exposed_by": "C4a",
+        "silence": "A case parenthetical ('a library alias chain may be checked at E') against K5",
+        "class": "MECHANICAL",
+        "closure": "K5 governs (clarifications.K5_governs). A parenthetical supplies no SHA."
+      },
+      {
+        "gap": 15,
+        "exposed_by": "C1a, C1b, C3a, C7a",
+        "silence": "target-validity side_rule covers removed, added and changed-default options, not predicate-only or helper-body hunks",
+        "class": "MECHANICAL",
+        "closure": "clarifications.side_for_predicate_hunks; target-validity v2 side_for_predicate_hunks."
+      },
+      {
+        "gap": 16,
+        "exposed_by": "C5a",
+        "silence": "Whether a submodule-typed mkOption (mpd.nix:153) counts as a declared intermediate segment under V3",
+        "class": "REVIEWER_OWNED",
+        "closure": "The rules do not decide this. The reviewer decided V3 passes for the settings submodule (leaf at mpd.nix:178). C5a is V_VALID on that decision, recorded with evidence before use."
+      },
+      {
+        "gap": 17,
+        "exposed_by": "C6c",
+        "silence": "For synthetic cases no declaring module is given, so the category cannot be E_DIRECT or E_INDIRECT",
+        "class": "AMBIGUITY_STATE",
+        "closure": "DECLARING_MODULE_UNSTATED: category E_AMBIGUOUS (clarifications.declaring_module_unstated)."
+      }
+    ]
   }
 }

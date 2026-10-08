@@ -1,6 +1,6 @@
 {
   "schema": "go-h-target-validity-rubric/2",
-  "status": "CANDIDATE (GO-H1D). Forward-only. target-validity-rubric.json (schema /1) is unchanged and remains the record of V1-V4 and S1.",
+  "status": "CANDIDATE (GO-H1D; closed by the owner ruling of 2026-10-08, see eligibility-rubric h1d_closure). Forward-only. target-validity-rubric.json (schema /1) is unchanged and remains the record of V1-V4 and S1.",
   "extends": "go-h-target-validity-rubric/1",
   "unchanged_from_v1": [
     "fields, source_loading, side_rule, checks V1-V4 and S1, declared_not_checked, validator_evidence"
@@ -16,8 +16,8 @@
     {"reason": "PREFIX_CONTRACT_VIOLATION", "when": "V2 fails: option_prefix ends in a declaration. Mechanical."},
     {"reason": "WATCH_PATH_NOT_DECLARED", "when": "V3 fails: a watch segment is not declared on that side. Mechanical."},
     {"reason": "FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION", "when": "The watch path names a key matched only by freeformType and not declared as an option (eligibility-rubric h1d_freeform F2). Mechanical."},
-    {"reason": "FOREIGN_ONLY_DEPENDENCY", "when": "Every changed predicate touching the target reads only foreign operands and none is gated by W (h1c_mixed_predicate M2). Mechanical once the operand declarations are pinned."},
-    {"reason": "NO_WATCHED_PREDICATE_DEPENDENCY", "when": "The derived target has changed predicates, and each is CONTROL_DEPENDENT_ONLY on W or INDEPENDENT of W with no foreign operand; and there is no option-semantic change under C4. Applies only when the derivation_precondition holds."}
+    {"reason": "FOREIGN_ONLY_DEPENDENCY", "when": "Every changed predicate touching the target reads only foreign operands and none is gated by W (h1c_mixed_predicate M2). Mechanical once the operand declarations are pinned. Inert under derivation_scope: a derived target has a W path, so this reason is not reached; retained for the record."},
+    {"reason": "NO_WATCHED_PREDICATE_DEPENDENCY", "when": "The derived target has changed predicates, and each is CONTROL_DEPENDENT_ONLY on W, and none is DATA_DEPENDENT on W; and there is no option-semantic change under C4. Applies only to a target derived under derivation_scope (eligibility-rubric h1d_validity_states.derivation_precondition). Owner ruling 2026-10-08."}
   ],
   "ambiguous_states": [
     "V4_UNRESOLVED_CONTAINER",
@@ -26,19 +26,22 @@
     "OPEN_NAMESPACE_RECEIVER (namespace_closure N2)",
     "DYNAMIC_KEY_OPEN (namespace_closure N3)",
     "FREEFORM_DYNAMIC_KEY (freeform F5)",
-    "HELPER_UNRESOLVED (interprocedural I5)"
+    "HELPER_UNRESOLVED (interprocedural I5)",
+    "UNRESOLVED_DEPENDENCY (eligibility-rubric h1d_control_dependence UNRESOLVED)",
+    "PARENT_DEFAULT_REACH (eligibility-rubric h1d_closure gap 9)"
   ],
   "precedence": [
     "1. Mechanical failure of V1-V3 gives V_INVALID with the first matching reason from the mechanical rows above.",
     "2. A V4 unresolved container, or any ambiguous_states entry on the only dependency path, gives V_AMBIGUOUS. This is checked before reason-based INVALID for dependency reasons, so an open receiver is never reported as invalid.",
     "3. A DATA_DEPENDENT changed predicate on W gives V_VALID when V1-V3 and S1 pass, even if other changed predicates on the same target are CONTROL_DEPENDENT_ONLY or foreign-only. Those are recorded and do not change the state.",
-    "4. Otherwise, with the derivation_precondition met and no ambiguous entry, the dependency reasons above give V_INVALID."
+    "4. Otherwise, with the target derived under derivation_scope and no ambiguous entry, the dependency reasons above give V_INVALID."
   ],
   "aggregation": {
     "per_target": "V_VALID iff precedence 3 holds. V_INVALID iff a reason applies. V_AMBIGUOUS otherwise.",
     "per_pr": "unchanged from v1: V(PR) iff at least one target is V_VALID and the other targets are V_VALID or explicitly out of scope with a reason. PARTIAL_V is reported separately.",
     "hunk_category": "V_INVALID carries no E category. V_AMBIGUOUS hunks take E_AMBIGUOUS. V_VALID hunks take the category from the eligibility rubric."
   },
+   "side_for_predicate_hunks": "For a hunk whose changed term is a predicate or a helper body, V1-V3 run against the side and module where W is declared. For option-semantic changes, side_rule governs (owner-independent GO-H1D closure clarification).",
   "not_decided_here": [
     "Whether the predicate is eligible (eligibility-rubric P_GATING, P_CONTROL, P_SELECTION roles)",
     "Callee identity (eligibility-rubric h1d_callee_resolution)",
