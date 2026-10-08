@@ -1,0 +1,44 @@
+GO-H1C bounded fresh review. You are an independent reviewer. Work only from the files named below. Do not run any command that writes to the repository, and do not modify any file.
+
+Context: the repository is /home/tandem/nix-option-branch-audit. It defines a classification protocol for NixOS option-semantic changes. The frozen rules are in work/go-h/eligibility-rubric.json (schema go-h-eligibility-rubric/5.0). Read these sections: "categories", "predicate_taxonomy", "lambda_rule", "ec10_equivalence", "absence_evidence", and every key starting with "h1c_". Ignore older sections unless a h1c_ rule refers to them.
+
+Evidence: work/go-h/independent-review/h1c-probe-excerpts.txt contains source excerpts printed from exact historical git SHAs in the nixpkgs repository at /home/tandem/.cache/go-h/nixpkgs-exact. The excerpts are the only evidence you need. You may also run read-only git commands against that repository, pinning every query to the SHA named in the excerpt. Working-tree reads are not evidence.
+
+Task. For each probe ID below, using only the frozen rules and the excerpt:
+  (a) state the predicate role (P_GATING, P_CONTROL, P_SELECTION, P_DATA_ONLY, P_UNKNOWN), or state "not a predicate";
+  (b) state the category (E_DIRECT, E_INDIRECT, E_AMBIGUOUS, E_NO) that the rules give for the watched option named in the excerpt header, and say which rule clause decides it;
+  (c) say where the rules are ambiguous, or where you had to reason beyond them. Name the clause.
+
+Probe IDs: P01, P02, P03, P04, P04b, P05, P05f, P05s, P06, P07a-c, P08a-b, P09 (owner-key and receiver queries), P09b, P10, P10b-c, P11 (a), (b), (c).
+
+Probe P05s has no historical SHA. It is a synthetic control. Classify it as written.
+
+For P11, the three callee forms are synthetic and need no SHA:
+  (a) let f = lib.filter; in f pred xs
+  (b) with lib; filter pred xs
+  (c) let filter = myFilter; in filter pred xs   (myFilter is a local helper with unknown body)
+
+Six comparisons. Where the rules separate the pair, say so; where they do not, say that. Do not assume the rules separate them.
+  1. P03 versus P04 (selection predicate versus transform lambda).
+  2. P01 versus P08a (gating versus data-only boolean).
+  3. P05 versus P05f (mixed watched and foreign operands versus foreign-only).
+  4. P10 versus P10b (library lambda versus library alias chain).
+  5. P06 versus P07 (transparent let alias versus let-bound default).
+  6. P09 versus P09b (exact-SHA absence candidate versus owner-key candidate with a different owner).
+
+Hard constraints.
+  - Do not propose a desired label or verdict for any probe in advance. Derive each answer from the rules and the excerpt.
+  - Do not invent rules. If the rules are silent, report "rules silent" and what the silence affects.
+  - Do not claim T_NONE or EQ levels beyond what the rules and the excerpt establish.
+  - Do not reference any prior verdict or any output of other tools in this session. Use only the files named above.
+
+Report format. Plain text, at most 350 lines. One block per probe ID:
+  ID: <probe id>
+  role: <role or "not a predicate">
+  category: <category>
+  rule: <clause name>
+  ambiguity: <none, or the clause name and a one-sentence description>
+
+Then a section "Pairs" with one line per comparison (1 to 6): "separated" or "not separated", and a one-sentence reason.
+
+Then a section "Rule gaps" listing each gap as: clause name; the probe that exposed it; a one-sentence description. Include gaps only where you had to reason beyond the rules.

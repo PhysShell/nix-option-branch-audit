@@ -1,0 +1,273 @@
+## P01 direct if predicate (watched services.beszel.agent.environment)
+### P01 if predicate in value position
+# e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix lines 204-216
+  204|         Type = "simple";
+  205|         UMask = 27;
+  206|       };
+  207|     };
+  208| 
+  209|     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
+  210|       (
+  211|         if (builtins.hasAttr "PORT" cfg.environment) then
+  212|           (lib.strings.toInt cfg.environment.PORT)
+  213|         else
+  214|           45876
+  215|       )
+  216|     ];
+
+## P02 assertion condition inside a gated block (watched programs.joycond-cemuhook.enable; foreign services.joycond.enable)
+### P02 assertion
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/programs/joycond-cemuhook.nix lines 12-18
+   12|   config = lib.mkIf config.programs.joycond-cemuhook.enable {
+   13|     assertions = [
+   14|       {
+   15|         assertion = config.services.joycond.enable;
+   16|         message = "joycond must be enabled through `services.joycond.enable`";
+   17|       }
+   18|     ];
+
+## P03 selection predicate lambda over option-derived list (watched services.beszel.agent.environment.GPU_COLLECTOR)
+### P03 filter predicate
+# fdc3396349781c0dc2b495b6a320f62918bd63f6:nixos/modules/services/monitoring/beszel-agent.nix lines 48-54
+   48|   activeCollectors = lib.optionals (!cfg.environment.SKIP_GPU) cfg.environment.GPU_COLLECTOR;
+   49| 
+   50|   collectorAttrs =
+   51|     attr: lib.unique (lib.concatMap (name: gpuCollectors.${name}.${attr} or [ ]) activeCollectors);
+   52| 
+   53|   gpuPackages = map (name: gpuCollectors.${name}.package) (
+   54|     lib.filter (name: gpuCollectors.${name} ? package) activeCollectors
+
+## P04 transform lambda without a boolean (negative control)
+### P04 map transform
+# fdc3396349781c0dc2b495b6a320f62918bd63f6:nixos/modules/services/monitoring/beszel-agent.nix lines 53-53
+   53|   gpuPackages = map (name: gpuCollectors.${name}.package) (
+
+## P04b transform lambda containing a conditional (negative control, watched environment)
+### P04b mapAttrs transform with if
+# fdc3396349781c0dc2b495b6a320f62918bd63f6:nixos/modules/services/monitoring/beszel-agent.nix lines 242-249
+  242|       environment = lib.mapAttrs (
+  243|         _: value:
+  244|         if lib.isBool value then
+  245|           (lib.boolToString value)
+  246|         else if lib.isList value then
+  247|           lib.concatStringsSep "," value
+  248|         else
+  249|           value
+
+## P05 mixed local and foreign operands in a stored attribute value (watched services.beszel.agent.smartmon.enable; foreign config.boot.zfs.enabled)
+### P05 attribute value, mixed operands
+# e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix lines 185-188
+  185|         NoNewPrivileges = !cfg.smartmon.enable;
+  186|         PrivateDevices = !cfg.smartmon.enable && !config.boot.zfs.enabled;
+  187|         PrivateTmp = true;
+  188|         PrivateUsers = !cfg.smartmon.enable && !config.boot.zfs.enabled && !cfg.environment.SKIP_SYSTEMD;
+
+## P05 foreign-only gating (watched not in predicate)
+### P05f lib.optionals foreign gating
+# e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix lines 136-140
+  136|       path =
+  137|         cfg.extraPath
+  138|         ++ lib.optionals cfg.smartmon.enable [ cfg.smartmon.package ]
+  139|         ++ lib.optionals config.boot.zfs.enabled [ config.boot.zfs.package ]
+  140|         ++ lib.optionals (builtins.elem "nvidia" config.services.xserver.videoDrivers) [
+
+## P05s SYNTHETIC mixed operands in gating position (no historical SHA)
+  lib.mkIf (cfg.smartmon.enable && config.boot.zfs.enabled) { ... }
+
+## P06 let alias around an option path (device-tree; watched hardware.deviceTree.dtboBuildExtraPreprocessorFlags)
+### P06 let alias
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/hardware/device-tree.nix lines 92-110
+   92|         dtboFile =
+   93|           let
+   94|             includePaths = [
+   95|               "${lib.getDev cfg.kernelPackage}/lib/modules/${cfg.kernelPackage.modDirVersion}/source/scripts/dtc/include-prefixes"
+   96|             ]
+   97|             ++ cfg.dtboBuildExtraIncludePaths;
+   98|             extraPreprocessorFlags = cfg.dtboBuildExtraPreprocessorFlags;
+   99|           in
+  100|           if o.dtboFile == null then
+  101|             let
+  102|               dtsFile = if o.dtsFile == null then (pkgs.writeText "dts" o.dtsText) else o.dtsFile;
+  103|             in
+  104|             pkgs.deviceTree.compileDTS {
+  105|               name = "${o.name}-dtbo";
+  106|               inherit includePaths extraPreprocessorFlags dtsFile;
+  107|             }
+  108|           else
+  109|             o.dtboFile;
+  110|       }
+
+## P07 let-bound default (watched programs.tmux.keyMode; changed binding defaultKeyMode)
+### P07a let binding
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/programs/tmux.nix lines 17-20
+   17|   cfg = config.programs.tmux;
+   18| 
+   19|   defaultKeyMode = "emacs";
+   20|   defaultResize = 5;
+
+### P07b option default uses binding
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/programs/tmux.nix lines 155-157
+  155|       keyMode = mkOption {
+  156|         default = defaultKeyMode;
+  157|         example = "vi";
+
+### P07c gating use of the option value
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/programs/tmux.nix lines 44-49
+   44|     set -g status-keys ${cfg.keyMode}
+   45|     set -g mode-keys   ${cfg.keyMode}
+   46| 
+   47|     ${optionalString (cfg.keyMode == "vi" && cfg.customPaneNavigationAndResize) ''
+   48|       bind h select-pane -L
+   49|       bind j select-pane -D
+
+## P08 boolean serialized into shell text (watched services.locate.pruneBindMounts)
+### P08a shell text use
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/misc/locate.nix lines 238-246
+  238|     environment = {
+  239|       # write /etc/updatedb.conf for manual calls to `updatedb`
+  240|       etc."updatedb.conf".text = ''
+  241|         PRUNEFS="${lib.concatStringsSep " " cfg.pruneFS}"
+  242|         PRUNENAMES="${lib.concatStringsSep " " cfg.pruneNames}"
+  243|         PRUNEPATHS="${lib.concatStringsSep " " cfg.prunePaths}"
+  244|         PRUNE_BIND_MOUNTS="${lib.boolToYesNo cfg.pruneBindMounts}"
+  245|       '';
+  246| 
+
+### P08b second use
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/misc/locate.nix lines 272-278
+  272|               (lib.getExe' cfg.package "updatedb")
+  273|               "--output"
+  274|               cfg.output
+  275|               "--prune-bind-mounts"
+  276|               (lib.boolToYesNo cfg.pruneBindMounts)
+  277|             ]
+  278|             ++ args
+
+## P09 exact-SHA absence, owner key gophernicus (watched services.gophernicus.rootDir)
+# owner-key query (A3)
+status=MATCH sha=e4c7d977153965496cbe73ff5631ca6a1118b347 scope=nixos/ exclude=nixos/modules/services/misc/gophernicus.nix files_in_scope=4637 pattern=\bgophernicus\b grep_exit=0 matches=13 generic_computed_files=573
+command=git grep -a -n -E -e '\bgophernicus\b' e4c7d977153965496cbe73ff5631ca6a1118b347 -- nixos/ :(exclude)nixos/modules/services/misc/gophernicus.nix
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/doc/manual/release-notes/rl-2611.section.md:95:- [gophernicus](https://github.com/gophernicus/gophernicus), a modern gopher daemon. Available at [services.gophernicus](#opt-services.gophernicus.enable).
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/module-list.nix:914:  ./services/misc/gophernicus.nix
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/all-tests.nix:791:  gophernicus = runTest ./gophernicus.nix;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:3:  name = "gophernicus";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:23:      services.gophernicus = {
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:27:        path = options.services.gophernicus.path.default ++ [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:32:          txt = pkgs.writeShellScript "gophernicus-test-filter-script" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:43:      alice-hello = pkgs.writeText "gophernicus-test-alice-hello" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:46:      bob-hello = pkgs.writeText "gophernicus-test-bob-hello" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:49:      bob-custom-command = pkgs.writeText "gophernicus-test-bob-custom-command" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:52:      bob-php-cgi = pkgs.writeText "gophernicus-test-bob-php-cgi" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:56:      bob-filtered = pkgs.writeText "gophernicus-test-bob-filtered" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:59:      bob-php-non-cgi = pkgs.writeText "gophernicus-test-bob-php-non-cgi" ''
+# receiver closure check (A5), whole-namespace and computed-key forms over config.services
+status=MATCH sha=e4c7d977153965496cbe73ff5631ca6a1118b347 scope=nixos/ exclude=none files_in_scope=4637 pattern=config\.services *(;|\)|\}|$)|config\.services\.\$\{|cfgs *= *config\.services grep_exit=0 matches=23 generic_computed_files=573
+command=git grep -a -n -E -e 'config\.services *(;|\)|\}|$)|config\.services\.\$\{|cfgs *= *config\.services' e4c7d977153965496cbe73ff5631ca6a1118b347 -- nixos/ 
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/kubernetes/pki.nix:48:  remote = with config.services; "https://${kubernetes.masterAddress}:${toString cfssl.port}";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix:24:      cfg = config.services.${name};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix:838:        environment.systemPackages = [ config.services.${name}.package ];
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/hardware/watt.nix:45:      assertion = !config.services.${service}.enable;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/mail/mailman.nix:405:        inherit (config.services) postfix;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/mautrix-signal.nix:177:      with config.services;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/mautrix-whatsapp.nix:179:      with config.services;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/cgit.nix:8:  cfgs = config.services.cgit;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/ncdns.nix:8:  cfgs = config.services;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/security/vault-agent.nix:134:          cfg = config.services.${flavour};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/dokuwiki.nix:16:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/drupal.nix:40:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/freshrss.nix:11:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/invoiceplane.nix:14:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/kimai.nix:14:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/limesurvey.nix:34:  group = config.services.${cfg.webserver}.group;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/limesurvey.nix:425:          "listen.owner" = config.services.${cfg.webserver}.user;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/limesurvey.nix:426:          "listen.group" = config.services.${cfg.webserver}.group;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/movim.nix:628:            DB_PORT = config.services.${cfg.database.type}.settings.port;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/wordpress.nix:14:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/zabbix.nix:282:      group = config.services.${cfg.frontend}.group;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/certmgr.nix:94:            networking.firewall.allowedTCPPorts = with config.services; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/public-inbox.nix:30:      inherit (config.services) public-inbox;
+
+## P09b owner key rundeck at a historical SHA (watched services.rundeck.aclPolicies; not decided by the script)
+status=MATCH sha=b063b8f9b2a655f72cec13f1877522c3e4066ac2 scope=nixos/ exclude=nixos/modules/services/web-apps/rundeck.nix files_in_scope=4633 pattern=\brundeck\b grep_exit=0 matches=42 generic_computed_files=571
+command=git grep -a -n -E -e '\brundeck\b' b063b8f9b2a655f72cec13f1877522c3e4066ac2 -- nixos/ :(exclude)nixos/modules/services/web-apps/rundeck.nix
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/doc/manual/release-notes/rl-2611.section.md:129:- [Rundeck](https://www.rundeck.com), Self-Service Operations [services.rundeck](#opt-services.rundeck.enable).
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/modules/module-list.nix:1841:  ./services/web-apps/rundeck.nix
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/all-tests.nix:1650:  rundeck = runTest ./rundeck.nix;
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:2:  name = "rundeck";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:5:    rundeck =
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:8:        environment.etc."rundeck-admin-password" = {
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:11:          user = "rundeck";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:12:          group = "rundeck";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:15:        environment.etc."rundeck-tokens.properties" = {
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:18:          user = "rundeck";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:19:          group = "rundeck";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:22:        services.rundeck = {
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:24:          serverHostname = "rundeck";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:26:          adminPasswordFile = "/etc/rundeck-admin-password";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:30:          frameworkSettings."rundeck.tokens.file" = "/etc/rundeck-tokens.properties";
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:43:    api = "http://rundeck:4441/api/26"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:50:        rundeck.wait_for_unit("rundeck.service")
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:51:        rundeck.wait_for_open_port(4441)
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:52:        rundeck.wait_until_succeeds(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:53:            "curl -sL http://rundeck:4441 | grep -qi Rundeck"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:57:        config = properties(rundeck, "/etc/rundeck/rundeck-config.properties")
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:58:        framework = properties(rundeck, "/etc/rundeck/framework.properties")
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:60:        assert "grails.serverURL=http://rundeck:4441" in config, config
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:62:        assert "framework.server.url=http://rundeck:4441" in framework, framework
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:65:        config = properties(rundeck, "/etc/rundeck/rundeck-config.properties")
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:71:        framework = properties(rundeck, "/etc/rundeck/framework.properties")
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:74:        rundeck.succeed(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:75:            "grep -qE '^rundeck\\.server\\.uuid = [0-9a-f-]{36}$'"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:76:            " /etc/rundeck/framework.properties"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:80:        rundeck.succeed(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:82:            " /etc/rundeck/realm.properties"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:84:        rundeck.fail("grep -q '@ADMIN_PASSWORD@' /etc/rundeck/realm.properties")
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:85:        rundeck.succeed(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:86:            "[ \"$(stat -c %a /etc/rundeck/realm.properties)\" = 600 ]"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:88:        rundeck.succeed(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:89:            "[ \"$(stat -c %U /etc/rundeck/realm.properties)\" = rundeck ]"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:93:        rundeck.wait_until_succeeds(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:96:            " http://rundeck:4441/j_security_check"
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:102:        rundeck.wait_until_succeeds(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:104:            " | jq -e '.system.rundeck.version'",
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:108:        rundeck.succeed(
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/tests/rundeck.nix:116:        rundeck.succeed(
+
+## P10 library binding: lib.boolToYesNo (lambda definition, not an alias)
+### P10 lib function definition
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/trivial.nix lines 306-308
+  306|     ```
+  307|   */
+  308|   boolToYesNo = b: if b then "yes" else "no";
+
+## P10b library binding: lib.filter (alias chain)
+### P10b lib alias to builtin (lists)
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/lists.nix lines 14-27
+   14|   inherit (lib.attrsets) mapAttrs attrNames attrValues;
+   15| in
+   16| rec {
+   17| 
+   18|   inherit (builtins)
+   19|     head
+   20|     tail
+   21|     length
+   22|     isList
+   23|     elemAt
+   24|     concatLists
+   25|     filter
+   26|     elem
+   27|     genList
+
+### P10c lib aggregation includes lists
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 266-270
+  266|         removeAttrs
+  267|         ;
+  268|       inherit (self.lists)
+  269|         singleton
+  270|         forEach
+
+## P11 SYNTHETIC callee controls (no historical SHA)
+  (a) let f = lib.filter; in f pred xs
+  (b) with lib; filter pred xs
+  (c) let filter = myFilter; in filter pred xs   (myFilter is a local helper)
+

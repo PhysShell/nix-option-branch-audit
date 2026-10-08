@@ -1,0 +1,137 @@
+GO-H1C bounded fresh review: record of the reviewer's report
+
+Provenance: fresh general-purpose agent (agent id ae2f9ae548c1870f7), prompt in
+work/go-h/independent-review/h1c-reviewer-prompt.txt, rubric as work/go-h/eligibility-rubric.json
+(schema go-h-eligibility-rubric/5.0, with the A1 correction already applied, before the reviewer was spawned). Inputs: the rubric and
+work/go-h/independent-review/h1c-probe-excerpts.txt only. The reviewer ran no git commands.
+This file transcribes the report from the agent's hand-back. It is not a byte copy.
+No wording refinement was applied after this review.
+
+PROBE BLOCKS
+
+P01: role P_CONTROL (if in value position, G0(i)); category E_DIRECT.
+  Rule: predicate_taxonomy P_CONTROL; declaration_module_governs; M1.
+  Ambiguity: the cfg binding and the option declaration are not in the excerpt; E_DIRECT assumes both are in beszel-agent.nix.
+
+P02: role P_GATING (assertion, G0(iii)); the enclosing mkIf is G0(ii).
+  Category: none of the four. The changed assertion does not read the watched option, so M2 makes the target invalid, not E_NO.
+  Rule: M2; causal_relevance accepted_edges.
+  Ambiguity: the rules are silent on control dependence from an enclosing mkIf, since accepted_edges lists only def-use edges.
+
+P03: role P_SELECTION (lambda is the predicate argument of lib.filter); category E_DIRECT.
+  Rule: lambda_rule.predicate_lambda; declaration_module_governs; M4.
+  Ambiguity: GPU_COLLECTOR is a key in the environment attrset option, whose declaration is not in the excerpt. The rules do not address keys inside freeform attrsets.
+
+P04: not a predicate (transform, H2); category E_NO.
+  Ambiguity: the E_NO list does not name transform lambdas; E_NO is inferred from no eligible role.
+
+P04b: role P_CONTROL (if lib.isBool inside a mapAttrs transform, classified at its own position per H2); category E_AMBIGUOUS.
+  Rule: lambda_rule.lambda_over_option_attrset.
+  Ambiguity: the mapAttrs collection argument (line 250 on) is outside the excerpt. If it traces to environment, the result becomes E_DIRECT as for P03.
+
+P05: role P_DATA_ONLY (stored in a serviceConfig attribute; consumer is the systemd unit, external under G1); category E_NO.
+  Rule: G1; data_only; eligible_roles excludes P_DATA_ONLY.
+  Ambiguity: none beyond the G0/G1 boundary for attribute values.
+
+P05f: role P_GATING (lib.optionals, boolean as first argument, G0(ii)); category none of the four for watched smartmon.enable. Foreign-only operand, so M2 makes the target invalid.
+  Ambiguity: G0(ii) requires reading lib.optionals at the exact SHA; that definition is not in the excerpt.
+
+P05s (synthetic, no SHA): role P_GATING (mkIf condition; && operand in G0(v) position); category E_INDIRECT (M1, M4).
+  Ambiguity: the declaration module of boot.zfs.enabled is assumed foreign; the mkIf definition is assumed per G0(ii).
+
+P06: not a predicate for the changed let; the predicate o.dtboFile == null does not read the watched option; category E_NO.
+  Rule: D3 (no branch edge from the option); causal_relevance not_causal; let_binding_rule.
+  Ambiguity: the cfg binding and o are not in the excerpt, so T1-T6 cannot be fully checked.
+
+P07a: not a predicate (static literal binding); category E_DIRECT through P07c.
+  Rule: D1 (recorded at the default property) and D3 (branch edge via P07c).
+  Ambiguity: other consumers of defaultKeyMode are outside the excerpt; D2 requires recording them.
+
+P07b: not a predicate (default property); category E_DIRECT. Rule: D1; declaration_module_governs; EC03 T_IN.
+
+P07c: role P_GATING (optionalString first argument, G0(ii); && operands in G0(v)); category E_DIRECT.
+  Rule: declaration_module_governs; M4; cfg is an exact alias (let_binding_rule).
+  Ambiguity: the rules do not say whether a default change that leaves this predicate's outcome unchanged is relevant. M3 makes no sole-cause claim, so the E category stands.
+
+P08a: role P_DATA_ONLY (interpolated into an etc text file; G1 external text); category E_NO.
+  Ambiguity: lib.boolToYesNo contains an if on its parameter. Whether that internal if makes the interpolation a control use is not covered by the rules.
+
+P08b: role P_DATA_ONLY (list element; G1 list-element clause); category E_NO.
+  Ambiguity: the list consumer is outside the excerpt. G1 does not say whether the consumer must be external. Same boolToYesNo gap as P08a.
+
+P09 (owner-key query, A3): not a predicate (absence query); category E_AMBIGUOUS (T_UNKNOWN until A5 is established).
+  Rule: A1 (MATCH, exit 0, pinned to e4c7d977); A2; A3; A4; A6.
+  Note: A3 is clean. All 13 matches classify under A4: 1 release note, 1 module-list line, 1 all-tests line, 10 lines in nixos/tests/gophernicus.nix.
+
+P09 (receiver query, A5): category E_AMBIGUOUS (T_UNKNOWN).
+  Ambiguity: not verifiable from the excerpt. Computed keys config.services.${x} (rancher:24,838; watt:45; vault-agent:134; the web-apps set; movim:628) need option types for their closed domains. Whole-namespace cfgs = config.services (ncdns.nix:8) has a domain that includes gophernicus unless use sites narrow it. The with and inherit forms are covered by A3. cgit.nix:8 is a named sub-attrset. A1 also needs a rev-parse check, which is not in the excerpt.
+
+P09b: not a predicate; category E_AMBIGUOUS (T_UNKNOWN).
+  Rule: A3/A4 (all 42 matches classify as release note, import list, test registration, or nixos/tests file); A5 not evidenced.
+  Ambiguity: no receiver query for rundeck at b063b8f9 is in the excerpt, so T_NONE is refused. The rules do not say whether A5 can be skipped; they require it.
+
+P10: role P_CONTROL inside the boolToYesNo definition (if on a parameter); not a predicate lambda because it is not passed to a selection callee; category E_NO.
+  Rule: lambda_rule.boundary (by analogy only).
+  Ambiguity: the rules have no clause for option-free helpers whose option operand arrives at call sites. Non-alias lambda, so equivalence is L2 (EQ3).
+
+P10b: not a predicate for the definition; builtins.filter is P_SELECTION when used as a predicate callee; category E_NO (definition).
+  Rule: L1 (EQ2(e) only if every step is evidenced); L3.
+  Ambiguity: only step 1 (lib/lists.nix:18-27) is in the excerpt. The reviewer reported that the lib/default.nix step is missing, so EQ3 on this evidence. SEE CONTROLLER FOLLOW-UP 1: this is incorrect; the step exists at lib/default.nix:278.
+
+P10c: not a predicate; category E_NO.
+  Rule: EC09/data scope.
+  Ambiguity: lines 266-270 show self.lists singleton and forEach only. Whether filter is aggregated is not shown in that window. SEE CONTROLLER FOLLOW-UP 1.
+
+P11(a) (let f = lib.filter; in f pred xs): taxonomy reading P_SELECTION; strict R1 reading P_UNKNOWN. Category: no watched option named; strict reading E_AMBIGUOUS with option operands; taxonomy reading follows the operand declaration module.
+  Rule: callee resolution R1/R2 (LOCAL_ALIAS of FQ_LIB).
+  Ambiguity: R1 requires an exact SHA, but the probe has none. The strict reading gives CALLEE_UNKNOWN; the taxonomy reading gives P_SELECTION. The rules conflict.
+
+P11(b) (with lib; filter pred xs): role P_UNKNOWN (CALLEE_UNKNOWN); category E_AMBIGUOUS with option operands.
+  Rule: R3 (BARE reachable only through an enclosing with). No ambiguity on role.
+
+P11(c) (let filter = myFilter; in filter pred xs): role P_UNKNOWN (CALLEE_UNKNOWN); category E_AMBIGUOUS with option operands.
+  Rule: R2 (LOCAL_ALIAS requires FQ right-hand side) and R4.
+  Ambiguity: a local-identifier right-hand side has no named class; CALLEE_UNKNOWN comes from R2's "otherwise". Spelling match is not resolution (R3).
+
+PAIRS
+1. P03 vs P04: separated. P03 is a predicate argument of a P_SELECTION callee; P04 is a transform (H2).
+2. P01 vs P08a: separated. P01 is an if-condition (G0(i), eligible); P08a is text data (G1, E_NO).
+3. P05 vs P05f: separated, partly through M1/M4. P05 is excluded by role first; P05f is separated by M2.
+4. P10 vs P10b: separated. P10 is a non-alias lambda (L2, EQ3); P10b is an alias chain (L1). The reviewer's EQ3 for P10b rests on the missing-step claim; see controller follow-up 1.
+5. P06 vs P07: separated. P06's binding reaches no predicate path; P07's binding reaches the default that P07c reads.
+6. P09 vs P09b: not separated by the rules. Same A1-A6 procedure, no owner-specific clause, both E_AMBIGUOUS. They differ only in evidence collected.
+
+RULE GAPS (as reported)
+- causal_relevance accepted_edges / M2; P02: control dependence from an enclosing mkIf is not a def-use edge. M2 gives invalid target, which is not one of the four categories.
+- declaration_module_governs; P01, P03: keys inside a freeform option have no declaration rule.
+- G0(ii); P03, P05f, P05s, P07c: lib.optionals, optionalString and mkIf definitions must be read at the SHA; they are outside the excerpt (evidence gap).
+- lambda_rule.lambda_over_option_attrset; P04b: an unresolved mapAttrs collection forces E_AMBIGUOUS.
+- categories E_NO list; P04: transform lambdas are not named.
+- M2; P02, P05f: no category for invalid targets in aggregation.
+- G1; P08b: the list-element clause does not say whether the consumer must be external.
+- predicate_rule (option-free helpers); P08a, P10: rules silent on a helper whose if acts on a parameter that receives option state at call sites.
+- A5; P09: whole-namespace bindings need a rule on whether use-site narrowing closes the domain; enum-typed computed keys need option types.
+- A1; P09: rev-parse result not in the excerpt.
+- A5; P09b: rules do not say what happens when no receiver query was run.
+- L1; P10b, P10c, P11(a): reported as a missing lib/default.nix step; see controller follow-up 1 (the step exists, the excerpt window was short).
+- R1 vs predicate_taxonomy P_SELECTION; P11(a): R1 requires an exact SHA, but the taxonomy names lib.filter as P_SELECTION. Conflict.
+- R2 LOCAL_ALIAS; P11(c): no named class for a local-identifier right-hand side.
+- watched-option requirement; P11(a)-(c): synthetic callees name no watched option, so categories are conditional on operands.
+
+CONTROLLER FOLLOW-UP (not part of the reviewer report; added after it returned)
+
+1. lib alias chain for lib.filter at e4c7d977 is complete:
+   lib/default.nix:268 `inherit (self.lists)`, lib/default.nix:278 `filter` (re-export),
+   lib/lists.nix:18-25 `inherit (builtins) ... filter`. Three steps, all in lib/, at one SHA,
+   ending at a builtins member. Under h1c_library_binding L1, lib.filter is equivalent to
+   builtins.filter by EQ2(e). The reviewer's "missing step" is a window-size effect of the
+   excerpt (266-270), not a missing binding. The excerpt file is not edited after review.
+   The reviewer's P10b EQ3 is therefore revised to EQ2(e) for lib.filter. P10 (boolToYesNo,
+   a non-alias lambda) remains L2, EQ3.
+
+2. The A5 receiver query was also run at rundeck b063b8f9 by the controller after the probe
+   excerpts were printed. It returns the same 23 matches as at e4c7d977. The controller
+   checked ncdns.nix:8 (named leaves only), watt.nix:22 (literal list without rundeck),
+   vault-agent (literal flavours), and the web-app enums (none contain rundeck). The rancher
+   closure relies on the literal import list at rancher default.nix:958 and was not
+   re-printed. The reviewer did not see these results; they are unreviewed.

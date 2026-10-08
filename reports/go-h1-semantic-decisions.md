@@ -263,3 +263,62 @@ Mechanical responsibilities for GO-I, if the protocol is later declared READY:
 **PROTOCOL-REDESIGN-PARTIAL.** The three named gaps are closed for absence evidence (exact-SHA search with positive and negative controls) and for EC10 levels (EQ0–EQ3 with forbidden normalizations). They are not closed for predicate roles: items 1–7 above are definitional, not wording, and the reviewer left the boundary between P_GATING and P_DATA_ONLY unresolved. READY requires those to be decided, so the verdict is PARTIAL.
 
 GO-I, GO-G1 and GO-J are not started. oba is not modified.
+
+## GO-H1C
+
+Scope: close the definitional items left open by GO-H1B and decide READY or PARTIAL. Rubric v5 is `work/go-h/eligibility-rubric.json` (schema `go-h-eligibility-rubric/5.0`). v4 is kept as `work/go-h/eligibility-rubric.v4.json`. Probes are DIAGNOSTIC / NON-SCORING. The P1 and GO-F verdicts are not altered. oba is not modified. The validator is not implemented. GO-G1, GO-J and GO-I are not started.
+
+### Rulings (rubric v5, `h1c_*` blocks)
+
+- **Callee resolution (`h1c_callee_resolution`).** Callees are FQ_BUILTIN (`builtins.<name>`), FQ_LIB (`lib.<path>`, resolved at the exact SHA), LOCAL_ALIAS (unique binding to a resolved callee), BARE, or DYNAMIC. Anything not resolved mechanically is CALLEE_UNKNOWN, which makes the predicate P_UNKNOWN. Matching identifier spelling is never resolution (R3).
+- **Mixed predicates (`h1c_mixed_predicate`).** A predicate with at least one proven watched dependency is eligible for the watched option (M1). Foreign dependencies are recorded separately and do not disqualify it. A predicate with only foreign dependencies makes the target invalid (M2). The record makes no sole-cause claim (M3). Category follows declaration_module_governs (M4).
+- **Causal relevance (`h1c_causal_relevance`).** A textual mention is not causal. The watched option must reach the predicate by an accepted def-use edge. An unbounded path is DEPENDENCY_UNBOUNDED and is never eligible.
+- **Let aliases (`h1c_let_alias_transparency`).** A let binding is transparent only if it is a pure alias satisfying T1–T6 (unique name, no shadowing, static option path, direct use, no intervening call or transform, proven chain). Any other let binding is not transparent. An unproven link is ALIAS_UNPROVEN, and the equivalence is EQ3.
+- **Let-bound defaults (`h1c_let_bound_defaults`).** A let change is recorded at the option property it reaches (D1). It is eligible only if that option has a branch relation (D3). A shared binding records every reached property, and unrelated consumers are recorded as not relevant (D2).
+- **Gating versus data (`h1c_gating_vs_data`).** G0 lists the gating positions: an if condition; the first argument of a resolved conditional-inclusion callee, with the contract read from its definition; an assertion or warning condition; a P_SELECTION predicate; and an operand of && or || that is itself in a gating position. G1 makes an attribute value, list element, interpolated text, serialized value, or external text P_DATA_ONLY. G2 makes an unidentified consumer P_UNKNOWN. G3: && and || are gating only when the whole result is in a G0 position. G4: no speculative downstream gating.
+- **Higher-order calls (`h1c_higher_order`).** Selection callbacks (filter, filterAttrs, partition, findFirst) are predicates (H1). Transform callbacks (map, mapAttrs, concatMap, and similar) are not predicates (H2). A custom higher-order function counts only when its body is resolved (H3). The table is a set of resolved callees, not a name whitelist (H4).
+- **EC10 (`ec10_equivalence`).** EQ2 gains (d) transparent alias introduction or removal under T1–T6, and (e) library alias substitution under L1. Forbidden automatic normalizations are unchanged, with one exception: the L1 library alias chain.
+- **Library binding (`h1c_library_binding`).** L1: a library name defined by an inherit or attribute-alias chain of at most 4 steps, all in lib/ at one SHA, ending at a builtins member, is EQ2(e). L2: a non-alias library definition is EQ3. L3: no SHA gives no equivalence claim. L4: a name is never evidence.
+- **Exact-source identity (`h1c_exact_source_identity`).** Every source fact records its SHA. Working-tree and default-branch evidence is diagnostic only.
+- **Ambiguity (`h1c_ambiguity_policy`).** Ambiguity is a first-class outcome: CALLEE_UNKNOWN, P_UNKNOWN, E_AMBIGUOUS, DEPENDENCY_UNBOUNDED, ALIAS_UNPROVEN, EQ3, and T_UNKNOWN.
+- **GO-I boundary (`h1c_go_i_boundary`).** GO-I must do the mechanical work: source loading from an exact SHA, AST parsing, lexical resolution, transparent let aliases, R1 resolution, selection-versus-transform split, watched-edge tracing, G0/G1 classification where decidable, V1–V4, side-aware checks, EQ0–EQ2 (a)–(e), and A1–A6 search. GO-I must fall into reviewer-owned states for CALLEE_UNKNOWN, dynamic paths, P_UNKNOWN, E_AMBIGUOUS, EQ3, DEPENDENCY_UNBOUNDED and ALIAS_UNPROVEN. It must not manufacture certainty.
+
+### Correction to absence evidence (A1)
+
+v4 A1 required status ZERO_COMPLETE. That status is only returned when the raw search has zero matches, but A3 decides absence after A4 classification. Under v4 wording, T_NONE was impossible whenever a non-consumer match existed. Gophernicus has 13 such matches, and rundeck has 42. The GO-H1B note that gophernicus gave T_NONE "under the corrected A5" was therefore not valid under the frozen A1. v5 A1 requires a pinned, completed search (MATCH or ZERO_COMPLETE, git grep exit 0 or 1, no ERROR). Absence is then decided by A3 after A4 classification. This was applied before the reviewer was spawned.
+
+### Probes (DIAGNOSTIC / NON-SCORING)
+
+Probe script: `work/go-h/h1c_probes.sh`. Output: `work/go-h/independent-review/h1c-probe-excerpts.txt`. Each excerpt is printed from an exact SHA: E = e4c7d977, B = e2497c3a, F = fdc33963, RUN = b063b8f9. P05s is synthetic, with no SHA. P11 is synthetic.
+
+Controller checks, outside the reviewed excerpt:
+- P09 owner key (`\bgophernicus\b`, E): 13 matches. All are A4 non-consumer: 1 release note, 1 module-list line, 1 all-tests line, 10 lines in nixos/tests/gophernicus.nix. No enum at E contains `gophernicus`. Enums checked: freshrss, invoiceplane, drupal, wordpress, zabbix frontend and proxy, dokuwiki, limesurvey, movim, kimai.
+- P09 receiver query (A5, E): 23 matches. Classified as: `with` and `inherit` (covered by A3), named sub-attrset (cgit.nix:8), whole-namespace with named leaves (ncdns.nix:8), literal sets (rancher, watt, vault-agent), and enum-typed computed keys (web apps). The rancher closure is inherited from the literal import list. This classification is controller work. The reviewer could not verify it from the excerpt, so it is unreviewed.
+- P09b owner key (`\brundeck\b`, RUN): 42 matches, all A4 non-consumer: 39 in nixos/tests/rundeck.nix, 1 release note, 1 module-list line, 1 all-tests line. A5 at RUN returns the same 23 matches, with the same classification. Rundeck T_NONE therefore depends on the same unreviewed A5 classification.
+- P08b (`locate.nix:276`): `lib.boolToYesNo` is an element of the argument list passed to `utils.escapeSystemdExecArgs`. This is data (G1).
+
+### Reviewer (bounded, fresh, one run)
+
+Agent `ae2f9ae548c1870f7`, prompt `work/go-h/independent-review/h1c-reviewer-prompt.txt`, inputs: the rubric and the probe excerpt file only. No git commands. Full report, transcribed: `work/go-h/independent-review/h1c-review-record.txt`.
+
+- Classified P01–P11 with role, category and rule clause.
+- Six pairs: 5 separated (P03/P04, P01/P08a, P05/P05f, P10/P10b, P06/P07). P09/P09b are not separated by the rules. Both use the same A1–A6 procedure, so this is expected.
+- Listed 15 rule gaps (in the record).
+- No wording refinement was applied. The gaps are definitional, not wording, so the one permitted refinement would not close them.
+
+One reviewer claim is wrong. The reviewer said the lib/default.nix step for `lib.filter` was missing. The step is at `lib/default.nix:278` (`filter` re-exported from `inherit (self.lists)` at line 268), and `lib/lists.nix:25` inherits `filter` from builtins. Three steps, all in lib/, at e4c7d977. The L1 chain is complete, so `lib.filter` is EQ2(e) equivalent to `builtins.filter`. The reviewer saw only the excerpt window 266–270. The excerpt file is not edited after review. `lib.boolToYesNo` (P10) is a non-alias lambda, so it stays L2, EQ3.
+
+### Verdict (GO-H1C)
+
+**PROTOCOL-REDESIGN-PARTIAL.** READY requires that the listed definitional conditions hold. The following constructs remain unresolved, each with its exact trigger:
+
+1. **Control dependence from an enclosing conditional, and the category for invalid targets (P02, M2).** A changed assertion inside `lib.mkIf` on the watched option is not a def-use edge, so it is not reached by the accepted-edge rule. M2 makes the target invalid, but invalid targets are not one of the four categories, so the aggregation rule cannot place them.
+2. **Name-based roles for unresolved callees (P11a).** `predicate_taxonomy` names `lib.filter` as P_SELECTION. R1 requires an exact SHA. For `let f = lib.filter`, with no SHA in the probe, the rules give CALLEE_UNKNOWN on a strict reading and P_SELECTION on the taxonomy reading. The rules conflict. Taxonomy names must apply only to SHA-resolved callees.
+3. **Keys inside freeform attrset options (P03, P04b).** `declaration_module_governs` does not say which module declares a key such as `GPU_COLLECTOR` inside an attrset option.
+4. **Option-free helper with an internal conditional (P08a, P10).** `lib.boolToYesNo` branches on its parameter. The rules are silent on helpers whose parameter receives option state at call sites.
+5. **A5 closure for whole-namespace bindings and enum-typed computed keys (P09, P09b).** The rules do not say whether use-site narrowing closes a whole-namespace domain (`ncdns.nix:8`), or how enum-typed computed-key domains are read. The rancher closure is not re-printed. Gophernicus and rundeck T_NONE both depend on A5 classification that the reviewer could not verify.
+6. **Evidence not yet printed at the SHA (P05f, P05s, P07c, P09 A1).** The G0(ii) definitions of `lib.optionals`, `lib.optionalString` and `lib.mkIf` must be read at the SHA. The rev-parse check for A1 was not in the excerpt.
+
+Not applied: the E_NO list does not name transform lambdas (P04). This is inferable from H2, so it is a wording point that was not spent on the review's one allowed refinement.
+
+GO-I, GO-G1 and GO-J are not started. oba is not modified.
