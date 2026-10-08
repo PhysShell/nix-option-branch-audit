@@ -1,0 +1,15 @@
+[[target]]
+name = "pr564819_maxConcurrency"
+module = "nixos/modules/services/networking/nar-serve.nix"
+test = "nixos/tests/nar-serve.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nar-serve"]
+watch = ["maxConcurrency"]
+
+[[target]]
+name = "pr564819_metricsAddress"
+module = "nixos/modules/services/networking/nar-serve.nix"
+test = "nixos/tests/nar-serve.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "nar-serve"]
+watch = ["metricsAddress"]

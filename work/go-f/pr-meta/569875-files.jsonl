@@ -1,0 +1,10 @@
+{"filename":"nixos/doc/manual/release-notes/rl-2611.section.md","previous_filename":null,"status":"modified"}
+{"filename":"nixos/modules/services/monitoring/grafana.nix","previous_filename":null,"status":"modified"}
+{"filename":"pkgs/by-name/gr/grafana/missing-hashes.json","previous_filename":null,"status":"modified"}
+{"filename":"pkgs/by-name/gr/grafana/package.nix","previous_filename":null,"status":"modified"}
+{"filename":"pkgs/servers/monitoring/grafana/plugins/jaeger/default.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/servers/monitoring/grafana/plugins/loki/default.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/servers/monitoring/grafana/plugins/plugins.nix","previous_filename":null,"status":"modified"}
+{"filename":"pkgs/servers/monitoring/grafana/plugins/prometheus/default.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/servers/monitoring/grafana/plugins/tempo/default.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/servers/monitoring/grafana/plugins/yesoreyeram-infinity-datasource/default.nix","previous_filename":null,"status":"modified"}

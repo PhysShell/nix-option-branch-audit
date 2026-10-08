@@ -1,0 +1,7 @@
+[[target]]
+name = "pr569875_declarativePlugins"
+module = "nixos/modules/services/monitoring/grafana.nix"
+test = "nixos/tests/grafana/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "grafana"]
+watch = ["declarativePlugins"]

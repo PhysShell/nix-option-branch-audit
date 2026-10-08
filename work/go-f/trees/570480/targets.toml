@@ -1,0 +1,7 @@
+[[target]]
+name = "pr570480_nixPath"
+module = "nixos/modules/config/nix-channel.nix"
+test = "nixos/tests/nix-required-mounts/default.nix"
+cfg_ident = "cfg"
+option_prefix = ["nix"]
+watch = ["nixPath"]

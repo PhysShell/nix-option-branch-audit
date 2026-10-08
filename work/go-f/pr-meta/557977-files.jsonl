@@ -1,0 +1,7 @@
+{"filename":"nixos/doc/manual/release-notes/rl-2611.section.md","previous_filename":null,"status":"modified"}
+{"filename":"nixos/modules/module-list.nix","previous_filename":null,"status":"modified"}
+{"filename":"nixos/modules/services/web-apps/elk.nix","previous_filename":null,"status":"added"}
+{"filename":"nixos/tests/all-tests.nix","previous_filename":null,"status":"modified"}
+{"filename":"nixos/tests/web-apps/elk.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/by-name/el/elk/fix-unhandled-instance-fetch.patch","previous_filename":null,"status":"added"}
+{"filename":"pkgs/by-name/el/elk/package.nix","previous_filename":null,"status":"added"}

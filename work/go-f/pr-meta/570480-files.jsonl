@@ -1,0 +1,3 @@
+{"filename":"nixos/modules/config/nix-channel.nix","previous_filename":null,"status":"modified"}
+{"filename":"nixos/modules/misc/nixpkgs-flake.nix","previous_filename":null,"status":"modified"}
+{"filename":"nixos/tests/nix-required-mounts/default.nix","previous_filename":null,"status":"modified"}

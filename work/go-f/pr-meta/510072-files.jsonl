@@ -1,0 +1,4 @@
+{"filename":"nixos/tests/all-tests.nix","previous_filename":null,"status":"modified"}
+{"filename":"nixos/tests/buildstream-plugins-community.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/development/python-modules/buildstream-plugins-community/default.nix","previous_filename":null,"status":"added"}
+{"filename":"pkgs/top-level/python-packages.nix","previous_filename":null,"status":"modified"}

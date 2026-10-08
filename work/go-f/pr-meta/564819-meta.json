@@ -1,0 +1,1 @@
+{"base_sha":"ec29f764b15c1d31b421da38d721d54549c056ba","merge_commit_sha":"3ed8ccb30f3ed69e26f2636d2571e6bbfc5b17a6","number":564819,"title":"nar-serve: 0.8.1 -\u003e 0.9.0, fix license and `domain`, add `maxConcurrency` and `metricsAddress`"}
