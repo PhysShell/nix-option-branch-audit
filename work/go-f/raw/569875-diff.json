@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 1,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/monitoring/grafana.nix",
+        "test": "nixos/tests/grafana/default.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "grafana"
+        ],
+        "watched_path": "declarativePlugins"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    }
+  ]
+}

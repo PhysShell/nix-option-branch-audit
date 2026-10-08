@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 1,
+    "verdict_transitions": {
+      "option_relocated->predicate_not_found": 1
+    }
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/config/nix-channel.nix",
+        "test": "nixos/tests/nix-required-mounts/default.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "nix"
+        ],
+        "watched_path": "nixPath"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionRelocated",
+            "option": "nixPath",
+            "to": [
+              "nix",
+              "settings",
+              "nix-path"
+            ],
+            "destination_confirmed": true,
+            "migration_source_file": "nixos/modules/config/nix-channel.nix",
+            "migration_span": {
+              "file": "nixos/modules/config/nix-channel.nix",
+              "line": 84,
+              "col": 6
+            },
+            "helper_form": "mkRenamedOptionModule"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "nixPath"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ]
+}

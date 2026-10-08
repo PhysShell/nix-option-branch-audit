@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 5,
+    "verdict_transitions": {
+      "option_not_found->predicate_not_found": 4,
+      "predicate_not_found->option_relocated": 1
+    }
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/bazarr.nix",
+        "test": "nixos/tests/bazarr.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "bazarr"
+        ],
+        "watched_path": "listenPort"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "listenPort"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "OptionRelocated",
+            "option": "listenPort",
+            "to": [
+              "services",
+              "bazarr",
+              "settings",
+              "general",
+              "port"
+            ],
+            "destination_confirmed": true,
+            "migration_source_file": "nixos/modules/services/misc/bazarr.nix",
+            "migration_span": {
+              "file": "nixos/modules/services/misc/bazarr.nix",
+              "line": 79,
+              "col": 6
+            },
+            "helper_form": "mkRenamedOptionModule"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/bazarr.nix",
+        "test": "nixos/tests/bazarr.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "bazarr"
+        ],
+        "watched_path": "settings"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/bazarr.nix",
+        "test": "nixos/tests/bazarr.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "bazarr"
+        ],
+        "watched_path": "settings.analytics.enabled"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.analytics.enabled"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.analytics.enabled"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/bazarr.nix",
+        "test": "nixos/tests/bazarr.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "bazarr"
+        ],
+        "watched_path": "settings.general.auto_update"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.general.auto_update"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.general.auto_update"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/misc/bazarr.nix",
+        "test": "nixos/tests/bazarr.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "bazarr"
+        ],
+        "watched_path": "settings.general.port"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "settings.general.port"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "settings.general.port"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ]
+}

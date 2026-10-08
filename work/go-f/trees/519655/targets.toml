@@ -11,24 +11,24 @@ name = "pr519655_settings_analytics_enabled"
 module = "nixos/modules/services/misc/bazarr.nix"
 test = "nixos/tests/bazarr.nix"
 cfg_ident = "cfg"
-option_prefix = ["services", "bazarr", "settings"]
-watch = ["analytics.enabled"]
+option_prefix = ["services", "bazarr"]
+watch = ["settings.analytics.enabled"]
 
 [[target]]
 name = "pr519655_settings_general_auto_update"
 module = "nixos/modules/services/misc/bazarr.nix"
 test = "nixos/tests/bazarr.nix"
 cfg_ident = "cfg"
-option_prefix = ["services", "bazarr", "settings"]
-watch = ["general.auto_update"]
+option_prefix = ["services", "bazarr"]
+watch = ["settings.general.auto_update"]
 
 [[target]]
 name = "pr519655_settings_general_port"
 module = "nixos/modules/services/misc/bazarr.nix"
 test = "nixos/tests/bazarr.nix"
 cfg_ident = "cfg"
-option_prefix = ["services", "bazarr", "settings"]
-watch = ["general.port"]
+option_prefix = ["services", "bazarr"]
+watch = ["settings.general.port"]
 
 [[target]]
 name = "pr519655_listenPort_removed"

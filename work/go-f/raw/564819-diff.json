@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 0,
+    "removed": 0,
+    "changed": 2,
+    "verdict_transitions": {
+      "option_not_found->predicate_not_found": 2
+    }
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/nar-serve.nix",
+        "test": "nixos/tests/nar-serve.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "nar-serve"
+        ],
+        "watched_path": "maxConcurrency"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "maxConcurrency"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "maxConcurrency"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/services/networking/nar-serve.nix",
+        "test": "nixos/tests/nar-serve.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "nar-serve"
+        ],
+        "watched_path": "metricsAddress"
+      },
+      "diff": {
+        "kind": "changed",
+        "base": {
+          "verdict": {
+            "verdict": "OptionNotFound",
+            "option": "metricsAddress"
+          }
+        },
+        "head": {
+          "verdict": {
+            "verdict": "PredicateNotFound",
+            "option": "metricsAddress"
+          }
+        },
+        "changes": [
+          "verdict_changed"
+        ]
+      }
+    }
+  ]
+}

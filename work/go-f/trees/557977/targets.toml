@@ -35,13 +35,13 @@ name = "pr557977_settings_HOST"
 module = "nixos/modules/services/web-apps/elk.nix"
 test = "nixos/tests/web-apps/elk.nix"
 cfg_ident = "cfg"
-option_prefix = ["services", "elk", "settings"]
-watch = ["HOST"]
+option_prefix = ["services", "elk"]
+watch = ["settings.HOST"]
 
 [[target]]
 name = "pr557977_settings_PORT"
 module = "nixos/modules/services/web-apps/elk.nix"
 test = "nixos/tests/web-apps/elk.nix"
 cfg_ident = "cfg"
-option_prefix = ["services", "elk", "settings"]
-watch = ["PORT"]
+option_prefix = ["services", "elk"]
+watch = ["settings.PORT"]
