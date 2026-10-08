@@ -1,0 +1,1128 @@
+{
+  "schema": "go-g-pr-classification/1",
+  "status": "DIAGNOSTIC / NON-SCORING",
+  "source_head": "a7931cb",
+  "frozen_inputs": [
+    "reports/go-f-f2-1-target-construction.md",
+    "reports/go-f-evaluation-final.md",
+    "fixtures/s6-r1/P1-target-construction.md",
+    "fixtures/s6-r1/P1-harness-repair.md",
+    "work/go-f/pr-meta/*-meta.json"
+  ],
+  "live_inputs": "NixOS/nixpkgs base/head sources and PR file patches, fetched read-only via gh api at classification time",
+  "rules": {
+    "step2": "PR has at least one nixos/modules/** file changed",
+    "step3_syntactic": "at least one changed line lies inside, or is, a line containing mkOption/mkEnableOption/mkPackageOption (heuristic brace walk)",
+    "step5": "wired test: nixos/tests file changed, or all-tests.nix entry at head (manual mapping, judgment)",
+    "uniform_rule_derived": "step2 AND step3_syntactic AND step5 (frozen derived PRs count as derived)"
+  },
+  "summary": {
+    "GO-F": {
+      "frozen_stop_counts": {
+        "derived": 5,
+        "step5": 1,
+        "step3": 4,
+        "step2": 5
+      },
+      "frozen_derived_pr_count": 5,
+      "frozen_derived_target_count": 15,
+      "uniform_rule_derived_pr_count": 7,
+      "frozen_records_inconsistent_with_span": [],
+      "ceilings": [
+        {
+          "row": "R0 frozen GO-F (as recorded)",
+          "count": 5,
+          "prs": [
+            519655,
+            557977,
+            564819,
+            569875,
+            570480
+          ],
+          "nc2_pass_threshold": 9,
+          "nc2_pass": false,
+          "NON_SCORING_COUNTERFACTUAL": true
+        },
+        {
+          "row": "R1 uniform syntactic declaration rule + wired test (no protocol change beyond consistent application)",
+          "count": 7,
+          "prs": [
+            519655,
+            557977,
+            564819,
+            569875,
+            569876,
+            569962,
+            570480
+          ],
+          "nc2_pass_threshold": 9,
+          "nc2_pass": false,
+          "NON_SCORING_COUNTERFACTUAL": true
+        },
+        {
+          "row": "R2 R1 + step-5 relaxation (declaration-touched PRs admitted without a wired test)",
+          "count": 8,
+          "prs": [
+            519655,
+            557977,
+            564819,
+            565935,
+            569875,
+            569876,
+            569962,
+            570480
+          ],
+          "nc2_pass_threshold": 9,
+          "nc2_pass": false,
+          "NON_SCORING_COUNTERFACTUAL": true
+        },
+        {
+          "row": "R3 R1 + config-level assignment admission (wired-test PRs only)",
+          "count": 8,
+          "prs": [
+            519655,
+            556686,
+            557977,
+            564819,
+            569875,
+            569876,
+            569962,
+            570480
+          ],
+          "nc2_pass_threshold": 9,
+          "nc2_pass": false,
+          "NON_SCORING_COUNTERFACTUAL": true
+        },
+        {
+          "row": "R4 R1 + step-5 relaxation + config-level admission (wired-test PRs) = minimal PASS path",
+          "count": 9,
+          "prs": [
+            519655,
+            556686,
+            557977,
+            564819,
+            565935,
+            569875,
+            569876,
+            569962,
+            570480
+          ],
+          "nc2_pass_threshold": 9,
+          "nc2_pass": true,
+          "NON_SCORING_COUNTERFACTUAL": true
+        },
+        {
+          "row": "R5 R4 + config-level admission for PR without wired test",
+          "count": 10,
+          "prs": [
+            483650,
+            519655,
+            556686,
+            557977,
+            564819,
+            565935,
+            569875,
+            569876,
+            569962,
+            570480
+          ],
+          "nc2_pass_threshold": 9,
+          "nc2_pass": true,
+          "NON_SCORING_COUNTERFACTUAL": true
+        }
+      ]
+    },
+    "P1": {
+      "frozen_stop_counts": {
+        "step3": 6,
+        "derived": 5,
+        "step5": 1,
+        "step2": 3
+      },
+      "frozen_derived_pr_count_original": 5,
+      "frozen_derived_pr_count_corrected": 3,
+      "uniform_rule_derived_pr_count_corrected": 3,
+      "note": "P1 cohort shown separately; not pooled with GO-F"
+    }
+  },
+  "records": [
+    {
+      "group": "GO-F",
+      "pr": 570480,
+      "title": "Revert \"nixos/nix: move nix.nixPath into nix.settings.nix-path\"",
+      "base_sha": "d58dbed454c50e5ced73c5ff00dbb1a92c198142",
+      "head_sha": "9a2095724addea3135ddf4de526826de56673943",
+      "meta_matches_api": true,
+      "files_total": 3,
+      "module_files": [
+        "nixos/modules/config/nix-channel.nix",
+        "nixos/modules/misc/nixpkgs-flake.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/nix-required-mounts/default.nix"
+      ],
+      "span_check": {
+        "nixos/modules/config/nix-channel.nix": {
+          "changed_lines": 9,
+          "lines_inside_declaration": 2
+        },
+        "nixos/modules/misc/nixpkgs-flake.nix": {
+          "changed_lines": 2,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 1,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 2,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "GO-F",
+      "pr": 565935,
+      "title": "python3Packages.exllamav3: 1.5.0 -> 1.5.4; tabbyapi: 0-unstable-2026-09-14 -> 0-unstable-2026-09-28",
+      "base_sha": "fde8680b3186f211f2c4ba715998edc37b45f481",
+      "head_sha": "a22f96f08dddea59d36921a21db47579be54da98",
+      "meta_matches_api": true,
+      "files_total": 3,
+      "module_files": [
+        "nixos/modules/services/web-apps/tabbyapi.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/web-apps/tabbyapi.nix": {
+          "changed_lines": 376,
+          "lines_inside_declaration": 372
+        }
+      },
+      "frozen_stop": "step5",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 372,
+      "step3_declaration_touched": true,
+      "step5_wired_test": false,
+      "step5_evidence": "all-tests.nix at head has no tabby entry; no nixos/tests file changed",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step5"
+    },
+    {
+      "group": "GO-F",
+      "pr": 483650,
+      "title": "nixos/syncoid: add home directory to serviceConfig.BindPaths",
+      "base_sha": "bb98d71deb7c775828e5e6199c405b5462fcc70c",
+      "head_sha": "aa8de5592bbb077ebc8faff7becce9d4967c5b6d",
+      "meta_matches_api": true,
+      "files_total": 1,
+      "module_files": [
+        "nixos/modules/services/backup/syncoid.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/backup/syncoid.nix": {
+          "changed_lines": 6,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": false,
+      "step5_evidence": "all-tests.nix at head has no syncoid entry (only borgbackup/mysql-* backup entries); no nixos/tests file changed",
+      "config_level_candidate": true,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "GO-F",
+      "pr": 568883,
+      "title": "zoom-us: 7.1.5.4332 -> 7.2.1.5760, fix missing libuuid and trim the FHS environment",
+      "base_sha": "88eef7451209acd2f70756a3caa57b08bc474098",
+      "head_sha": "d5276f27e2aa8280953e22b2dfc8d28694d751d5",
+      "meta_matches_api": true,
+      "files_total": 2,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/zoom-us.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "GO-F",
+      "pr": 510072,
+      "title": "buildstream-plugins-community: init at 2.3.3",
+      "base_sha": "735eb1535c9d816dffa90a2cd357050ff7e025f3",
+      "head_sha": "dd865e067841c85a8c25f3cc2c15229f574c1695",
+      "meta_matches_api": true,
+      "files_total": 4,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/all-tests.nix",
+        "nixos/tests/buildstream-plugins-community.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "GO-F",
+      "pr": 565712,
+      "title": "nixosTests.prometheus-exporters.ipmi: set maintainers to freeipmi",
+      "base_sha": "6774f7bc253789b113a4f39285dc0fa100abeacc",
+      "head_sha": "726af214fe37e5d2c198f66a426b93836d02329f",
+      "meta_matches_api": true,
+      "files_total": 1,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/prometheus-exporters.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "GO-F",
+      "pr": 519655,
+      "title": "nixos/bazarr: add settings option",
+      "base_sha": "575941f57ac6308dd39abef7803410b8c0d2a67b",
+      "head_sha": "c43c080f9c524aad594fc403d58891d5db8d14ac",
+      "meta_matches_api": true,
+      "files_total": 3,
+      "module_files": [
+        "nixos/modules/services/misc/bazarr.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/bazarr.nix"
+      ],
+      "span_check": {
+        "nixos/modules/services/misc/bazarr.nix": {
+          "changed_lines": 157,
+          "lines_inside_declaration": 55
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 5,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 55,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "GO-F",
+      "pr": 569962,
+      "title": "netbird: add missing dashboard environment substitutions",
+      "base_sha": "190ae7b8fadbd0fdd41ab535fb160a59f451121a",
+      "head_sha": "fe5d7ae723c8e23a8a08f4e1256085b9a542d04d",
+      "meta_matches_api": true,
+      "files_total": 1,
+      "module_files": [
+        "nixos/modules/services/networking/netbird/dashboard.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/networking/netbird/dashboard.nix": {
+          "changed_lines": 19,
+          "lines_inside_declaration": 4
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 4,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "all-tests.nix at head: netbird = runTest ./netbird.nix (service-name mapping, judgment)",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "GO-F",
+      "pr": 569876,
+      "title": "nixos/radicle: use `cfg.package` to check config",
+      "base_sha": "0d6a8805a6491dc0b4a8a1bc3b44caa71c12f809",
+      "head_sha": "011d4d155bd087e701ba180a1f23030102262094",
+      "meta_matches_api": true,
+      "files_total": 1,
+      "module_files": [
+        "nixos/modules/services/misc/radicle.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/misc/radicle.nix": {
+          "changed_lines": 66,
+          "lines_inside_declaration": 6
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 6,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "all-tests.nix at head: radicle = runTest ./radicle.nix",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "GO-F",
+      "pr": 564819,
+      "title": "nar-serve: 0.8.1 -> 0.9.0, fix license and `domain`, add `maxConcurrency` and `metricsAddress`",
+      "base_sha": "ec29f764b15c1d31b421da38d721d54549c056ba",
+      "head_sha": "3ed8ccb30f3ed69e26f2636d2571e6bbfc5b17a6",
+      "meta_matches_api": true,
+      "files_total": 4,
+      "module_files": [
+        "nixos/modules/services/networking/nar-serve.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/nar-serve.nix"
+      ],
+      "span_check": {
+        "nixos/modules/services/networking/nar-serve.nix": {
+          "changed_lines": 31,
+          "lines_inside_declaration": 26
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 2,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 26,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "GO-F",
+      "pr": 569875,
+      "title": "grafana: 13.1.6 -> 13.2.3",
+      "base_sha": "2872e79c7b40eeab21503ae19437a8581d90df84",
+      "head_sha": "d4c1a15c45722c76a9bdb8bc5a684c929ab2efa6",
+      "meta_matches_api": true,
+      "files_total": 10,
+      "module_files": [
+        "nixos/modules/services/monitoring/grafana.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/monitoring/grafana.nix": {
+          "changed_lines": 9,
+          "lines_inside_declaration": 9
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 1,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 9,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "GO-F",
+      "pr": 566204,
+      "title": "lomiri.lomiri: 0.6.1 -> 0.6.2",
+      "base_sha": "cf39579c66ce8d9ac7e1ba0a8099d281ba37362c",
+      "head_sha": "65e49e876e46a4aff0171b18193192c6834d8e60",
+      "meta_matches_api": true,
+      "files_total": 2,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/lomiri.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "GO-F",
+      "pr": 565592,
+      "title": "monetdb: 11.55.5 -> 11.55.7",
+      "base_sha": "7d77c54fa7f603a8048ed4da71c752c485c053cd",
+      "head_sha": "ae5830200f551bf192df9d37ea780961868923e9",
+      "meta_matches_api": true,
+      "files_total": 2,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/monetdb.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "GO-F",
+      "pr": 556686,
+      "title": "nixos/pgbackrest: make the SFTP key accessible for postgres",
+      "base_sha": "fb6fd7a04abe09403de90bc7a0a24164775a8a59",
+      "head_sha": "c93b0882c7def157c311ca297d30f18bc4e23e49",
+      "meta_matches_api": true,
+      "files_total": 2,
+      "module_files": [
+        "nixos/modules/services/backup/pgbackrest.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/pgbackrest/sftp.nix"
+      ],
+      "span_check": {
+        "nixos/modules/services/backup/pgbackrest.nix": {
+          "changed_lines": 3,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": true,
+      "step5_evidence": "PR changes nixos/tests/pgbackrest/sftp.nix; all-tests.nix at head: pgbackrest = import ./pgbackrest",
+      "config_level_candidate": true,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "GO-F",
+      "pr": 557977,
+      "title": "elk: init at 1.0.1; nixos/elk: init",
+      "base_sha": "2046df35edc2528d9596adb234aa1f7abe31bff6",
+      "head_sha": "91c7777088e8228f53818827de9744188bc45dc8",
+      "meta_matches_api": true,
+      "files_total": 7,
+      "module_files": [
+        "nixos/modules/module-list.nix",
+        "nixos/modules/services/web-apps/elk.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/all-tests.nix",
+        "nixos/tests/web-apps/elk.nix"
+      ],
+      "span_check": {
+        "nixos/modules/module-list.nix": {
+          "changed_lines": 1,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/web-apps/elk.nix": {
+          "changed_lines": 116,
+          "lines_inside_declaration": 45
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 6,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 45,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "P1",
+      "pr": 565943,
+      "title": "weblate: Fix compilation and module test",
+      "base_sha": "41f00923ab494dd791b4f7a2c542f0179c24b2ce",
+      "head_sha": "2cacf23ed7845d02e38e87eff046cdee48b48932",
+      "meta_matches_api": null,
+      "files_total": 2,
+      "module_files": [
+        "nixos/modules/services/web-apps/weblate.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/web-apps/weblate.nix": {
+          "changed_lines": 8,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "P1",
+      "pr": 566007,
+      "title": "nixos/beszel-agent: enable zfs monitoring support",
+      "base_sha": "e812ab65aa98d89c4accf1345fa0470f1b6ee760",
+      "head_sha": "3e088916002263174424f071277bb631848f8342",
+      "meta_matches_api": null,
+      "files_total": 1,
+      "module_files": [
+        "nixos/modules/services/monitoring/beszel-agent.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/monitoring/beszel-agent.nix": {
+          "changed_lines": 5,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "P1",
+      "pr": 569867,
+      "title": "staging-nixos merge for 2026-10-03, attempt #2",
+      "base_sha": "9e616ae86a1ced7b553a579472a084b92a73853a",
+      "head_sha": "6162fb15f4d03133802a373fc819bec0b4b40421",
+      "meta_matches_api": null,
+      "files_total": 1,
+      "module_files": [
+        "nixos/modules/security/wrappers/default.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/security/wrappers/default.nix": {
+          "changed_lines": 18,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "P1",
+      "pr": 508090,
+      "title": "nixos/beszel.agent: fix GPU monitoring, expose SKIP_GPU and GPU_COLLECTOR",
+      "base_sha": "d4e00cc559c325edc7f8ec7947dd81ef2761c3c4",
+      "head_sha": "461071d7ab456653ceba20f6f2675cee0020ff14",
+      "meta_matches_api": null,
+      "files_total": 2,
+      "module_files": [
+        "nixos/modules/services/monitoring/beszel-agent.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/beszel.nix"
+      ],
+      "span_check": {
+        "nixos/modules/services/monitoring/beszel-agent.nix": {
+          "changed_lines": 158,
+          "lines_inside_declaration": 39
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 2,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 39,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "P1",
+      "pr": 568429,
+      "title": "cliproxyapi: 7.3.10 -> 8.0.4",
+      "base_sha": "6adce641b596aac2c69f7217d061019642834c4d",
+      "head_sha": "e5ebd085e2692963fe3ac47624e0bfa30aa0300e",
+      "meta_matches_api": null,
+      "files_total": 4,
+      "module_files": [
+        "nixos/modules/services/misc/cliproxyapi.md",
+        "nixos/modules/services/misc/cliproxyapi.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/cliproxyapi.nix"
+      ],
+      "span_check": {
+        "nixos/modules/services/misc/cliproxyapi.md": {
+          "changed_lines": 30,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/misc/cliproxyapi.nix": {
+          "changed_lines": 37,
+          "lines_inside_declaration": 28
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 4,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 28,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "P1",
+      "pr": 563823,
+      "title": "nixos/rundeck: fix module for rundeck 6.x",
+      "base_sha": "3d35b67b0b8051a9080c09ffdd9fa4f41e845d15",
+      "head_sha": "6c6973cdf55fbe86579846439ec5ddd9a1198e46",
+      "meta_matches_api": null,
+      "files_total": 2,
+      "module_files": [
+        "nixos/modules/services/web-apps/rundeck.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/rundeck.nix"
+      ],
+      "span_check": {
+        "nixos/modules/services/web-apps/rundeck.nix": {
+          "changed_lines": 53,
+          "lines_inside_declaration": 38
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 1,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 38,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "derived"
+    },
+    {
+      "group": "P1",
+      "pr": 566696,
+      "title": "Cosmic stable 1.9.0",
+      "base_sha": "531062ef77c040cd714a062cd63f5e0e55248419",
+      "head_sha": "1e867c1c02c9772068dd014d9727aca60f509a91",
+      "meta_matches_api": null,
+      "files_total": 31,
+      "module_files": [
+        "nixos/modules/services/desktop-managers/cosmic.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/desktop-managers/cosmic.nix": {
+          "changed_lines": 8,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "P1",
+      "pr": 443747,
+      "title": "gophernicus: init at 3.1.1 with nixos module",
+      "base_sha": "1acfd66170c28f3271d806d82348f0bd53ff4685",
+      "head_sha": "82c6719c63bf9544fd336d8febb0cca9ff638ff8",
+      "meta_matches_api": null,
+      "files_total": 6,
+      "module_files": [
+        "nixos/modules/module-list.nix",
+        "nixos/modules/services/misc/gophernicus.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/all-tests.nix",
+        "nixos/tests/gophernicus.nix"
+      ],
+      "span_check": {
+        "nixos/modules/module-list.nix": {
+          "changed_lines": 1,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/misc/gophernicus.nix": {
+          "changed_lines": 229,
+          "lines_inside_declaration": 113
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 10,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 113,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": "NOT_EVALUABLE_BY_CURRENT_PROTOCOL (NEW_MODULE_NO_BASE)",
+      "classification_label": "NOT_EVALUABLE_BY_CURRENT_PROTOCOL (NEW_MODULE_NO_BASE)"
+    },
+    {
+      "group": "P1",
+      "pr": 556752,
+      "title": "discourse: 2026.7.1 -> 2026.8.0",
+      "base_sha": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "head_sha": "452cd10fe859df9b1e49abb4afd978691b5d2b3f",
+      "meta_matches_api": null,
+      "files_total": 10,
+      "module_files": [
+        "nixos/modules/services/web-apps/discourse.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/web-apps/discourse.nix": {
+          "changed_lines": 4,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "P1",
+      "pr": 564688,
+      "title": "treewide: replace reimplemented helpers with existing lib functions",
+      "base_sha": "bf68538028d2e18ae913a4c595c42e75c765512d",
+      "head_sha": "07f0e5db555e530c1965a730db93245ac397ab96",
+      "meta_matches_api": null,
+      "files_total": 20,
+      "module_files": [
+        "nixos/modules/services/mail/dovecot.nix",
+        "nixos/modules/services/mail/mlmmj.nix",
+        "nixos/modules/services/monitoring/prometheus/default.nix",
+        "nixos/modules/services/networking/cgit.nix",
+        "nixos/modules/services/networking/cloudflare-ddns.nix",
+        "nixos/modules/services/networking/strongswan-swanctl/param-lib.nix",
+        "nixos/modules/services/search/manticore.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/mail/dovecot.nix": {
+          "changed_lines": 4,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/mail/mlmmj.nix": {
+          "changed_lines": 10,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/monitoring/prometheus/default.nix": {
+          "changed_lines": 15,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/networking/cgit.nix": {
+          "changed_lines": 4,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/networking/cloudflare-ddns.nix": {
+          "changed_lines": 3,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/networking/strongswan-swanctl/param-lib.nix": {
+          "changed_lines": 4,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/search/manticore.nix": {
+          "changed_lines": 6,
+          "lines_inside_declaration": 0
+        }
+      },
+      "frozen_stop": "step3",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step3"
+    },
+    {
+      "group": "P1",
+      "pr": 568782,
+      "title": "nixos/dnscache: Introduce \"package\" option",
+      "base_sha": "b6b4035ae18d572b48abbd7c96fe314fc2b04599",
+      "head_sha": "1e9fa63c81490ce6fbc1a837b5e98cd6659b7b9c",
+      "meta_matches_api": null,
+      "files_total": 1,
+      "module_files": [
+        "nixos/modules/services/networking/dnscache.nix"
+      ],
+      "test_files_changed": [],
+      "span_check": {
+        "nixos/modules/services/networking/dnscache.nix": {
+          "changed_lines": 10,
+          "lines_inside_declaration": 1
+        }
+      },
+      "frozen_stop": "step5",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 1,
+      "step3_declaration_touched": true,
+      "step5_wired_test": false,
+      "step5_evidence": "all-tests.nix at head has no dnscache entry; no nixos/tests file changed",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step5"
+    },
+    {
+      "group": "P1",
+      "pr": 567915,
+      "title": "music-assistant: remove hexa and emilylange from maintainers",
+      "base_sha": "1cb5777f02b7e9bb6dbc73ff2595d076f238b4a0",
+      "head_sha": "643318e5a698b723a51488e97fdaeb7c732bbc73",
+      "meta_matches_api": null,
+      "files_total": 10,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/music-assistant.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "P1",
+      "pr": 568245,
+      "title": "nixosTests.syncthing*: miscellaneous tidying",
+      "base_sha": "8b25d3076d5b89dbabfedd6075542988a2709146",
+      "head_sha": "2917de87766a9bc2ba538f38ede0ae930d8f3f36",
+      "meta_matches_api": null,
+      "files_total": 10,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/syncthing/defaults.nix",
+        "nixos/tests/syncthing/folders.nix",
+        "nixos/tests/syncthing/guiPassword.nix",
+        "nixos/tests/syncthing/guiPasswordFile.nix",
+        "nixos/tests/syncthing/init.nix",
+        "nixos/tests/syncthing/main.nix",
+        "nixos/tests/syncthing/many-devices.nix",
+        "nixos/tests/syncthing/no-settings.nix",
+        "nixos/tests/syncthing/relay.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "P1",
+      "pr": 561242,
+      "title": "nginxModules.otel: init at 0.1.2",
+      "base_sha": "3396d0584677afd0e6ce20ac2474eab0adf0fb2b",
+      "head_sha": "261daca02ddac46826dc6a1a0849d8ff0fedf0ca",
+      "meta_matches_api": null,
+      "files_total": 5,
+      "module_files": [],
+      "test_files_changed": [
+        "nixos/tests/all-tests.nix",
+        "nixos/tests/nginx-otel.nix"
+      ],
+      "span_check": {},
+      "frozen_stop": "step2",
+      "frozen_derived_targets": 0,
+      "step2_module_file_present": false,
+      "step3_declaration_lines_touched": 0,
+      "step3_declaration_touched": false,
+      "step5_wired_test": null,
+      "step5_evidence": "step 2: no nixos/modules file",
+      "config_level_candidate": false,
+      "uniform_rule_derived": false,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": null,
+      "classification_label": "step2"
+    },
+    {
+      "group": "P1",
+      "pr": 568048,
+      "title": "nixos.ollaya: init service",
+      "base_sha": "803c63ce3bb749922969cc7edc346e48897d8029",
+      "head_sha": "e97af004f41f80ea370d11f010af15d653fa6931",
+      "meta_matches_api": null,
+      "files_total": 5,
+      "module_files": [
+        "nixos/modules/module-list.nix",
+        "nixos/modules/services/misc/ollaya.nix"
+      ],
+      "test_files_changed": [
+        "nixos/tests/all-tests.nix",
+        "nixos/tests/ollaya.nix"
+      ],
+      "span_check": {
+        "nixos/modules/module-list.nix": {
+          "changed_lines": 1,
+          "lines_inside_declaration": 0
+        },
+        "nixos/modules/services/misc/ollaya.nix": {
+          "changed_lines": 228,
+          "lines_inside_declaration": 80
+        }
+      },
+      "frozen_stop": "derived",
+      "frozen_derived_targets": 11,
+      "step2_module_file_present": true,
+      "step3_declaration_lines_touched": 80,
+      "step3_declaration_touched": true,
+      "step5_wired_test": true,
+      "step5_evidence": "frozen derived",
+      "config_level_candidate": false,
+      "uniform_rule_derived": true,
+      "frozen_consistent_with_span": true,
+      "p1_harness_repair": "NOT_EVALUABLE_BY_CURRENT_PROTOCOL (NEW_MODULE_NO_BASE)",
+      "classification_label": "NOT_EVALUABLE_BY_CURRENT_PROTOCOL (NEW_MODULE_NO_BASE)"
+    }
+  ]
+}
