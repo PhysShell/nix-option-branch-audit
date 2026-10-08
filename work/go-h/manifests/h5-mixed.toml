@@ -1,0 +1,15 @@
+[[target]]
+name = "openFirewall-withtest"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-noset.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["openFirewall"]
+
+[[target]]
+name = "openFirewall-notest"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-absent.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["openFirewall"]

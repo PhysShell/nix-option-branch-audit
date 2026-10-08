@@ -1,0 +1,1278 @@
+[
+  {
+    "manifest": "as-frozen",
+    "name": "pr508090_SKIP_GPU",
+    "pr": "508090",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'environment' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent",
+      "environment"
+    ],
+    "watch": [
+      "SKIP_GPU"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr508090_SKIP_GPU",
+    "pr": "508090",
+    "side": "head",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'environment' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent",
+      "environment"
+    ],
+    "watch": [
+      "SKIP_GPU"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr508090_GPU_COLLECTOR",
+    "pr": "508090",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'environment' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent",
+      "environment"
+    ],
+    "watch": [
+      "GPU_COLLECTOR"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr508090_GPU_COLLECTOR",
+    "pr": "508090",
+    "side": "head",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'environment' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent",
+      "environment"
+    ],
+    "watch": [
+      "GPU_COLLECTOR"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_settings",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_settings",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_settings_server_port",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'settings' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi",
+      "settings"
+    ],
+    "watch": [
+      "server.port"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_settings_server_port",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'settings' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi",
+      "settings"
+    ],
+    "watch": [
+      "server.port"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_settings_oauth_auth_dir",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'settings' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi",
+      "settings"
+    ],
+    "watch": [
+      "oauth.auth-dir"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_settings_oauth_auth_dir",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "INVALID",
+    "reasons": [
+      "V2: option_prefix last segment 'settings' is declared with mk*Option (interior option container, not a walkable root)"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi",
+      "settings"
+    ],
+    "watch": [
+      "oauth.auth-dir"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_openFirewall",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "openFirewall"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568429_openFirewall",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "openFirewall"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr563823_aclPolicies",
+    "pr": "563823",
+    "side": "base",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "rundeck"
+    ],
+    "watch": [
+      "aclPolicies"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr563823_aclPolicies",
+    "pr": "563823",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "rundeck"
+    ],
+    "watch": [
+      "aclPolicies"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_enable",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "enable"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_enable",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "enable"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_package",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "package"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_package",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "package"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_domain",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "domain"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_domain",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "domain"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_path",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "path"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_path",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "path"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_filters",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "filters"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_filters",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "filters"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_rootDir",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "rootDir"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_rootDir",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "rootDir"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_enableDefaultRootIndex",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "enableDefaultRootIndex"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_enableDefaultRootIndex",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "enableDefaultRootIndex"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_enableUserDirs",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "enableUserDirs"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_enableUserDirs",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "enableUserDirs"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_listenStreams",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "listenStreams"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_listenStreams",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "listenStreams"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_extraArgs",
+    "pr": "443747",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "extraArgs"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr443747_extraArgs",
+    "pr": "443747",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "gophernicus"
+    ],
+    "watch": [
+      "extraArgs"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_enable",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "enable"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_enable",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "enable"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_package",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "package"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_package",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "package"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_user",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "user"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_user",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "user"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_group",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "group"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_group",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "group"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_home",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "home"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_home",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "home"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_modelsDir",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "modelsDir"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_modelsDir",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "modelsDir"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_host",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "host"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_host",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "host"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_port",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "port"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_port",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "port"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_settings",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "settings"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_settings",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "settings"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_loadModels",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "loadModels"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_loadModels",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "loadModels"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_openFirewall",
+    "pr": "568048",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V1: module file not found under source root"
+    ],
+    "test_on_side": "absent",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "openFirewall"
+    ]
+  },
+  {
+    "manifest": "as-frozen",
+    "name": "pr568048_openFirewall",
+    "pr": "568048",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "ollaya"
+    ],
+    "watch": [
+      "openFirewall"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_settings",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_settings",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_openFirewall",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "openFirewall"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_openFirewall",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "openFirewall"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_settings_server_port",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V3: watch segment 'server' (in 'settings.server.port') not declared in module source"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings.server.port"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_settings_server_port",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings.server.port"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_settings_oauth_auth_dir",
+    "pr": "568429",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V3: watch segment 'oauth' (in 'settings.oauth.auth-dir') not declared in module source"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings.oauth.auth-dir"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr568429_settings_oauth_auth_dir",
+    "pr": "568429",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "cliproxyapi"
+    ],
+    "watch": [
+      "settings.oauth.auth-dir"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr563823_aclPolicies",
+    "pr": "563823",
+    "side": "base",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "rundeck"
+    ],
+    "watch": [
+      "aclPolicies"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr563823_aclPolicies",
+    "pr": "563823",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "rundeck"
+    ],
+    "watch": [
+      "aclPolicies"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr508090_SKIP_GPU",
+    "pr": "508090",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V3: watch leaf 'SKIP_GPU' (in 'environment.SKIP_GPU') not declared in module source"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent"
+    ],
+    "watch": [
+      "environment.SKIP_GPU"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr508090_SKIP_GPU",
+    "pr": "508090",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent"
+    ],
+    "watch": [
+      "environment.SKIP_GPU"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr508090_GPU_COLLECTOR",
+    "pr": "508090",
+    "side": "base",
+    "verdict": "INVALID",
+    "reasons": [
+      "V3: watch leaf 'GPU_COLLECTOR' (in 'environment.GPU_COLLECTOR') not declared in module source"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent"
+    ],
+    "watch": [
+      "environment.GPU_COLLECTOR"
+    ]
+  },
+  {
+    "manifest": "corrected",
+    "name": "pr508090_GPU_COLLECTOR",
+    "pr": "508090",
+    "side": "head",
+    "verdict": "VALID",
+    "reasons": [
+      "V1-V3 pass"
+    ],
+    "test_on_side": "present",
+    "option_prefix": [
+      "services",
+      "beszel",
+      "agent"
+    ],
+    "watch": [
+      "environment.GPU_COLLECTOR"
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "base:d4e00cc559:nixos/modules/services/monitoring/beszel-agent.nix": "present",
+  "base:d4e00cc559:nixos/tests/beszel.nix": "present",
+  "head:461071d7ab:nixos/modules/services/monitoring/beszel-agent.nix": "present",
+  "head:461071d7ab:nixos/tests/beszel.nix": "present",
+  "base:6adce641b5:nixos/modules/services/misc/cliproxyapi.nix": "present",
+  "base:6adce641b5:nixos/tests/cliproxyapi.nix": "present",
+  "head:e5ebd085e2:nixos/modules/services/misc/cliproxyapi.nix": "present",
+  "head:e5ebd085e2:nixos/tests/cliproxyapi.nix": "present",
+  "base:3d35b67b0b:nixos/modules/services/web-apps/rundeck.nix": "present",
+  "base:3d35b67b0b:nixos/tests/rundeck.nix": "present",
+  "head:6c6973cdf5:nixos/modules/services/web-apps/rundeck.nix": "present",
+  "head:6c6973cdf5:nixos/tests/rundeck.nix": "present",
+  "base:1acfd66170:nixos/modules/services/misc/gophernicus.nix": "absent",
+  "base:1acfd66170:nixos/tests/gophernicus.nix": "absent",
+  "head:82c6719c63:nixos/modules/services/misc/gophernicus.nix": "present",
+  "head:82c6719c63:nixos/tests/gophernicus.nix": "present",
+  "base:803c63ce3b:nixos/modules/services/misc/ollaya.nix": "absent",
+  "base:803c63ce3b:nixos/tests/ollaya.nix": "absent",
+  "head:e97af004f4:nixos/modules/services/misc/ollaya.nix": "present",
+  "head:e97af004f4:nixos/tests/ollaya.nix": "present"
+}

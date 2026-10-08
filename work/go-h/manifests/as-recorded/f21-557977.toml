@@ -1,0 +1,23 @@
+[[target]]
+name = "pr557977_settings"
+module = "nixos/modules/services/web-apps/elk.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "elk"]
+watch = ["settings"]
+
+[[target]]
+name = "pr557977_settings_HOST"
+module = "nixos/modules/services/web-apps/elk.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "elk", "settings"]
+watch = ["HOST"]
+
+[[target]]
+name = "pr557977_settings_PORT"
+module = "nixos/modules/services/web-apps/elk.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "elk", "settings"]
+watch = ["PORT"]

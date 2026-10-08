@@ -1,0 +1,7 @@
+[[target]]
+name = "openFirewall-headonly"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-new.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["openFirewall"]

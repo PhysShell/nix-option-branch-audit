@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 0,
+    "added": 1,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/demo.nix",
+        "test": "nixos/tests/demo-new.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "demo"
+        ],
+        "watched_path": "openFirewall"
+      },
+      "diff": {
+        "kind": "added",
+        "head": {
+          "verdict": {
+            "verdict": "OBA001",
+            "option": "openFirewall",
+            "predicate": {
+              "path": [
+                "openFirewall"
+              ],
+              "kind": {
+                "Truthy": "optional"
+              },
+              "span": {
+                "file": "nixos/modules/demo.nix",
+                "line": 25,
+                "col": 43
+              },
+              "source": "lib.optional cfg.openFirewall cfg.port"
+            },
+            "default_outcome": true,
+            "predicate_attempts": [
+              {
+                "predicate": {
+                  "path": [
+                    "openFirewall"
+                  ],
+                  "kind": {
+                    "Truthy": "optional"
+                  },
+                  "span": {
+                    "file": "nixos/modules/demo.nix",
+                    "line": 25,
+                    "col": 43
+                  },
+                  "source": "lib.optional cfg.openFirewall cfg.port"
+                },
+                "witnessed": false
+              },
+              {
+                "predicate": {
+                  "ir": {
+                    "Eq": [
+                      {
+                        "Ref": [
+                          "openFirewall"
+                        ]
+                      },
+                      {
+                        "Literal": {
+                          "Bool": true
+                        }
+                      }
+                    ]
+                  },
+                  "refs": [
+                    [
+                      "openFirewall"
+                    ]
+                  ],
+                  "span": {
+                    "file": "nixos/modules/demo.nix",
+                    "line": 25,
+                    "col": 43
+                  },
+                  "source": "lib.optional cfg.openFirewall cfg.port"
+                },
+                "witnessed": false
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

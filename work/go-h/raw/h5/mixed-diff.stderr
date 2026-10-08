@@ -1,0 +1,1 @@
+TOOL_ERROR: target openFirewall-notest: module/test present under NEITHER --base-root nor --head-root -- a real manifest/input error, not a PR-introduced module addition or removal

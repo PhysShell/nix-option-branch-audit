@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "oba",
+    "version": "0.5.0"
+  },
+  "mode": "diff",
+  "summary": {
+    "unchanged": 3,
+    "added": 0,
+    "removed": 0,
+    "changed": 0,
+    "verdict_transitions": {}
+  },
+  "targets": [
+    {
+      "identity": {
+        "module": "nixos/modules/demo.nix",
+        "test": "nixos/tests/demo-noset.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "demo"
+        ],
+        "watched_path": "openFirewall"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/demo.nix",
+        "test": "nixos/tests/demo-noset.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "demo"
+        ],
+        "watched_path": "package"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    },
+    {
+      "identity": {
+        "module": "nixos/modules/demo.nix",
+        "test": "nixos/tests/demo-noset.nix",
+        "cfg_ident": "cfg",
+        "option_prefix": [
+          "services",
+          "demo"
+        ],
+        "watched_path": "port"
+      },
+      "diff": {
+        "kind": "unchanged"
+      }
+    }
+  ]
+}

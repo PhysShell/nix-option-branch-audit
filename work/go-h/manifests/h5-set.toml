@@ -1,0 +1,24 @@
+[[target]]
+name = "openFirewall-set"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-set.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["openFirewall"]
+
+[[target]]
+name = "port-set"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-set.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["port"]
+
+[[target]]
+name = "package-set"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-set.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["package"]
+

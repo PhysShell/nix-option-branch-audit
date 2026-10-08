@@ -1,0 +1,39 @@
+[[target]]
+name = "pr519655_settings"
+module = "nixos/modules/services/misc/bazarr.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "bazarr"]
+watch = ["settings"]
+
+[[target]]
+name = "pr519655_settings_analytics_enabled"
+module = "nixos/modules/services/misc/bazarr.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "bazarr", "settings"]
+watch = ["analytics.enabled"]
+
+[[target]]
+name = "pr519655_settings_general_auto_update"
+module = "nixos/modules/services/misc/bazarr.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "bazarr", "settings"]
+watch = ["general.auto_update"]
+
+[[target]]
+name = "pr519655_settings_general_port"
+module = "nixos/modules/services/misc/bazarr.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "bazarr", "settings"]
+watch = ["general.port"]
+
+[[target]]
+name = "pr519655_listenPort_removed"
+module = "nixos/modules/services/misc/bazarr.nix"
+test = "unused"
+cfg_ident = "cfg"
+option_prefix = ["services", "bazarr"]
+watch = ["listenPort"]

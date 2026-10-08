@@ -1,0 +1,24 @@
+[[target]]
+name = "openFirewall-absent"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-absent.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["openFirewall"]
+
+[[target]]
+name = "port-absent"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-absent.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["port"]
+
+[[target]]
+name = "package-absent"
+module = "nixos/modules/demo.nix"
+test = "nixos/tests/demo-absent.nix"
+cfg_ident = "cfg"
+option_prefix = ["services", "demo"]
+watch = ["package"]
+
