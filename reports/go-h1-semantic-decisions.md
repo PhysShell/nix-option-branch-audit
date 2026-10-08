@@ -1,6 +1,6 @@
 # GO-H1 — Semantic decisions
 
-Status: STOPPED at H1.1. The declared product goal conflicts with the H1.1 premise. No U1–U4 ruling that depends on scope was made. Verdict: PROTOCOL-REDESIGN-PARTIAL.
+Status: the H1.1 stop is superseded by the owner's scope ruling (README Layer A retained). Sections H1.0–H1.13 below are the first pass and are kept for provenance. The current rulings, the three-PR re-adjudication, W, the funnel and the bounded review are in the section "GO-H1A: applied rulings" at the end. Where the two disagree, the GO-H1A section governs.
 
 ## H1.0 Provenance
 
@@ -76,3 +76,104 @@ Not run. Its only purpose would be to apply v2 to the three disputed PRs and con
 ## Verdict
 
 PROTOCOL-REDESIGN-PARTIAL. U1 and U2 are closed. U3, U4, the funnel, the metrics and the bounded review are blocked on the scope ruling. GO-I, GO-G1 and GO-J are not started.
+
+## GO-H1A: applied rulings
+
+Scope (owner ruling): README Layer A is retained. oba is an option-dependent source-level branch-activation analyzer. It is not a runtime or public-contract analyzer, and runtime observability is a separate layer.
+
+### Rulings
+
+| ID | Ruling |
+|---|---|
+| U1 | Documentation-only change: OUT. |
+| U2 | Configuration-value assignments: separate mode, OUT for current Layer A evaluation. |
+| U3 | Option semantic change (declaration, default, type, apply, readOnly, path, helper-generated declaration): eligible only when a traceable relationship exists from the changed option to an option-dependent branch predicate. Traceability is searched as specified in `work/go-h/eligibility-rubric.json` (`traceability_search`). |
+| U4 | Predicate change: eligible when the changed boolean predicate directly or indirectly consumes option state. Shell or external-command tests (including inside derivation strings) are not option-branch predicates. A change that only alters data read by an unchanged predicate is OUT. |
+
+Eligibility categories: `E_DIRECT`, `E_INDIRECT`, `E_AMBIGUOUS`, `E_NO`. E-positive means `E_DIRECT` or `E_INDIRECT`. The category is the strongest hunk category.
+
+### Re-adjudication of the three H13 disagreements
+
+Each row cites the source trace recorded in H1.2. The decisive hunk is the one that changes the category.
+
+| PR | Decisive hunk | Trace | Category | Dependency recorded |
+|---|---|---|---|---|
+| 569867 | `system.checks` derivation: `file --mime` ELF branch removed (shell `if` inside the build string) | The removed test is a shell predicate on `file(1)` output. Option state (`security.wrappers`) enters only as the iteration domain, which the PR does not change. The Nix expressions changed are the derivation name and `nativeBuildInputs`, neither of which is option semantics. Contrary evidence was checked and not found. | `E_NO` | Not an option-branch predicate (`predicate_rule.not_nix_predicate`). |
+| 566007 | `PrivateDevices` and `PrivateUsers` gain `&& !config.boot.zfs.enabled`; `path` gains `lib.optionals config.boot.zfs.enabled [config.boot.zfs.package]` | The changed predicates still read `cfg.smartmon.enable`, an option declared in the changed module (`T_IN`, unchanged context). The added operand `config.boot.zfs.enabled` is declared in another module (`nixos/modules/tasks/filesystems/zfs.nix`). The changed term therefore consumes option state declared outside the module. | `E_INDIRECT` | `cfg.smartmon.enable` (in-module, existing, unchanged) and `config.boot.zfs.enabled` (foreign, added) feed the same changed predicates. |
+| 566696 | `cosmic.nix`: `corePkgs` gains `cosmic-osk`; `cosmic-viewer` added to `systemPackages`; `qt.*` and `services.switcherooControl.enable` set with `mkDefault` | The `warnings` condition (`cfg.showExcludedPkgsWarning && excludedCorePkgs != [ ]`) is unchanged in the diff (context line only). The changed expressions are the `corePkgs` list literal (data read by the unchanged condition, `EC21`), a `systemPackages` list entry, and config-value assignments (`EC11`, U2). No option declaration, default, type or apply changed. | `E_NO` | None. The warning content changes (lists more packages) but the predicate does not, so this is OUT under the owner's rule. |
+
+These three adjudications were fixed before the bounded review (below). They are not revised to match the reviewer.
+
+### W: witnessability (separate axis)
+
+W is an annotation. It is never a condition for R, E, D or V. Labels, from the H5 evidence:
+
+- `W_YES`: a test at the relevant side drives the traceable predicate to the opposite outcome from the option's default.
+- `W_NO_TEST`: no test file exists or the test is absent on that side (H5: check exit 3).
+- `W_NOT_WITNESSED`: a test exists and references the option, but never drives the opposite outcome (H5: OBA001, check exit 2).
+- `W_NOT_REQUIRED`: E_NO or no predicate to witness.
+- `W_AMBIGUOUS`: the witness could not be determined.
+
+### Funnel
+
+`R → E → D → V → A`, with W as an annotation on the final stage.
+
+- R: census file-path relevance (`nixos/modules/**` or `nixos/tests/**`). File-path rule only.
+- E: the rubric categories above, from source semantics only.
+- D: a mechanically derivable target from frozen steps 1–7.
+- V: target validity against source, independent of oba (`validate_targets.py`, `target-validity-rubric.json`).
+- A: analyzer outcome from oba. Measured only after V.
+
+Preserved rules:
+
+- `D != V`. D is "derived", V is "valid against source". A derived target can be invalid.
+- Known prefix and watch mistakes are recorded as `D=yes, V=no`. The GO-F pre-correction defect (option_prefix ending in an interior `mkOption` container) is an example. V2 catches it.
+- Historical P1 new-module outcomes (`NEW_MODULE_NO_BASE`, `NOT_EVALUABLE_BY_CURRENT_PROTOCOL`) are historical only. They describe the pre-GO-E analyzer. They are not current post-GO-E limitations, since `db4d44c` (ancestor of the candidate `9ff7c04`) supports new-module analysis.
+
+### mkPackageOption
+
+For protocol purposes `mkPackageOption` is an option declaration. Its arguments define default and type (EC17). Traceability applies as for any declaration. Its discovery by the analyzer is not investigated here and not fixed (GO-G1 scope).
+
+### Metric ownership
+
+| Metric | Numerator / denominator | Owner |
+|---|---|---|
+| M1 E/R | E-positive PRs / R PRs | ELIGIBILITY RUBRIC |
+| M2 D/E | derivable E-positive PRs / E-positive PRs | TARGET CONSTRUCTOR |
+| M3 V/D | valid targets / derived targets | TARGET VALIDATOR |
+| M4 A/V | substantive analyzer outcomes / valid targets | OBA ANALYSIS |
+| M5 correct/adjudicated | correct substantive outcomes / adjudicated substantive outcomes | adjudication (named reviewer) |
+| M6 witnessed/witnessable | witnessed targets / witnessable targets (threshold-free) | WITNESS INFRASTRUCTURE |
+
+No threshold is set in this report.
+
+### Bounded fresh review (H1.14)
+
+Run 1 applied `eligibility-rubric.v3-prereview.json` to the three disputed PRs and eight controls. Run 2 applied `work/go-h/eligibility-rubric.json` (v3.1) to five affected cases. Both are fresh agents. Neither was given GO-G classifications, the original H13 answers, expected outcomes, or the list of which PRs are controls. Run 1 is kept as a compact per-PR record in `work/go-h/independent-review/h1a-review-results.txt`; its verbatim output is not retained in this repository. Run 2 is verbatim in `work/go-h/independent-review/h1a-review-rerun.txt`. Results are in "Review result" below.
+
+### Review result
+
+**Run 1 (rubric v3, eight controls and three disputed PRs).** All three disputed categories agree with the fixed adjudications: 566007 E_INDIRECT, 569867 E_NO, 566696 E_NO. Controls: 443747 E_DIRECT, 508090 E_DIRECT, 563823 E_DIRECT, 568429 E_AMBIGUOUS (search cap), 565943 E_NO, 564688 E_NO, 567915 E_NO, 556752 E_NO. The reviewer raised six rubric gaps. One was a real internal contradiction: `traceability_search.result_map` assigned E_DIRECT to a same-file consumer of a foreign operand, which contradicted `predicate_rule`. All six were addressed once in v3.1, recorded in its `amendments`.
+
+**Run 2 (rubric v3.1, five affected cases).** Blind, as above.
+
+| PR | Fixed adjudication | Run 2 PR category | Decisive hunk (run 2) |
+|---|---|---|---|
+| 566007 | E_INDIRECT | E_INDIRECT | `PrivateDevices`/`PrivateUsers`/`path`: foreign operand `config.boot.zfs.enabled` |
+| 508090 | E_DIRECT (control) | E_DIRECT | `services.beszel.agent.environment.SKIP_GPU`, read by `lib.optionals` in the same module |
+| 563823 | E_DIRECT (control) | E_DIRECT | `jaasLoginModuleClass`: reads `cfg.package.version`, `cfg.package` declared in the same module |
+| 564688 | E_NO (control) | E_NO | No E-positive hunk; every nixos/modules hunk is an EC10 equivalent rewrite |
+| 443747 | E_DIRECT (control) | E_DIRECT | `services.gophernicus.enable`, read by `lib.mkIf` in the same module |
+
+All five agree on the PR category. The decisive hunks match run 1 where run 1 named one. The rerun did not change any fixed adjudication, and none was revised to match it. A category disagreement did not occur, so there was no reason to refine again or rerun. No further iteration was run.
+
+**Remaining rubric gaps raised in run 2.** These are not category disagreements, and they do not change any of the five categories.
+
+- Wording, to be stated explicitly in a later version: hunk-level aggregation when a hunk mixes categories (the strongest term was used); precedence between EC10 and `lambda_over_option_attrset` (EC10 was applied); non-boolean let-bound value functions reading option state, such as `collectorAttrs` and list concatenations, are outside `scope.in` (E_NO was applied); a data-derived type on a new option; whether to search by full option path or last segment; whether a declaring module may be established by absence of a declaration; files outside `nixos/modules` and `nixos/tests` (`ci/`, `lib/`, `pkgs/`); a default change whose only consumer generates shell or data output (E_NO, per U3).
+- **S1, the primary semantic ambiguity.** `gh search code` searches the default branch and cannot be pinned to a base or head SHA. A T_NONE result (which gives E_NO) and a T_FOREIGN result (which gives E_INDIRECT) both depend on that search being complete for the side under test. The protocol has no rule for when an unpinned index is adequate, and no available tool supplies a pinned search. In the five cases, no PR category depends on S1: 443747's decisive hunk is in-module, and 563823's `aclPolicies` E_NO is also given by scope. The ambiguity still applies to any general absence claim.
+- **S2.** The branch-construct list does not include lambda predicates in `lib.filter` or `filterAttrs`. It is not settled whether such a boolean is an option-branch predicate for E. The 508090 `filterAttrs` hunk is one instance. It does not change that PR's category.
+- **S3.** EC10 equivalence is stated by reading lib definitions at a pinned SHA. The rubric does not say how far builtins semantics must be verified. In 564688 (`param-lib.nix`), the duplicate-key rule of `listToAttrs` was not checked. If the equivalence fails, an E_NO would be wrong.
+
+### Verdict (GO-H1A)
+
+**PROTOCOL-REDESIGN-PARTIAL.** The exact remaining semantic ambiguity is S1: whether an absence claim (T_NONE → E_NO, or the absence of a foreign consumer) obtained from an unpinned default-branch code search is verified evidence. The protocol needs a complete search at the base or head SHA for that claim, and no current tool provides one. S2 and S3 must also be decided before the protocol is declared READY. The rubric is not changed by this section. GO-I, GO-G1 and GO-J are not started.

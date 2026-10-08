@@ -1,0 +1,28 @@
+GO-H1A first bounded review (rubric v3, pre-refinement). Reviewer: fresh independent agent, instrument = work/go-h/eligibility-rubric.v3-prereview.json.
+Blind: reviewer saw no GO-G classifications, no original H13 answers, no expected outcomes.
+Scope of this record: per-PR category only. The per-hunk detail is not retained in this file; the verbatim hand-back remains in the agent transcript and is not reproduced here.
+
+Disputed PRs (fixed adjudications from GO-H1A ruling)
+PR      reviewer category  fixed adjudication  agree  decisive hunk (as recorded)
+566007  E_INDIRECT         E_INDIRECT          yes    PrivateDevices / PrivateUsers / path: changed term reads config.boot.zfs.enabled (declared in nixos/modules/tasks/filesystems/zfs.nix)
+569867  E_NO               E_NO                yes    removed ELF `file --mime` branch is a shell predicate; option state enters only as iteration domain
+566696  E_NO               E_NO                yes    corePkgs list literal (cosmic-osk), systemPackages entry, mkDefault assignments; warnings condition unchanged
+
+Controls (no adjudication was fixed for these before review; recorded as reviewer output)
+PR      reviewer category
+443747  E_DIRECT
+508090  E_DIRECT
+563823  E_DIRECT
+568429  E_AMBIGUOUS  (traceability search for a common segment exceeds result cap: T_UNKNOWN)
+565943  E_NO
+564688  E_NO
+567915  E_NO
+556752  E_NO
+
+Rubric gaps raised by the reviewer (addressed in v3.1, see amendments in eligibility-rubric.json)
+1. traceability_search.result_map mapped a same-file consumer of a foreign operand to E_DIRECT, contradicting predicate_rule. Fixed: declaration_module_governs.
+2. Unclear whether cfg.package.version reads cfg.package, and whether lib.optionals cond P reads P. Fixed: reads include attribute extensions and value arguments.
+3. Relocated or refactored predicate with equivalent evaluation had no class. Fixed: EC10 with equivalence (E_NO).
+4. Lambda predicates over option attrsets had no traceability path. Fixed: lambda_over_option_attrset (T_UNKNOWN if not traceable).
+5. Several options in one hunk: aggregation was unspecified. Fixed: strongest option category.
+6. Import-list and test registration lines had no class. Fixed: EC22.

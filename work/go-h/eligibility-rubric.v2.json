@@ -1,0 +1,68 @@
+{
+  "schema": "go-h-eligibility-rubric/2",
+  "status": "v2 structured; scope-dependent classes are DEPENDS_ON_RULING until the user rules on product scope (see reports/go-h1-semantic-decisions.md H1.1). Not preregistration-ready.",
+  "supersedes": "work/go-h/eligibility-rubric.v1.json",
+  "purpose": "Decide E (eligible PR) from source semantics only. Must not consult oba output, test presence, derivability, or historical verdicts.",
+  "scope_readings": {
+    "a": "declared goal: option branch activation (README layer A). Units: option declaration semantics and branch predicates over options. No runtime claim.",
+    "b": "runtime or public contract. Would extend E beyond layer A and reopen README non-goal 'No claim about runtime behavior'. Not adopted; requires a declared-goal change first."
+  },
+  "product_premises": {
+    "P1": "oba's unit is an option's semantics: declaration, default, type, apply/readOnly, and the branch predicates that read the option. Documentation-only fields are outside the unit.",
+    "P2": "Configuration VALUES (config.<path> = ...) are a separate unit (configuration choice). Out of scope for E under reading (a). Separate mode needed.",
+    "P3": "E is not reduced by oba's current coverage. Analyzer inability is an OBA DISCOVERY or OBA ANALYSIS outcome counted after V."
+  },
+  "procedure": [
+    "1. Take the PR's changed files restricted to nixos/modules/** and nixos/tests/**. Record every hunk.",
+    "2. For each hunk, identify the innermost enclosing construct in BASE and HEAD source by parsing, not by line-prefix heuristics.",
+    "3. Assign each hunk one class from classes[]. Containment inside mkOption { } alone never makes a hunk eligible; the attribute the changed text belongs to decides (attribute_rule).",
+    "4. For each hunk record: operands read (in-module or foreign), the option-contract property changed, and the eligibility under each scope reading.",
+    "5. A hunk whose eligibility is DEPENDS_ON_RULING is recorded as such and is not counted as ELIGIBLE or INELIGIBLE. A PR whose only hunks are DEPENDS_ON_RULING has E = PENDING_RULING.",
+    "6. A CONDITIONAL hunk (EC10, EC13 where unclear) needs a written reason in the adjudication record; with no reason it is NOT_RESOLVED.",
+    "7. Record per PR: R (file-path rule only), E under each reading, the decisive hunk, and one sentence of reason.",
+    "8. Do NOT decide D or V here. A PR can be E and still have no mechanically derivable target."
+  ],
+  "attribute_rule": {
+    "behavioral_attributes": ["default", "type", "apply", "readOnly", "enable-gating predicate on the option", "option name (rename/move)", "presence/absence of the declaration"],
+    "documentation_attributes": ["description", "example", "defaultText", "longDescription", "relatedPackages", "markdown rendering helpers"],
+    "rule": "A change to a behavioral attribute is behavioral. A change to a documentation attribute only is documentation. A change that touches both is behavioral. Attribute attribution uses the innermost attribute key the changed text belongs to."
+  },
+  "operand_rule": {
+    "in_module": "the operand is an option declared in the changed module (verified by source search at the same SHA)",
+    "foreign": "the operand is an option declared in another module",
+    "note": "A predicate whose only changed operand is foreign is a change to the foreign option's branch, not to this module's option. Under reading (a) it is DEPENDS_ON_RULING (U4), not ELIGIBLE by default."
+  },
+  "classes": [
+    {"id": "EC01", "name": "new option declaration", "semantic_property": "declaration, default, type", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "head", "reason": "A new option's default and type are new behavior a test can witness."},
+    {"id": "EC02", "name": "removed option declaration", "semantic_property": "declaration", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base", "reason": "Removal changes which configurations are accepted and what they do."},
+    {"id": "EC03", "name": "default value changed", "semantic_property": "default", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base and head", "reason": "Changes behavior for every configuration that does not set the option."},
+    {"id": "EC04", "name": "type changed", "semantic_property": "type", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base and head", "reason": "Changes which values are accepted and how they merge."},
+    {"id": "EC05", "name": "apply or readOnly changed", "semantic_property": "apply, readOnly", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base and head", "reason": "Changes the value seen by config or the assignability of the option."},
+    {"id": "EC06", "name": "example only changed", "semantic_property": "none (documentation)", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "INELIGIBLE"}, "status": "DETERMINATE", "side": "none", "reason": "Documentation attribute; no evaluated behavior. Closes U1."},
+    {"id": "EC07", "name": "description only changed", "semantic_property": "none (documentation)", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "INELIGIBLE"}, "status": "DETERMINATE", "side": "none", "reason": "Documentation attribute; no evaluated behavior. Closes U1."},
+    {"id": "EC08", "name": "defaultText only changed", "semantic_property": "none (documentation)", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "INELIGIBLE"}, "status": "DETERMINATE", "side": "none", "reason": "Rendering of the default for documentation only; the default itself is unchanged. Closes U1."},
+    {"id": "EC09", "name": "formatting, reordering, or comment change inside a declaration", "semantic_property": "none", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "INELIGIBLE"}, "status": "DETERMINATE", "side": "none", "reason": "No semantic change to any attribute."},
+    {"id": "EC10", "name": "default or type expression rewritten, equivalence unknown from syntax", "semantic_property": "default or type (equivalence to be shown)", "scope": "in_module", "eligibility": {"a": "CONDITIONAL", "b": "CONDITIONAL"}, "status": "CONDITIONAL", "side": "base and head", "reason": "Must state whether the evaluated value or accepted set changes. If not: INELIGIBLE with that reason. If yes: ELIGIBLE under EC03/EC04."},
+    {"id": "EC11", "name": "configuration value assignment (config.<path> = ...) not declared by the PR's own options", "semantic_property": "configuration value (not option semantics)", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "DEPENDS_ON_RULING"}, "status": "DEPENDS_ON_RULING (reading b only)", "side": "none", "reason": "Configuration choice, not option semantics (P2). Under (a) no Nix evaluation is claimed, so values are outside E. Under (b) they may be in scope; separate mode needed either way."},
+    {"id": "EC12", "name": "branch predicate changed that reads an existing option", "semantic_property": "enable-gating predicate", "scope": "in_module or foreign operand (operand_rule)", "eligibility": {"a": "ELIGIBLE if the changed predicate's changed operand is in_module; DEPENDS_ON_RULING if the only new operand is foreign", "b": "ELIGIBLE"}, "status": "DEPENDS_ON_RULING for foreign-only operands (U4)", "side": "base and head", "reason": "Behavior conditioned on an option. Foreign-only operand cases are the 566007 split."},
+    {"id": "EC13", "name": "assertion or warning changed", "semantic_property": "none directly (validation or message)", "scope": "in_module operand in condition", "eligibility": {"a": "DEPENDS_ON_RULING", "b": "ELIGIBLE iff the condition reads an option declared in this module; else INELIGIBLE"}, "status": "DEPENDS_ON_RULING (U4)", "side": "base and head", "reason": "README layer A defines branches, not assertions or warnings. Reading (b) follows the v1 rule. 566696 warning is EC13 under (b)."},
+    {"id": "EC14", "name": "test-only change (nixos/tests/**, no module behavior hunk)", "semantic_property": "none (witness only)", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "INELIGIBLE"}, "status": "DETERMINATE", "side": "none", "reason": "Changes the witness, not the module's option semantics. Counts for R only."},
+    {"id": "EC15", "name": "package-only or non-NixOS-module change", "semantic_property": "none", "scope": "none", "eligibility": {"a": "INELIGIBLE", "b": "INELIGIBLE"}, "status": "DETERMINATE", "side": "none", "reason": "Outside the NixOS module unit. Not in census R."},
+    {"id": "EC16", "name": "rename or move of an option (mkRenamedOptionModule, mkRemovedOptionModule, or explicit relocation)", "semantic_property": "option path", "scope": "in_module (old path base, new path head)", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base for old path, head for new path", "reason": "Both old and new option paths are the subject; the relocation mapping is part of the semantics."},
+    {"id": "EC17", "name": "option declared through a helper (mkPackageOption, mkEnableOption, shared option-generating function)", "semantic_property": "declaration, default, type via helper arguments", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "head or base as applicable", "reason": "The helper call's arguments define default and type. D may fail even when E holds; that is a derivation limitation."},
+    {"id": "EC18", "name": "nested or submodule option (attrsOf or submodule instance)", "semantic_property": "declaration, default, type at nested path", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base and head", "reason": "Same semantics as EC01-EC05 at a nested path."},
+    {"id": "EC19", "name": "option declared with a dotted key inside an options block", "semantic_property": "declaration", "scope": "in_module", "eligibility": {"a": "ELIGIBLE", "b": "ELIGIBLE"}, "status": "DETERMINATE", "side": "base and head", "reason": "Same semantics as the nested form; key spelling is not a semantic difference."},
+    {"id": "EC20", "name": "build-time system check or derivation validation over module option values", "semantic_property": "none directly (build-time validation)", "scope": "in_module operand as input", "eligibility": {"a": "INELIGIBLE", "b": "DEPENDS_ON_RULING"}, "status": "DEPENDS_ON_RULING (reading b only)", "side": "base and head", "reason": "Not an option branch predicate under README layer A. Added from the 569867 trace; v1 classed it under EC13 by judgment."}
+  ],
+  "unresolved_product_decisions": [
+    {"id": "U1", "question": "Is a documentation-only change (EC06-EC08) in product scope?", "status": "CLOSED: OUT under both readings", "basis": "README layer A has no documentation semantics."},
+    {"id": "U2", "question": "Are configuration-value assignments (EC11) a separate product mode or out of scope?", "status": "CLOSED for reading (a): separate mode, not in E. Reading (b) still open.", "basis": "README: 'No Nix evaluation'."},
+    {"id": "U3", "question": "Are value-only behavioral options (no predicate) in E although oba cannot analyze them?", "status": "OPEN: needs scope ruling", "basis": "Under (a) layer A cannot witness them; under (b) they are E with an analyzer-scope outcome."},
+    {"id": "U4", "question": "Are predicate changes with foreign-only operands (EC12), warnings and assertions (EC13), and build checks (EC20) in E?", "status": "OPEN: needs scope ruling", "basis": "Reading (a) vs (b). 566007 (foreign-only operand), 566696 (warning), 569867 (build check) split the reading."}
+  ],
+  "known_gaps": [
+    "Attribute attribution by text heuristics is unreliable for multi-line Nix strings; an adjudicator must read the parsed or indented structure.",
+    "Helper-generated declarations (EC17) are E-eligible but their canonical path may be invisible to text search; this affects D, not E.",
+    "Configuration-dependent behavior beyond the module (EC11) is not evaluated by any class under reading (a)."
+  ]
+}

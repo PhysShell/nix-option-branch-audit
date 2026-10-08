@@ -1,0 +1,70 @@
+{
+  "schema": "go-h-eligibility-rubric/3",
+  "status": "GO-H1A rulings applied. Scope: README Layer A (option-dependent source-level branch-activation analysis). Supersedes v2 (eligibility-rubric.v2.json) and v1 (eligibility-rubric.v1.json).",
+  "purpose": "Assign each PR hunk an E category from source semantics only. Must not consult oba output, test presence, derivability (D), target validity (V), witnessability (W), or any historical verdict.",
+  "scope": {
+    "in": "Changes to an option's semantics (declaration, default, type, apply, readOnly, path) that are traceable to an option-dependent branch predicate; changes to a boolean predicate that directly or indirectly consumes option state.",
+    "out": [
+      "Documentation-only changes (U1).",
+      "Configuration-value assignments config.<path> = ... (U2): separate mode, not Layer A.",
+      "Changes to warning or assertion message text or to data that a condition reads, when the condition expression itself is unchanged.",
+      "Shell or command-level tests inside derivation strings (build checks); their operands are external command output, not Nix option state.",
+      "Test-only changes (witness only; counts for R, never for E).",
+      "Runtime behavior, runtime observability, and consumer contracts (README non-goals; layer C)."
+    ]
+  },
+  "categories": {
+    "E_DIRECT": "The changed construct is an option semantic change traceable to a branch predicate in the same module, OR a changed predicate whose changed (added, removed or modified) operands are options declared in the same module.",
+    "E_INDIRECT": "The changed construct is an option semantic change traceable only to a predicate in another module, OR a changed predicate whose changed operand is an option declared in another module, OR whose option state reaches the predicate only through Nix-level let bindings or helper functions.",
+    "E_AMBIGUOUS": "Traceability or predicate status cannot be determined by the search procedure below (search incomplete, truncated, or unavailable). Not counted as E-positive; reported separately.",
+    "E_NO": "No change in scope: out-of-scope categories above, or traceability searched and absent."
+  },
+  "pr_aggregation": "PR category = strongest hunk category in the order E_DIRECT > E_INDIRECT > E_AMBIGUOUS > E_NO. E-positive = E_DIRECT or E_INDIRECT. A PR with only E_AMBIGUOUS hunks is reported as E_AMBIGUOUS.",
+  "traceability_search": {
+    "unit": "option path P of the changed option (for a removed option: base side; otherwise head side)",
+    "step1": "Search the changed module file at the relevant side for a branch construct (mkIf, optional, optionals, if-then-else, assert, && or || or ! with a boolean operand, lib.mkMerge condition) whose operand reads P (cfg.<...>, config.<...>, a let binding or function argument that equals P). Found in the same module file: T_IN.",
+    "step2": "If not found in step1, search NixOS/nixpkgs at the same side for the last segment of P in nixos/modules with the branch-construct pattern (gh search code, or gh api search). Found in another module: T_FOREIGN. If the search was executed and returned the complete result set with no branch consumer: T_NONE. If the search was truncated, rate-limited, or unavailable: T_UNKNOWN.",
+    "result_map": {"T_IN": "E_DIRECT", "T_FOREIGN": "E_INDIRECT", "T_NONE": "E_NO", "T_UNKNOWN": "E_AMBIGUOUS"},
+    "record": "For each traceability decision record: P, the search query or file searched, the predicate found (file, line, text) or the search result count, and T_*."
+  },
+  "predicate_rule": {
+    "changed_term": "Only operands and operators the PR adds, removes or modifies count as the changed term. Unchanged operands are recorded as context.",
+    "direct": "Changed term reads only options declared in the same module (E_DIRECT).",
+    "indirect": "Changed term reads an option declared in another module, or reaches option state through Nix-level let bindings or helper functions (E_INDIRECT).",
+    "not_nix_predicate": "A predicate evaluated by a shell or by an external command (including inside a derivation string) is not an option-branch predicate: E_NO, even when its input path is derived from option values. Option state enters only as the iteration domain.",
+    "data_only": "A change to a value (list literal, package set, attribute value) that a predicate reads, when the predicate expression itself is unchanged and the option semantics are unchanged: E_NO (changes output or content only)."
+  },
+  "attribute_rule": {
+    "option_semantic": ["default", "type", "apply", "readOnly", "declaration presence", "option path (rename/move)"],
+    "documentation": ["description", "example", "defaultText", "longDescription", "relatedPackages"],
+    "rule": "Helper-generated declarations (mkPackageOption, mkEnableOption, shared option-generating functions) are option declarations for protocol purposes; their arguments define default and type. Traceability (traceability_search) applies to them the same way as to hand-written declarations."
+  },
+  "classes": [
+    {"id": "EC01", "name": "new option declaration", "unit": "option_semantic", "side": "head", "rule": "traceability_search on the new path"},
+    {"id": "EC02", "name": "removed option declaration", "unit": "option_semantic", "side": "base", "rule": "traceability_search on the removed path, base side"},
+    {"id": "EC03", "name": "default value changed", "unit": "option_semantic", "side": "base and head", "rule": "traceability_search on the changed path"},
+    {"id": "EC04", "name": "type changed", "unit": "option_semantic", "side": "base and head", "rule": "traceability_search on the changed path"},
+    {"id": "EC05", "name": "apply or readOnly changed", "unit": "option_semantic", "side": "base and head", "rule": "traceability_search on the changed path"},
+    {"id": "EC06", "name": "example only changed", "unit": "documentation", "rule": "E_NO"},
+    {"id": "EC07", "name": "description only changed", "unit": "documentation", "rule": "E_NO"},
+    {"id": "EC08", "name": "defaultText only changed", "unit": "documentation", "rule": "E_NO (the default value is unchanged)"},
+    {"id": "EC09", "name": "formatting, reordering, or comment change", "unit": "none", "rule": "E_NO"},
+    {"id": "EC10", "name": "default or type expression rewritten, equivalence unknown from syntax", "unit": "option_semantic", "rule": "Show whether the evaluated value or accepted set changes. If not: E_NO with that reason. If yes: treat as EC03 or EC04. If not decidable from source: E_AMBIGUOUS."},
+    {"id": "EC11", "name": "configuration value assignment config.<path> = ...", "unit": "config_value", "rule": "E_NO (U2: separate mode)"},
+    {"id": "EC12", "name": "boolean predicate changed that consumes option state", "unit": "predicate", "rule": "predicate_rule (direct / indirect / not_nix_predicate)"},
+    {"id": "EC13", "name": "warning or assertion condition changed", "unit": "predicate", "rule": "If the condition expression changed: predicate_rule. If only message text changed: E_NO. A warning or assertion condition is a predicate for this rule only when it is a Nix boolean expression."},
+    {"id": "EC14", "name": "test-only change", "unit": "test", "rule": "E_NO"},
+    {"id": "EC15", "name": "package-only or non-NixOS-module change", "unit": "package", "rule": "E_NO"},
+    {"id": "EC16", "name": "rename or move of an option (mkRenamedOptionModule, mkRemovedOptionModule, explicit relocation)", "unit": "option_semantic", "rule": "traceability_search on the old path (base) and new path (head)"},
+    {"id": "EC17", "name": "option declared through a helper (mkPackageOption, mkEnableOption, shared option-generating function)", "unit": "option_semantic", "rule": "as EC01-EC05, with the attribute_rule for helpers"},
+    {"id": "EC18", "name": "nested or submodule option", "unit": "option_semantic", "rule": "as EC01-EC05 at the nested path"},
+    {"id": "EC19", "name": "option declared with a dotted key", "unit": "option_semantic", "rule": "as EC01-EC05; key spelling is not a semantic change"},
+    {"id": "EC20", "name": "build-time check or derivation string test over option-derived values", "unit": "build_check", "rule": "not_nix_predicate: E_NO. A Nix-level boolean predicate in the same hunk is EC12."},
+    {"id": "EC21", "name": "data change feeding a predicate (list, let value, or package set read by a condition), predicate expression unchanged, option semantics unchanged", "unit": "data", "rule": "E_NO (data_only)"}
+  ],
+  "known_gaps": [
+    "Attribute attribution by text heuristics is unreliable for multi-line Nix strings; the adjudicator must read the parsed or indented structure.",
+    "Traceability across modules depends on search completeness; T_UNKNOWN is reported, never converted to E_NO.",
+    "Helper-generated declarations (EC17) may be invisible to text search; this affects D, not E."
+  ]
+}
