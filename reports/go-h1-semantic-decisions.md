@@ -322,3 +322,57 @@ One reviewer claim is wrong. The reviewer said the lib/default.nix step for `lib
 Not applied: the E_NO list does not name transform lambdas (P04). This is inferable from H2, so it is a wording point that was not spent on the review's one allowed refinement.
 
 GO-I, GO-G1 and GO-J are not started. oba is not modified.
+
+## GO-H1D
+
+Status: DIAGNOSTIC / NON-SCORING probes. P1 and GO-F classifications are not altered. Rubric: `work/go-h/eligibility-rubric.json`, schema go-h-eligibility-rubric/6.0 (`h1d_*` keys govern; v5 kept as `eligibility-rubric.v5.json`). Target validity: `work/go-h/target-validity-rubric.v2.json` (schema /2; v1 unchanged). Reviewer prompt: `work/go-h/independent-review/h1d-reviewer-prompt.txt`. Record: `work/go-h/independent-review/h1d-review-record.txt`. Raw probe output: `work/go-h/independent-review/h1d-probe-raw.txt` (from `work/go-h/h1d_probes.sh`).
+
+### Rules frozen before the reviewer
+
+1. Control dependence (C1–C4): DATA_DEPENDENT, CONTROL_DEPENDENT_ONLY, INDEPENDENT. Only DATA_DEPENDENT predicates are dependencies of W (C1). A gate that is itself DATA_DEPENDENT is a predicate on W (C2). An option-semantic change is eligible only when a DATA_DEPENDENT predicate reads W (C4).
+2. Validity (v2): V_VALID, V_INVALID, V_AMBIGUOUS. Named invalid reasons: WRONG_BASE_HEAD_SIDE, PREFIX_CONTRACT_VIOLATION, WATCH_PATH_NOT_DECLARED, FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION, FOREIGN_ONLY_DEPENDENCY, NO_WATCHED_PREDICATE_DEPENDENCY. V_INVALID carries no E category. A derivation precondition was added before the reviewer ran: a V state is computed only for a target derived from a changed predicate on W or an option-semantic change to W.
+3. Callee resolution (K1–K6): a name is not a resolution (K1). A lib path is resolved only by exact-SHA identity (K2). K1 settles the H1C conflict between R1 and the taxonomy example `lib.filter`.
+4. G0(ii) pinning: tree and blob SHAs of the pinned primitives were verified against the pinned repository. Trees: E `21fd84ae`, B `d181338d`, F `6e06015b`. Blobs at E: `lib/modules.nix` `74ff0f04`, `lib/lists.nix` `819b6d7f`, `lib/strings.nix` `ccd84572`, `lib/attrsets.nix` `a7056726`, `lib/trivial.nix` `f333440e`, `lib/default.nix` `56baba87`.
+5. Freeform (F1–F6): a declared suboption is an independent declaration (F1). A freeform-only key is not (F2).
+6. Namespace closure (N1–N6): literal-leaf closure (N1), whole-namespace consumption is open (N2), computed keys are closed only over an exact domain (N3), enum expansion needs four pieces of evidence (N4). A grep is a screen, not a closure (N6).
+7. Interprocedural (I1–I5): a boolean's role is fixed at its own consumer position (I1). One W-derived call site is positive evidence (I2). A data-position call-site change is E_NO for that hunk (I3). Eligibility and equivalence are separate decisions (I4).
+8. boolToYesNo ruling: the helper's internal `if` is P_CONTROL at its own position (I1). A change to `lib/trivial.nix:308` is E_INDIRECT for `services.locate.pruneBindMounts` (I3). Rewriting `locate.nix:276` inline is EC10 with L2 and EQ3, reviewer-owned.
+
+### Reviewer result
+
+One fresh general-purpose reviewer, 17 cases, seven distinctions (D1–D7), 17 rule-gap entries. The reviewer separated all seven distinctions. Full record in `h1d-review-record.txt`. Controller notes are kept separate in that file.
+
+- D1 (control vs data): C1a is CONTROL_DEPENDENT_ONLY, V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY. C1b is DATA_DEPENDENT, V_VALID.
+- D2 (foreign-only vs no-watched-gate): C2a is FOREIGN_ONLY_DEPENDENCY. C2b is NO_WATCHED_PREDICATE_DEPENDENCY.
+- D3 (invalid vs ambiguous): C3a is V_INVALID (freeform, mechanical). C3b is V_AMBIGUOUS (open dynamic key on the only path).
+- D4 (resolved vs unresolved callee): C4d resolves at F to `lib.filter` (P_SELECTION, V_VALID). C4a–C4c are CALLEE_UNKNOWN (V_AMBIGUOUS).
+- D5 (declared vs freeform-only key): C5a is a declared suboption (V_VALID). C5b is freeform-only (V_INVALID).
+- D6 (closed vs open): an open receiver off the dependency path does not change V (C6c). An open computed key on the path makes V_AMBIGUOUS (C6d). The closed enum at movim (C6b) is closed by N4.
+- D7 (helper vs caller position vs equivalence): C7a is E_INDIRECT (V_VALID). C7b is E_NO (not derived). C7c is E_AMBIGUOUS (EC10, reviewer-owned).
+
+The reviewer's answer for C1a contains a self-contradiction: V_INVALID together with category E_NO. The rule text says V_INVALID carries no E category.
+
+### Why the verdict is PARTIAL
+
+The blocking construct is control-only predicate change inside a W-gated block, exemplified by C1a (`beszel-agent.nix:211`, inside `lib.mkIf cfg.openFirewall` at :209).
+
+- C1 says CONTROL_DEPENDENT_ONLY never establishes a dependency on W. C4 then makes an option-semantic change eligible only through a DATA_DEPENDENT gate. Under that rule C1a is V_INVALID, and by aggregation it has no E category.
+- The reviewer's answer gives E_NO. Under the rule as written that is not available, so the case has no category under the frozen rules.
+- Deriving a category from the enclosing gate would need a different rule. The open question is whether a predicate reached only through a W gate counts as a dependency of W.
+- U3 as ruled (GO-H1A/H1C) concerns "conditional option-semantic eligibility through a branch relation". C1 and C4 read that branch relation narrowly, as a direct DATA_DEPENDENT gate. That narrowing is H1D drafting, not a user ruling. Whether it matches what U3 intended is a scope question for the user. The directive forbids reopening U3 without exact contradicting repository evidence. C1a exposes the question, but it does not show that the repository contradicts U3.
+
+No mechanical, reviewer-owned, ambiguity, or D-capability classification suffices for this construct without deciding that scope question. Ambiguity would mark a hunk the rubric itself says has no dependency, and leaves the V_INVALID versus E_AMBIGUOUS conflict open. A reviewer-owned call would hand a scope decision to each case. Because the question is about intent, this round does not decide it.
+
+Secondary, non-blocking items for the next round:
+
+- I1 versus I3 for a call-site rewrite in a data position (C7c). The EC10 route gives E_AMBIGUOUS, so the category is decided, but the routing conflict should be fixed.
+- Synthetic cases with `lib.mkIf` or `lib.filter` and no SHA take P_UNKNOWN under K5. The prompt said "classify as written", which pointed the other way. This was a defect in the prompt, not in the rules, and changes no V result.
+- Gaps about a parent-option default reaching a child key (C4, C3a), a submodule as an intermediate container under V3 (C5a), and the module used for V1–V3 when the changed predicate is in another module (C7a). Each is covered by an ambiguity state or by a mechanical reason that does not depend on it.
+
+Wording refinement: none applied. The reviewer's gaps are rule silences and conflicts, not wording defects. The one permitted refinement is not used.
+
+### Verdict (GO-H1D)
+
+**PROTOCOL-REDESIGN-PARTIAL.** Five constructs have rules, mechanical or reviewer-owned classifications, or explicit ambiguity states, and the reviewer separated the distinctions for them. Control dependence from an enclosing gate, and whether such a dependency is eligible under U3, are not decided. The GO-I handoff is not written, because READY was not reached. GO-I, GO-G1 and GO-J are not started. oba is not modified.
+
+Next step, for the user: decide whether a predicate reached only through a W gate (CONTROL_DEPENDENT_ONLY) is a dependency of W for eligibility under U3. The answer determines whether C1a becomes V_VALID with a category, or stays V_INVALID with no category. Until that is decided, a further round would only restate this one.

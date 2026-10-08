@@ -1,0 +1,72 @@
+GO-H1D bounded fresh review. You are an independent reviewer. Read-only. Do not modify, create, stage, or commit any file. Do not run any command that writes to any repository.
+
+FROZEN RULES (read first, in this order; these are the rules you apply):
+  1. work/go-h/eligibility-rubric.json, schema go-h-eligibility-rubric/6.0. Read these keys in full: "categories", "predicate_taxonomy", "lambda_rule", "ec10_equivalence", "absence_evidence", every key starting with "h1c_", and every key starting with "h1d_". Where an h1d_ key conflicts with an earlier key, the h1d_ key governs. Ignore other sections.
+  2. work/go-h/target-validity-rubric.v2.json (schema go-h-target-validity-rubric/2). It extends work/go-h/target-validity-rubric.json (schema /1). Read both.
+
+EVIDENCE:
+  - work/go-h/independent-review/h1d-probe-raw.txt contains source excerpts printed from exact historical git commits in the nixpkgs repository at /home/tandem/.cache/go-h/nixpkgs-exact. Excerpts are a starting point; you may read more of the same file at the same commit.
+  - You may run read-only git commands against /home/tandem/.cache/go-h/nixpkgs-exact, pinned to a commit: git -C <repo> show <sha>:<path>, git -C <repo> grep -n <pattern> <sha> -- <path>, git -C <repo> rev-parse. Every query must name a SHA. Working-tree reads are not evidence.
+  - Commits in play: E = e4c7d977153965496cbe73ff5631ca6a1118b347; B = e2497c3a5262687ff7aada0707bc754cca66396f; F = fdc3396349781c0dc2b495b6a320f62918bd63f6.
+  - Synthetic cases (labelled SYNTHETIC below) have no historical commit. Classify them as written; do not look for a commit for them.
+
+WHAT TO DO:
+  For each case below, state the following, using only the frozen rules and the evidence:
+    (a) dependency state of the watched option W on the changed predicate, one of DATA_DEPENDENT, CONTROL_DEPENDENT_ONLY, INDEPENDENT, with the gate chain if CONTROL_DEPENDENT_ONLY (C1-C2);
+    (b) predicate role (P_GATING, P_CONTROL, P_SELECTION, P_DATA_ONLY, P_UNKNOWN), or "not a predicate";
+    (c) category (E_DIRECT, E_INDIRECT, E_AMBIGUOUS, E_NO) for the hunk, or "none of the four" where the rules say the target is invalid;
+    (d) V state (V_VALID, V_INVALID, V_AMBIGUOUS) and, for V_INVALID, the first applicable named reason, or "not derived" under derivation_precondition;
+    (e) for every decision, the rule clause name that decides it.
+  If the rules are silent on any point, write "rules silent" and say what the silence affects. Do not invent a rule. Do not claim a callee resolution, an EQ level, or an absence beyond what the rules and evidence establish. Allow UNKNOWN and AMBIGUOUS wherever the rules or evidence give them. Do not propose a desired label in advance; derive each answer.
+
+  Do not consult any other file in work/go-h/ or reports/, or any earlier review record. The frozen rules and the evidence named above are the only inputs.
+
+CASES. Each case gives a watched option (W) and a changed hunk. Where a case names a real file, the file at the named commit is the source.
+
+  D1 CONTROL VS DATA
+    C1a (real, base B): nixos/modules/services/monitoring/beszel-agent.nix, lines 204-216 at B. W = services.beszel.agent.openFirewall. Hunk: the if expression at line 211 is changed.
+    C1b (real, base B): same file, the lib.mkIf on line 209 is changed. W = services.beszel.agent.openFirewall. Hunk: the condition cfg.openFirewall on line 209 is changed.
+
+  D2 FOREIGN-ONLY VS NO-WATCHED-GATE
+    C2a (SYNTHETIC): module declares option services.foo.port. Changed line: lib.mkIf config.boot.zfs.enabled { ... } where boot.zfs.enabled is declared in another module. W = services.foo.port.
+    C2b (SYNTHETIC): module declares option services.foo.port. Changed line: lib.mkIf (1 < 2) { ... }. W = services.foo.port. No predicate reads W.
+
+  D3 INVALID VS AMBIGUOUS
+    C3a (real, base E): nixos/modules/services/accessibility/speechd.nix, lines 36-48 at E. W = services.speechd.modules.<name> for a name not declared as an option. Hunk: a change to the default value of that key.
+    C3b (SYNTHETIC): a module with services.foo.<name> where the name comes from builtins.getEnv "X" (open domain). Changed line: config.services.foo.${builtins.getEnv "X"}.enable is used in a lib.mkIf condition. W = services.foo.bar (one specific name in the domain).
+
+  D4 RESOLVED VS UNRESOLVED CALLEE
+    C4a (SYNTHETIC; a library alias chain may be checked at E): let f = lib.filter; in f (x: x.enable) items. W = services.foo.enable (the lambda reads it through items). Classify the lambda role.
+    C4b (SYNTHETIC): let filter = myFilter; in filter (x: x.enable) items, where myFilter is a local helper with no visible definition. W as in C4a.
+    C4c (SYNTHETIC): with lib; filter (x: x.enable) items. W as in C4a.
+    C4d (real, F): nixos/modules/services/monitoring/beszel-agent.nix, line 54 at F: lib.filter (name: gpuCollectors.${name} ? package) activeCollectors. W = services.beszel.agent.environment.GPU_COLLECTOR (its declaration is not in the excerpt; state what you can establish).
+
+  D5 DECLARED VS FREEFORM-ONLY KEY
+    C5a (real, E): nixos/modules/services/audio/mpd.nix, lines 153-185 at E. W = services.mpd.settings.music_directory. Hunk: the default changed.
+    C5b (real, E): speechd.nix as in C3a. W = services.speechd.modules.<name> with <name> not declared.
+
+  D6 CLOSED VS OPEN NAMESPACE OR ENUM
+    C6a (real, E): nixos/modules/services/networking/ncdns.nix, lines 7-9, 189, 199, 207-209 at E, and every occurrence of cfgs in the file (use git grep). W = services.pdns-recursor.resolveNamecoin. Hunk: its default changed.
+    C6b (real, E): nixos/modules/services/web-apps/movim.nix, lines 476-484 and 622-628 at E. W = services.movim.database.type (enum). Hunk: a change to the option's default. Also state whether the computed key config.services.${cfg.database.type} at line 628 is closed and by which rule.
+    C6c (SYNTHETIC): a module with builtins.attrNames config.services and, elsewhere in the same file, a literal config.services.ncdns.enable. W = services.ncdns.enable. Hunk: a change to a lib.mkIf condition that reads it.
+    C6d (SYNTHETIC): same as C3b with the name given by config.services.${x} where x is a function parameter whose call sites are not in the file. W = services.foo.bar.
+
+  D7 HELPER ELIGIBILITY VS CALLER DATA POSITION AND EQUIVALENCE
+    C7a (real, E): lib/trivial.nix line 308 at E. W = services.locate.pruneBindMounts (declared in nixos/modules/misc/locate.nix lines 191-193 at E). Hunk: the if inside boolToYesNo is changed.
+    C7b (real, E): nixos/modules/misc/locate.nix line 244 at E. Same W. Hunk: the interpolated text on that line is changed.
+    C7c (real, E): nixos/modules/misc/locate.nix line 276 at E. Same W. Hunk: the call lib.boolToYesNo cfg.pruneBindMounts is rewritten to the inline form (if cfg.pruneBindMounts then "yes" else "no"). State whether the rewrite is equivalent, and under which class (ec10_equivalence / h1d_interprocedural I4).
+
+REPORT FORMAT. Plain text, at most 300 lines. One block per case:
+  CASE: <id>
+  dependency: <state and gate chain if any>
+  role: <role or "not a predicate">
+  category: <category, or "none of the four">
+  V: <V state> <reason if V_INVALID, or "not derived">
+  rule: <clause names that decide it>
+  ambiguity: <none, or "rules silent: <what it affects">, or a clause name and one-sentence description>
+
+Then a section "Distinctions", one line for each of D1-D7: "separated" or "not separated", followed by one sentence giving the reason and the cases.
+
+Then a section "Rule gaps": each gap as "<clause name>; <case that exposed it>; <one-sentence description>". Include a gap only where you had to reason beyond the rules.
+
+Keep to the format. Do not add a summary or a verdict; the controller decides the verdict.

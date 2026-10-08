@@ -1,0 +1,380 @@
+## A. G0(ii) primitives and alias chains at E (e4c7d977153965496cbe73ff5631ca6a1118b347)
+### A1 lib.mkIf: re-export header, definition, discharge documentation
+# nearest preceding inherit header for lib/default.nix:496 is line 482
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 482-482
+  482|       inherit (self.modules)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 496-496
+  496|         mkIf
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 71-71
+   71|       modules = callLibs ./modules.nix;
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/modules.nix lines 1579-1582
+ 1579|   mkIf = condition: content: {
+ 1580|     _type = "if";
+ 1581|     inherit condition content;
+ 1582|   };
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/modules.nix lines 1393-1398
+ 1393|   /**
+ 1394|     Given a config value, expand mkMerge properties, and discharge
+ 1395|     any mkIf conditions.  That is, this is the place where mkIf
+ 1396|     conditions are actually evaluated.  The result is a list of
+ 1397|     config values.  For example, ‘mkIf false x’ yields ‘[]’,
+ 1398|     ‘mkIf true x’ yields ‘[x]’, and
+
+### A2 lib.optionals: re-export header, definition
+# nearest preceding inherit header for lib/default.nix:289 is line 268
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 268-268
+  268|       inherit (self.lists)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 289-289
+  289|         optionals
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/lists.nix lines 836-839
+  836| 
+  837|     :::
+  838|   */
+  839|   optionals = cond: elems: if cond then elems else [ ];
+
+### A3 lib.optionalString: re-export header, definition
+# nearest preceding inherit header for lib/default.nix:350 is line 330
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 330-330
+  330|       inherit (self.strings)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 350-350
+  350|         optionalString
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/strings.nix lines 776-776
+  776|   optionalString = cond: string: if cond then string else "";
+
+### A4 lib.filter: builtins inherit, re-export, self/lists binding
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/lists.nix lines 4-4
+    4| { lib }:
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/lists.nix lines 18-25
+   18|   inherit (builtins)
+   19|     head
+   20|     tail
+   21|     length
+   22|     isList
+   23|     elemAt
+   24|     concatLists
+   25|     filter
+
+# nearest preceding inherit header for lib/default.nix:278 is line 268
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 268-268
+  268|       inherit (self.lists)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 268-268
+  268|       inherit (self.lists)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 278-278
+  278|         filter
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 58-58
+   58|       lists = callLibs ./lists.nix;
+
+### A5 lib.filterAttrs: definition, filter source inside attrsets.nix, re-export
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/attrsets.nix lines 14-19
+   14|   inherit (lib.lists)
+   15|     all
+   16|     concatLists
+   17|     concatMap
+   18|     elemAt
+   19|     filter
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/attrsets.nix lines 667-667
+  667|   filterAttrs = pred: set: removeAttrs set (filter (name: !pred name set.${name}) (attrNames set));
+
+# nearest preceding inherit header for lib/default.nix:218 is line 208
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 208-208
+  208|       inherit (self.attrsets)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 218-218
+  218|         filterAttrs
+
+### A6 lib.boolToYesNo: definition and re-export
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/trivial.nix lines 305-308
+  305|     boolToYesNo :: Bool -> String
+  306|     ```
+  307|   */
+  308|   boolToYesNo = b: if b then "yes" else "no";
+
+# nearest preceding inherit header for lib/default.nix:149 is line 134
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 134-134
+  134|       inherit (self.trivial)
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:lib/default.nix lines 149-149
+  149|         boolToYesNo
+
+### A8 rebinding of lib / builtins in beszel-agent.nix at F (inherit or pattern forms)
+# (end A8)
+## A7. Rebinding check in a caller at F (fdc3396349781c0dc2b495b6a320f62918bd63f6), beszel-agent.nix (lib.filter caller)
+# fdc3396349781c0dc2b495b6a320f62918bd63f6:nixos/modules/services/monitoring/beszel-agent.nix lines 1-4
+    1| {
+    2|   lib,
+    3|   config,
+    4|   pkgs,
+
+# fdc3396349781c0dc2b495b6a320f62918bd63f6:nixos/modules/services/monitoring/beszel-agent.nix lines 48-54
+   48|   activeCollectors = lib.optionals (!cfg.environment.SKIP_GPU) cfg.environment.GPU_COLLECTOR;
+   49| 
+   50|   collectorAttrs =
+   51|     attr: lib.unique (lib.concatMap (name: gpuCollectors.${name}.${attr} or [ ]) activeCollectors);
+   52| 
+   53|   gpuPackages = map (name: gpuCollectors.${name}.package) (
+   54|     lib.filter (name: gpuCollectors.${name} ? package) activeCollectors
+
+# rebinding grep for lib / builtins / let / with at F (none expected except with lib.<ns>)
+nixos/modules/services/monitoring/beszel-agent.nix:7:let
+nixos/modules/services/monitoring/beszel-agent.nix:81:  meta.maintainers = with lib.maintainers; [
+nixos/modules/services/monitoring/beszel-agent.nix:144:              with lib.types;
+
+## B. Control dependence: enclosing gate versus inner predicate (e2497c3a5262687ff7aada0707bc754cca66396f)
+# e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix lines 22-26
+   22|       description = "Data directory of beszel-agent.";
+   23|     };
+   24|     openFirewall = (lib.mkEnableOption "") // {
+   25|       description = "Whether to open the firewall port (default 45876).";
+   26|     };
+
+# e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix lines 204-216
+  204|         Type = "simple";
+  205|         UMask = 27;
+  206|       };
+  207|     };
+  208| 
+  209|     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
+  210|       (
+  211|         if (builtins.hasAttr "PORT" cfg.environment) then
+  212|           (lib.strings.toInt cfg.environment.PORT)
+  213|         else
+  214|           45876
+  215|       )
+  216|     ];
+
+
+## C. Freeform keys versus declared suboptions (e4c7d977153965496cbe73ff5631ca6a1118b347)
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/audio/mpd.nix lines 153-185
+  153|       settings = lib.mkOption {
+  154|         type = lib.types.submodule {
+  155|           freeformType =
+  156|             let
+  157|               inherit (lib.types)
+  158|                 oneOf
+  159|                 attrsOf
+  160|                 listOf
+  161|                 str
+  162|                 int
+  163|                 bool
+  164|                 path
+  165|                 ;
+  166|               atomType = oneOf [
+  167|                 str
+  168|                 int
+  169|                 bool
+  170|                 path
+  171|               ];
+  172|             in
+  173|             attrsOf (oneOf [
+  174|               atomType
+  175|               (listOf (attrsOf atomType))
+  176|             ]);
+  177|           options = {
+  178|             music_directory = lib.mkOption {
+  179|               type = with lib.types; either path (strMatching "([a-z]+)://.+");
+  180|               default = "${cfg.dataDir}/music";
+  181|               defaultText = lib.literalExpression ''"''${dataDir}/music"'';
+  182|               description = ''
+  183|                 The directory or URI where MPD reads music from. If left
+  184|                 as the default value this directory will automatically be created before
+  185|                 the MPD server starts, otherwise the sysadmin is responsible for ensuring
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/accessibility/speechd.nix lines 36-48
+   36|     modules = mkOption {
+   37|       type = with lib.types; submodule { freeformType = attrsOf lines; };
+   38|       default = { };
+   39|       description = ''
+   40|         Configuration files of output modules.
+   41|       '';
+   42|       example = {
+   43|         generic-epos = ''
+   44|           AddVoice        "cs"  "male1"   "kadlec"
+   45|           AddVoice        "sk"  "male1"   "bob"
+   46|         '';
+   47|       };
+   48|     };
+
+# count of freeformType declarations in nixos/modules/services at E
+lines=534
+
+## D. Namespace closure (e4c7d977153965496cbe73ff5631ca6a1118b347)
+### D1 literal-leaf alias: ncdns whole-namespace alias with only literal accesses
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/ncdns.nix lines 8-9
+    8|   cfgs = config.services;
+    9|   cfg = cfgs.ncdns;
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/ncdns.nix lines 189-189
+  189|     services.pdns-recursor = lib.mkIf cfgs.pdns-recursor.resolveNamecoin {
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/ncdns.nix lines 207-209
+  207|         namecoinrpcaddress = "${cfgs.namecoind.rpc.address}:${toString cfgs.namecoind.rpc.port}";
+  208|         namecoinrpcusername = cfgs.namecoind.rpc.user;
+  209|         namecoinrpcpassword = cfgs.namecoind.rpc.password;
+
+### D1b every use of the ncdns whole-namespace binding cfgs
+nixos/modules/services/networking/ncdns.nix:8:  cfgs = config.services;
+nixos/modules/services/networking/ncdns.nix:9:  cfg = cfgs.ncdns;
+nixos/modules/services/networking/ncdns.nix:189:    services.pdns-recursor = lib.mkIf cfgs.pdns-recursor.resolveNamecoin {
+nixos/modules/services/networking/ncdns.nix:199:    systemd.services.pdns-recursor = lib.mkIf cfgs.pdns-recursor.resolveNamecoin {
+nixos/modules/services/networking/ncdns.nix:207:        namecoinrpcaddress = "${cfgs.namecoind.rpc.address}:${toString cfgs.namecoind.rpc.port}";
+nixos/modules/services/networking/ncdns.nix:208:        namecoinrpcusername = cfgs.namecoind.rpc.user;
+nixos/modules/services/networking/ncdns.nix:209:        namecoinrpcpassword = cfgs.namecoind.rpc.password;
+### D2 whole-namespace iteration over config.services (expected: none)
+# (end D2)
+### D2s SYNTHETIC whole-namespace consumption (no historical SHA)
+  let cfgs = config.services; in builtins.attrNames cfgs
+  -> whole-namespace consumption; literal enumeration of cfgs.<name> does not close it
+### D3 dynamic key with unknown domain: rancher config.services.${name}
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix lines 8-8
+    8|   mkRancherModule =
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix lines 22-25
+   22|     }:
+   23|     let
+   24|       cfg = config.services.${name};
+   25| 
+
+### D3b every caller of mkRancherModule in nixos/ (domain of the rancher name key)
+nixos/modules/services/cluster/rancher/default.nix:8:  mkRancherModule =
+nixos/modules/services/cluster/rancher/default.nix:972:    # pass mkRancherModule explicitly instead of via
+nixos/modules/services/cluster/rancher/default.nix:977:        inherit mkRancherModule;
+nixos/modules/services/cluster/rancher/k3s.nix:4:  mkRancherModule,
+nixos/modules/services/cluster/rancher/k3s.nix:9:  baseModule = mkRancherModule {
+nixos/modules/services/cluster/rancher/rke2.nix:4:  mkRancherModule,
+nixos/modules/services/cluster/rancher/rke2.nix:9:  baseModule = mkRancherModule {
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix lines 976-984
+  976|         inherit config lib;
+  977|         inherit mkRancherModule;
+  978|       };
+  979|     in
+  980|     [
+  981|       (import ./k3s.nix args)
+  982|       (import ./rke2.nix args)
+  983|     ];
+  984| 
+
+### D4 finite literal-list domain: vault-agent config.services.${flavour}
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/security/vault-agent.nix lines 120-126
+  120| {
+  121|   options = {
+  122|     services.consul-template.instances = commonOptions { pkgName = "consul-template"; };
+  123|     services.vault-agent.instances = commonOptions {
+  124|       pkgName = "vault";
+  125|       flavour = "vault-agent";
+  126|     };
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/security/vault-agent.nix lines 129-149
+  129|   config = lib.mkMerge (
+  130|     map
+  131|       (
+  132|         flavour:
+  133|         let
+  134|           cfg = config.services.${flavour};
+  135|         in
+  136|         lib.mkIf (cfg.instances != { }) {
+  137|           systemd.services = lib.mapAttrs' (
+  138|             name: instance:
+  139|             lib.nameValuePair "${flavour}-${name}" (createAgentInstance {
+  140|               inherit name instance flavour;
+  141|             })
+  142|           ) cfg.instances;
+  143|         }
+  144|       )
+  145|       [
+  146|         "consul-template"
+  147|         "vault-agent"
+  148|       ]
+  149|   );
+
+### D5 finite enum domain: movim config.services.${cfg.database.type}
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/movim.nix lines 476-484
+  476|       database = {
+  477|         type = mkOption {
+  478|           type = types.enum [
+  479|             "mariadb"
+  480|             "postgresql"
+  481|           ];
+  482|           example = "mariadb";
+  483|           default = "postgresql";
+  484|           description = "Database engine to use.";
+
+nixos/modules/services/web-apps/movim.nix:58:        // lib.optionalAttrs (cfg.database.type == "postgresql") {
+nixos/modules/services/web-apps/movim.nix:61:        // lib.optionalAttrs (cfg.database.type == "mariadb") {
+nixos/modules/services/web-apps/movim.nix:174:    .${cfg.database.type};
+nixos/modules/services/web-apps/movim.nix:626:              .${cfg.database.type};
+nixos/modules/services/web-apps/movim.nix:628:            DB_PORT = config.services.${cfg.database.type}.settings.port;
+nixos/modules/services/web-apps/movim.nix:793:      mysql = mkIf (cfg.database.createLocally && cfg.database.type == "mariadb") {
+nixos/modules/services/web-apps/movim.nix:805:      postgresql = mkIf (cfg.database.createLocally && cfg.database.type == "postgresql") {
+nixos/modules/services/web-apps/movim.nix:23:  cfg = config.services.movim;
+nixos/modules/services/web-apps/movim.nix:628:            DB_PORT = config.services.${cfg.database.type}.settings.port;
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/movim.nix lines 622-628
+  622|               {
+  623|                 "postgresql" = "pgsql";
+  624|                 "mariadb" = "mysql";
+  625|               }
+  626|               .${cfg.database.type};
+  627|             DB_HOST = "localhost";
+  628|             DB_PORT = config.services.${cfg.database.type}.settings.port;
+
+
+## E. Helper with internal predicate and call-context identity (e4c7d977153965496cbe73ff5631ca6a1118b347)
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/misc/locate.nix lines 191-193
+  191|     pruneBindMounts = lib.mkOption {
+  192|       type = lib.types.bool;
+  193|       default = false;
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/misc/locate.nix lines 242-245
+  242|         PRUNENAMES="${lib.concatStringsSep " " cfg.pruneNames}"
+  243|         PRUNEPATHS="${lib.concatStringsSep " " cfg.prunePaths}"
+  244|         PRUNE_BIND_MOUNTS="${lib.boolToYesNo cfg.pruneBindMounts}"
+  245|       '';
+
+# e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/misc/locate.nix lines 272-277
+  272|               (lib.getExe' cfg.package "updatedb")
+  273|               "--output"
+  274|               cfg.output
+  275|               "--prune-bind-mounts"
+  276|               (lib.boolToYesNo cfg.pruneBindMounts)
+  277|             ]
+
+# all boolToYesNo call sites in nixos/ at E
+count=66
+# boolToYesNo call sites in nixos/modules/misc/ and nixos/modules/config/ at E
+nixos/modules/config/getaddrinfo.nix:21:      "reload ${lib.boolToYesNo cfg.reload}"
+nixos/modules/misc/locate.nix:244:        PRUNE_BIND_MOUNTS="${lib.boolToYesNo cfg.pruneBindMounts}"
+nixos/modules/misc/locate.nix:276:              (lib.boolToYesNo cfg.pruneBindMounts)
+
+## F. Exact-SHA sanity: definitions cited above are present at the pinned commits
+e4c7d977153965496cbe73ff5631ca6a1118b347 resolves
+e2497c3a5262687ff7aada0707bc754cca66396f resolves
+fdc3396349781c0dc2b495b6a320f62918bd63f6 resolves
+
+## F2. Tree SHAs for the pinned commits (H1D.4 identity)
+commit e4c7d977153965496cbe73ff5631ca6a1118b347 tree 21fd84ae4c901616d8f70c57cb0841fc01405142
+commit e2497c3a5262687ff7aada0707bc754cca66396f tree d181338dec379080ba51c4e7ca60d72b66abbca0
+commit fdc3396349781c0dc2b495b6a320f62918bd63f6 tree 6e06015b2a51e7180b27eb546e435bc3242db336
+# primitive definition blob SHAs at E
+lib/modules.nix blob 74ff0f04eb1e15d7063f2dc606bf5385b7e4c890
+lib/lists.nix blob 819b6d7fc6ed5a31d13b33d8fce9b2bab508f489
+lib/strings.nix blob ccd8457289b58216ddaec1f5533fb5a0733663ea
+lib/attrsets.nix blob a70567260a51daad33c1cb87813c4922c698f126
+lib/trivial.nix blob f333440ee384619abf43ec01b81a1e5703dadd57
+lib/default.nix blob 56baba8708c5f72254d83d7f218097462def4c62
+
+## G. Synthetic controls for H1D.3 callee identity (no historical SHA)
+  (s1) let f = lib.filter; in f pred xs          -> callee resolves only if lib binding is exact-SHA proven
+  (s2) let filter = myFilter; in filter pred xs  -> myFilter body unresolved -> P_UNKNOWN
+  (s3) with lib; filter pred xs                  -> BARE, reachable through with -> P_UNKNOWN unless resolved

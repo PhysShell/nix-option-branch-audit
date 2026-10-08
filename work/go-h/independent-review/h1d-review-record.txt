@@ -1,0 +1,201 @@
+GO-H1D bounded fresh review: record of the reviewer's report
+
+Provenance: fresh general-purpose agent (agent id aad2327e3388196b6), not a fork. Prompt: work/go-h/independent-review/h1d-reviewer-prompt.txt. Rules: work/go-h/eligibility-rubric.json (schema go-h-eligibility-rubric/6.0, h1d_ keys governing), work/go-h/target-validity-rubric.v2.json, work/go-h/target-validity-rubric.json. Evidence: work/go-h/independent-review/h1d-probe-raw.txt and read-only pinned git at E (e4c7d977), B (e2497c3a), F (fdc33963). The reviewer reports it read no other file in work/go-h/ or reports/.
+This file transcribes the report from the agent's hand-back. It is not a byte copy. Indentation and frame text are removed.
+
+No wording refinement was applied after this review. Reason: the reviewer's gaps are rule silences and conflicts, not wording defects. See the controller note at the end.
+
+REPORT
+
+Process note (reviewer): read the required rubric keys and sections, target-validity v1 and v2, and h1d-probe-raw.txt. Ran read-only git show and grep at E, B and F.
+
+CASE: C1a
+dependency: CONTROL_DEPENDENT_ONLY on openFirewall. Gate chain: beszel-agent.nix:209 lib.mkIf cfg.openFirewall (G0(ii), DATA_DEPENDENT on W, C2 applies) -> :211 if. The outer :89 lib.mkIf cfg.enable is INDEPENDENT of W. The if at :211 reads only cfg.environment (builtins.hasAttr "PORT" cfg.environment), so it has no W read.
+role: P_CONTROL (G0(i), own position per I1).
+category: E_NO
+V: V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY (V1 and V3 pass at B; V2 not evaluated because option_prefix is not supplied).
+rule: C1, C3; h1d_validity_states precedence 1 and invalid_reasons NO_WATCHED_PREDICATE_DEPENDENCY; predicate_taxonomy (E-eligibility needs a watched dependency); categories E_NO.
+ambiguity: rules silent: derivation_precondition says "changed predicate on W" without defining it for CONTROL_DEPENDENT_ONLY predicates. Read as satisfied, following the NO_WATCHED example. Under a strict DATA-only reading the target is not derived, and G1 cannot route it because the changed term is P_CONTROL, not P_DATA_ONLY. E_NO is used although the E_NO clause names T_NONE, which needs an absence record that this case does not have.
+
+CASE: C1b
+dependency: DATA_DEPENDENT on openFirewall. Direct read at beszel-agent.nix:209 (cfg.openFirewall; cfg = config.services.beszel.agent at :8, an exact alias satisfying T1-T6). W declared at :24.
+role: P_GATING (G0(ii), first argument of lib.mkIf; B pinned by lib/modules.nix:1579-1582 and lib/default.nix:71,482,496).
+category: E_DIRECT (the only operand is cfg.openFirewall, declared in the same file).
+V: V_VALID (precedence 3; V1 and V3 pass; V2 not evaluated; S1 is reviewer-owned).
+rule: h1c_gating_vs_data G0(ii); h1c_mixed_predicate M1 and M4; h1c_causal_relevance direct read; h1d_control_dependence C1 and C4; h1d_validity_states precedence 3.
+ambiguity: none for dependency or category. V2 and S1 are unevaluated inputs, not rule silence.
+
+CASE: C2a
+dependency: INDEPENDENT of W. No read of services.foo.port. The only operand is config.boot.zfs.enabled, which is foreign.
+role: P_UNKNOWN (G2) under K5: lib.mkIf has no SHA, and K5 gives P_UNKNOWN for a lib path without a SHA. If "as written" is read as the G0(ii) lib.mkIf, the role is P_GATING. The V and category results are the same under either reading.
+category: none of the four (target V_INVALID).
+V: V_INVALID FOREIGN_ONLY_DEPENDENCY (the predicate reads no W path, is not gated by W, and all its operands are foreign). No earlier mechanical reason is evidenced; option_prefix is not supplied.
+rule: h1d_validity_states invalid_reasons FOREIGN_ONLY_DEPENDENCY; h1c_mixed_predicate M2; aggregation_note (V_INVALID carries no E category).
+ambiguity: rules silent: derivation_precondition, since neither operand relation to W holds. Under the reading used in C1a the hunk is in W's scope and the target is derived. Under a strict reading it is not derived. Also, a P_UNKNOWN predicate with option operands is E_AMBIGUOUS by the taxonomy, while V_INVALID carries no E category. The reviewer followed V_INVALID.
+
+CASE: C2b
+dependency: INDEPENDENT of W. No operands at all (1 < 2).
+role: P_UNKNOWN (K5) under the strict reading; P_GATING as written. No option operand, so the E_AMBIGUOUS clause does not apply.
+category: none of the four.
+V: V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY (INDEPENDENT of W, no foreign operand; the rubric's own example is a predicate over constants).
+rule: h1d_validity_states precedence 1 and invalid_reasons NO_WATCHED_PREDICATE_DEPENDENCY; target-validity v2 NO_WATCHED row.
+ambiguity: the derivation_precondition gap from C2a applies. The role gap from C2a applies, with no effect on V.
+
+CASE: C3a
+dependency: no changed predicate. The hunk is the default at speechd.nix:38 (default = { };). That default belongs to services.speechd.modules (declared at :36, option block at :18), not to a key. W names a key matched only by freeformType (:37 submodule with freeformType and no options).
+role: not a predicate.
+category: none of the four.
+V: V_INVALID FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION. This assumes option_prefix is not services.speechd.modules, which the case does not supply. With that prefix the first reason would be PREFIX_CONTRACT_VIOLATION.
+rule: h1d_freeform F2; h1d_validity_states invalid_reasons (order); target-validity v2 invalid_reasons_in_precedence_order.
+ambiguity: rules silent: C4 speaks of an option-semantic change to W. The changed default is on the parent option, and the rules do not say whether a parent-default change reaches a child key. The V reason does not depend on this, because the F2 reason is mechanical. The case's phrase "default value of that key" does not match the source line.
+
+CASE: C3b
+dependency: UNRESOLVED. config.services.foo.${builtins.getEnv "X"}.enable is a computed key over an open domain. It cannot be established as DATA_DEPENDENT on services.foo.bar, and it cannot be established as INDEPENDENT.
+role: P_UNKNOWN (G2): the boolean's consumer is the lib.mkIf of a synthetic case (K5).
+category: E_AMBIGUOUS.
+V: V_AMBIGUOUS (DYNAMIC_KEY_OPEN on the only dependency path; precedence 2, so not INVALID).
+rule: h1d_namespace_closure N3 and N5; h1d_validity_states precedence 2 and ambiguity_states; categories E_AMBIGUOUS.
+ambiguity: rules silent: the three-state dependency set in h1d_control_dependence has no UNRESOLVED state. The reviewer used the V ambiguity state directly.
+
+CASE: C4a
+dependency: lambda reads W through items. The case does not state items' option path, so the lambda-over-option-attrset trace cannot be completed from the case.
+role: P_UNKNOWN. f = lib.filter has no shown lib header binding (K2a unverified), no SHA (K5), so the callee is CALLEE_UNKNOWN (K3). The spelling "filter" is not a resolution (K1). The case's parenthetical "a library alias chain may be checked at E" cannot be applied, because the case gives no lib header binding and the case has no commit.
+category: E_AMBIGUOUS (P_UNKNOWN with option operand).
+V: V_AMBIGUOUS (CALLEE_UNKNOWN on the only dependency path).
+rule: h1d_callee_resolution K1, K2, K3, K5; h1c_callee_resolution R2, R5; h1c_ambiguity_policy; h1d_validity_states precedence 2 and ambiguity_states.
+ambiguity: rules silent on whether a case parenthetical may license reading library identity at E, given that the case also says not to look for a commit. The reviewer did not borrow E.
+
+CASE: C4b
+dependency: as C4a; not established.
+role: P_UNKNOWN. filter is bound to myFilter, which has no static binding (R3 fails), so R2 fails and K3 gives CALLEE_UNKNOWN. K1 applies.
+category: E_AMBIGUOUS.
+V: V_AMBIGUOUS (CALLEE_UNKNOWN on the only dependency path; the helper is also HELPER_UNRESOLVED under I5).
+rule: h1d_callee_resolution K1, K3; h1c_callee_resolution R2, R3, R5; h1d_interprocedural I5; h1d_validity_states precedence 2.
+ambiguity: as C4a for items' path.
+
+CASE: C4c
+dependency: as C4a; not established.
+role: P_UNKNOWN. filter is BARE and reachable only through an enclosing with lib, so R3 fails ("no enclosing with between binding and use"). CALLEE_UNKNOWN; K1 applies.
+category: E_AMBIGUOUS.
+V: V_AMBIGUOUS (CALLEE_UNKNOWN on the only dependency path).
+rule: h1c_callee_resolution R3, R5; h1d_callee_resolution K1; h1d_validity_states precedence 2.
+ambiguity: as C4a for items' path.
+
+CASE: C4d
+dependency: DATA_DEPENDENT on services.beszel.agent.environment.GPU_COLLECTOR. Path: activeCollectors (beszel-agent.nix:48 at F, a let binding whose RHS is lib.optionals (!cfg.environment.SKIP_GPU) cfg.environment.GPU_COLLECTOR) -> lambda parameter name iterating activeCollectors (lib.filter at :54) -> predicate gpuCollectors.${name} ? package. Accepted edge: lambda parameter iterating an option-derived collection. W is declared at beszel-agent.nix:141, a suboption of environment (:121, freeformType plus options), so it is an F1 declared suboption.
+role: P_SELECTION. Callee resolved at F: header { lib, config, pkgs, ... }: (:1-5, no @ pattern); the let at :7 has no lib binding (grep); lib.filter -> lib/default.nix:278 filter <- :268 inherit (self.lists) <- lib/lists.nix:25 filter from inherit (builtins) at :18. Three steps, within L1 (at F, not only at E). gpuCollectors (:14) is a static let attrset.
+category: E_DIRECT (predicate and declaration both in beszel-agent.nix; M4).
+V: V_VALID (precedence 3; V1 and V3 pass; V2 not evaluated; S1 is reviewer-owned).
+rule: h1d_callee_resolution K2, K4; h1c_callee_resolution R1; h1d_gating_primitives lib.filter entry; lambda_rule predicate_lambda and eligibility; h1c_causal_relevance accepted edges; h1d_validity_states precedence 3.
+ambiguity: rules silent in the permitted sections on the path through a let binding whose RHS is a lib.optionals call. h1c_let_alias_transparency says a function-call RHS is not transparent. The edge is accepted only through the lambda-iteration clause. The let_binding_rule that the categories and lambda rule cite is not in the reviewer's permitted sections.
+
+CASE: C5a
+dependency: DATA_DEPENDENT on services.mpd.settings.music_directory. Direct read at mpd.nix:438: cfg.settings.music_directory == "/var/lib/${name}/music" inside lib.optionals (cfg = config.services.mpd at :13, an alias). W declared at mpd.nix:178 inside the settings submodule options (:177), an F1 declared suboption.
+role: P_GATING (G0(ii), first argument of lib.optionals; definition lib/lists.nix:839 at E, reached via lib/default.nix:268, 289).
+category: E_DIRECT (declaration and predicate both in mpd.nix).
+V: V_VALID (precedence 3; V1 and V3 pass; V2 not evaluated; S1 is reviewer-owned). The default change at :180 satisfies C4 through :438.
+rule: h1c_gating_vs_data G0(ii); h1c_causal_relevance direct read; h1d_control_dependence C4; h1d_freeform F1; h1d_validity_states precedence 3.
+ambiguity: rules silent on whether a submodule-typed mkOption (settings, mpd.nix:153) counts as an intermediate container under target-validity V3. Rules silent on mpd.nix:348 (mkRenamedOptionModule with a literal option path), which is a rename target, not a G0 or G1 position. Neither changes the V or category result.
+
+CASE: C5b
+dependency: no predicate. W is a freeform-only key (speechd.nix:37).
+role: not a predicate.
+category: none of the four.
+V: V_INVALID FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION (same assumptions as C3a).
+rule: h1d_freeform F2; h1d_validity_states invalid_reasons.
+ambiguity: the case gives no hunk. The reviewer used the C3a hunk (default at :38). The parent-default gap from C3a applies.
+
+CASE: C6a
+dependency: DATA_DEPENDENT on services.pdns-recursor.resolveNamecoin. Direct reads at ncdns.nix:189 and :199 (lib.mkIf cfgs.pdns-recursor.resolveNamecoin). cfgs = config.services at :8 is the only binding of cfgs in the file, so it is an exact alias under T1-T6. Namespace closure N1 holds: all occurrences of cfgs are :8, :9, :189, :199, :207, :208, :209, and the selections are literal, with domain {ncdns, pdns-recursor, namecoind}. The closure is a record only; V does not depend on it.
+role: P_GATING (G0(ii), lib.mkIf; pinned at E).
+category: E_DIRECT. W declared at ncdns.nix:175 in the same file, so the category does not depend on which line holds the default hunk.
+V: V_VALID (precedence 3; V1 and V3 pass; V2 not evaluated; S1 is reviewer-owned).
+rule: h1c_let_alias_transparency T1-T6; h1c_gating_vs_data G0(ii); h1d_namespace_closure N1 (record); h1d_control_dependence C4; h1d_validity_states precedence 3.
+ambiguity: none for V or category. The case's listed line range does not include the declaration at :175 where the default lies.
+
+CASE: C6b
+dependency: DATA_DEPENDENT on services.movim.database.type. Direct reads at movim.nix:793 and :805: mkIf (cfg.database.createLocally && cfg.database.type == ...). cfg = config.services.movim at :23 is an alias. Declaration at movim.nix:477-481 (types.enum literal list), default "postgresql" at :483.
+role: P_GATING for :793 and :805 (G0(ii) mkIf, inherited from lib at :9-20 so R3 resolves; the && is in a G0 position per G3). For :58 and :61 (optionalAttrs), lib.optionalAttrs is defined at lib/attrsets.nix:1492 at E but has no H1D.4 table entry, so it is P_UNKNOWN until pinned. Those lines are not needed for the result.
+category: E_DIRECT (declaration and gates are in movim.nix; createLocally is also in-module).
+V: V_VALID (precedence 3; V1 and V3 pass; V2 not evaluated; S1 is reviewer-owned).
+Computed key at movim.nix:628, config.services.${cfg.database.type}: CLOSED by h1d_namespace_closure N3(ii) via N4. The receiver is exactly the chain cfg.database.type = services.movim.database.type, the option type is types.enum ["mariadb" "postgresql"] at :478-481 (span recorded), and no other binding supplies x. Domain {mariadb, postgresql}. The literal attrset at :622-626 indexed at :626 is a value lookup, not a namespace receiver.
+rule: h1c_gating_vs_data G0(ii) and G3; h1c_mixed_predicate M1; h1d_namespace_closure N3(ii) and N4; h1d_validity_states precedence 3.
+ambiguity: rules silent on the status of lib.optionalAttrs at :58 and :61 (not pinned in the table). No effect on this result.
+
+CASE: C6c
+dependency: DATA_DEPENDENT on services.ncdns.enable. Direct read in the changed lib.mkIf condition (direct-read edge). The open receiver builtins.attrNames config.services (N2) is not on this dependency path.
+role: P_UNKNOWN (K5, synthetic lib.mkIf). As written, P_GATING.
+category: E_AMBIGUOUS under both readings of the role. The declaring module of services.ncdns.enable is not stated, so declaration_module_governs cannot classify it as E_DIRECT or E_INDIRECT.
+V: V_VALID (precedence 3; a DATA_DEPENDENT changed predicate. The open namespace receiver is off the only dependency path, so precedence 2 does not apply.)
+rule: h1d_namespace_closure N2; h1d_validity_states precedence 2 and 3; h1c_causal_relevance direct read; categories E_AMBIGUOUS.
+ambiguity: rules silent on the declaring module of services.ncdns.enable for synthetic cases. Rules are silent on whether an open receiver elsewhere in the module affects V when it is not on the dependency path; precedence 2 implies it does not.
+
+CASE: C6d
+dependency: UNRESOLVED. config.services.${x} is a computed key whose domain is open, because x is a function parameter whose call sites are outside the file (N3(i) requires every call site). It cannot be established as DATA_DEPENDENT or INDEPENDENT on services.foo.bar.
+role: P_UNKNOWN (as C3b).
+category: E_AMBIGUOUS.
+V: V_AMBIGUOUS (DYNAMIC_KEY_OPEN on the only dependency path; precedence 2).
+rule: h1d_namespace_closure N3(i) and N5; h1d_validity_states precedence 2 and ambiguity_states.
+ambiguity: rules silent on an UNRESOLVED dependency state, as in C3b.
+
+CASE: C7a
+dependency: DATA_DEPENDENT on services.locate.pruneBindMounts through I2. The helper parameter b receives cfg.pruneBindMounts at locate.nix:244 and :276 (cfg = config.services.locate at :10, an alias). One W-derived call site is positive evidence. W declared at locate.nix:191-193, in a different module from the helper.
+role: P_CONTROL (I1, the if inside the helper, G0(i)).
+category: E_INDIRECT (I3: helper declared in lib/trivial.nix, a different module from W's declaration in locate.nix).
+V: V_VALID (precedence 3; V1-V3 are run against locate.nix and pass; V2 not evaluated; S1 is reviewer-owned).
+rule: h1d_interprocedural I1, I2, I3; h1d_callee_resolution K2 (boolToYesNo at locate.nix:244, :276 resolves through lib/default.nix:53, :134, :149 to the lambda at trivial.nix:308, read at E with span recorded, so I5 does not fire); h1d_validity_states precedence 3.
+ambiguity: rules silent on which module V1-V3 run against when the changed predicate is in lib/trivial.nix. The reviewer used locate.nix. The let_binding_rule that the category clause cites is outside the permitted sections.
+
+CASE: C7b
+dependency: the call-site argument is W-derived (I2), but the changed term is string interpolation. No predicate changes.
+role: P_DATA_ONLY (G1, string interpolation).
+category: E_NO (I3: a call-site change whose argument is in a text-interpolation data position is E_NO for that hunk).
+V: not derived (derivation_precondition: no changed predicate and no option-semantic change to W; the hunk is not reported as V_INVALID).
+rule: h1d_validity_states derivation_precondition; G1_data_only; h1d_interprocedural I3 caller_positions; categories E_NO.
+ambiguity: none. A change to the literal text on that line outside the interpolation is also string data, with the same result.
+
+CASE: C7c
+dependency: DATA_DEPENDENT on services.locate.pruneBindMounts. The new if's condition reads cfg.pruneBindMounts directly (locate.nix:276, cfg alias at :10).
+role: P_CONTROL for the new if (I1, own position, G0(i)). The surrounding list element is a data position for the old call.
+category: E_AMBIGUOUS (EC10). The rewrite of lib.boolToYesNo into an inline conditional is L2 (lib/trivial.nix:308 is a lambda, not an alias), so EQ3. Justifying it needs the definition outside the expression, which forbidden_automatic excludes. EC10_AUTOMATIC is false, so the decision is reviewer-owned. Equivalence: the definition at E is "if b then yes else no", and the rewrite substitutes b with cfg.pruneBindMounts, so the two are substantively the same. The rubric does not establish equivalence at EQ0-EQ2, so no equivalence is claimed here.
+V: V_VALID (precedence 3, from the new DATA_DEPENDENT predicate; V1-V3 on locate.nix pass; V2 not evaluated; S1 is reviewer-owned).
+rule: ec10_equivalence (levels EQ3, forbidden_automatic, decision); h1c_library_binding L2; h1d_interprocedural I1, I3, I4; categories E_AMBIGUOUS; h1d_validity_states precedence 3.
+ambiguity: rules silent on whether a pending EQ3 rewrite that introduces a DATA_DEPENDENT predicate is a "changed predicate" for V. The reviewer gave V from the predicate and the category from EC10. I1 and I3 conflict for this caller position: I3 gives E_NO for a data-position call-site change, while I1 gives the new if P_CONTROL at its own position. The reviewer applied EC10.
+
+Distinctions
+D1: separated. C1a is CONTROL_DEPENDENT_ONLY and gives V_INVALID NO_WATCHED_PREDICATE_DEPENDENCY; C1b is a direct DATA_DEPENDENT gate and gives V_VALID.
+D2: separated. C2a reads a foreign option and gives FOREIGN_ONLY_DEPENDENCY; C2b reads no operand and gives NO_WATCHED_PREDICATE_DEPENDENCY. Both are none of the four.
+D3: separated. C3a is V_INVALID by the mechanical freeform reason; C3b is V_AMBIGUOUS because an open dynamic key lies on the only dependency path.
+D4: separated. C4d resolves (P_SELECTION, E_DIRECT, V_VALID); C4a-C4c stay CALLEE_UNKNOWN (P_UNKNOWN, E_AMBIGUOUS, V_AMBIGUOUS) for three different reasons (K3/K5, R2, R3).
+D5: separated. C5a is a declared suboption (F1, V_VALID, E_DIRECT); C5b is freeform-only (F2, V_INVALID).
+D6: separated. C6c (open whole-namespace receiver, off the dependency path) gives V_VALID; C6d (open computed key on the dependency path) gives V_AMBIGUOUS. The closed C6a and C6b do not change V, so closure matters only where the receiver lies on the path.
+D7: separated. C7a is a helper predicate reached through I2 (E_INDIRECT, V_VALID); C7b is a caller data position (E_NO, not derived); C7c is an EC10 rewrite (E_AMBIGUOUS).
+
+Rule gaps (as reported)
+1. derivation_precondition (h1d_validity_states); C1a, C2a, C2b, C3a. "A changed predicate on W" is undefined for predicates that are CONTROL_DEPENDENT_ONLY or INDEPENDENT of W. Under a strict DATA-only reading, C1a, C2a and C2b are not derived.
+2. G1_data_only and derivation_precondition; C1a. A non-derived hunk is routed to G1, but G1 presupposes a P_DATA_ONLY boolean, and the C1a changed term is P_CONTROL.
+3. categories E_NO; C1a. The E_NO clause names T_NONE (absence record), but C1 gives a non-dependence without an absence record.
+4. h1d_gating_primitives "unlisted" and K5; C2a, C2b, C3b, C4a-C4c, C6c, C6d. Synthetic cases name lib.mkIf and lib.filter with no SHA. K5 gives P_UNKNOWN, while "classify as written" points the other way. The V and category outcomes are the same under both readings, except that C6c's category is E_AMBIGUOUS either way.
+5. h1d_gating_primitives (table pins E only) and K2 (same-SHA resolution); C1b, C4d. The reviewer pinned lib.mkIf at B and lib.filter at F by direct reads, not by table entries.
+6. h1d_gating_primitives; C6b. lib.optionalAttrs (movim.nix:58, 61) is defined at E (lib/attrsets.nix:1492) but has no table entry, so it is P_UNKNOWN under the rule.
+7. let_binding_rule (cited by categories, lambda_rule and I3) and h1c_let_alias_transparency (function-call RHS is not transparent); C4d. The GPU_COLLECTOR path through the activeCollectors let binding is accepted only through the lambda-iteration clause, and the governing let rule is outside the reviewer's permitted sections.
+8. h1d_control_dependence (state set); C3b, C6d. The three dependency states have no UNRESOLVED state, so an open dynamic key on the only path has no dependency state, only a V ambiguity state.
+9. h1d_control_dependence C4; C3a, C5b. C4 names an option-semantic change "to W", but the default at speechd.nix:38 belongs to the parent option, and the rules do not say whether it reaches a child key.
+10. h1d_validity_states precedence 3 and ec10_equivalence decision; C7c. Rules are silent on whether a pending EQ3 rewrite that introduces a DATA_DEPENDENT predicate counts as a changed predicate for V.
+11. h1d_interprocedural I1 and I3; C7c (and C7b). I3 gives E_NO for a data-position call-site change, while I1 gives the new if P_CONTROL at its own position. The reviewer applied EC10 and reached E_AMBIGUOUS.
+12. h1d_validity_states V1-V3; C7a. The changed predicate is in lib/trivial.nix while W is declared in locate.nix, and the rules do not say which module V1-V3 are run against.
+13. categories E_AMBIGUOUS versus aggregation_note; C2a. A P_UNKNOWN predicate with option operands is E_AMBIGUOUS in the taxonomy, but V_INVALID carries no E category. The reviewer followed V_INVALID.
+14. h1d_callee_resolution K5 and lambda_rule; C4a. The case says a library alias chain "may be checked at E" but also that synthetic cases need no commit, and the rules do not say which governs. The reviewer did not borrow E.
+15. target-validity v1 side_rule; C1a, C1b, C3a, C7a. The side rule covers removed, added and changed-default options, not predicate-only changes or helper-body changes, so the side for those hunks is unstated.
+16. target-validity v1 V3 (container); C5a. The rules do not say whether a submodule-typed mkOption counts as an intermediate container.
+17. declaration_module_governs; C6c. For synthetic cases the rules do not give a declaring module, so the category cannot be classified as E_DIRECT or E_INDIRECT.
+
+CONTROLLER NOTES (not part of the reviewer report; added after it returned; the report above is not edited)
+
+A. Self-contradiction in the reviewer's C1a answer. The reviewer gives V_INVALID for C1a and also category E_NO. The rule h1d_validity_states aggregation_note states that V_INVALID carries no E category. The two answers cannot both hold. This is the construct that decides the verdict (see GO-H1D in reports/go-h1-semantic-decisions.md).
+
+B. Case-design error in the probe prompt. The reviewer was told that synthetic cases are "classified as written". Two synthetic cases (C2a, C2b) and several others use lib.mkIf or lib.filter with no SHA. K5 then gives P_UNKNOWN. The reviewer's reading is rule-consistent. This is a defect in the prompt, not in the rules. It does not change any V result.
+
+C. Rule-gap items 1, 2, 3, 8, 9, 10, 11 and 12 are not wording defects. Each needs a rule decision. Gap 13 (E_AMBIGUOUS versus V_INVALID) and gap 14 are covered by existing policy or by the same aggregation note, once stated. The one permitted wording refinement is not used for any of them.
+
+D. Reviewer claims beyond the probe excerpt (for example beszel-agent.nix:141, mpd.nix:348, lib/attrsets.nix:1492, movim.nix:58 and :61) are reviewer-read at pinned SHAs. They were not re-verified by the controller in this round, except the movim lines 622-628 and the rancher line 838, which were checked directly.
