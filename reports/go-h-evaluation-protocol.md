@@ -176,3 +176,13 @@ Consequence for the protocol: E as a single boolean is not stable enough. Judgme
 ## 12. Commit and CI
 
 Branch `claude/go-h-protocol-redesign` from `c9879b5`. Named files only; the frozen binary `work/go-f/oba-candidate-9ff7c04` and the fetched upstream sources under `work/go-h/h12/src/` are excluded. The commit SHA and CI result are reported in the GO-H final message, not in this file, because a file cannot contain its own commit SHA.
+
+## 13. Forward notes (GO-H1)
+
+These notes correct or qualify the text above. Sections 0–12 are not rewritten.
+
+1. Section 10 item 2 (line 115), "KNOWN PRODUCT LIMITATION": historical. `NEW_MODULE_NO_BASE` and `NOT_EVALUABLE_BY_CURRENT_PROTOCOL` are frozen P1 analyzer outcomes from before GO-E. After GO-E (`db4d44c`, an ancestor of the candidate `9ff7c04`), new-module targets are analyzable, so this is not a current product limitation.
+2. Section 2 (eligibility) and section 9: the U4 split is scope-dependent, not a reading error. See `reports/go-h1-semantic-decisions.md` H1.1 for the conflict between the H1.1 "runtime contract" premise and README layer A and non-goal "No claim about runtime behavior".
+3. Section 9 blind results are preserved verbatim in `work/go-h/independent-review/h13-blind-report-verbatim.txt`. The per-PR table above is a summary of that report.
+4. The eligibility rubric is now v2 (`work/go-h/eligibility-rubric.json`); v1 is kept as `work/go-h/eligibility-rubric.v1.json`. v2 classes that depend on scope are `DEPENDS_ON_RULING`, not decided.
+5. Verdict for GO-H1: PROTOCOL-REDESIGN-PARTIAL. Blocked on the user's scope ruling (U3, U4, the funnel, metrics and the bounded fresh reviewer). See `reports/go-h1-semantic-decisions.md`.

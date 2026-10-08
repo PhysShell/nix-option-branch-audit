@@ -1,0 +1,56 @@
+{
+  "schema": "go-h-eligibility-rubric/1",
+  "status": "CANDIDATE for GO-H adjudication; product premises P1-P3 require user confirmation before any preregistration",
+  "purpose": "Decide E (eligible PR) from source semantics only. Must not consult oba output, test presence, derivability, or whether a verdict looks interesting.",
+  "product_premises": {
+    "P1": "oba's product unit is an option's SEMANTICS: declaration, default, type, apply/readOnly, and the branch predicates that read the option. Documentation-only fields are outside the unit.",
+    "P2": "Configuration VALUES (assignments such as config.x.y = ...) are a different unit (a configuration choice, not an option semantics change). They are out of scope for the current declaration-analysis product and need a separate mode with its own R/E/D/V.",
+    "P3": "Eligibility is NOT reduced by oba's current coverage. A semantically behavioral change to a value-only option (no predicate) is E; oba's inability to analyze it is an analyzer-scope outcome counted after V."
+  },
+  "procedure": [
+    "1. Take the PR's changed files restricted to nixos/modules/** and nixos/tests/**. Record every hunk.",
+    "2. For each hunk, identify the innermost enclosing construct in BASE and HEAD source (option declaration, config block, predicate, assertion, test, other) by parsing, not by line-prefix heuristics.",
+    "3. Assign each hunk one class from classes[]. Containment inside mkOption { } alone never makes a hunk eligible; the attribute the changed text belongs to decides (see attribute_rule).",
+    "4. Resolve every CONDITIONAL hunk by writing an explicit reason in the adjudication record. A CONDITIONAL hunk with no written reason counts as NOT_RESOLVED, never as ELIGIBLE.",
+    "5. PR is E iff at least one hunk is ELIGIBLE (after CONDITIONAL resolution). Otherwise PR is INELIGIBLE. A PR with no nixos/modules hunk and no test hunk is not R.",
+    "6. Record, per PR: R (census relevance, by file-path rule only), E, the hunk classes, and a one-sentence reason naming the decisive hunk.",
+    "7. Do NOT decide D or V here. A PR can be E and still have no mechanically derivable target."
+  ],
+  "attribute_rule": {
+    "behavioral_attributes": ["default", "type", "apply", "readOnly", "enable-gating predicate on the option", "option name (rename/move)", "presence/absence of the declaration"],
+    "documentation_attributes": ["description", "example", "defaultText", "longDescription", "relatedPackages", "markdown rendering helpers"],
+    "rule": "A change to a behavioral attribute is behavioral. A change to a documentation attribute only is documentation. A change that touches both is behavioral. Attribute attribution uses the innermost attribute key the changed text belongs to."
+  },
+  "classes": [
+    {"id": "EC01", "name": "new option declaration", "decision": "ELIGIBLE", "reason": "A new option's default and type are new behavior a test can witness.", "side": "head"},
+    {"id": "EC02", "name": "removed option declaration", "decision": "ELIGIBLE", "reason": "Removal changes which configurations are accepted and what they do.", "side": "base"},
+    {"id": "EC03", "name": "default value changed", "decision": "ELIGIBLE", "reason": "Changes behavior for every configuration that does not set the option.", "side": "base and head"},
+    {"id": "EC04", "name": "type changed", "decision": "ELIGIBLE", "reason": "Changes which values are accepted and how they merge.", "side": "base and head"},
+    {"id": "EC05", "name": "apply or readOnly changed", "decision": "ELIGIBLE", "reason": "Changes the value seen by config or the assignability of the option.", "side": "base and head"},
+    {"id": "EC06", "name": "example only changed", "decision": "INELIGIBLE", "reason": "Documentation attribute; no evaluated behavior (P1).", "side": "none"},
+    {"id": "EC07", "name": "description only changed", "decision": "INELIGIBLE", "reason": "Documentation attribute; no evaluated behavior (P1).", "side": "none"},
+    {"id": "EC08", "name": "defaultText only changed", "decision": "INELIGIBLE", "reason": "Rendering of the default for documentation only; the default itself is unchanged (P1).", "side": "none"},
+    {"id": "EC09", "name": "formatting, reordering, or comment change inside a declaration", "decision": "INELIGIBLE", "reason": "No semantic change to any attribute.", "side": "none"},
+    {"id": "EC10", "name": "default or type expression rewritten, equivalence unknown from syntax", "decision": "CONDITIONAL", "reason": "Must state whether the evaluated value or accepted set changes; if it does not, INELIGIBLE with that reason; if it does, ELIGIBLE under EC03/EC04.", "side": "base and head"},
+    {"id": "EC11", "name": "configuration value assignment (config.<path> = ...) not declared by the PR's own options", "decision": "INELIGIBLE", "reason": "Configuration choice, not option semantics (P2). Separate mode required.", "side": "none"},
+    {"id": "EC12", "name": "branch predicate changed that reads an existing option (mkIf, optional, if on cfg.<option>)", "decision": "ELIGIBLE", "reason": "Changes behavior conditioned on the option; the option is the subject even though its declaration is untouched.", "side": "base and head"},
+    {"id": "EC13", "name": "assertion or warning changed", "decision": "CONDITIONAL", "reason": "ELIGIBLE iff the condition reads a module option declared in this module; INELIGIBLE iff it reads no option of this module. Written reason required.", "side": "base and head"},
+    {"id": "EC14", "name": "test-only change (nixos/tests/**, no module behavior hunk)", "decision": "INELIGIBLE", "reason": "Changes the witness, not the module's option semantics. Counts for R only.", "side": "none"},
+    {"id": "EC15", "name": "package-only or non-NixOS-module change", "decision": "INELIGIBLE", "reason": "Outside the NixOS module unit. Not in the census R set either.", "side": "none"},
+    {"id": "EC16", "name": "rename or move of an option (mkRenamedOptionModule, mkRemovedOptionModule, or explicit relocation)", "decision": "ELIGIBLE", "reason": "Both old and new option paths are the subject; the relocation mapping is part of the semantics.", "side": "base for old path, head for new path"},
+    {"id": "EC17", "name": "option declared through a helper (mkPackageOption, mkEnableOption, shared option-generating function)", "decision": "ELIGIBLE", "reason": "The helper call's arguments define default and type; source semantics are the same as EC01/EC03.", "side": "head or base as applicable", "note": "D may fail even when E holds; that is a derivation limitation, not an ineligibility."},
+    {"id": "EC18", "name": "nested or submodule option (attrsOf or submodule instance)", "decision": "ELIGIBLE", "reason": "Same semantics as EC01-EC05 at a nested path.", "side": "base and head"},
+    {"id": "EC19", "name": "option declared with a dotted key inside an options block", "decision": "ELIGIBLE", "reason": "Same semantics as the nested form; the key spelling is not a semantic difference.", "side": "base and head"}
+  ],
+  "unresolved_product_decisions": [
+    {"id": "U1", "question": "Is a documentation-only change (EC06-EC08) in product scope?", "working_position": "INELIGIBLE under P1", "needs": "user confirmation"},
+    {"id": "U2", "question": "Are configuration-value assignments (EC11) a separate product mode, or out of scope entirely?", "working_position": "separate mode, not in current E", "needs": "user confirmation"},
+    {"id": "U3", "question": "Are value-only behavioral options (no branch predicate) in E although oba cannot analyze them?", "working_position": "yes, under P3; analyzer limitation counted after V", "needs": "user confirmation"},
+    {"id": "U4", "question": "Are predicate-only changes that read an existing option (EC12) and assertion-like checks (EC13) in E?", "working_position": "yes, under P1; blind reader disagreed with a declaration-only proxy on 3 PRs (566007, 569867, 566696)", "needs": "user confirmation"}
+  ],
+  "known_gaps": [
+    "Attribute attribution by text heuristics is unreliable for multi-line Nix strings; an adjudicator must read the parsed or indented structure.",
+    "Helper-generated declarations (EC17) are E-eligible but their canonical path may be invisible to text search; this affects D, not E.",
+    "Behavior that depends on configuration beyond the module (EC11 cases) is not evaluated by any class here."
+  ]
+}
