@@ -1,0 +1,706 @@
+{
+  "schema": "go-h-eligibility-rubric/6.0",
+  "status": "Finalized rubric, schema go-h-eligibility-rubric/6.0. Sanitized for independent audit: controller results and history removed.",
+  "purpose": "Assign each PR hunk an E category from source semantics only. Must not consult oba output, test presence, derivability (D), target validity (V), witnessability (W), or any historical verdict.",
+  "scope": {
+    "in": "Changes to an option's semantics (declaration, default, type, apply, readOnly, path) that are traceable to an option-dependent branch predicate; changes to a boolean predicate that directly or indirectly consumes option state and controls selection, emission, enabling, rejection or branch choice.",
+    "out": [
+      "Documentation-only changes (U1).",
+      "Configuration-value assignments config.<path> = ... (U2): separate mode, not Layer A.",
+      "Changes to warning or assertion message text, or to data that a condition reads, when the condition expression itself is unchanged.",
+      "Shell or external-command tests (including inside derivation strings); their operands are command output, not Nix option state.",
+      "Test-only changes (witness only; counts for R, never for E). Test files are not Layer-A consumers.",
+      "Import-list registration, package-only changes, and runtime behavior or observability (README non-goals; layer C). Layer A claims only the selection decision, never downstream runtime behavior of the selected element."
+    ]
+  },
+  "categories": {
+    "E_DIRECT": "The changed construct is an option semantic change traceable to a branch predicate in the same module, OR a changed predicate whose changed term reads only options declared in the same module.",
+    "E_INDIRECT": "The changed construct is an option semantic change traceable only to a predicate in another module, OR a changed predicate whose changed term reads an option declared in another module (declaration_module_governs), OR whose option state reaches the changed term through a let binding or helper function declared in another module (let_binding_rule).",
+    "E_AMBIGUOUS": "Traceability, predicate role, or EC10 equivalence cannot be decided by the procedure below (search incomplete or unpinned, predicate role P_UNKNOWN with option operands, EC10 level EQ3, or an operand with no named option path). Not counted as E-positive; reported separately.",
+    "E_NO": "No change in scope: out-of-scope categories above, traceability established absent (T_NONE under absence_evidence), P_DATA_ONLY or not_nix_predicate, or an equivalent rewrite established at EC10 level EQ0-EQ2."
+  },
+  "pr_aggregation": "PR category = strongest hunk category in the order E_DIRECT > E_INDIRECT > E_AMBIGUOUS > E_NO. A hunk that declares or reads several options takes the strongest option's category. E-positive = E_DIRECT or E_INDIRECT. Under 6.0 (h1d_validity_states): a hunk whose watched target is V_INVALID carries no E category and is excluded from E aggregation; a hunk whose target is V_AMBIGUOUS is E_AMBIGUOUS.",
+  "source_evidence": {
+    "rule": "Every traceability, absence and equivalence decision is made on a committed tree identified by a full 40-hex SHA that the search resolves to (git rev-parse --verify <sha>^{commit} equals the required SHA). A working tree, a default-branch code-search index, or any search not pinned to the SHA is not evidence for T_NONE and not evidence for EQ1-EQ2 equivalence. A resolution mismatch or any search error is ERROR, never negative evidence.",
+    "procedure": "work/go-h/exact_tree_search.sh <repo> <sha> <scope> <extended_regex> [exclude] [receiver_regex]. Status MATCH, ZERO_COMPLETE (the only status that can support absence) or ERROR. Uses git grep exit codes: 0 match, 1 no match, other error."
+  },
+  "traceability_search": {
+    "applies_to": "Option-semantic changes (EC01-EC05, EC16-EC19). For a predicate change, the consumer check confirms the changed predicate is in a branch construct; the category is set by predicate_rule.",
+    "unit": "option path P of the changed option (for a removed option: base side; otherwise head side)",
+    "step1": "Search the changed module file at the relevant side for a branch construct (mkIf, optional, optionals, if-then-else, assert, && or || or ! with a boolean operand, lib.mkMerge condition, or a P_SELECTION function) whose operand reads P. A reference reads P if P appears in the changed expression or in an attribute path extending P (cfg.package.version reads cfg.package), including value arguments such as lib.optionals cond P. Found in the same module file: T_IN.",
+    "step2": "If not found in step1, search the committed tree at the same side (exact_tree_search.sh) for the reference patterns of P (full path, exact alias, and the owner-key identifier per absence_evidence A3) in nixos/ with branch-construct context. Found in another module, read in a branch context: T_FOREIGN (positive evidence, one exact occurrence suffices). Absence established under absence_evidence A1-A6: T_NONE. Otherwise: T_UNKNOWN.",
+    "result_map": {
+      "T_IN": "E_DIRECT",
+      "T_FOREIGN": "E_INDIRECT",
+      "T_NONE": "E_NO",
+      "T_UNKNOWN": "E_AMBIGUOUS"
+    },
+    "record": "For each traceability decision record: P, side, SHA, procedure name, query regex(es), grep status and match count, each occurrence (file, line, text) with its branch context, and the T_* decision."
+  },
+  "absence_evidence": {
+    "positive_evidence": "One exact occurrence at the required SHA, read in its branch context, establishes T_IN or T_FOREIGN when it reads P under predicate_rule. Positive evidence never needs completeness.",
+    "conditions_for_T_NONE": [
+      "A1 pinned and completed: the search resolved to the required full SHA and returned status MATCH or ZERO_COMPLETE (git grep exit 0 or 1, no ERROR). ERROR is never negative evidence. A1 does not require zero raw matches; absence is decided by A3 after A4 classification.",
+      "A2 complete scope: scope covers every file under nixos/ at that SHA. Exclusions are only the declaring module file(s) of P, recorded.",
+      "A3 owner-key query: K is the owner key of P, the first segment of P below its top-level namespace (gophernicus for services.gophernicus.rootDir; zfs for boot.zfs.enabled). Pattern \\bK\\b (identifier, not path) must return zero matches outside the declaring module after A4 classification. A leaf-only or container-path-only query (for example \\.rootDir\\b or services\\.K\\.) is a diagnostic superset and is never sufficient alone.",
+      "A4 non-consumer classes, excluded by scope.out and recorded per match: documentation (*.md, release notes), import-list lines, test files under nixos/tests (witness only), comments. Any unclassified match makes the result T_UNKNOWN.",
+      "A5 receiver closure: every receiver that can reach K without naming K as an identifier must have a closed domain (a literal list, a literal set of names, or a closed enum type) whose members do not include K. Such receivers are: whole-namespace bindings (cfg = config.<namespace>); attrNames/attrValues/attrByPath/getAttr and mapAttrs-family iteration applied to config.<namespace> itself (not to a named sub-attrset such as config.<namespace>.<name>); and computed keys config.<namespace>.${x}. Any open-domain receiver (user-supplied, derived from attrNames or unknown) is T_UNKNOWN. A receiver whose domain includes K is a consumer and T_NONE is refused. `with config.<namespace>` and `inherit (config.<namespace>) x` reach K only by naming it, so they are covered by A3 and are not A5 receivers.",
+      "A6 K is not a common word: if A3 cannot be cleanly classified because K matches unrelated identifiers, the result is T_UNKNOWN rather than T_NONE."
+    ],
+    "result": "T_NONE only when A1-A6 all hold, recorded as an absence record. Any failed or unverifiable condition gives T_UNKNOWN. Never convert an incomplete or default-branch search into negative evidence.",
+    "forbidden_sources_for_T_NONE": [
+      "gh search code (default-branch index, no SHA pin, result cap)",
+      "working-tree searches",
+      "container-path-only searches",
+      "leaf-only searches",
+      "searches truncated or with an unrecorded exclusion"
+    ],
+    "absence_record_fields": [
+      "sha",
+      "scope",
+      "exclusions",
+      "procedure",
+      "query regex(es)",
+      "grep status",
+      "match count",
+      "classification of each match (A4 class)",
+      "receiver domain check (A5)",
+      "decision (T_NONE or T_UNKNOWN) and the failing condition if T_UNKNOWN"
+    ]
+  },
+  "predicate_rule": {
+    "changed_term": "Only operands and operators the PR adds, removes or modifies count as the changed term. Unchanged operands are recorded as context.",
+    "declaration_module_governs": "The module that declares an operand decides the category of the changed term. A changed term that reads an option declared in another module is E_INDIRECT even when its consumer predicate is in the changed file. A changed term that reads only options declared in the changed module is E_DIRECT. Where the changed term mixes both, any foreign operand makes it E_INDIRECT.",
+    "let_binding_rule": "A let binding is transparent for tracing: a binding that is a pure expression of named option paths (and static values) carries the option state of those paths. The category is set by declaration_module_governs of the traced paths, not by the binding site. An exact alias (cfg = config.x) is a direct read of x. A binding that is a helper function declared in another module makes the reads through it E_INDIRECT. This resolves the v3.1 tension between indirect_via_bindings and lambda_over_option_attrset: v3.1 could give E_INDIRECT or E_AMBIGUOUS for the same expression.",
+    "not_nix_predicate": "A predicate evaluated by a shell or by an external command (including inside a derivation string) is not an option-branch predicate: E_NO, even when its input path is derived from option values. Option state enters only as the iteration domain.",
+    "data_only": "A change to a value (list literal, package set, attribute value) that a predicate reads, when the predicate expression itself is unchanged and the option semantics are unchanged: E_NO (changes output or content only). A boolean whose role is P_DATA_ONLY is E_NO."
+  },
+  "predicate_taxonomy": {
+    "question": "Does the boolean control whether a source-level element, path, value, definition or branch is selected, emitted, enabled, rejected or taken?",
+    "roles": {
+      "P_GATING": "A boolean value is consumed in a position that determines whether a source-level branch, configuration fragment, assertion, warning, selected element or equivalent guarded structure is taken, emitted or included. Consumers are defined operationally in h1c_gating_vs_data (G0).",
+      "P_CONTROL": "The boolean chooses which of two or more alternative expressions is evaluated: if-then-else in value position, and guard forms where the other branch is taken when the boolean is false.",
+      "P_SELECTION": "The boolean is the predicate of a function that keeps or drops elements of a list or attribute set (lib.filter, lib.filterAttrs, builtins.filter, lib.partition, lib.findFirst, lib.remove, and any function whose documented role is keeping or dropping elements by a boolean). The list of functions is not closed; role decides, and a name in this list is not callee resolution (h1d_callee_resolution K1).",
+      "P_DATA_ONLY": "A boolean is only stored as a value, passed on as ordinary data, returned from a transform, serialized, interpolated into text, or passed to an external consumer, with no identified gating consumer (G1).",
+      "P_UNKNOWN": "A Nix boolean whose role cannot be classified from the source at the stated side. With option operands it is E_AMBIGUOUS."
+    },
+    "eligible_roles": [
+      "P_GATING",
+      "P_CONTROL",
+      "P_SELECTION"
+    ],
+    "rule": "A predicate change is E-eligible iff its role is in eligible_roles, its operands read option state, and the mixed-predicate and causal-relevance rules (h1c_mixed_predicate, h1c_causal_relevance) hold for the watched option. The category then follows declaration_module_governs. P_DATA_ONLY predicates are E_NO. A P_UNKNOWN predicate with option operands is E_AMBIGUOUS."
+  },
+  "lambda_rule": {
+    "predicate_lambda": "A lambda passed as the predicate argument of a P_SELECTION callee, where the callee is resolved under h1c_callee_resolution, is a predicate. A lambda passed to a transform callee (h1c_higher_order H2) is not a predicate, whatever its body returns. A boolean produced inside any lambda is classified by h1c_gating_vs_data at its own position.",
+    "eligibility": "A predicate lambda is eligible iff its boolean result controls selection (P_SELECTION) and its outcome depends on option state directly or indirectly: through a lambda parameter that iterates an option-derived collection (traced under lambda_over_option_attrset and let_binding_rule), or through a free variable that reads option state.",
+    "lambda_over_option_attrset": "A predicate whose operand is a lambda parameter iterating an option attrset or list is traced to the iterated option path P (through let bindings where needed), and P is then searched as in traceability_search. If the iterated collection cannot be traced to a named option path, the result is T_UNKNOWN (E_AMBIGUOUS).",
+    "named_predicates": "A predicate passed by name (for example builtins.filter f xs) is classified by resolving the binding of f in the same file at the side. If it cannot be resolved there, P_UNKNOWN.",
+    "boundary": "A predicate lambda whose boolean depends only on static values (no option state reaches it, directly or through its iterated collection) is E_NO."
+  },
+  "ec10_equivalence": {
+    "applies_to": "A predicate expression or option default/type expression rewritten in the PR (EC10). Decides whether an apparent rewrite is E_NO (equivalent) or a semantic change.",
+    "levels": {
+      "EQ0": "Textual identity after normalizing location, whitespace and line breaks.",
+      "EQ1": "Identical AST after dropping formatting, comments and redundant parentheses.",
+      "EQ2": "Bounded local normalization, all of the following and nothing else: (a) alpha-renaming of lambda parameters and let bindings without capture; (b) attribute-path sugar with identical AST meaning; (c) commensurate path spelling where a same-file let alias binds exactly the option path; (d) pure lexical alias introduction or removal that satisfies the transparency conditions T1-T6 (h1c_let_alias_transparency), proven by exact-SHA def-use; (e) library alias substitution L1 (h1c_library_binding).",
+      "EQ3": "Any equivalence needing semantic reasoning: global bindings or imports, dynamic attribute names, non-local computation, operand or list reordering, or any normalization not listed under EQ2. EC10_AUTOMATIC is false for EQ3."
+    },
+    "forbidden_automatic": [
+      "reordering the operands of && or ||",
+      "reducing !(!x) to x",
+      "reordering list elements",
+      "adding or removing mkDefault, mkForce or mkOverride priority wrappers",
+      "replacing an expression by a literal with the same current value without evaluating the source",
+      "any equivalence whose justification needs a binding outside the same expression, except a library alias chain permitted by h1c_library_binding L1"
+    ],
+    "decision": "EQ0-EQ2 equivalent: E_NO with the equivalence stated. EQ0-EQ2 not equivalent: treat as EC03, EC04 or EC12. EQ3: E_AMBIGUOUS until a reviewer decides, with the decision recorded with evidence. EQ0-EQ2 checks are automatic (EC10_AUTOMATIC=true); EQ3 is not (EC10_AUTOMATIC=false).",
+    "evidence_record": [
+      "base_expr",
+      "head_expr",
+      "side and SHA for each",
+      "file:line for each",
+      "level",
+      "normalization steps applied (EQ2 only)",
+      "review_requirement (none for EQ0-EQ2; manual for EQ3)",
+      "decision"
+    ]
+  },
+  "attribute_rule": {
+    "option_semantic": [
+      "default",
+      "type",
+      "apply",
+      "readOnly",
+      "declaration presence",
+      "option path (rename/move)"
+    ],
+    "documentation": [
+      "description",
+      "example",
+      "defaultText",
+      "longDescription",
+      "relatedPackages"
+    ],
+    "rule": "Helper-generated declarations (mkPackageOption, mkEnableOption, shared option-generating functions) are option declarations for protocol purposes; their arguments define default and type. Traceability applies to them as to hand-written declarations."
+  },
+  "classes": [
+    {
+      "id": "EC01",
+      "name": "new option declaration",
+      "unit": "option_semantic",
+      "side": "head",
+      "rule": "traceability_search on the new path"
+    },
+    {
+      "id": "EC02",
+      "name": "removed option declaration",
+      "unit": "option_semantic",
+      "side": "base",
+      "rule": "traceability_search on the removed path, base side"
+    },
+    {
+      "id": "EC03",
+      "name": "default value changed",
+      "unit": "option_semantic",
+      "side": "base and head",
+      "rule": "traceability_search on the changed path"
+    },
+    {
+      "id": "EC04",
+      "name": "type changed",
+      "unit": "option_semantic",
+      "side": "base and head",
+      "rule": "traceability_search on the changed path"
+    },
+    {
+      "id": "EC05",
+      "name": "apply or readOnly changed",
+      "unit": "option_semantic",
+      "side": "base and head",
+      "rule": "traceability_search on the changed path"
+    },
+    {
+      "id": "EC06",
+      "name": "example only changed",
+      "unit": "documentation",
+      "rule": "E_NO"
+    },
+    {
+      "id": "EC07",
+      "name": "description only changed",
+      "unit": "documentation",
+      "rule": "E_NO"
+    },
+    {
+      "id": "EC08",
+      "name": "defaultText only changed",
+      "unit": "documentation",
+      "rule": "E_NO (the default value is unchanged)"
+    },
+    {
+      "id": "EC09",
+      "name": "formatting, reordering, or comment change",
+      "unit": "none",
+      "rule": "E_NO"
+    },
+    {
+      "id": "EC10",
+      "name": "default, type, or predicate expression rewritten",
+      "unit": "option_semantic or predicate",
+      "rule": "ec10_equivalence. EQ0-EQ2 equivalent: E_NO with equivalence stated. EQ0-EQ2 not equivalent: EC03, EC04 or EC12. EQ3: E_AMBIGUOUS pending review."
+    },
+    {
+      "id": "EC11",
+      "name": "configuration value assignment config.<path> = ...",
+      "unit": "config_value",
+      "rule": "E_NO (U2: separate mode)"
+    },
+    {
+      "id": "EC12",
+      "name": "boolean predicate changed that consumes option state",
+      "unit": "predicate",
+      "rule": "predicate_taxonomy role must be eligible; then predicate_rule (declaration_module_governs, let_binding_rule, not_nix_predicate) and lambda_rule for predicate lambdas"
+    },
+    {
+      "id": "EC13",
+      "name": "warning or assertion condition changed",
+      "unit": "predicate",
+      "rule": "If the condition expression changed: predicate_taxonomy (P_GATING for assertion and warning conditions) and predicate_rule. If only message text changed: E_NO."
+    },
+    {
+      "id": "EC14",
+      "name": "test-only change",
+      "unit": "test",
+      "rule": "E_NO"
+    },
+    {
+      "id": "EC15",
+      "name": "package-only or non-NixOS-module change",
+      "unit": "package",
+      "rule": "E_NO"
+    },
+    {
+      "id": "EC16",
+      "name": "rename or move of an option (mkRenamedOptionModule, mkRemovedOptionModule, explicit relocation)",
+      "unit": "option_semantic",
+      "rule": "traceability_search on the old path (base) and new path (head)"
+    },
+    {
+      "id": "EC17",
+      "name": "option declared through a helper (mkPackageOption, mkEnableOption, shared option-generating function)",
+      "unit": "option_semantic",
+      "rule": "as EC01-EC05, with attribute_rule for helpers"
+    },
+    {
+      "id": "EC18",
+      "name": "nested or submodule option",
+      "unit": "option_semantic",
+      "rule": "as EC01-EC05 at the nested path"
+    },
+    {
+      "id": "EC19",
+      "name": "option declared with a dotted key",
+      "unit": "option_semantic",
+      "rule": "as EC01-EC05; key spelling is not a semantic change"
+    },
+    {
+      "id": "EC20",
+      "name": "build-time check or derivation string test over option-derived values",
+      "unit": "build_check",
+      "rule": "not_nix_predicate: E_NO. A Nix-level boolean predicate in the same hunk is EC12."
+    },
+    {
+      "id": "EC21",
+      "name": "data change feeding a predicate, predicate expression unchanged, option semantics unchanged",
+      "unit": "data",
+      "rule": "E_NO (data_only)"
+    },
+    {
+      "id": "EC22",
+      "name": "import-list registration of a module file, or a test registration",
+      "unit": "registration",
+      "rule": "E_NO by itself. The imported module's own declarations are classified under their own hunks."
+    }
+  ],
+  "known_gaps": [
+    "Attribute attribution by text heuristics is unreliable for multi-line Nix strings; the parsed structure is authoritative.",
+    "Helper-generated declarations (EC17) may be invisible to text search; this affects D, not E.",
+    "Named or higher-order predicates whose body is in another file are P_UNKNOWN until read at the exact SHA (h1c_callee_resolution).",
+    "Custom higher-order functions are CALLEE_UNKNOWN unless H3 holds.",
+    "EQ3 equivalences, including library semantic equivalences, are reviewer-owned; the protocol claims no automatic equivalence beyond EQ0-EQ2 and L1.",
+    "Indirect dependencies beyond bounded static tracing are DEPENDENCY_UNBOUNDED and reviewer-owned."
+  ],
+  "h1c_callee_resolution": {
+    "purpose": "H1C.1. Predicate role depends on the resolved semantic callee of an application head, not on identifier spelling.",
+    "callee_classes": {
+      "FQ_BUILTIN": "builtins.<name>, where builtins is not rebound in any enclosing scope of the use.",
+      "FQ_LIB": "lib.<path>, where lib is the file's module argument (header { lib, ... }: or { lib }:) and is not rebound in an enclosing scope. Resolved at the exact SHA through lib/ (h1c_library_binding).",
+      "LOCAL_ALIAS": "an identifier whose unique binding in the enclosing scopes is f = <FQ_BUILTIN or FQ_LIB>, with no rebinding of f on the use path.",
+      "BARE": "an identifier with no static binding in the file, or reachable only through an enclosing with.",
+      "DYNAMIC": "application head is a computed attribute selection, a function result, or an import result."
+    },
+    "rules": {
+      "R1": "FQ_BUILTIN and FQ_LIB resolve mechanically to a semantic callee at the exact SHA.",
+      "R2": "LOCAL_ALIAS resolves mechanically only if def-use proves a unique binding to an R1-resolved callee and no intervening rebinding on the use path. Otherwise CALLEE_UNKNOWN.",
+      "R3": "BARE resolves only through a unique static binding visible at the use, with no enclosing with between binding and use. Otherwise CALLEE_UNKNOWN. Matching the identifier text is never a resolution.",
+      "R4": "DYNAMIC, an unresolved import, or any callee whose resolution needs reasoning beyond these bounded contracts is CALLEE_UNKNOWN.",
+      "R5": "CALLEE_UNKNOWN makes the predicate role P_UNKNOWN. With option operands the result is E_AMBIGUOUS. It is a reviewer-owned state, not a validator error."
+    },
+    "builtin_roles": {
+      "builtins.filter": "P_SELECTION: argument 1 is the predicate; argument 2 is the list.",
+      "builtins.isString, builtins.isInt, builtins.isBool, builtins.isList, builtins.isAttrs": "value tests. When passed as the predicate argument of a resolved P_SELECTION callee they are the predicate; their operand is each element, so eligibility follows the operand, not the spelling of the test.",
+      "other builtins": "classified only when used under a resolved role; otherwise P_UNKNOWN."
+    },
+    "named_predicates": "A predicate passed by name is resolved to its binding in the same file at the side SHA (lambda rule). If that binding is not in the file, its definition is read at the same SHA under R1 or R3; otherwise CALLEE_UNKNOWN."
+  },
+  "h1c_mixed_predicate": {
+    "purpose": "H1C.2. A predicate with watched and foreign operands is eligible for the watched option; the foreign operand does not disqualify it.",
+    "predicate_record_fields": [
+      "predicate_span: {file, sha, lines, expression text}",
+      "watched_dependencies[]: {option path, dependency_path[] of def-use edges, edge kinds}",
+      "foreign_dependencies[]: {option path, declaring module, dependency_path[]}",
+      "dependency_paths[]: union of the edges above",
+      "predicate_role and consumer (h1c_gating_vs_data)"
+    ],
+    "rules": {
+      "M1": "A predicate with an eligible role and at least one proven watched dependency is eligible for the watched option. Foreign dependencies are recorded and do not disqualify it.",
+      "M2": "A predicate with only foreign dependencies relative to the target is not a valid Layer-A target for that watched option. The target is invalid (target validity), not E_NO.",
+      "M3": "The record makes no claim that the watched option is the sole cause of the branch outcome. Other operands are recorded, not dismissed.",
+      "M4": "Category follows declaration_module_governs: a term with any foreign operand is E_INDIRECT, a term reading only in-module options is E_DIRECT."
+    }
+  },
+  "h1c_causal_relevance": {
+    "purpose": "H1C.3. Mere textual mention of an option is insufficient; the watched option must feed the predicate through a def-use path.",
+    "accepted_edges": [
+      "direct read in the predicate expression",
+      "exact alias binding that satisfies h1c_let_alias_transparency",
+      "lambda parameter iterating an option-derived collection (lambda rule)",
+      "transparent let binding whose value reads the option and is referenced on the path to the predicate"
+    ],
+    "not_causal": [
+      "textual occurrence in description, example, defaultText, documentation or message text",
+      "a binding with no reference on any path to the predicate (dead or unrelated)",
+      "an output payload that the predicate does not consume"
+    ],
+    "unbounded": "If the path cannot be bounded (read through a function body, dynamic key, unresolved helper), the result is DEPENDENCY_UNBOUNDED. A DEPENDENCY_UNBOUNDED edge is never eligible; the outcome is E_AMBIGUOUS when the predicate is otherwise eligible."
+  },
+  "h1c_let_alias_transparency": {
+    "purpose": "H1C.4. A pure let alias may be transparent under bounded proof. Not a general rule for let-bound expressions.",
+    "conditions": {
+      "T1": "the binding name is lexically unique in the scopes visible at the use",
+      "T2": "no shadowing occurs on the path from binding to use",
+      "T3": "the RHS is a static attribute path rooted at an option (config.<path>) or at an exact alias already proven transparent, optionally followed by static attribute selections",
+      "T4": "the use is directly traceable: the alias name appears where the option value would appear",
+      "T5": "no function call, conditional, dynamic attribute key, coercion or transformation intervenes between binding and use",
+      "T6": "each link of a chain of aliases is itself proven under T1-T5"
+    },
+    "effect": "A chain satisfying T1-T6 is EQ2 (d) for the introduction or removal of the alias. Any unproven link is ALIAS_UNPROVEN and the equivalence is EQ3.",
+    "not_transparent": "A let binding whose RHS is a function call, a conditional, a computed key, a transformed value or an expression over several options is not an alias and is not transparent."
+  },
+  "h1c_let_bound_defaults": {
+    "purpose": "H1C.5. A let binding that feeds an option property is classified by the property it defines.",
+    "chain": [
+      "changed binding",
+      "approved option property (default, type, apply, readOnly, declaration)",
+      "option value where a predicate reads the option (only where the target needs a branch relation)",
+      "option-dependent predicate"
+    ],
+    "rules": {
+      "D1": "The change is recorded at the option property path it reaches (for example services.x.y.default). The let is not the eligibility reason.",
+      "D2": "For a shared binding, only the option property paths the binding reaches are relevant. Other consumers are recorded as not relevant, with the reason.",
+      "D3": "A default or type change is eligible only if the option has a branch relation under U3 (a predicate reads its value, through a proven edge). Without that edge the change is not E-eligible.",
+      "D4": "If any link cannot be resolved conservatively, the result is E_AMBIGUOUS."
+    }
+  },
+  "h1c_gating_vs_data": {
+    "purpose": "H1C.6. An operational test for P_GATING versus P_DATA_ONLY.",
+    "G0_gating_consumers": [
+      "(i) condition of an if-then-else (P_CONTROL)",
+      "(ii) first argument of a resolved conditional-inclusion callee, whose definition at the exact SHA shows that it returns its second argument when the first is true and otherwise an empty value (for example lib.mkIf, lib.optional, lib.optionals, lib.optionalString, lib.optionalAttrs). The contract is read from the definition, not from the name.",
+      "(iii) the assertion attribute of an assertion, or the condition of a warning (P_GATING)",
+      "(iv) the predicate argument of a resolved P_SELECTION callee (P_SELECTION)",
+      "(v) an operand of && or || whose result is itself in one of positions (i)-(iv)"
+    ],
+    "G1_data_only": "The boolean only flows into attribute values not consumed by (i)-(v) in the same file, list elements, string interpolation, serialization or formatting calls, the result of a transform lambda, or external text (shell, configuration file, unit file). An attribute value consumed by an external system is data.",
+    "G2_unknown": "If the consumer of a boolean cannot be identified within bounded analysis, the role is P_UNKNOWN. With option operands the result is E_AMBIGUOUS.",
+    "G3_boolean_operators": "The result of && or || is not gating by itself. It is gating only when the whole result is in a G0 position.",
+    "G4_no_speculation": "A boolean does not become P_GATING because some downstream consumer might eventually branch on it. The consumer must be identified."
+  },
+  "h1c_higher_order": {
+    "purpose": "H1C.7. Predicate status belongs to the callback's role at the resolved call site.",
+    "H1_selection": "filter (predicate over elements), filterAttrs (predicate over name and value), partition, findFirst: the callback is a selection predicate.",
+    "H2_transform": "map, mapAttrs, concatMap, concatMapAttrs, imap0, imap1, foldl: the callback is a transform, not a predicate, whatever its result type. Booleans inside it are classified by h1c_gating_vs_data at their own positions.",
+    "H3_custom": "A custom higher-order function is recognized mechanically only if its body is resolved (in-file or at the exact SHA) and shows that the callback result selects elements. Otherwise CALLEE_UNKNOWN.",
+    "H4_no_whitelist": "The table is the set of resolved callees named here, not a general name whitelist. Other callees are resolved under h1c_callee_resolution or left as CALLEE_UNKNOWN."
+  },
+  "h1c_library_binding": {
+    "purpose": "H1C.9. Equivalence involving library functions.",
+    "L1_alias_chain": "A library name whose definition at the exact SHA is a chain of inherit or direct attribute-alias bindings (inherit (X) name; or name = X.name;) ending in a builtins member, with at most 4 steps, all in lib/ at one SHA. lib.<name> is equivalent to builtins.<name> by EQ2 (e). Record the SHA and file:line of every step.",
+    "L2_non_alias_definition": "A library definition that is not an alias (for example a lambda) requires inlining or beta-reduction to match an inline expression. That is EQ3, reviewer-owned, with the definition's SHA recorded.",
+    "L3_no_sha": "Without SHA evidence there is no equivalence claim. The result is EQ3 unknown.",
+    "L4_name_is_not_evidence": "A function name or documentation alone is never evidence of equivalence."
+  },
+  "h1c_exact_source_identity": {
+    "purpose": "H1C.10. Every decision that depends on a source fact records the SHA of that source.",
+    "required_identities": [
+      "the module file containing the predicate or the change",
+      "the header library file used to resolve lib (callee resolution)",
+      "each alias target and each library binding step",
+      "each option declaration used for watched or foreign dependencies",
+      "each predicate definition used by a named predicate",
+      "each library definition used by L1 or L2"
+    ],
+    "non_evidence": "Working-tree and default-branch evidence is diagnostic only. It cannot establish a historical target's semantics."
+  },
+  "h1c_ambiguity_policy": {
+    "purpose": "H1C.11. Conservative fallback when a case needs reasoning beyond the bounded contracts.",
+    "states": [
+      "CALLEE_UNKNOWN",
+      "P_UNKNOWN",
+      "E_AMBIGUOUS",
+      "DEPENDENCY_UNBOUNDED",
+      "ALIAS_UNPROVEN",
+      "EQ3",
+      "T_UNKNOWN"
+    ],
+    "rule": "If a case needs reasoning beyond the bounded contracts, do not stretch automatic classification. Use a reviewer-owned state. Ambiguity is a first-class outcome, not a validator failure.",
+    "absence_note": "T_NONE is claimed only under the exact-SHA absence standard (absence_evidence A1-A6). Any unmet condition gives T_UNKNOWN."
+  },
+  "h1c_go_i_boundary": {
+    "purpose": "H1C.14. Mechanical versus reviewer-owned responsibilities for GO-I.",
+    "mechanical": [
+      "load source from the exact base or head SHA; never from a working tree",
+      "parse Nix syntax to an AST for the supported subset",
+      "lexical name resolution within the supported bounded subset",
+      "resolve transparent let aliases satisfying T1-T6",
+      "resolve known fully-qualified selection constructs under R1",
+      "distinguish selection callbacks from transforms (H1-H2)",
+      "trace watched option to predicate dependencies where locally provable, recording the edges",
+      "record foreign predicate dependencies separately, with their declaring module",
+      "classify P_GATING and P_DATA_ONLY where G0 and G1 are decidable",
+      "validate option_prefix and watch (V1-V4)",
+      "perform side-aware base and head checks",
+      "implement EQ0, EQ1 and EQ2 (a)-(e)",
+      "provide exact-tree T_NONE search (A1-A6)"
+    ],
+    "reviewer_owned": [
+      "unresolved callee identity (CALLEE_UNKNOWN)",
+      "dynamic attribute paths",
+      "non-local or dynamic imports beyond supported resolution",
+      "P_UNKNOWN",
+      "E_AMBIGUOUS",
+      "EQ3, including arbitrary library semantic equivalence (L2, L3)",
+      "indirect dependencies beyond bounded static tracing (DEPENDENCY_UNBOUNDED)",
+      "ALIAS_UNPROVEN"
+    ],
+    "fail_rule": "GO-I must fall into a reviewer-owned state rather than manufacture certainty."
+  },
+  "h1d_control_dependence": {
+    "purpose": "H1D.1. Separates a changed predicate that reads the watched option from one that only runs under a gate that reads it.",
+    "states": {
+      "DATA_DEPENDENT": "The watched option W reaches an operand of predicate Q through an accepted edge of h1c_causal_relevance: direct read, exact alias under T1-T6, transparent let, lambda iteration, or the helper call-site chain of h1d_interprocedural I2.",
+      "CONTROL_DEPENDENT_ONLY": "Q is not DATA_DEPENDENT on W, but Q is evaluated only under a G0 gate whose condition is DATA_DEPENDENT on W, directly or through a further gate. The gate chain is recorded.",
+      "INDEPENDENT": "Neither of the above holds.",
+      "UNRESOLVED": "Q's dependence on W cannot be decided: a path to W is unbounded, or an open key or unresolved callee lies on it (h1c_causal_relevance unbounded; h1d_namespace_closure N2/N3; h1d_freeform F5; h1d_callee_resolution K3/K5; h1d_interprocedural I5). Never treated as INDEPENDENT. The V state is V_AMBIGUOUS (UNRESOLVED_DEPENDENCY); the category is E_AMBIGUOUS when Q is otherwise eligible."
+    },
+    "rules": {
+      "C1": "Only DATA_DEPENDENT predicates are watched predicate dependencies. CONTROL_DEPENDENT_ONLY never establishes a dependency on W, however many gates separate Q from W.",
+      "C2": "A gate that is itself DATA_DEPENDENT on W is a predicate on W in its own right, classified under h1c_gating_vs_data at its own position.",
+      "C3": "A changed predicate that is CONTROL_DEPENDENT_ONLY or INDEPENDENT of W is not a dependency of W. It affects the validity of W only through h1d_validity_states.",
+      "C4": "An option-semantic change (default, type, apply, readOnly) to W is E-eligible only when some DATA_DEPENDENT eligible predicate reads W (D3 under U3). Gate predicates on W satisfy this; predicates reached only through W do not.",
+      "C5": "Owner ruling 2026-10-08. Control dependence alone does not make an inner predicate dependent on W. Q is a valid target for W only if W contributes to Q's boolean value through an accepted data or semantic edge. A predicate reached only through a W gate is CONTROL_DEPENDENT_ONLY: the target is invalid (NO_WATCHED_PREDICATE_DEPENDENCY) and no E category is assigned from that invalid target. The enclosing W-dependent gate is its own predicate under C2. No composite predicate such as W && Q is synthesized unless a source predicate, or a separately specified reachability layer, introduces it."
+    }
+  },
+  "h1d_validity_states": {
+    "purpose": "H1D.2. Explicit V states for a watched target whose dependence is predicate-based. Extends target-validity/1 without changing its checks V1-V4 or S1.",
+    "states": [
+      "V_VALID",
+      "V_INVALID",
+      "V_AMBIGUOUS"
+    ],
+    "invalid_reasons": {
+      "WRONG_BASE_HEAD_SIDE": "The target is checked against a side that does not match the side rule of target-validity.",
+      "PREFIX_CONTRACT_VIOLATION": "V2 fails: option_prefix ends in a declaration rather than a container.",
+      "WATCH_PATH_NOT_DECLARED": "V3 fails: a watch segment is not declared in the module on that side.",
+      "FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION": "The watch path names a key matched only by freeformType and not declared as an option (h1d_freeform F2).",
+      "FOREIGN_ONLY_DEPENDENCY": "The changed predicate reads no W path, is not gated by W, and its operands are all foreign (h1c_mixed_predicate M2). Inert under derivation_scope: a derived target has a W path, so this reason is not reached. Retained for the record.",
+      "NO_WATCHED_PREDICATE_DEPENDENCY": "The derived target's changed predicates are all CONTROL_DEPENDENT_ONLY on W, and none is DATA_DEPENDENT on W (owner ruling 2026-10-08, C5). Applies only to a target derived under derivation_precondition. No E category is assigned from this state."
+    },
+    "ambiguity_states": [
+      "V4_UNRESOLVED_CONTAINER",
+      "CALLEE_UNKNOWN on the only dependency path",
+      "DEPENDENCY_UNBOUNDED",
+      "OPEN_NAMESPACE_RECEIVER (h1d_namespace_closure N2)",
+      "DYNAMIC_KEY_OPEN (h1d_namespace_closure N3)",
+      "FREEFORM_DYNAMIC_KEY (h1d_freeform F5)",
+      "HELPER_UNRESOLVED (h1d_interprocedural I5)",
+      "UNRESOLVED_DEPENDENCY (h1d_control_dependence UNRESOLVED)",
+      "PARENT_DEFAULT_REACH"
+    ],
+    "precedence": [
+      "1. V_INVALID when every changed predicate on the target is decided (no unresolved dependency path) and none is DATA_DEPENDENT on W. The reason set is recorded; the order of invalid_reasons above names the first reason when several apply.",
+      "2. V_AMBIGUOUS when no changed predicate is DATA_DEPENDENT on W and some dependency path or check is unresolved (ambiguity_states), or when a V4 check is unresolved.",
+      "3. V_VALID when at least one changed predicate is DATA_DEPENDENT on W, or C4 holds for an option-semantic change, and checks V1-V3 and S1 pass and V4 is not unresolved.",
+      "4. A DATA_DEPENDENT changed predicate on W makes the target not invalid, even when other changed predicates on the same target are CONTROL_DEPENDENT_ONLY or foreign-only. Those are recorded and do not change the target state."
+    ],
+    "derivation_precondition": "derivation_scope. A hunk derives target W when it changes (a) W's own declaration or an option-semantic attribute of W (C4); (b) a predicate Q that is DATA_DEPENDENT on W, or CONTROL_DEPENDENT_ONLY on W through a gate chain whose gate is DATA_DEPENDENT on W (C1); or (c) an ancestor option of W whose change has undecided reach to W (PARENT_DEFAULT_REACH, which then gives V_AMBIGUOUS). A changed data term (G1) does not derive W, even inside a W-gated block. A changed predicate that is INDEPENDENT of W, with no W path and no W gate, does not derive W: the hunk has no V state for W and no category for W. An unresolved W path (ambiguity_states) derives W with V_AMBIGUOUS, not 'not derived'. A case that supplies no changed term does not derive W.",
+    "aggregation_note": "The mechanical part of target-validity/1 remains (V1-V3 failure is INVALID; V4 unresolved is AMBIGUOUS; S1 is reviewer-owned). V_VALID additionally needs precedence 3. V_INVALID carries no E category. V_AMBIGUOUS hunks take E_AMBIGUOUS. The v2 target-validity rubric records these states."
+  },
+  "h1d_callee_resolution": {
+    "purpose": "H1D.3. Resolved versus unresolved callees, including library names used as callees. Extends h1c_callee_resolution.",
+    "rules": {
+      "K1": "A name is not a resolution. A callee is resolved only by R1-R3 of h1c_callee_resolution at the exact SHA. Example lists (predicate_taxonomy P_SELECTION, h1c_higher_order) name candidate callees; they do not decide a role on their own.",
+      "K2_library_path": "lib.<path> is resolved when (a) the file's lib is its module argument and is not rebound (no let or inherit binding of lib and no @-pattern; checked by grep of the file at the SHA), and (b) the path reaches a definition in lib/ at the same SHA through an alias chain of at most 4 steps ending in a builtins member (L1), or through a definition read at the SHA with its span recorded. Its role then follows h1d_gating_primitives or h1c_higher_order.",
+      "K3_local_alias": "let f = X in f ... resolves only if X resolves under K1 or K2 at the SHA, f has a unique binding, and no rebinding lies on the use path (R2). Otherwise CALLEE_UNKNOWN.",
+      "K4_role_from_identity": "After resolution, the role comes from the resolved identity (h1d_gating_primitives or the H1 lists). Without resolution the role is P_UNKNOWN regardless of spelling.",
+      "K5_no_sha": "Without a SHA there is no resolution of a lib path. The callee is CALLEE_UNKNOWN and the role is P_UNKNOWN.",
+      "K6_conflict": "Where a reading that uses taxonomy names alone conflicts with K1, K1 governs. This settles the H1C conflict between R1 and the taxonomy example lib.filter."
+    }
+  },
+  "h1d_gating_primitives": {
+    "purpose": "H1D.4. Exact-SHA identity, with tree and blob SHAs, for the G0(ii) and selection primitives relied upon by H1D decisions.",
+    "commits": {
+      "e4c7d977153965496cbe73ff5631ca6a1118b347": "tree 21fd84ae4c901616d8f70c57cb0841fc01405142 (library, nixpkgs)",
+      "e2497c3a5262687ff7aada0707bc754cca66396f": "tree d181338dec379080ba51c4e7ca60d72b66abbca0 (beszel-agent.nix, base side of the B probe)",
+      "fdc3396349781c0dc2b495b6a320f62918bd63f6": "tree 6e06015b2a51e7180b27eb546e435bc3242db336 (beszel-agent.nix, F probe)"
+    },
+    "entries": [
+      {
+        "primitive": "lib.mkIf",
+        "role": "G0(ii) conditional-inclusion. First argument is the gate.",
+        "definition": "lib/modules.nix:1579-1582, blob 74ff0f04eb1e15d7063f2dc606bf5385b7e4c890",
+        "alias_chain": "lib/default.nix:71 modules = callLibs ./modules.nix; lib/default.nix:482 inherit (self.modules); lib/default.nix:496 mkIf",
+        "discharge_contract": "lib/modules.nix:1393-1398: mkIf false x yields [], mkIf true x yields [x]",
+        "equivalence_class": "L2 (lambda definition, not an alias chain to builtins)"
+      },
+      {
+        "primitive": "lib.optionals",
+        "role": "G0(ii). Returns elems when cond holds, otherwise an empty list.",
+        "definition": "lib/lists.nix:839, blob 819b6d7fc6ed5a31d13b33d8fce9b2bab508f489",
+        "alias_chain": "lib/default.nix:58 lists = callLibs ./lists.nix; lib/default.nix:268 inherit (self.lists); lib/default.nix:289 optionals",
+        "discharge_contract": "read from the definition: if cond then elems else []",
+        "equivalence_class": "L2"
+      },
+      {
+        "primitive": "lib.optionalString",
+        "role": "G0(ii). Returns string when cond holds, otherwise the empty string.",
+        "definition": "lib/strings.nix:776, blob ccd8457289b58216ddaec1f5533fb5a0733663ea",
+        "alias_chain": "lib/default.nix:330 inherit (self.strings); lib/default.nix:350 optionalString",
+        "discharge_contract": "read from the definition: if cond then string else an empty string",
+        "equivalence_class": "L2"
+      },
+      {
+        "primitive": "lib.filter",
+        "role": "P_SELECTION (argument 1 is the predicate; argument 2 is the list), by identity.",
+        "definition": "lib/lists.nix:18-25 inherit (builtins) ... filter, blob 819b6d7fc6ed5a31d13b33d8fce9b2bab508f489",
+        "alias_chain": "lib/default.nix:58 lists = callLibs; lib/default.nix:268 inherit (self.lists); lib/default.nix:278 filter; lib/lists.nix:25 filter from builtins (three steps, all in lib/)",
+        "discharge_contract": "builtins.filter",
+        "equivalence_class": "EQ2 (e) under L1"
+      },
+      {
+        "primitive": "lib.filterAttrs",
+        "role": "P_SELECTION by H1 list (predicate over name and value). Its body keeps elements where the predicate holds.",
+        "definition": "lib/attrsets.nix:667, blob a70567260a51daad33c1cb87813c4922c698f126. Body: removeAttrs set (filter (name: !pred name set.${name}) (attrNames set))",
+        "alias_chain": "lib/attrsets.nix:14-19 inherit (lib.lists) ... filter (filter at :19); lib/default.nix:208 inherit (self.attrsets); lib/default.nix:218 filterAttrs",
+        "discharge_contract": "read from the definition",
+        "equivalence_class": "L2 (lambda definition)"
+      },
+      {
+        "primitive": "lib.boolToYesNo",
+        "role": "Not a gate primitive. A helper whose if acts on its parameter. Governed by h1d_interprocedural.",
+        "definition": "lib/trivial.nix:308 boolToYesNo = b: if b then \"yes\" else \"no\"; blob f333440ee384619abf43ec01b81a1e5703dadd57",
+        "alias_chain": "lib/default.nix:134 inherit (self.trivial); lib/default.nix:149 boolToYesNo",
+        "discharge_contract": "not applicable",
+        "equivalence_class": "L2"
+      },
+      {
+        "primitive": "builtins.filter",
+        "role": "P_SELECTION (argument 1). FQ_BUILTIN under R1 when builtins is not rebound.",
+        "definition": "builtin",
+        "alias_chain": "none",
+        "discharge_contract": "builtin",
+        "equivalence_class": "not applicable"
+      },
+      {
+        "primitive": "builtins.hasAttr",
+        "role": "Value test. Not a predicate by itself. Its result, used as an if condition, is P_CONTROL (G0(i)) at that if.",
+        "definition": "builtin",
+        "alias_chain": "none",
+        "discharge_contract": "builtin",
+        "equivalence_class": "not applicable"
+      }
+    ],
+    "unlisted": "A primitive not listed here is P_UNKNOWN (G2) until pinned with the same fields at the exact SHA.",
+    "per_commit_blobs": {
+      "rule": "Identity at a commit holds when every file in the alias chain has, at that commit, the blob recorded here (K2, same-SHA resolution). A blob recorded for one commit does not establish identity at another commit.",
+      "lib/default.nix": {
+        "E": "56baba8708c5f72254d83d7f218097462def4c62",
+        "B": "56baba8708c5f72254d83d7f218097462def4c62",
+        "F": "56baba8708c5f72254d83d7f218097462def4c62"
+      },
+      "lib/modules.nix": {
+        "E": "74ff0f04eb1e15d7063f2dc606bf5385b7e4c890",
+        "B": "74ff0f04eb1e15d7063f2dc606bf5385b7e4c890",
+        "F": "64a86c55407f8c5b5d85906432c311125ff2648e"
+      },
+      "lib/lists.nix": {
+        "E": "819b6d7fc6ed5a31d13b33d8fce9b2bab508f489",
+        "B": "9932d410bd98dd02563fc3a455dbcc4b8078f7be",
+        "F": "8d9ec38b9a28aafbf4f01a1535767c29f1c4f3ba"
+      },
+      "lib/strings.nix": {
+        "E": "ccd8457289b58216ddaec1f5533fb5a0733663ea",
+        "B": "ccd8457289b58216ddaec1f5533fb5a0733663ea",
+        "F": "ccd8457289b58216ddaec1f5533fb5a0733663ea"
+      },
+      "lib/trivial.nix": {
+        "E": "f333440ee384619abf43ec01b81a1e5703dadd57",
+        "B": "f333440ee384619abf43ec01b81a1e5703dadd57",
+        "F": "f333440ee384619abf43ec01b81a1e5703dadd57"
+      },
+      "lib/attrsets.nix": {
+        "E": "a70567260a51daad33c1cb87813c4922c698f126",
+        "B": "a70567260a51daad33c1cb87813c4922c698f126",
+        "F": "a70567260a51daad33c1cb87813c4922c698f126"
+      }
+    }
+  },
+  "h1d_freeform": {
+    "purpose": "H1D.5. Freeform keys against declared suboptions.",
+    "rules": {
+      "F1_declared_suboption": "A key declared in options of a submodule with freeformType is an independent declaration. It participates in V3, E and D like any declared option. Example: mpd.nix:178 music_directory, declared in the settings submodule at e4c7d977.",
+      "F2_freeform_only_key": "A key matched only by freeformType is not an independent declared target. Example: speechd.nix:37 modules = submodule { freeformType = attrsOf lines; } with no options. A watch path naming such a key is V_INVALID with reason FREEFORM_KEY_NOT_INDEPENDENT_DECLARATION.",
+      "F3_undeclared_key_under_mixed_submodule": "A key not declared in options, under a submodule that also declares options (mpd settings), is freeform-only under F2.",
+      "F4_container_type": "A change to freeformType is an option type change (EC04) on the container path, not a change to any key.",
+      "F5_dynamic_key": "A freeform key whose name is computed is FREEFORM_DYNAMIC_KEY (V_AMBIGUOUS) unless h1d_namespace_closure establishes its domain. A closed domain gives each member its F1 or F2 status.",
+      "F6_count": "grep of freeformType under nixos/modules/services at e4c7d977 gives 534 matching lines. This count is diagnostic, not a closure."
+    }
+  },
+  "h1d_namespace_closure": {
+    "purpose": "H1D.6. Closure for namespace receivers and computed keys. Extends absence_evidence A5 with rules N1-N6; A5 still governs T_NONE.",
+    "rules": {
+      "N1_literal_leaf": "A whole-namespace binding B = config.<ns> (or an exact alias) is closed when every occurrence of B within its T1-unique lexical scope is a literal attribute selection B.<name>. The domain is the set of selected names. Every occurrence is enumerated (grep of the binding name in the file at the SHA) and classified.",
+      "N2_whole_namespace_consumption": "Any occurrence of B or config.<ns> as a value (argument of attrNames, attrValues, the mapAttrs family, filterAttrs, getAttr, attrByPath, a function argument, a // merge, or a returned value) makes the domain open. Literal leaf selections do not close an open domain.",
+      "N3_computed_key": "config.<ns>.${x} is closed when the domain of x is exact: (i) a literal list or set, traced to every value of x (for a function parameter, every call site is listed); or (ii) an option of enum type at the SHA, under N4. Otherwise the domain is open.",
+      "N4_enum_expansion": "Expanding an enum-typed key requires this evidence: the receiver chain resolves to one option path; the option type is types.enum with a literal list at the SHA, span recorded; the receiver expression is exactly that chain, with no other binding supplying x; and the module system type check restricts the option value to that list (recorded from the type declaration, not assumed).",
+      "N5_decision": "A closed receiver excludes K when K is not in its domain. An open receiver is OPEN_NAMESPACE_RECEIVER or DYNAMIC_KEY_OPEN, so T_UNKNOWN for K. A receiver whose domain contains K is a consumer of K: positive evidence under the predicate rules, and T_NONE is refused.",
+      "N6_screen_not_closure": "A grep that finds no receiver is diagnostic only. Closure is N1-N5 per receiver. A whole-namespace grep is a screen, not a closure."
+    },
+    "worked_examples_diagnostic": {
+      "ncdns": "ncdns.nix:8 cfgs = config.services. Occurrences at :8, :9, :189, :199, :207, :208, :209 are all literal selections (ncdns, pdns-recursor, namecoind). N1 closed domain: {ncdns, pdns-recursor, namecoind}.",
+      "rancher": "default.nix:24 and :838 use config.services.${name}. The mkRancherModule callers under nixos/ are k3s.nix:9 and rke2.nix:9, with literal names k3s and rke2; default.nix:977 passes the function on. N3(i) closed domain: {k3s, rke2}.",
+      "vault_agent": "vault-agent.nix:129-149 maps over the literal list [consul-template vault-agent] (:145-148) to config.services.${flavour} at :134. N3(i) closed.",
+      "movim": "movim.nix:478-481 types.enum [mariadb postgresql] at the option reached by cfg.database.type (cfg = config.services.movim at :23). The computed key config.services.${cfg.database.type} is at :628. The literal attrset at :622-626 is indexed by the same value and is not a namespace receiver. N4 closed domain: {mariadb, postgresql}.",
+      "synthetic_open": "SYNTHETIC, no historical SHA: builtins.attrNames config.services. N2 applies; T_UNKNOWN for every K. Literal selections elsewhere do not close it.",
+      "synthetic_dynamic_open": "SYNTHETIC, no historical SHA: config.services.${builtins.getEnv \"X\"}. N3 applies; the domain of an environment value is not exact; T_UNKNOWN."
+    },
+    "carry_forward": "H1D does not reclassify the H1C A5 receiver matches. Their closure for gophernicus or rundeck requires N1-N5 for each receiver in the run that decides that absence."
+  },
+  "h1d_interprocedural": {
+    "purpose": "H1D.8-H1D.10. Helpers, call context, and the boolToYesNo ruling.",
+    "rules": {
+      "I1_own_position": "A boolean's role is fixed at its own consumer position. An if condition inside a helper is P_CONTROL (G0(i)) whatever the caller does with the result.",
+      "I2_call_site_chain": "W reaches a helper parameter p at call site c when the argument for p at c is W-derived under h1c_causal_relevance. One W-derived call site is positive evidence that the helper predicate is DATA_DEPENDENT on W. Eligibility needs no completeness. A claim that W has no helper dependence does need the complete call-site list.",
+      "I3_category": "A change to a helper predicate is E_INDIRECT when the helper is declared in another module (let_binding_rule). A change at a call site whose argument is in a data position (text interpolation, list element) is E_NO for that hunk (G1 at the caller).",
+      "I4_separation": "Predicate eligibility and expression equivalence are separate decisions. Eligibility of a helper predicate does not make a call-site rewrite equivalent. Rewriting a helper call as an inline conditional, or the reverse, is an EC10 question: L2, EQ3, reviewer-owned, unless it is an L1 alias chain.",
+      "I5_unresolved_helper": "A helper whose identity is unresolved under h1d_callee_resolution makes its predicate P_UNKNOWN. With option operands the result is E_AMBIGUOUS (HELPER_UNRESOLVED)."
+    },
+    "boolToYesNo_ruling": {
+      "definition": "lib/trivial.nix:308 boolToYesNo = b: if b then \"yes\" else \"no\"; header lib/default.nix:134; re-export lib/default.nix:149",
+      "call_sites_under_nixos": "66 lines in nixos/ match -w boolToYesNo at e4c7d977 (diagnostic count)",
+      "watched_example": "services.locate.pruneBindMounts. Declaration locate.nix:191-193 (bool, default false). Uses at locate.nix:244, inside the PRUNE_BIND_MOUNTS text, and locate.nix:276, as an argument element to updatedb. Both arguments are cfg.pruneBindMounts, with cfg an exact alias.",
+      "eligibility": "The helper's if b is P_CONTROL and DATA_DEPENDENT on pruneBindMounts through I2 (positive evidence at :244 and :276). A change to lib/trivial.nix:308 is E_INDIRECT for pruneBindMounts (I3).",
+      "caller_positions": "A change to locate.nix:244 or :276 (the interpolation or the argument element) is data for the caller: E_NO (I3). The helper's internal if does not make the caller position gating.",
+      "equivalence": "Rewriting locate.nix:276 from lib.boolToYesNo cfg.pruneBindMounts to an inline conditional is EC10 with L2 and EQ3 (I4). It is reviewer-owned and not automatic."
+    },
+    "superseded_H1C": "The H1C P10 label (E_NO for the unchanged helper definition) is superseded for future changes to that definition: such a change is E_INDIRECT under I3. The H1C record is not edited (forward-only)."
+  },
+  "h1d_go_i_boundary": {
+    "additional_mechanical": [
+      "dependency-state computation (DATA_DEPENDENT, CONTROL_DEPENDENT_ONLY, INDEPENDENT) on the exact SHA, with gate chains recorded",
+      "V states with named reasons (h1d_validity_states)",
+      "identity of lib primitives at the exact SHA (h1d_gating_primitives), with tree and blob SHAs",
+      "namespace closure N1, N3(i) and N4 where the evidence list is present"
+    ],
+    "additional_reviewer_owned": [
+      "N2 whole-namespace consumption not syntactically closed",
+      "N3 open dynamic keys",
+      "F5 freeform keys with dynamic names",
+      "I4 equivalence between helper and inline forms (EQ3)",
+      "I5 unresolved helpers"
+    ]
+  },
+  "h1d_owner_ruling_and_clarifications": {
+    "owner_ruling_2026_10_08": "Control dependence alone does not make an inner predicate dependent on watched option W for Layer A. A predicate is a valid Layer-A target for W only if W contributes to its boolean value through an accepted data or semantic dependency edge. If W only controls whether the predicate is reached or evaluated, the state is CONTROL_DEPENDENT_ONLY and is insufficient. A control-only inner predicate is not a valid target for W: it is V_INVALID with NO_WATCHED_PREDICATE_DEPENDENCY / CONTROL_DEPENDENT_ONLY, and no E category is assigned from the invalid target. a changed inner predicate that depends on another watched option is evaluated for that option separately; the enclosing W-dependent gate may be a valid Layer-A predicate where applicable. No composite predicate such as W && inner is synthesized unless a source predicate or a separately specified reachability layer introduces it.",
+    "clarifications": {
+      "K_T": "In h1c_causal_relevance, accepted edge 4 ('transparent let binding') means transparent for tracing under predicate_rule.let_binding_rule. It does not mean an h1c_let_alias_transparency alias. A function-call right-hand side is not an alias, but it is traced when it is a pure expression of named option paths and static values.",
+      "K5_governs": "K5 governs. A lib.* name with no SHA at the case's commit is P_UNKNOWN, including for synthetic cases. A case parenthetical ('classify as written', 'may be checked at E') supplies no SHA.",
+      "I3_scope": "The I3 caller clause (E_NO for a data-position call-site change) applies only when every changed term in the hunk is G1 data. A hunk that changes a predicate is decided by I1 and I4.",
+      "changed_predicate": "Any predicate term in the after-state of a hunk that differs from the before-state is a changed predicate, including one introduced by an EC10 rewrite. Its EC10 status does not change its V state.",
+      "ec10_category": "A rewrite decided EQ3 takes E_AMBIGUOUS under ec10_equivalence until the reviewer decision is recorded,.",
+      "side_for_predicate_hunks": "For a hunk whose changed term is a predicate or a helper body, V1-V3 run against the side and module where W is declared. For option-semantic changes, target-validity side_rule governs.",
+      "declaring_module_unstated": "If the module declaring W or an operand is not stated or not resolved, the category is E_AMBIGUOUS (DECLARING_MODULE_UNSTATED). declaration_module_governs is not applied without a declaring module."
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "go-h-target-validity-rubric/1",
+  "status": "CANDIDATE; checks V1-V4 are implemented in work/go-h/validate_targets.py; S1 is a reviewer judgment",
+  "purpose": "Decide V (derived target is contract-valid) for one target, before any oba call. Target validity is a property of the manifest against source, not of oba's verdict.",
+  "unit": "one [[target]] record in a manifest, checked against the source tree of one side (base or head) named by the provenance field",
+  "fields": {
+    "module": "path relative to the source root; must be a file",
+    "test": "path relative to the source root; must be a file (oba reads it; a missing test is a read error)",
+    "cfg_ident": "Nix identifier used to name the configuration under test",
+    "option_prefix": "walkable root: an attrset path whose last segment is a container, not a leaf option declared with mk*Option",
+    "watch": "dotted path relative to option_prefix; each intermediate segment is a container, the leaf is an option or container key"
+  },
+  "source_loading": {
+    "rule": "V1-V4 read source only from a committed tree at the full SHA named by provenance for that side (git show <sha>:<path> or git ls-tree / git grep at <sha>). The validator must not read a working tree, and a SHA that does not resolve to a commit is an ERROR for that target (never VALID or INVALID).",
+    "reason": "Validity is a property of the manifest against the pinned source. A working-tree read makes the verdict depend on checkout state, the same defect the T_NONE standard forbids.",
+    "search_procedure": "V4 and S1 support searches use work/go-h/exact_tree_search.sh with the side SHA; status ZERO_COMPLETE or MATCH is usable, ERROR is not."
+  },
+  "side_rule": {
+    "rule": "Each target records side: base, head, or both. Validation runs against the source tree of that side. A removed option is validated against base; an added option against head; a changed-default option is validated against both.",
+    "reason": "Validating a removed option against head yields a false INVALID (observed in the H5/validator run: listenPort_removed flagged on head, valid on base)."
+  },
+  "checks": [
+    {"id": "V1", "name": "module exists on the named side", "verdict_if_fail": "INVALID", "mechanical": true},
+    {"id": "V2", "name": "option_prefix last segment is not an option declaration (mk*Option or mk*PackageOption or mkEnableOption)", "verdict_if_fail": "INVALID", "mechanical": true, "note": "Catches the GO-F pre-correction defect where option_prefix ended in an interior mkOption container."},
+    {"id": "V3", "name": "each watch segment is declared in the module on that side: intermediate segments as container keys or dotted keys; leaf as an option declaration or a key", "verdict_if_fail": "INVALID", "mechanical": true},
+    {"id": "V4", "name": "option_prefix last segment is found as a container key at all", "verdict_if_fail": "AMBIGUOUS", "mechanical": true, "note": "Reachable only through a helper, so text search cannot confirm it. Reviewer must resolve by reading the helper; AMBIGUOUS does not count as V."},
+    {"id": "S1", "name": "semantic remainder: the target's watch paths are the options whose semantics the PR changes, not unrelated siblings", "verdict_if_fail": "INVALID", "mechanical": false, "note": "Reviewer judgment. Must cite the decisive hunk from the eligibility record. Never decided by oba output."}
+  ],
+  "verdict_aggregation": {
+    "per_target": "VALID iff V1, V2, V3 pass and V4 is not AMBIGUOUS and S1 passes (or S1 is not applicable for a provenance-only check). INVALID if any check fails. AMBIGUOUS otherwise.",
+    "per_pr": "V(PR) iff at least one target is VALID AND every target is VALID or the PR's extra targets are explicitly marked out-of-scope with a reason. A PR with some INVALID and some VALID targets is PARTIAL_V and is counted in V with the VALID targets only, reported separately. A PR whose targets are all INVALID is not V.",
+    "aggregation_decided_before_run": true
+  },
+  "declared_not_checked": [
+    "Whether oba discovers the option through its own analyzer (that is OBA DISCOVERY, after V)",
+    "Whether the test witnesses the option (that is WITNESS, a separate axis W)",
+    "Whether the derived target matches the historical verdict (never used as a validity criterion)"
+  ],
+  "validator_evidence": {
+    "file": "work/go-h/validate_targets.py",
+    "as_recorded_F21_manifests": "5/5 pre-correction option_prefix defects flagged INVALID by V2 (work/go-h/manifests/as-recorded/)",
+    "on_disk_corrected_GOF_targets": "all head targets VALID except listenPort_removed, which is VALID on base (side rule)",
+    "known_limitation": "557977 package is declared with mkPackageOption; validator reports VALID; oba reports OptionNotFound. This is a separation between target validity (V) and analyzer discovery, not a validator error."
+  }
+}

@@ -1,0 +1,232 @@
+# Exact-SHA source excerpts. Read from pinned commits with git show; no working tree.
+# repo: /home/tandem/.cache/go-h/nixpkgs-exact
+
+=== beszel, base B: e2497c3a5262:nixos/modules/services/monitoring/beszel-agent.nix lines 204-216
+  204          Type = "simple";
+  205          UMask = 27;
+  206        };
+  207      };
+  208  
+  209      networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
+  210        (
+  211          if (builtins.hasAttr "PORT" cfg.environment) then
+  212            (lib.strings.toInt cfg.environment.PORT)
+  213          else
+  214            45876
+  215        )
+  216      ];
+
+=== beszel, head F: fdc339634978:nixos/modules/services/monitoring/beszel-agent.nix lines 44-56
+   44        ];
+   45      };
+   46    };
+   47  
+   48    activeCollectors = lib.optionals (!cfg.environment.SKIP_GPU) cfg.environment.GPU_COLLECTOR;
+   49  
+   50    collectorAttrs =
+   51      attr: lib.unique (lib.concatMap (name: gpuCollectors.${name}.${attr} or [ ]) activeCollectors);
+   52  
+   53    gpuPackages = map (name: gpuCollectors.${name}.package) (
+   54      lib.filter (name: gpuCollectors.${name} ? package) activeCollectors
+   55    );
+   56  
+
+=== speechd, E: e4c7d9771539:nixos/modules/services/accessibility/speechd.nix lines 34-50
+   34      };
+   35  
+   36      modules = mkOption {
+   37        type = with lib.types; submodule { freeformType = attrsOf lines; };
+   38        default = { };
+   39        description = ''
+   40          Configuration files of output modules.
+   41        '';
+   42        example = {
+   43          generic-epos = ''
+   44            AddVoice        "cs"  "male1"   "kadlec"
+   45            AddVoice        "sk"  "male1"   "bob"
+   46          '';
+   47        };
+   48      };
+   49  
+   50      clients = mkOption {
+
+=== mpd settings submodule, E: e4c7d9771539:nixos/modules/services/audio/mpd.nix lines 150-186
+  150          '';
+  151        };
+  152  
+  153        settings = lib.mkOption {
+  154          type = lib.types.submodule {
+  155            freeformType =
+  156              let
+  157                inherit (lib.types)
+  158                  oneOf
+  159                  attrsOf
+  160                  listOf
+  161                  str
+  162                  int
+  163                  bool
+  164                  path
+  165                  ;
+  166                atomType = oneOf [
+  167                  str
+  168                  int
+  169                  bool
+  170                  path
+  171                ];
+  172              in
+  173              attrsOf (oneOf [
+  174                atomType
+  175                (listOf (attrsOf atomType))
+  176              ]);
+  177            options = {
+  178              music_directory = lib.mkOption {
+  179                type = with lib.types; either path (strMatching "([a-z]+)://.+");
+  180                default = "${cfg.dataDir}/music";
+  181                defaultText = lib.literalExpression ''"''${dataDir}/music"'';
+  182                description = ''
+  183                  The directory or URI where MPD reads music from. If left
+  184                  as the default value this directory will automatically be created before
+  185                  the MPD server starts, otherwise the sysadmin is responsible for ensuring
+  186                  the directory exists with appropriate ownership and permissions.
+
+=== boolToYesNo, E: e4c7d9771539:lib/trivial.nix lines 302-310
+  302      # Type
+  303  
+  304      ```
+  305      boolToYesNo :: Bool -> String
+  306      ```
+  307    */
+  308    boolToYesNo = b: if b then "yes" else "no";
+  309  
+  310    /**
+
+=== locate pruneBindMounts, E: e4c7d9771539:nixos/modules/misc/locate.nix lines 188-200
+  188        '';
+  189      };
+  190  
+  191      pruneBindMounts = lib.mkOption {
+  192        type = lib.types.bool;
+  193        default = false;
+  194        description = ''
+  195          Whether not to index bind mounts
+  196        '';
+  197      };
+  198  
+  199    };
+  200  
+
+=== locate updatedb.conf, E: e4c7d9771539:nixos/modules/misc/locate.nix lines 240-246
+  240        etc."updatedb.conf".text = ''
+  241          PRUNEFS="${lib.concatStringsSep " " cfg.pruneFS}"
+  242          PRUNENAMES="${lib.concatStringsSep " " cfg.pruneNames}"
+  243          PRUNEPATHS="${lib.concatStringsSep " " cfg.prunePaths}"
+  244          PRUNE_BIND_MOUNTS="${lib.boolToYesNo cfg.pruneBindMounts}"
+  245        '';
+  246  
+
+=== locate command, E: e4c7d9771539:nixos/modules/misc/locate.nix lines 270-278
+  270            utils.escapeSystemdExecArgs (
+  271              [
+  272                (lib.getExe' cfg.package "updatedb")
+  273                "--output"
+  274                cfg.output
+  275                "--prune-bind-mounts"
+  276                (lib.boolToYesNo cfg.pruneBindMounts)
+  277              ]
+  278              ++ args
+
+=== movim database.type, E: e4c7d9771539:nixos/modules/services/web-apps/movim.nix lines 474-486
+  474        };
+  475  
+  476        database = {
+  477          type = mkOption {
+  478            type = types.enum [
+  479              "mariadb"
+  480              "postgresql"
+  481            ];
+  482            example = "mariadb";
+  483            default = "postgresql";
+  484            description = "Database engine to use.";
+  485          };
+  486  
+
+=== movim computed key, E: e4c7d9771539:nixos/modules/services/web-apps/movim.nix lines 620-630
+  620            (mkIf cfg.database.createLocally {
+  621              DB_DRIVER =
+  622                {
+  623                  "postgresql" = "pgsql";
+  624                  "mariadb" = "mysql";
+  625                }
+  626                .${cfg.database.type};
+  627              DB_HOST = "localhost";
+  628              DB_PORT = config.services.${cfg.database.type}.settings.port;
+  629              DB_DATABASE = cfg.database.name;
+  630              DB_USERNAME = cfg.database.user;
+
+=== optionalString, E: e4c7d9771539:lib/strings.nix lines 774-778
+  774      :::
+  775    */
+  776    optionalString = cond: string: if cond then string else "";
+  777  
+  778    /**
+
+=== lib.lists binding, E: e4c7d9771539:lib/default.nix lines 266-280
+  266          removeAttrs
+  267          ;
+  268        inherit (self.lists)
+  269          singleton
+  270          forEach
+  271          map
+  272          foldr
+  273          fold
+  274          foldl
+  275          foldl'
+  276          imap0
+  277          imap1
+  278          filter
+  279          ifilter0
+  280          concatMap
+
+=== lib.lists binding, F: fdc339634978:lib/default.nix lines 266-280
+  266          removeAttrs
+  267          ;
+  268        inherit (self.lists)
+  269          singleton
+  270          forEach
+  271          map
+  272          foldr
+  273          fold
+  274          foldl
+  275          foldl'
+  276          imap0
+  277          imap1
+  278          filter
+  279          ifilter0
+  280          concatMap
+
+=== lists.nix inherit, F: fdc339634978:lib/lists.nix lines 16-26
+   16  rec {
+   17  
+   18    inherit (builtins)
+   19      head
+   20      tail
+   21      length
+   22      isList
+   23      elemAt
+   24      concatLists
+   25      filter
+   26      elem
+
+=== lists.nix inherit, E: e4c7d9771539:lib/lists.nix lines 16-26
+   16  rec {
+   17  
+   18    inherit (builtins)
+   19      head
+   20      tail
+   21      length
+   22      isList
+   23      elemAt
+   24      concatLists
+   25      filter
+   26      elem
+
