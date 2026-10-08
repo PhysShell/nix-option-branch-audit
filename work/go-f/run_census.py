@@ -5,12 +5,13 @@ mechanism verbatim, with exactly one addition: the GO-F exclusion set
 is subtracted from the merged-PR population before systematic_sample
 ever runs (reports/go-f-prereg.md Phase F1.2).
 
-NOT EXECUTED TO COMPLETION as of this commit. The preregistered
-WINDOW_INCREMENT_DAYS=5 window cannot mature within one continuous
-session (only ~7 minutes had elapsed since the LOWER_BOUND anchor at
-the time this was written) -- see reports/go-f-evaluation.md's own
-"Phase F2 status" section for the honest account of this blocker and
-why no shortcut was taken.
+Updated per reports/go-f-prereg-amendment-A1.md (commit 7cbb2be):
+uses the retrospective window [2026-10-02T11:22:03Z, 2026-10-07T11:22:03Z)
+in place of the original, as-yet-immature prospective window. Window
+is already fully matured; no WINDOW_INCREMENT_DAYS extension logic is
+needed or used (amendment A1 fixes a single, already-matured window;
+it does not authorize further extension-by-waiting, since the whole
+point was to avoid further waiting).
 """
 import importlib.util
 import json
@@ -26,9 +27,10 @@ spec.loader.exec_module(ps1)
 
 EXCLUDED = set(json.load(open("/home/tandem/nix-option-branch-audit/work/go-f/exclusion-set.json"))["excluded_pr_numbers"])
 
-LOWER_BOUND = datetime(2026, 10, 7, 11, 22, 3, tzinfo=timezone.utc)
-WINDOW_INCREMENT_DAYS = 5
-WINDOW_HARD_CAP_DAYS = 30
+# Amendment A1 (7cbb2be): fixed retrospective window, already matured.
+# No extension-by-waiting -- A1 explicitly does not authorize it.
+WINDOW_START = datetime(2026, 10, 2, 11, 22, 3, tzinfo=timezone.utc)
+WINDOW_END = datetime(2026, 10, 7, 11, 22, 3, tzinfo=timezone.utc)
 
 
 def throttled_page_fetch_fn(query, page, per_page):
@@ -75,28 +77,23 @@ def exclusion_filtered_census(lower, upper):
 
 
 def main():
-    upper = LOWER_BOUND + timedelta(days=WINDOW_INCREMENT_DAYS)
-    attempts = []
-    while True:
-        started = ps1._default_now().isoformat()
-        before, after, n_inspected, relevant = exclusion_filtered_census(LOWER_BOUND, upper)
-        attempts.append({
-            "lower": LOWER_BOUND.isoformat(), "upper": upper.isoformat(),
-            "raw_population_before_exclusion": before,
-            "population_after_exclusion": after,
-            "n_inspected": n_inspected,
-            "n_relevant": len(relevant),
-            "relevant_pr_numbers": sorted(r["number"] for r in relevant),
-            "started": started, "finished": ps1._default_now().isoformat(),
-        })
-        print(json.dumps(attempts[-1], indent=2))
-        if len(relevant) >= ps1.NC1_THRESHOLD:
-            result = {"outcome": "NC1_PASS", "attempts": attempts, "relevant_pool": relevant, "inspection_log": log}
-            break
-        if (upper - LOWER_BOUND).days >= WINDOW_HARD_CAP_DAYS:
-            result = {"outcome": "NC1_KILL_STOP_LOW_YIELD", "attempts": attempts, "inspection_log": log}
-            break
-        upper = upper + timedelta(days=WINDOW_INCREMENT_DAYS)
+    started = ps1._default_now().isoformat()
+    before, after, n_inspected, relevant = exclusion_filtered_census(WINDOW_START, WINDOW_END)
+    attempt = {
+        "lower": WINDOW_START.isoformat(), "upper": WINDOW_END.isoformat(),
+        "raw_population_before_exclusion": before,
+        "population_after_exclusion": after,
+        "n_inspected": n_inspected,
+        "n_relevant": len(relevant),
+        "relevant_pr_numbers": sorted(r["number"] for r in relevant),
+        "started": started, "finished": ps1._default_now().isoformat(),
+    }
+    print(json.dumps(attempt, indent=2))
+    if len(relevant) >= ps1.NC1_THRESHOLD:
+        outcome = "NC1_PASS"
+    else:
+        outcome = "NC1_FAIL_NO_FURTHER_EXTENSION_PER_A1"
+    result = {"outcome": outcome, "attempt": attempt, "relevant_pool": relevant, "inspection_log": log}
 
     with open("/home/tandem/nix-option-branch-audit/work/go-f/census-result.json", "w") as f:
         json.dump(result, f, indent=2, default=str)
