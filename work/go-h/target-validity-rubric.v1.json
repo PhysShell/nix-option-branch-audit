@@ -10,11 +10,6 @@
     "option_prefix": "walkable root: an attrset path whose last segment is a container, not a leaf option declared with mk*Option",
     "watch": "dotted path relative to option_prefix; each intermediate segment is a container, the leaf is an option or container key"
   },
-  "source_loading": {
-    "rule": "V1-V4 read source only from a committed tree at the full SHA named by provenance for that side (git show <sha>:<path> or git ls-tree / git grep at <sha>). The validator must not read a working tree, and a SHA that does not resolve to a commit is an ERROR for that target (never VALID or INVALID).",
-    "reason": "Validity is a property of the manifest against the pinned source. A working-tree read makes the verdict depend on checkout state, the same defect the T_NONE standard forbids.",
-    "search_procedure": "V4 and S1 support searches use work/go-h/exact_tree_search.sh with the side SHA; status ZERO_COMPLETE or MATCH is usable, ERROR is not."
-  },
   "side_rule": {
     "rule": "Each target records side: base, head, or both. Validation runs against the source tree of that side. A removed option is validated against base; an added option against head; a changed-default option is validated against both.",
     "reason": "Validating a removed option against head yields a false INVALID (observed in the H5/validator run: listenPort_removed flagged on head, valid on base)."

@@ -1,0 +1,37 @@
+GO-H1B bounded fresh review: record of the reviewer's report
+
+Provenance: fresh general-purpose agent (session agent id a829c7ddf02e66054), prompt in
+work/go-h/independent-review/h1b-reviewer-prompt.txt, rubric as v4 BEFORE the A5 wording
+correction (see reports/go-h1-semantic-decisions.md, GO-H1B). This file transcribes the
+report lines from the agent's hand-back; it is not a byte copy of the hand-back.
+
+C1: role=P_SELECTION | eligible=yes | category=E_DIRECT | reason=predicate lambda of lib.filter keeps elements by a boolean reading config state of the same module (lambda rule).
+C2: role=P_SELECTION | eligible=yes | category=E_DIRECT | reason=filterAttrs predicate on environment attrset reads cfg of the same module; mapAttrs transform is not a predicate.
+C3: role=P_SELECTION | eligible=yes | category=E_INDIRECT | reason=filterUsers reads config.users.users declared outside the file; builtins.isString and builtins.isInt are P_UNKNOWN.
+C4: role=P_SELECTION | eligible=yes | category=E_DIRECT | reason=builtins.filter with named predicate invalidOverlay over cfg.overlays of the same module.
+C5: role=P_SELECTION | eligible=yes | category=E_INDIRECT | reason=predicate compares against config.system.build declared outside fish.nix.
+C6: role=P_GATING (line 139) | eligible=yes | category=E_INDIRECT | reason=config.boot.zfs.enabled is declared in zfs.nix; lines 186 and 188 may be P_DATA_ONLY (boundary unresolved).
+C7: T_NONE=no | failing_condition=A5 | owner_key_query_matches=13, all non-consumer classes | reason=whole-namespace receivers were reported open under the v4 A5 wording, which listed with/inherit as open; the wording is self-contradictory (see GO-H1B).
+C8: T_NONE=no | failing_condition=A5 | owner_key_query_matches=42 | reason=same A5 wording issue; match classification not completed by the reviewer.
+C9a: level=EQ3 | equivalent=no | EC10_AUTOMATIC=false | reason=operand reordering of && is forbidden as automatic normalization.
+C9b: level=EQ3 | equivalent=no | EC10_AUTOMATIC=false | reason=double negation reduction is forbidden as automatic normalization.
+C9c: level=EQ2 | equivalent=yes | EC10_AUTOMATIC=true | reason=same-file let alias binding exactly the option path (rule EQ2 c).
+C9d: level=EQ3 | equivalent=no | EC10_AUTOMATIC=false | reason=if-then-else with boolean literals is not in any EQ0-EQ2 kind.
+C9e: level=EQ3 | equivalent=unknown | EC10_AUTOMATIC=false | reason=list-producing equivalence needs semantic reasoning about lib.optional.
+C9f: level=EQ3 | equivalent=no | EC10_AUTOMATIC=false | reason=mkDefault wrapper removal is forbidden as automatic normalization.
+C9g: level=EQ3 | equivalent=no | EC10_AUTOMATIC=false | reason=list element reordering is forbidden as automatic normalization.
+C9h: level=EQ2 | equivalent=yes | EC10_AUTOMATIC=true | reason=same-file let alias with exact option path, rule EQ2 c.
+C9i: level=EQ3 | equivalent=unknown | EC10_AUTOMATIC=false | reason=lib.boolToYesNo needs its definition from another file.
+C9j: level=EQ3 | equivalent=unknown | EC10_AUTOMATIC=false | reason=lib.filter and builtins.filter equivalence needs the lib binding (outside the expression).
+
+Reviewer rule-wording objections (as reported):
+1. builtins are unbound in-file, so builtin predicates become P_UNKNOWN (builtins resolution).
+2. No rule for combining categories when one predicate traces both in-module and foreign paths.
+3. Unclear whether unforced let-bound values count as read under ?.
+4. Traced paths stop at the named option and ignore its default (GPU_COLLECTOR default reads services.xserver.videoDrivers).
+5. A5 self-contradictory: with/inherit listed as open receivers, yet they reach K only by naming it (corrected after review; not re-reviewed).
+6. A selection inside a message interpolation (C4) is not clearly "message text".
+7. No aggregation rule across per-site results.
+8. P_GATING vs P_DATA_ONLY boundary unresolved for a boolean written as an attribute value.
+9. EC10 (c) does not say whether a head-introduced let around an option path is covered.
+10. EQ3 library-binding equivalences cannot be decided without a SHA.

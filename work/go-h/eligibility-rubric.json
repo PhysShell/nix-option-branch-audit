@@ -1,40 +1,95 @@
 {
-  "schema": "go-h-eligibility-rubric/3.1",
-  "status": "GO-H1A rulings applied. Scope: README Layer A (option-dependent source-level branch-activation analysis). v3.1 = v3 after one wording refinement from the first bounded review (see amendments). Supersedes v3 (eligibility-rubric.v3-prereview.json), v2 and v1.",
+  "schema": "go-h-eligibility-rubric/4.0",
+  "status": "GO-H1B candidate, pending bounded reviewer check. Scope and U1-U4 unchanged (GO-H1A rulings). Supersedes v3.1 (eligibility-rubric.v3.1.json), v3 (eligibility-rubric.v3-prereview.json), v2 and v1. v4 changes: exact-SHA absence standard (T_NONE), semantic predicate roles, lambda predicate rule, let-binding transparency, EC10 equivalence levels.",
   "purpose": "Assign each PR hunk an E category from source semantics only. Must not consult oba output, test presence, derivability (D), target validity (V), witnessability (W), or any historical verdict.",
   "scope": {
-    "in": "Changes to an option's semantics (declaration, default, type, apply, readOnly, path) that are traceable to an option-dependent branch predicate; changes to a boolean predicate that directly or indirectly consumes option state.",
+    "in": "Changes to an option's semantics (declaration, default, type, apply, readOnly, path) that are traceable to an option-dependent branch predicate; changes to a boolean predicate that directly or indirectly consumes option state and controls selection, emission, enabling, rejection or branch choice.",
     "out": [
       "Documentation-only changes (U1).",
       "Configuration-value assignments config.<path> = ... (U2): separate mode, not Layer A.",
       "Changes to warning or assertion message text, or to data that a condition reads, when the condition expression itself is unchanged.",
       "Shell or external-command tests (including inside derivation strings); their operands are command output, not Nix option state.",
-      "Test-only changes (witness only; counts for R, never for E).",
-      "Import-list registration, package-only changes, and runtime behavior or observability (README non-goals; layer C)."
+      "Test-only changes (witness only; counts for R, never for E). Test files are not Layer-A consumers.",
+      "Import-list registration, package-only changes, and runtime behavior or observability (README non-goals; layer C). Layer A claims only the selection decision, never downstream runtime behavior of the selected element."
     ]
   },
   "categories": {
     "E_DIRECT": "The changed construct is an option semantic change traceable to a branch predicate in the same module, OR a changed predicate whose changed term reads only options declared in the same module.",
-    "E_INDIRECT": "The changed construct is an option semantic change traceable only to a predicate in another module, OR a changed predicate whose changed term reads an option declared in another module, OR whose option state reaches the changed term only through Nix-level let bindings or helper functions.",
-    "E_AMBIGUOUS": "Traceability or predicate status cannot be determined by the procedure below (search incomplete, truncated, unavailable, or an operand with no named option path). Not counted as E-positive; reported separately.",
-    "E_NO": "No change in scope: out-of-scope categories above, or traceability searched and absent, or an equivalent rewrite (EC10 with equivalence shown)."
+    "E_INDIRECT": "The changed construct is an option semantic change traceable only to a predicate in another module, OR a changed predicate whose changed term reads an option declared in another module (declaration_module_governs), OR whose option state reaches the changed term through a let binding or helper function declared in another module (let_binding_rule).",
+    "E_AMBIGUOUS": "Traceability, predicate role, or EC10 equivalence cannot be decided by the procedure below (search incomplete or unpinned, predicate role P_UNKNOWN with option operands, EC10 level EQ3, or an operand with no named option path). Not counted as E-positive; reported separately.",
+    "E_NO": "No change in scope: out-of-scope categories above, traceability established absent (T_NONE under absence_evidence), P_DATA_ONLY or not_nix_predicate, or an equivalent rewrite established at EC10 level EQ0-EQ2."
   },
-  "pr_aggregation": "PR category = strongest hunk category in the order E_DIRECT > E_INDIRECT > E_AMBIGUOUS > E_NO. A hunk that declares several options takes the strongest option's category. E-positive = E_DIRECT or E_INDIRECT.",
+  "pr_aggregation": "PR category = strongest hunk category in the order E_DIRECT > E_INDIRECT > E_AMBIGUOUS > E_NO. A hunk that declares or reads several options takes the strongest option's category. E-positive = E_DIRECT or E_INDIRECT.",
+  "source_evidence": {
+    "rule": "Every traceability, absence and equivalence decision is made on a committed tree identified by a full 40-hex SHA that the search resolves to (git rev-parse --verify <sha>^{commit} equals the required SHA). A working tree, a default-branch code-search index, or any search not pinned to the SHA is not evidence for T_NONE and not evidence for EQ1-EQ2 equivalence. A resolution mismatch or any search error is ERROR, never negative evidence.",
+    "procedure": "work/go-h/exact_tree_search.sh <repo> <sha> <scope> <extended_regex> [exclude] [receiver_regex]. Status MATCH, ZERO_COMPLETE (the only status that can support absence) or ERROR. Uses git grep exit codes: 0 match, 1 no match, other error."
+  },
   "traceability_search": {
-    "applies_to": "Option-semantic changes (EC01-EC05, EC16-EC19). For a predicate change, the consumer check is used only to confirm that the changed predicate is in a branch construct; the category is set by predicate_rule.",
+    "applies_to": "Option-semantic changes (EC01-EC05, EC16-EC19). For a predicate change, the consumer check confirms the changed predicate is in a branch construct; the category is set by predicate_rule.",
     "unit": "option path P of the changed option (for a removed option: base side; otherwise head side)",
-    "step1": "Search the changed module file at the relevant side for a branch construct (mkIf, optional, optionals, if-then-else, assert, && or || or ! with a boolean operand, lib.mkMerge condition) whose operand reads P. A reference reads P if P appears in the changed expression or in an attribute path extending P (cfg.package.version reads cfg.package). Found in the same module file: T_IN.",
-    "step2": "If not found in step1, search NixOS/nixpkgs at the same side for the option path or its last segment in nixos/modules with the branch-construct pattern. Found in another module: T_FOREIGN. Search executed with a complete result set and no branch consumer: T_NONE. Search truncated, rate-limited, unfiltered or unavailable: T_UNKNOWN.",
+    "step1": "Search the changed module file at the relevant side for a branch construct (mkIf, optional, optionals, if-then-else, assert, && or || or ! with a boolean operand, lib.mkMerge condition, or a P_SELECTION function) whose operand reads P. A reference reads P if P appears in the changed expression or in an attribute path extending P (cfg.package.version reads cfg.package), including value arguments such as lib.optionals cond P. Found in the same module file: T_IN.",
+    "step2": "If not found in step1, search the committed tree at the same side (exact_tree_search.sh) for the reference patterns of P (full path, exact alias, and the owner-key identifier per absence_evidence A3) in nixos/ with branch-construct context. Found in another module, read in a branch context: T_FOREIGN (positive evidence, one exact occurrence suffices). Absence established under absence_evidence A1-A6: T_NONE. Otherwise: T_UNKNOWN.",
     "result_map": {"T_IN": "E_DIRECT", "T_FOREIGN": "E_INDIRECT", "T_NONE": "E_NO", "T_UNKNOWN": "E_AMBIGUOUS"},
-    "record": "For each traceability decision record: P, the search query or file searched, the predicate found (file, line, text) or the search result count, and T_*."
+    "record": "For each traceability decision record: P, side, SHA, procedure name, query regex(es), grep status and match count, each occurrence (file, line, text) with its branch context, and the T_* decision."
+  },
+  "absence_evidence": {
+    "positive_evidence": "One exact occurrence at the required SHA, read in its branch context, establishes T_IN or T_FOREIGN when it reads P under predicate_rule. Positive evidence never needs completeness.",
+    "conditions_for_T_NONE": [
+      "A1 pinned: the search resolved to the required full SHA (status ZERO_COMPLETE from exact_tree_search.sh; ERROR is never negative).",
+      "A2 complete scope: scope covers every file under nixos/ at that SHA. Exclusions are only the declaring module file(s) of P, recorded.",
+      "A3 owner-key query: K is the owner key of P, the first segment of P below its top-level namespace (gophernicus for services.gophernicus.rootDir; zfs for boot.zfs.enabled). Pattern \\bK\\b (identifier, not path) must return zero matches outside the declaring module after A4 classification. A leaf-only or container-path-only query (for example \\.rootDir\\b or services\\.K\\.) is a diagnostic superset and is never sufficient alone.",
+      "A4 non-consumer classes, excluded by scope.out and recorded per match: documentation (*.md, release notes), import-list lines, test files under nixos/tests (witness only), comments. Any unclassified match makes the result T_UNKNOWN.",
+      "A5 receiver closure: every receiver that can reach K without naming K as an identifier must have a closed domain (a literal list, a literal set of names, or a closed enum type) whose members do not include K. Such receivers are: whole-namespace bindings (cfg = config.<namespace>); attrNames/attrValues/attrByPath/getAttr and mapAttrs-family iteration applied to config.<namespace> itself (not to a named sub-attrset such as config.<namespace>.<name>); and computed keys config.<namespace>.${x}. Any open-domain receiver (user-supplied, derived from attrNames or unknown) is T_UNKNOWN. A receiver whose domain includes K is a consumer and T_NONE is refused. `with config.<namespace>` and `inherit (config.<namespace>) x` reach K only by naming it, so they are covered by A3 and are not A5 receivers.",
+      "A6 K is not a common word: if A3 cannot be cleanly classified because K matches unrelated identifiers, the result is T_UNKNOWN rather than T_NONE."
+    ],
+    "result": "T_NONE only when A1-A6 all hold, recorded as an absence record. Any failed or unverifiable condition gives T_UNKNOWN. Never convert an incomplete or default-branch search into negative evidence.",
+    "forbidden_sources_for_T_NONE": ["gh search code (default-branch index, no SHA pin, result cap)", "working-tree searches", "container-path-only searches", "leaf-only searches", "searches truncated or with an unrecorded exclusion"],
+    "absence_record_fields": ["sha", "scope", "exclusions", "procedure", "query regex(es)", "grep status", "match count", "classification of each match (A4 class)", "receiver domain check (A5)", "decision (T_NONE or T_UNKNOWN) and the failing condition if T_UNKNOWN"]
   },
   "predicate_rule": {
     "changed_term": "Only operands and operators the PR adds, removes or modifies count as the changed term. Unchanged operands are recorded as context.",
     "declaration_module_governs": "The module that declares an operand decides the category of the changed term. A changed term that reads an option declared in another module is E_INDIRECT even when its consumer predicate is in the changed file. A changed term that reads only options declared in the changed module is E_DIRECT. Where the changed term mixes both, any foreign operand makes it E_INDIRECT.",
-    "indirect_via_bindings": "A changed term that reaches option state only through Nix-level let bindings or helper functions is E_INDIRECT. A let alias that is exactly an option path (cfg = config.x) is a direct read of x, not a binding.",
-    "lambda_over_option_attrset": "A predicate whose operand is a lambda parameter iterating an option attrset is traced to the iterated option path P, and P is then searched as in traceability_search. If the iterated attrset cannot be traced to a named option path, the result is T_UNKNOWN (E_AMBIGUOUS).",
+    "let_binding_rule": "A let binding is transparent for tracing: a binding that is a pure expression of named option paths (and static values) carries the option state of those paths. The category is set by declaration_module_governs of the traced paths, not by the binding site. An exact alias (cfg = config.x) is a direct read of x. A binding that is a helper function declared in another module makes the reads through it E_INDIRECT. This resolves the v3.1 tension between indirect_via_bindings and lambda_over_option_attrset: v3.1 could give E_INDIRECT or E_AMBIGUOUS for the same expression.",
     "not_nix_predicate": "A predicate evaluated by a shell or by an external command (including inside a derivation string) is not an option-branch predicate: E_NO, even when its input path is derived from option values. Option state enters only as the iteration domain.",
-    "data_only": "A change to a value (list literal, package set, attribute value) that a predicate reads, when the predicate expression itself is unchanged and the option semantics are unchanged: E_NO (changes output or content only)."
+    "data_only": "A change to a value (list literal, package set, attribute value) that a predicate reads, when the predicate expression itself is unchanged and the option semantics are unchanged: E_NO (changes output or content only). A boolean whose role is P_DATA_ONLY is E_NO."
+  },
+  "predicate_taxonomy": {
+    "question": "Does the boolean control whether a source-level element, path, value, definition or branch is selected, emitted, enabled, rejected or taken?",
+    "roles": {
+      "P_GATING": "The boolean decides whether a definition, list element, attribute, module fragment or assertion is active: lib.mkIf cond, lib.optional(s) cond, conditional items in lib.mkMerge, assertion and warning conditions, and cond && x / cond || x where x is in definition position.",
+      "P_CONTROL": "The boolean chooses which of two or more alternative expressions is evaluated: if-then-else in value position, and guard forms where the other branch is taken when the boolean is false.",
+      "P_SELECTION": "The boolean is the predicate of a function that keeps or drops elements of a list or attribute set (lib.filter, lib.filterAttrs, builtins.filter, lib.partition, lib.findFirst, lib.remove, and any function whose documented role is keeping or dropping elements by a boolean). The list of functions is not closed; role decides.",
+      "P_DATA_ONLY": "The boolean value is only converted to data or output text and selects nothing (for example boolToString or boolToYesNo used to build a string, or a boolean stored in an attribute value that no branch reads).",
+      "P_UNKNOWN": "A Nix boolean whose role cannot be classified from the source at the stated side. With option operands it is E_AMBIGUOUS."
+    },
+    "eligible_roles": ["P_GATING", "P_CONTROL", "P_SELECTION"],
+    "rule": "A predicate change is E-eligible iff its role is in eligible_roles and its operands read option state (directly, through an exact alias, through a let binding under let_binding_rule, or through a lambda parameter under lambda_rule). The category then follows declaration_module_governs. A P_DATA_ONLY or not_nix_predicate boolean is E_NO. A P_UNKNOWN boolean with option operands is E_AMBIGUOUS."
+  },
+  "lambda_rule": {
+    "predicate_lambda": "A lambda passed as the predicate argument of a P_SELECTION function is a predicate. A lambda whose result is a value (map, mapAttrs, concatMap, concatMapAttrs, transform functions) is not a predicate merely because it mentions an option; transform lambdas are not E-eligible on their own.",
+    "eligibility": "A predicate lambda is eligible iff its boolean result controls selection (P_SELECTION) and its outcome depends on option state directly or indirectly: through a lambda parameter that iterates an option-derived collection (traced under lambda_over_option_attrset and let_binding_rule), or through a free variable that reads option state.",
+    "lambda_over_option_attrset": "A predicate whose operand is a lambda parameter iterating an option attrset or list is traced to the iterated option path P (through let bindings where needed), and P is then searched as in traceability_search. If the iterated collection cannot be traced to a named option path, the result is T_UNKNOWN (E_AMBIGUOUS).",
+    "named_predicates": "A predicate passed by name (for example builtins.filter f xs) is classified by resolving the binding of f in the same file at the side. If it cannot be resolved there, P_UNKNOWN.",
+    "boundary": "A predicate lambda whose boolean depends only on static values (no option state reaches it, directly or through its iterated collection) is E_NO."
+  },
+  "ec10_equivalence": {
+    "applies_to": "A predicate expression or option default/type expression rewritten in the PR (EC10). Decides whether an apparent rewrite is E_NO (equivalent) or a semantic change.",
+    "levels": {
+      "EQ0": "Textual identity after normalizing location, whitespace and line breaks.",
+      "EQ1": "Identical AST after dropping formatting, comments and redundant parentheses.",
+      "EQ2": "Bounded local normalization, all of the following and nothing else: (a) alpha-renaming of lambda parameters and let bindings with no capture; (b) attribute-path sugar with identical AST meaning (a.b = c; versus a = { b = c; };); (c) commensurate path spelling where a same-file let alias binds exactly the option path (cfg = config.services.K; and cfg.x versus config.services.K.x).",
+      "EQ3": "Any equivalence needing semantic reasoning: global bindings or imports, dynamic attribute names, non-local computation, operand or list reordering, or any normalization not listed under EQ2. EC10_AUTOMATIC is false for EQ3."
+    },
+    "forbidden_automatic": [
+      "reordering the operands of && or ||",
+      "reducing !(!x) to x",
+      "reordering list elements",
+      "adding or removing mkDefault, mkForce or mkOverride priority wrappers",
+      "replacing an expression by a literal with the same current value without evaluating the source",
+      "any equivalence whose justification needs a binding outside the same expression"
+    ],
+    "decision": "EQ0-EQ2 equivalent: E_NO with the equivalence stated. EQ0-EQ2 not equivalent: treat as EC03, EC04 or EC12. EQ3: E_AMBIGUOUS until a reviewer decides, with the decision recorded with evidence. EQ0-EQ2 checks are automatic (EC10_AUTOMATIC=true); EQ3 is not (EC10_AUTOMATIC=false).",
+    "evidence_record": ["base_expr", "head_expr", "side and SHA for each", "file:line for each", "level", "normalization steps applied (EQ2 only)", "review_requirement (none for EQ0-EQ2; manual for EQ3)", "decision"]
   },
   "attribute_rule": {
     "option_semantic": ["default", "type", "apply", "readOnly", "declaration presence", "option path (rename/move)"],
@@ -51,10 +106,10 @@
     {"id": "EC07", "name": "description only changed", "unit": "documentation", "rule": "E_NO"},
     {"id": "EC08", "name": "defaultText only changed", "unit": "documentation", "rule": "E_NO (the default value is unchanged)"},
     {"id": "EC09", "name": "formatting, reordering, or comment change", "unit": "none", "rule": "E_NO"},
-    {"id": "EC10", "name": "default, type, or predicate expression rewritten", "unit": "option_semantic or predicate", "rule": "Show whether the evaluated value, accepted set, or branch outcome changes for every input. If not (for example a relocated or refactored predicate with equivalent evaluation): E_NO, with the equivalence stated. If yes: treat as EC03, EC04, or EC12. If not decidable from source: E_AMBIGUOUS."},
+    {"id": "EC10", "name": "default, type, or predicate expression rewritten", "unit": "option_semantic or predicate", "rule": "ec10_equivalence. EQ0-EQ2 equivalent: E_NO with equivalence stated. EQ0-EQ2 not equivalent: EC03, EC04 or EC12. EQ3: E_AMBIGUOUS pending review."},
     {"id": "EC11", "name": "configuration value assignment config.<path> = ...", "unit": "config_value", "rule": "E_NO (U2: separate mode)"},
-    {"id": "EC12", "name": "boolean predicate changed that consumes option state", "unit": "predicate", "rule": "predicate_rule (declaration_module_governs, indirect_via_bindings, lambda_over_option_attrset, not_nix_predicate)"},
-    {"id": "EC13", "name": "warning or assertion condition changed", "unit": "predicate", "rule": "If the condition expression changed: predicate_rule. If only message text changed: E_NO. Only a Nix boolean condition is a predicate for this rule."},
+    {"id": "EC12", "name": "boolean predicate changed that consumes option state", "unit": "predicate", "rule": "predicate_taxonomy role must be eligible; then predicate_rule (declaration_module_governs, let_binding_rule, not_nix_predicate) and lambda_rule for predicate lambdas"},
+    {"id": "EC13", "name": "warning or assertion condition changed", "unit": "predicate", "rule": "If the condition expression changed: predicate_taxonomy (P_GATING for assertion and warning conditions) and predicate_rule. If only message text changed: E_NO."},
     {"id": "EC14", "name": "test-only change", "unit": "test", "rule": "E_NO"},
     {"id": "EC15", "name": "package-only or non-NixOS-module change", "unit": "package", "rule": "E_NO"},
     {"id": "EC16", "name": "rename or move of an option (mkRenamedOptionModule, mkRemovedOptionModule, explicit relocation)", "unit": "option_semantic", "rule": "traceability_search on the old path (base) and new path (head)"},
@@ -66,15 +121,24 @@
     {"id": "EC22", "name": "import-list registration of a module file, or a test registration", "unit": "registration", "rule": "E_NO by itself. The imported module's own declarations are classified under their own hunks."}
   ],
   "amendments": [
-    "v3.1 (after first bounded review): declaration_module_governs made explicit; the v3 result_map no longer sets the category of a predicate change (v3 contradicted predicate_rule for foreign operands in the same file).",
-    "v3.1: a reference extending an option path (cfg.package.version) reads that option; a changed expression that contains P reads P, including value arguments such as lib.optionals cond P.",
-    "v3.1: EC10 covers relocated or refactored predicates with equivalent evaluation (E_NO with equivalence stated).",
-    "v3.1: lambda_over_option_attrset rule added; predicates over lambda parameters with no traceable option path are E_AMBIGUOUS.",
-    "v3.1: aggregation over several options in one hunk; EC22 added for import-list and test registration lines."
+    "v3.1: declaration_module_governs made explicit; the result_map no longer sets the category of a predicate change.",
+    "v3.1: a reference extending an option path reads that option; value arguments count as reads.",
+    "v3.1: EC10 covers relocated or refactored predicates with equivalent evaluation.",
+    "v3.1: lambda_over_option_attrset added; untraceable iterated collections are E_AMBIGUOUS.",
+    "v3.1: aggregation over several options in one hunk; EC22 for import-list and test registration lines.",
+    "v4 (GO-H1B.1): absence_evidence replaces unpinned gh search as the only T_NONE source. T_NONE requires SHA-pinned complete scope, owner-key identifier search, classified non-consumer matches, and receiver-domain closure. gh search and leaf-only or container-path-only searches are forbidden as T_NONE sources.",
+    "v4 (GO-H1B.2): positive evidence (one exact occurrence) and absence evidence (A1-A6) are separated; incomplete search yields T_UNKNOWN, never T_NONE.",
+    "v4 (GO-H1B.4-7): predicate_taxonomy with roles P_GATING, P_CONTROL, P_SELECTION, P_DATA_ONLY, P_UNKNOWN; eligibility depends on role and option dependence. Syntax lists are not used.",
+    "v4 (GO-H1B.5-7): lambda_rule. Predicate lambdas passed to P_SELECTION functions are eligible when their boolean controls selection and depends on option state; transform lambdas are not predicates; Layer A claims only the selection decision.",
+    "v4 (GO-H1B.8-11): ec10_equivalence levels EQ0-EQ3; EQ0-EQ2 automatic; EQ3 review-required; forbidden automatic normalizations listed; EC10 evidence record defined.",
+    "v4: let_binding_rule resolves the v3.1 conflict between indirect_via_bindings and lambda_over_option_attrset."
   ],
   "known_gaps": [
     "Attribute attribution by text heuristics is unreliable for multi-line Nix strings; the adjudicator must read the parsed or indented structure.",
-    "Traceability across modules depends on search completeness. gh search code cannot filter by branch construct or pin a SHA; common option segments can exceed the result cap. Such cases are T_UNKNOWN and reported, never converted to E_NO.",
-    "Helper-generated declarations (EC17) may be invisible to text search; this affects D, not E."
+    "Helper-generated declarations (EC17) may be invisible to text search; this affects D, not E.",
+    "Predicate role (taxonomy) for named or higher-order predicates whose body is in another file is P_UNKNOWN until read; E-positive requires the role to be established.",
+    "let_binding_rule transparency across modules is judged by the reviewer; a helper defined in another module is E_INDIRECT by rule.",
+    "EQ3 equivalences are reviewer-owned; the protocol makes no automatic claim beyond EQ2.",
+    "E_INDIRECT cases whose dependency exceeds mechanical proof are reviewer-owned (see GO-I handoff in reports/go-h1-semantic-decisions.md)."
   ]
 }

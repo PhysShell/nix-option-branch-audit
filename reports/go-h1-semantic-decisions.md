@@ -177,3 +177,89 @@ All five agree on the PR category. The decisive hunks match run 1 where run 1 na
 ### Verdict (GO-H1A)
 
 **PROTOCOL-REDESIGN-PARTIAL.** The exact remaining semantic ambiguity is S1: whether an absence claim (T_NONE → E_NO, or the absence of a foreign consumer) obtained from an unpinned default-branch code search is verified evidence. The protocol needs a complete search at the base or head SHA for that claim, and no current tool provides one. S2 and S3 must also be decided before the protocol is declared READY. The rubric is not changed by this section. GO-I, GO-G1 and GO-J are not started.
+
+## GO-H1B: closing the three protocol gaps
+
+### H1B.0 Provenance
+
+- Branch `claude/go-h-protocol-redesign`. Start HEAD `6d806c1` (clean). Parent: GO-H, GO-H1, GO-H1A. CI on `6d806c1`: success, run 37744079684.
+- Protocol and rubric: `eligibility-rubric.json` v4 (`go-h-eligibility-rubric/4.0`); v3.1 kept as `eligibility-rubric.v3.1.json`. `target-validity-rubric.json` gained `source_loading`; prior version kept as `target-validity-rubric.v1.json`.
+- Existing solutions checked (CLAUDE.md order), recorded per the reuse rule:
+  - Git at a pinned commit (`git grep` on a blobless clone): closest and used. It supplies pinned, complete, reproducible search and gives line-level evidence. Limitation: it is text search, so it has no Nix parse; it cannot resolve `with`, `inherit`, or let bindings by itself.
+  - `gh search code`: rejected for absence. Default branch only, no SHA pin, file-level results only (`rundeck.nix` for `aclPolicies`, no line numbers).
+  - ripgrep: same text-search role as git grep but has no SHA pin; rejected for absence evidence.
+  - Nix evaluation and CodeQL: not run. Too heavy for a per-target check and neither gives a pinned, reproducible absence result without a separate build of each SHA.
+  - Gap that remains: no parser-level receiver resolution. A5 is therefore a textual closure over known receiver forms, not a semantic one.
+
+### H1B.1–H1B.3 Exact-tree absence evidence
+
+`work/go-h/exact_tree_search.sh <repo> <sha> <scope> <regex> [exclude] [receiver_regex]` resolves the SHA with `git rev-parse --verify --quiet <sha>^{commit}`, requires an exact match and a non-empty scope, and runs `git grep -a -n -E`. Exit 0 is MATCH; exit 1 is ZERO_COMPLETE; anything else is ERROR. Only ZERO_COMPLETE can support absence. Controls are in `work/go-h/h1b3_controls.sh`, output in `work/go-h/independent-review/h1b-exact-tree-controls.txt`:
+
+- P1 positive: `config\.boot\.zfs\.enabled` in beszel-agent.nix @ e2497c3a: MATCH, 3 matches (lines 139, 186, 188). The earlier count of 2 was wrong.
+- P2 positive: `enabled = lib\.mkOption` in zfs.nix @ e812ab65: MATCH, 1 match (line 304).
+- N1 owner-key `\bgophernicus\b` outside gophernicus.nix @ e4c7d977: 13 matches, all non-consumer (1 release note, module-list.nix:914, all-tests.nix:791, 10 in tests/gophernicus.nix).
+- N2 leaf `\.rootDir\b`: 8 matches, all in other receivers (cloudflare-warp, darkhttpd, nspawn-container; suwayomi-server.nix:224 is a string).
+- N3 container path `services\.gophernicus\.`: 2 matches (release note, one test read).
+- PC1/PC2 `aclPolicies` @ b063b8f9 and @ 3d35b67b: MATCH, 2 each, both in rundeck.nix. The gh result (rundeck.nix, no SHA) agrees on the file set; the exact tree gives pinned line-level evidence.
+
+Controller check of the whole-namespace A5 receivers at e4c7d977:
+
+- `ncdns.nix:8` `cfgs = config.services`: closed use (only literal `ncdns`, `pdns-recursor`, `namecoind`).
+- `with config.services;` (pki.nix:48, mautrix-signal:177, mautrix-whatsapp:179, certmgr test:94) and `inherit (config.services) …` (mailman:405, public-inbox test:30): reach K only by naming it; A3 covers them.
+- Iterations over `config.services.<name>` (restic, redis, uhub, vmalert, bitcoind, fedimintd, gitwatch, and others): named sub-attrsets, not the namespace.
+- `cgit.nix:8` `cfgs = config.services.cgit`: a named sub-attrset; the cgit iterations do not read the namespace.
+- No bare iteration over `config.services` itself was found. The earlier suspected gap is not present at e4c7d977.
+- Computed keys `config.services.${x}`: rancher (`"k3s"`, `"rke2"`), watt (literal list), vault-agent (three literals), web-app enums; all closed.
+
+### H1B.4–H1B.7 Predicate roles and lambdas
+
+Rule (v4): roles P_GATING, P_CONTROL, P_SELECTION, P_DATA_ONLY, P_UNKNOWN; eligible roles are GATING, CONTROL, SELECTION. A predicate lambda passed to a P_SELECTION function is a predicate; a transform lambda (map, mapAttrs, concatMap) is not. Let bindings are transparent: the category follows the declaration module of the traced paths. This resolves the v3.1 conflict between `indirect_via_bindings` and `lambda_over_option_attrset`.
+
+The fresh reviewer (below) applied this on C1–C6. Each `filter` predicate was classed P_SELECTION and eligible: C1, C2, C4 E_DIRECT; C3, C5 E_INDIRECT; C6 P_GATING, E_INDIRECT. The controller did not separately re-derive these categories; they are the reviewer's reported results.
+
+Open: builtins are unbound in-file, so `builtins.isString` and `builtins.isInt` are P_UNKNOWN. A predicate that traces both in-module and foreign paths has no combination rule. A boolean written as an attribute value (C6 lines 186, 188) sits on the P_GATING / P_DATA_ONLY boundary.
+
+### H1B.8–H1B.11 EC10 equivalence levels
+
+Rule (v4): EQ0 textual; EQ1 AST; EQ2 bounded (alpha-renaming of lambda and let bindings, attribute-path sugar, same-file let alias that binds exactly the option path); EQ3 everything else. EC10_AUTOMATIC is true for EQ0–EQ2 only. Forbidden automatic normalizations: reordering `&&` / `||` operands, `!(!x)` → `x`, list reordering, `mkDefault` / `mkForce` wrapper changes, literal substitution, bindings outside the expression.
+
+Reviewer on the ten synthetic pairs (C9a–j): C9c and C9h EQ2 equivalent; the other eight are EQ3 with equivalent = no, unknown (C9e, C9i, C9j). All EC10_AUTOMATIC = false except C9c and C9h. Two wording points are open: whether a head-introduced let around an option path is covered by EQ2 (c), and EQ3 library-binding equivalences, which need a SHA.
+
+### H1B.12 Diagnostic dry run (non-scoring)
+
+Re-read this turn: 508090 (`filterAttrs`, reviewed above as C2) and 566007 (sandbox boolean). Not re-read this turn; these rest on GO-H1A notes: 566696, 569867, 564688. The dry run is diagnostic only and does not change any GO-H1A category.
+
+### H1B.13 Bounded fresh reviewer
+
+One reviewer run on the v4 prompt (`work/go-h/independent-review/h1b-reviewer-prompt.txt`). Its report, transcribed, is in `work/go-h/independent-review/h1b-review-record.txt`. It returned category agreement on every decidable case. Its material objections are: the A5 wording (self-contradictory), P_GATING / P_DATA_ONLY, let-binding defaults (`GPU_COLLECTOR` reads `services.xserver.videoDrivers`), builtins resolution, the aggregation rule, and EQ3 library bindings.
+
+One refinement is applied: the A5 wording is corrected (`with` and `inherit` are covered by A3, not open receivers; whole-namespace iteration is named explicitly). This is a wording correction only; no rule was added. It was not re-reviewed. Re-running the reviewer on it would not close the definitional items below, so the verdict is not changed by it. C7 and C8 are therefore not decided by the reviewer; the controller check above gives T_NONE for `services.gophernicus.rootDir` under the corrected A5, but that is not reviewer-confirmed.
+
+### H1B.14 Pipeline
+
+R (file relevance) → E (eligibility) → D (derivable target) → V (target validity, exact-SHA source) → A (analyzer outcome). W (witnessability) remains an annotation and is not in the pipeline's pass/fail path.
+
+### H1B.15 GO-I handoff
+
+Mechanical responsibilities for GO-I, if the protocol is later declared READY:
+
+- `work/go-h/validate_targets.py:46–49` reads the working tree (`Path(root) / target["module"]` with `read_text()`). This violates `target-validity-rubric.json` `source_loading`. It must read `git show <sha>:<module>` at the side SHA, and an unresolved SHA is ERROR. The validator is not modified in GO-H1B.
+- Exact-tree search for V4 and S1 uses `exact_tree_search.sh` with the side SHA.
+
+### Remaining items (reviewer-owned or definitional)
+
+1. Builtins resolution: whether builtins are a fixed table of P_SELECTION / P_DATA_ONLY functions.
+2. Combination rule when a predicate traces both in-module and foreign paths.
+3. Let-bound defaults: whether an unforced value under `?` counts as a read.
+4. Option defaults: traced paths stop at the named option; defaults are not followed.
+5. P_GATING vs P_DATA_ONLY for a boolean written as an attribute value.
+6. Selection inside a message interpolation (C4).
+7. Aggregation rule across per-site results of one hunk.
+8. EC10 (c): whether a head-introduced let around an option path is covered.
+9. EQ3 library-binding equivalences: need a SHA, not decidable from the expression.
+
+### Verdict (GO-H1B)
+
+**PROTOCOL-REDESIGN-PARTIAL.** The three named gaps are closed for absence evidence (exact-SHA search with positive and negative controls) and for EC10 levels (EQ0–EQ3 with forbidden normalizations). They are not closed for predicate roles: items 1–7 above are definitional, not wording, and the reviewer left the boundary between P_GATING and P_DATA_ONLY unresolved. READY requires those to be decided, so the verdict is PARTIAL.
+
+GO-I, GO-G1 and GO-J are not started. oba is not modified.

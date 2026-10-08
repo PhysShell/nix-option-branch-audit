@@ -1,0 +1,61 @@
+TASK: bounded review of definitional rules for a static analysis protocol. You are a fresh reviewer. Apply the rules below to the source cases below and report. Do not look for other sources, do not run any tool that modifies files, do not write files. Read-only git commands are allowed.
+
+SOURCE ACCESS. All Nix source is in a blobless git object store. Read it only through git at a pinned commit:
+  git -C /home/tandem/.cache/go-h/nixpkgs-exact show <sha>:<path>
+  git -C /home/tandem/.cache/go-h/nixpkgs-exact grep -n -E '<regex>' <sha> -- <path-or-dir>
+Do not use any working tree or any web search. The SHA given with each case is the only source you may use for that case.
+
+LAYER A (eligibility scope). Question class: option-dependent source-level branch activation. In scope: changes to an option's semantics (declaration, default, type, apply, readOnly, path) traceable to an option-dependent branch predicate; changes to a boolean predicate that directly or indirectly consumes option state and controls selection, emission, enabling, rejection or branch choice. Out of scope: documentation-only changes; configuration-value assignments config.<path> = ...; changes to message text when the condition is unchanged; shell or external-command tests (including inside derivation strings); test-only changes (test files are not Layer-A consumers); import-list registration; package-only changes. Layer A claims only the selection decision, never downstream runtime behavior.
+
+CATEGORIES. E_DIRECT: changed term reads only options declared in the same module. E_INDIRECT: changed term reads an option declared in another module, or reaches option state through a let binding or helper declared in another module. E_AMBIGUOUS: not decidable by the procedure. E_NO: out of scope, or traceability established absent, or EC10 equivalence established at level EQ0-EQ2.
+
+PREDICATE ROLES. Question for a boolean: does it control whether a source-level element, path, value, definition or branch is selected, emitted, enabled, rejected or taken?
+  P_GATING: decides whether a definition, list element, attribute, module fragment or assertion is active (lib.mkIf cond, lib.optional(s) cond, conditional items in lib.mkMerge, assertion and warning conditions, cond && x in definition position).
+  P_CONTROL: chooses which alternative expression is evaluated (if-then-else in value position, guard forms).
+  P_SELECTION: is the predicate of a function that keeps or drops elements of a list or attrset (lib.filter, lib.filterAttrs, builtins.filter, lib.partition, lib.findFirst, lib.remove, or any function whose role is keeping or dropping elements by a boolean; the list is not closed, role decides).
+  P_DATA_ONLY: value is only converted to output data and selects nothing.
+  P_UNKNOWN: role cannot be classified from the source at the stated commit.
+Eligible roles: P_GATING, P_CONTROL, P_SELECTION. A predicate change is E-eligible iff its role is eligible and its operands read option state (directly, through an exact alias, through a let binding, or through a lambda parameter). P_DATA_ONLY or a shell/external-command test is E_NO. P_UNKNOWN with option operands is E_AMBIGUOUS.
+
+LAMBDA RULE. A lambda passed as the predicate argument of a P_SELECTION function is a predicate. A lambda whose result is a value (map, mapAttrs, concatMap, concatMapAttrs, transforms) is not a predicate merely because it mentions an option. A predicate lambda is eligible iff its boolean controls selection and its outcome depends on option state, directly or through a lambda parameter iterating an option-derived collection (traced through let bindings). A predicate passed by name is classified by resolving that name's binding in the same file at the same commit; if unresolvable, P_UNKNOWN. A predicate whose boolean depends only on static values is E_NO. If the iterated collection cannot be traced to a named option path, E_AMBIGUOUS.
+
+LET-BINDING RULE. A let binding is transparent: a binding that is a pure expression of named option paths carries the option state of those paths; the category is set by declaration_module_governs of the traced paths, not by the binding site. An exact alias (cfg = config.x) is a direct read of x. A helper function declared in another module makes reads through it E_INDIRECT.
+
+ABSENCE (T_NONE) STANDARD. Absence may be claimed only if all hold:
+  A1 pinned: the search resolved to the required full SHA.
+  A2 complete scope: every file under nixos/ at that SHA, excluding only the declaring module file(s), recorded.
+  A3 owner-key identifier query: K = owner key of option path P (first segment below its top-level namespace). Pattern \bK\b must return zero matches outside the declaring module after A4 classification. Path-only or leaf-only queries are diagnostics, never sufficient alone.
+  A4 non-consumer classes, recorded per match: documentation (*.md, release notes), import-list lines, test files under nixos/tests, comments. Any unclassified match makes the result T_UNKNOWN.
+  A5 receiver closure: every receiver that can reach K without naming it as an identifier (whole-namespace bindings like cfg = config.<namespace>, inherit (config.<namespace>), with config.<namespace>, attrNames/attrByPath/getAttr over config.<namespace>, computed keys config.<namespace>.${x}) must have a closed domain (literal list, literal name set, or closed enum type) that does not include K. Open-domain receivers give T_UNKNOWN.
+  A6 if K is a common word whose matches cannot be cleanly classified, T_UNKNOWN.
+Otherwise the result is T_UNKNOWN. Incomplete, unpinned or default-branch search is never negative evidence.
+
+EC10 EQUIVALENCE LEVELS (for a rewritten expression, base vs head). EQ0: textual identity after normalizing location, whitespace and line breaks. EQ1: identical AST after dropping formatting, comments and redundant parentheses. EQ2: bounded local normalization of exactly three kinds: (a) alpha-renaming of lambda parameters and let bindings without capture; (b) attribute-path sugar with identical AST meaning; (c) commensurate path spelling where a same-file let alias binds exactly the option path. EQ3: any equivalence needing semantic reasoning (global bindings or imports, dynamic attribute names, non-local computation, operand or list reordering, any other normalization). EC10_AUTOMATIC is true for EQ0-EQ2 and false for EQ3. Forbidden as automatic normalizations: reordering operands of && or ||; reducing !(!x) to x; reordering list elements; adding or removing mkDefault/mkForce/mkOverride wrappers; replacing an expression by a literal with the same current value without evaluating the source; any equivalence needing a binding outside the same expression.
+
+CASES. Each case is source evidence only. No case has a stated classification. Use the rules above.
+
+C1 (predicate lambda, selection). Commit fdc3396349781c0dc2b495b6a320f62918bd63f6, file nixos/modules/services/monitoring/beszel-agent.nix, lines 14-16, 45-56 (gpuCollectors, activeCollectors, gpuPackages).
+C2 (predicate lambda, selection over attrset). Same commit and file, lines 240-256 (environment attrset: mapAttrs transform and filterAttrs predicate).
+C3 (named predicate, builtins.filter). Commit fdc3396349781c0dc2b495b6a320f62918bd63f6, file nixos/modules/programs/benchexec.nix, lines 55-82 (uses builtins.filter with builtins.isString, builtins.isInt, and a named predicate filterUsers; find filterUsers' binding in that file).
+C4 (named predicate over option list). Commit fdc3396349781c0dc2b495b6a320f62918bd63f6, file nixos/modules/hardware/device-tree.nix, lines 230-246 (builtins.filter invalidOverlay cfg.overlays; find invalidOverlay's binding in that file).
+C5 (lambda comparing with a config value). Commit fdc3396349781c0dc2b495b6a320f62918bd63f6, file nixos/modules/programs/fish.nix, lines 400-416 (builtins.filter with a lambda comparing against config.system.build.manual.nixos-configuration-reference-manpage).
+C6 (cross-module predicate read, positive dependency). Commit e2497c3a5262687ff7aada0707bc754cca66396f, file nixos/modules/services/monitoring/beszel-agent.nix, lines 136-140 and 183-190 (uses of config.boot.zfs.enabled inside boolean expressions). Declaration: commit e812ab65aa98d89c4accf1345fa0470f1b6ee760, file nixos/modules/tasks/filesystems/zfs.nix, lines 300-310.
+C7 (absence, gophernicus). Commit e4c7d977153965496cbe73ff5631ca6a1118b347. Option path: services.gophernicus.rootDir (declared in nixos/modules/services/misc/gophernicus.nix). Owner key K = gophernicus. Commands and raw output for the owner-key query, the leaf query and the container-path query are in /home/tandem/nix-option-branch-audit/work/go-h/independent-review/h1b-exact-tree-controls.txt (sections N1, N2, N3). The receiver-closure check (A5) is yours to perform with git grep at that commit: it must cover whole-namespace bindings and computed keys over config.services.
+C8 (absence, owner key is not the attribute name). Commit b063b8f9b2a655f72cec13f1877522c3e4066ac2. Option path: services.rundeck.aclPolicies (declared in nixos/modules/services/web-apps/rundeck.nix). Owner key K = rundeck. Decide whether T_NONE can be claimed for services.rundeck.aclPolicies from outside its declaring module, and state the failing condition if not. The controls file (sections PC1, PC2) gives the aclPolicies query only; you must determine the owner-key query yourself.
+C9 (EC10 pairs; synthetic expressions, not from any commit). For each pair, give the EC10 level, whether it is equivalent, and whether EC10_AUTOMATIC applies.
+  a. base: cond1 && cond2   head: cond2 && cond1
+  b. base: !(!x)            head: x
+  c. base: cfg.enable       head: let e = cfg.enable; in e   (same file)
+  d. base: if c then true else false   head: c
+  e. base: lib.optional c x  head: if c then [ x ] else [ ]
+  f. base: lib.mkDefault 1  head: 1
+  g. base: [ a b ]          head: [ b a ]
+  h. base: config.services.k.enable   head: cfg.enable with cfg = config.services.k; in the same file
+  i. base: lib.boolToYesNo c   head: if c then "yes" else "no"
+  j. base: lib.filter (x: x != "") xs   head: builtins.filter (x: x != "") xs
+
+REPORT FORMAT. Answer each of C1-C9 in this exact form, one block per case, no preface, no closing summary:
+  Cn: role=<P_*> | eligible=<yes|no|unknown> | category=<E_DIRECT|E_INDIRECT|E_AMBIGUOUS|E_NO> | reason=<one or two sentences citing the rule>
+For C7 and C8 use: Cn: T_NONE=<yes|no> | failing_condition=<A1..A6 or none> | owner_key_query_matches=<count and classes> | reason=<one or two sentences>
+For C9 use: Cn: level=<EQ0|EQ1|EQ2|EQ3> | equivalent=<yes|no|unknown> | EC10_AUTOMATIC=<true|false> | reason=<one sentence>
+Then, in at most 10 lines, list any rule wording you found genuinely incomplete or contradictory, with the rule's name. Do not propose a new rule and do not optimize for any particular answer; if a rule is clear, say so.

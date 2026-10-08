@@ -1,0 +1,103 @@
+### P1 positive control: config.boot.zfs.enabled consumers (beszel-agent.nix @ e2497c3a)
+status=MATCH sha=e2497c3a5262687ff7aada0707bc754cca66396f scope=nixos/modules/services/monitoring/beszel-agent.nix exclude=none files_in_scope=1 pattern=config\.boot\.zfs\.enabled grep_exit=0 matches=3 generic_computed_files=0
+command=git grep -a -n -E -e 'config\.boot\.zfs\.enabled' e2497c3a5262687ff7aada0707bc754cca66396f -- nixos/modules/services/monitoring/beszel-agent.nix 
+e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix:139:        ++ lib.optionals config.boot.zfs.enabled [ config.boot.zfs.package ]
+e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix:186:        PrivateDevices = !cfg.smartmon.enable && !config.boot.zfs.enabled;
+e2497c3a5262687ff7aada0707bc754cca66396f:nixos/modules/services/monitoring/beszel-agent.nix:188:        PrivateUsers = !cfg.smartmon.enable && !config.boot.zfs.enabled && !cfg.environment.SKIP_SYSTEMD;
+### P2 positive control: zfs.nix declaration (@ e812ab65)
+status=MATCH sha=e812ab65aa98d89c4accf1345fa0470f1b6ee760 scope=nixos/modules/tasks/filesystems/zfs.nix exclude=none files_in_scope=1 pattern=enabled = lib\.mkOption grep_exit=0 matches=1 generic_computed_files=1
+command=git grep -a -n -E -e 'enabled = lib\.mkOption' e812ab65aa98d89c4accf1345fa0470f1b6ee760 -- nixos/modules/tasks/filesystems/zfs.nix 
+e812ab65aa98d89c4accf1345fa0470f1b6ee760:nixos/modules/tasks/filesystems/zfs.nix:304:      enabled = lib.mkOption {
+### N1 known negative, owner-key identifier (gophernicus outside own module @ e4c7d977)
+status=MATCH sha=e4c7d977153965496cbe73ff5631ca6a1118b347 scope=nixos/ exclude=nixos/modules/services/misc/gophernicus.nix files_in_scope=4637 pattern=\bgophernicus\b grep_exit=0 matches=13 generic_computed_files=573
+command=git grep -a -n -E -e '\bgophernicus\b' e4c7d977153965496cbe73ff5631ca6a1118b347 -- nixos/ :(exclude)nixos/modules/services/misc/gophernicus.nix
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/doc/manual/release-notes/rl-2611.section.md:95:- [gophernicus](https://github.com/gophernicus/gophernicus), a modern gopher daemon. Available at [services.gophernicus](#opt-services.gophernicus.enable).
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/module-list.nix:914:  ./services/misc/gophernicus.nix
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/all-tests.nix:791:  gophernicus = runTest ./gophernicus.nix;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:3:  name = "gophernicus";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:23:      services.gophernicus = {
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:27:        path = options.services.gophernicus.path.default ++ [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:32:          txt = pkgs.writeShellScript "gophernicus-test-filter-script" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:43:      alice-hello = pkgs.writeText "gophernicus-test-alice-hello" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:46:      bob-hello = pkgs.writeText "gophernicus-test-bob-hello" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:49:      bob-custom-command = pkgs.writeText "gophernicus-test-bob-custom-command" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:52:      bob-php-cgi = pkgs.writeText "gophernicus-test-bob-php-cgi" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:56:      bob-filtered = pkgs.writeText "gophernicus-test-bob-filtered" ''
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:59:      bob-php-non-cgi = pkgs.writeText "gophernicus-test-bob-php-non-cgi" ''
+receiver_hits=50
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/backup/borgbackup.nix:936:  config = lib.mkIf (with config.services.borgbackup; jobs != { } || repos != { }) (
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/backup/borgbackup.nix:937:    with config.services.borgbackup;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/backup/postgresql-backup.nix:173:            message = "config.services.postgresqlBackup.backupAll cannot be used together with config.services.postgresqlBackup.databases";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/kubernetes/pki.nix:48:  remote = with config.services; "https://${kubernetes.masterAddress}:${toString cfssl.port}";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/kubernetes/pki.nix:176:        with config.services.cfssl;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix:24:      cfg = config.services.${name};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/cluster/rancher/default.nix:838:        environment.systemPackages = [ config.services.${name}.package ];
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/databases/postgresql.nix:238:        defaultText = "with config.services.postgresql; package.withPackages extensions";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/hardware/watt.nix:45:      assertion = !config.services.${service}.enable;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/mail/mailman.nix:405:        inherit (config.services) postfix;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/maubot.md:39:     services.maubot.plugins = with config.services.maubot.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/maubot.md:60:     services.maubot.plugins = with config.services.maubot.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/maubot.nix:70:        with config.services.maubot.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/mautrix-signal.nix:177:      with config.services;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/mautrix-whatsapp.nix:179:      with config.services;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/matrix/synapse.nix:695:            with config.services.matrix-synapse.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/monitoring/librenms.nix:644:            with config.services.nginx.virtualHosts."${cfg.hostname}";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/ncdns.nix:8:  cfgs = config.services;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/netbird/coturn.nix:77:      default = with config.services.coturn; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/netbird/coturn.nix:84:        with config.services.coturn; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/netbird/coturn.nix:155:        allowedUDPPortRanges = with config.services.coturn; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/searx.nix:316:              with config.services.nginx.virtualHosts."${cfg.domain}";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/security/vault-agent.nix:134:          cfg = config.services.${flavour};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/castopod.nix:163:          with config.services.nginx.virtualHosts.${cfg.localDomain};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/discourse.md:284:    plugins = with config.services.discourse.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/discourse.nix:511:          with config.services.discourse.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/dokuwiki.nix:16:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/drupal.nix:40:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/freshrss.nix:11:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/gotosocial.md:43:    virtualHosts = with config.services.gotosocial.settings; {
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/hedgedoc.nix:128:              with config.services.hedgedoc.settings; [ host ] ++ lib.optionals (domain != null) [ domain ]
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/invoiceplane.nix:14:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/kimai.nix:14:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/lemmy.nix:165:                url = with config.services.pict-rs; "http://${address}:${toString port}";
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/limesurvey.nix:34:  group = config.services.${cfg.webserver}.group;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/limesurvey.nix:425:          "listen.owner" = config.services.${cfg.webserver}.user;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/limesurvey.nix:426:          "listen.group" = config.services.${cfg.webserver}.group;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/movim.nix:628:            DB_PORT = config.services.${cfg.database.type}.settings.port;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/nextcloud.md:255:  services.nextcloud.extraApps = with config.services.nextcloud.package.packages.apps; {
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/pretalx.nix:113:        with config.services.pretalx.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/pretix.nix:122:        with config.services.pretix.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/wordpress.nix:14:  webserver = config.services.${cfg.webserver};
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/zabbix.nix:282:      group = config.services.${cfg.frontend}.group;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/certmgr.nix:94:            networking.firewall.allowedTCPPorts = with config.services; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/keycloak.nix:52:                plugins = with config.services.keycloak.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/nextcloud/with-postgresql-and-redis.nix:41:            extraApps = with config.services.nextcloud.package.packages.apps; {
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/public-inbox.nix:30:      inherit (config.services) public-inbox;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/web-apps/pretalx.nix:16:        plugins = with config.services.pretalx.package.plugins; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/web-servers/h2o/basic.nix:101:            allowedTCPPorts = with config.services.h2o; [
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/web-servers/h2o/basic.nix:105:            allowedUDPPorts = with config.services.h2o; [
+### N2 leaf-only diagnostic (rootDir selections outside own module @ e4c7d977)
+status=MATCH sha=e4c7d977153965496cbe73ff5631ca6a1118b347 scope=nixos/ exclude=nixos/modules/services/misc/gophernicus.nix files_in_scope=4637 pattern=\.rootDir\b grep_exit=0 matches=8 generic_computed_files=573
+command=git grep -a -n -E -e '\.rootDir\b' e4c7d977153965496cbe73ff5631ca6a1118b347 -- nixos/ :(exclude)nixos/modules/services/misc/gophernicus.nix
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/cloudflare-warp.nix:47:      "d ${cfg.rootDir}    - root root"
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/cloudflare-warp.nix:48:      "z ${cfg.rootDir}    - root root"
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/cloudflare-warp.nix:73:            "${cfg.rootDir}"
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/networking/cloudflare-warp.nix:83:          WorkingDirectory = cfg.rootDir;
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-apps/suwayomi-server.nix:224:          ${lib.getExe cfg.package} -Dsuwayomi.tachidesk.config.server.rootDir=${cfg.dataDir}
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/services/web-servers/darkhttpd.nix:21:      cfg.rootDir
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/virtualisation/nspawn-container/default.nix:44:    virtualisation.rootDir = lib.mkOption {
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/modules/virtualisation/nspawn-container/default.nix:118:          root-dir = cfg.rootDir;
+### N3 container-path-only diagnostic (services.gophernicus. outside own module @ e4c7d977)
+status=MATCH sha=e4c7d977153965496cbe73ff5631ca6a1118b347 scope=nixos/ exclude=nixos/modules/services/misc/gophernicus.nix files_in_scope=4637 pattern=services\.gophernicus\. grep_exit=0 matches=2 generic_computed_files=573
+command=git grep -a -n -E -e 'services\.gophernicus\.' e4c7d977153965496cbe73ff5631ca6a1118b347 -- nixos/ :(exclude)nixos/modules/services/misc/gophernicus.nix
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/doc/manual/release-notes/rl-2611.section.md:95:- [gophernicus](https://github.com/gophernicus/gophernicus), a modern gopher daemon. Available at [services.gophernicus](#opt-services.gophernicus.enable).
+e4c7d977153965496cbe73ff5631ca6a1118b347:nixos/tests/gophernicus.nix:27:        path = options.services.gophernicus.path.default ++ [
+### PC1 prior case aclPolicies (head b063b8f9)
+status=MATCH sha=b063b8f9b2a655f72cec13f1877522c3e4066ac2 scope=nixos/ exclude=none files_in_scope=4633 pattern=aclPolicies grep_exit=0 matches=2 generic_computed_files=572
+command=git grep -a -n -E -e 'aclPolicies' b063b8f9b2a655f72cec13f1877522c3e4066ac2 -- nixos/ 
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/modules/services/web-apps/rundeck.nix:141:      aclPolicies = lib.mkOption {
+b063b8f9b2a655f72cec13f1877522c3e4066ac2:nixos/modules/services/web-apps/rundeck.nix:683:          ) cfg.aclPolicies
+### PC2 prior case aclPolicies (base 3d35b67b)
+status=MATCH sha=3d35b67b0b8051a9080c09ffdd9fa4f41e845d15 scope=nixos/ exclude=none files_in_scope=4633 pattern=aclPolicies grep_exit=0 matches=2 generic_computed_files=572
+command=git grep -a -n -E -e 'aclPolicies' 3d35b67b0b8051a9080c09ffdd9fa4f41e845d15 -- nixos/ 
+3d35b67b0b8051a9080c09ffdd9fa4f41e845d15:nixos/modules/services/web-apps/rundeck.nix:134:      aclPolicies = lib.mkOption {
+3d35b67b0b8051a9080c09ffdd9fa4f41e845d15:nixos/modules/services/web-apps/rundeck.nix:642:          ) cfg.aclPolicies
